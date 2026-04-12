@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reflexion Doctor Console</title>
+    <link rel="stylesheet" href="/doctor/static/styles/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="/clinic">
+          <span class="brand-mark">R</span>
+          <span>Reflexion</span>
+        </a>
+        <nav class="nav-links" aria-label="Product surfaces">
+          <a class="is-active" href="/doctor">Doctor</a>
+          <a href="/care">Care</a>
+          <a href="/clinic">Clinic</a>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Doctor Console</p>
+          <h1>Review formal results and patient screening flow.</h1>
+          <p class="lede">
+            This provider-facing surface summarizes recent assessments, patient watchlists, and
+            routing workload from the formal multimodal analysis layer.
+          </p>
+        </div>
+        <aside class="hero-card">
+          <p class="mini-label">Source Of Truth</p>
+          <strong>Persisted clinic assessments</strong>
+          <p class="support-copy">
+            Data is aggregated from the normalized assessment artifacts written by the clinic batch
+            pipeline.
+          </p>
+          <button id="refresh-dashboard" type="button">Refresh Dashboard</button>
+        </aside>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Program Snapshot</p>
+            <h2>Current population view</h2>
+          </div>
+          <p class="status-copy" id="doctor-status">Loading dashboard...</p>
+        </div>
+
+        <div class="metric-grid">
+          <article class="metric-card">
+            <span class="mini-label">Assessments</span>
+            <strong id="total-assessments">-</strong>
+          </article>
+          <article class="metric-card">
+            <span class="mini-label">Patients</span>
+            <strong id="total-patients">-</strong>
+          </article>
+          <article class="metric-card metric-card-alert">
+            <span class="mini-label">High Risk</span>
+            <strong id="high-risk-assessments">-</strong>
+          </article>
+          <article class="metric-card metric-card-watch">
+            <span class="mini-label">Watchlist</span>
+            <strong id="watchlist-assessments">-</strong>
+          </article>
+          <article class="metric-card">
+            <span class="mini-label">Average Risk</span>
+            <strong id="average-risk-score">-</strong>
+          </article>
+          <article class="metric-card">
+            <span class="mini-label">Usable Sessions</span>
+            <strong id="usable-sessions">-</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Recent Output</p>
+              <h2>Latest assessments</h2>
+            </div>
+          </div>
+          <div class="table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Created</th>
+                  <th>Tier</th>
+                  <th>Classification</th>
+                  <th>Risk</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="recent-assessment-rows"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Patient Roster</p>
+              <h2>Latest patient status</h2>
+            </div>
+          </div>
+          <div class="table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Sessions</th>
+                  <th>Latest</th>
+                  <th>Tier</th>
+                  <th>Average Risk</th>
+                </tr>
+              </thead>
+              <tbody id="patient-summary-rows"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Provider Mesh</p>
+            <h2>Routing mix</h2>
+          </div>
+        </div>
+        <div class="chip-row" id="provider-mix"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/doctor/static/services/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reflexion Care Dashboard</title>
+    <link rel="stylesheet" href="/care/static/styles/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="/clinic">
+          <span class="brand-mark">R</span>
+          <span>Reflexion</span>
+        </a>
+        <nav class="nav-links" aria-label="Product surfaces">
+          <a href="/doctor">Doctor</a>
+          <a class="is-active" href="/care">Care</a>
+          <a href="/clinic">Clinic</a>
+        </nav>
+      </header>
+
+      <section class="intro">
+        <div>
+          <p class="eyebrow">Patient And Caregiver App</p>
+          <h1>A calm single-screen result for families.</h1>
+          <p class="lede">
+            This view keeps the caregiver experience focused on three things: current risk,
+            recommended next steps, and whether the long-term pattern is changing over time.
+          </p>
+        </div>
+        <aside class="controls-card">
+          <label class="field">
+            <span class="mini-label">Patient Or Demo Case</span>
+            <select id="patient-select"></select>
+          </label>
+          <button id="refresh-dashboard" type="button">Refresh View</button>
+          <p class="support-copy" id="care-status">Loading patient list...</p>
+        </aside>
+      </section>
+
+      <section class="phone-shell">
+        <article class="hero-card dashboard-highlight">
+          <div class="hero-orbit"></div>
+          <div class="hero-copy">
+            <p class="card-kicker">Latest Result</p>
+            <h2 id="risk-label">-</h2>
+            <p class="hero-summary" id="care-summary">-</p>
+            <ul class="reason-tags" id="hero-reasons"></ul>
+            <div class="hero-meta">
+              <div>
+                <span class="mini-label">Last Updated</span>
+                <strong id="last-updated-at">-</strong>
+              </div>
+              <div>
+                <span class="mini-label">Sessions</span>
+                <strong id="sessions-completed">-</strong>
+              </div>
+              <div>
+                <span class="mini-label">Current Signal</span>
+                <strong id="hero-status-label">-</strong>
+              </div>
+            </div>
+          </div>
+          <div class="score-card">
+            <div class="score-ring" id="score-ring">
+              <span class="score-caption">Risk Score</span>
+              <strong id="risk-score">-</strong>
+            </div>
+            <p class="score-support" id="score-support">Latest clinician-shared signal.</p>
+            <p class="threshold-note">Demo anchors: HIGH &ge; 0.70, LOW &le; 0.35</p>
+          </div>
+        </article>
+
+        <section class="card-stack">
+              <article class="app-card reason-card">
+                <div class="card-head">
+                  <div>
+                    <p class="eyebrow">Risk Level</p>
+                    <h3>Why this result</h3>
+                  </div>
+                  <span class="status-pill" id="status-label">-</span>
+                </div>
+                <p class="card-summary" id="reason-summary">-</p>
+                <ul class="reason-list" id="top-reasons"></ul>
+              </article>
+
+              <article class="app-card app-card-accent recommendation-card">
+                <div class="card-head">
+                  <div>
+                    <p class="eyebrow">Recommendation</p>
+                    <h3>Suggested next step</h3>
+                  </div>
+                </div>
+                <p class="recommendation-copy" id="recommendation">-</p>
+                <ul class="support-list" id="next-steps"></ul>
+              </article>
+
+              <article class="app-card chart-card">
+                <div class="card-head">
+                  <div>
+                    <p class="eyebrow">Long-Term Monitoring</p>
+                    <h3>Trend vs baseline</h3>
+                  </div>
+                  <span class="trend-pill" id="longitudinal-direction">-</span>
+                </div>
+                <p class="baseline-copy" id="baseline-comparison">-</p>
+                <ul class="support-list monitoring-list" id="monitoring-notes"></ul>
+                <div class="chart-axis-copy">
+                  <span id="chart-y-axis-label">Y-axis: Risk Score</span>
+                  <span id="chart-x-axis-label">X-axis: Date</span>
+                </div>
+                <div class="chart-shell">
+                  <svg id="trend-chart" viewBox="0 0 320 200" aria-label="Longitudinal risk trend chart"></svg>
+                </div>
+                <div class="chart-labels" id="trend-labels"></div>
+              </article>
+
+              <article class="app-card app-card-soft notes-card">
+                <div class="card-head">
+                  <div>
+                    <p class="eyebrow">Care Notes</p>
+                    <h3>What caregivers should know</h3>
+                  </div>
+                </div>
+                <ul class="support-list" id="alerts"></ul>
+              </article>
+
+              <article class="app-card timeline-card">
+                <div class="card-head">
+                  <div>
+                    <p class="eyebrow">Recent Updates</p>
+                    <h3>Shared history</h3>
+                  </div>
+                </div>
+                <ul class="history-list" id="history-list"></ul>
+              </article>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="/care/static/services/app.js"></script>
+  </body>
+</html>

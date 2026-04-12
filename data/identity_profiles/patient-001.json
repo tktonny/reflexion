@@ -1,0 +1,31 @@
+{
+  "profile_id": "patient-001-identity",
+  "patient_id": "patient-001",
+  "created_at": "2026-04-07T10:52:52.526734Z",
+  "updated_at": "2026-04-07T11:26:45.825121Z",
+  "enrollment_assessment_id": null,
+  "canonical_face_embedding": [],
+  "canonical_face_recognition_method": null,
+  "canonical_voice_embedding": [
+    0.0321,
+    -0.0004,
+    0.0496,
+    -0.2964,
+    -0.0659,
+    0.3496,
+    0.2199,
+    0.1951
+  ],
+  "sessions_linked": 8,
+  "sessions_included": 7,
+  "sessions_manual_review": 1,
+  "sessions_excluded": 0,
+  "latest_link_id": "2549a2cf469046f4a764132fe609233c-identity-link",
+  "latest_linkage_verdict": "confirmed",
+  "latest_linkage_confidence": 0.9,
+  "notes": [
+    "One or more sessions were held for identity review before longitudinal aggregation.",
+    "Initial identity enrollment was created from the first includable session.",
+    "Legacy face profile was cleared because the previous embedding format was too permissive and must be re-enrolled with the current face encoder."
+  ]
+}

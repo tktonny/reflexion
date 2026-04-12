@@ -1,0 +1,6 @@
+risk_id,domain,risk_description,severity,probability,mitigation,owner,status
+RISK-001,data,Public benchmark datasets are misused as commercial training foundation,high,medium,Use public data for benchmarking and pretraining only and document provenance,ML Lead,OPEN
+RISK-002,clinical,Session quality is too poor for reliable assessment in pilot sites,high,medium,Implement capture QC staff training and site qualification,Clinical Ops Lead,OPEN
+RISK-003,regulatory,Claims drift beyond frozen intended use,high,medium,Formal labeling review and approval before any external material,Quality Lead,OPEN
+RISK-004,product,Home monitoring produces alerts before baseline is mature,medium,medium,Require baseline completeness and coverage gating,Product Lead,OPEN
+RISK-005,business,Pilot does not convert into paid provider deployment,high,medium,Track workflow value and economic evidence during pilot,CEO,OPEN

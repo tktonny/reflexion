@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reflexion.local/schemas/identity-link.schema.json",
+  "title": "Reflexion Identity Link Result",
+  "type": "object",
+  "required": [
+    "linkId",
+    "patientId",
+    "sessionId",
+    "assessedAt",
+    "targetPresence",
+    "linkageVerdict",
+    "timelineInclusion"
+  ],
+  "properties": {
+    "linkId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "patientId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sessionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "enrollmentProfileId": {
+      "type": "string"
+    },
+    "targetPresence": {
+      "type": "string",
+      "enum": [
+        "clear",
+        "probable",
+        "uncertain",
+        "absent"
+      ]
+    },
+    "dominantTrackId": {
+      "type": "string"
+    },
+    "withinSessionAttributionConfidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "faceMatchConfidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "voiceMatchConfidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "finalLinkageConfidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "linkageVerdict": {
+      "type": "string",
+      "enum": [
+        "confirmed",
+        "probable",
+        "uncertain",
+        "mismatch",
+        "no-face"
+      ]
+    },
+    "timelineInclusion": {
+      "type": "string",
+      "enum": [
+        "include",
+        "exclude",
+        "manual-review"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "qualityFlags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,75 @@
+{
+  "flow_id": "clinic_dementia_intake_v1",
+  "title": "Structured Clinic Dementia Intake",
+  "opening_message": "Hello, I'm Reflexion's AI screening guide. We'll do a brief structured conversation. Please start by telling me your full name and where you are right now.",
+  "conversation_goal": "Collect orientation, narrative continuity, daily-function, and delayed-recall cues in a calm short interview that feels natural to the patient.",
+  "completion_rule": "Complete all four required stages unless fatigue, distress, safety concerns, or repeated non-response make continuation inappropriate.",
+  "completion_message": "Thank you. That completes the conversation. I will prepare the risk summary for the clinician now.",
+  "assistant_response_rules": [
+    "Acknowledge briefly before moving to the next step.",
+    "Keep every response under 18 words.",
+    "Use at most one brief clarification question per stage unless the local clinician explicitly overrides.",
+    "Do not diagnose, score risk, or discuss dementia probability during the live conversation.",
+    "After the final stage is complete, thank the patient and say the session is complete."
+  ],
+  "processing_steps": [
+    "Audio and webcam frames are captured turn by turn.",
+    "The conversation follows a configurable staged interview plan with goals and exit conditions.",
+    "Speech and face-stream proxies are converted into compact feature embeddings.",
+    "The full recorded session is uploaded for formal multimodal assessment after the live conversation."
+  ],
+  "steps": [
+    {
+      "key": "orientation",
+      "title": "Orientation",
+      "goal": "Anchor the patient in self and place without making the opening feel like an exam.",
+      "prompt": "Please tell me your full name and where you are right now.",
+      "rationale": "Checks basic orientation, self-reference, and place awareness.",
+      "exit_when": [
+        "The patient gives a name, clear self-reference, or states they are unsure.",
+        "The patient gives a location, setting, or clearly expresses uncertainty about where they are.",
+        "One brief clarification has been used if the first answer was partial."
+      ],
+      "max_follow_ups": 1
+    },
+    {
+      "key": "recent_story",
+      "title": "Recent Story",
+      "goal": "Elicit a sequenced recent narrative with enough detail to assess continuity and recall.",
+      "prompt": "Walk me through what you did earlier today, starting from the morning.",
+      "rationale": "Looks for narrative continuity, sequencing, and conversational detail.",
+      "exit_when": [
+        "The patient describes at least two events, activities, or time-linked details from the day.",
+        "The patient gives a clearly limited answer after one brief prompt for more detail.",
+        "The patient cannot continue after one brief clarification."
+      ],
+      "max_follow_ups": 1
+    },
+    {
+      "key": "daily_function",
+      "title": "Daily Function",
+      "goal": "Surface whether daily routines are self-managed or rely on reminders, supervision, or help.",
+      "prompt": "How are you managing meals, medicines, or appointments at home, and who helps if needed?",
+      "rationale": "Surfaces independence cues and whether routine tasks require support.",
+      "exit_when": [
+        "The patient describes how they handle at least one daily routine.",
+        "The answer clarifies whether another person helps, reminds, or supervises.",
+        "One brief clarification has been used if the first answer was vague."
+      ],
+      "max_follow_ups": 1
+    },
+    {
+      "key": "delayed_recall",
+      "title": "Delayed Recall",
+      "goal": "Check short delayed recall near the end of the conversation using a fixed anchor set.",
+      "prompt": "Before we finish, what were the three words: apple, bridge, candle?",
+      "rationale": "Creates a simple delayed recall checkpoint inside the conversation.",
+      "exit_when": [
+        "The patient attempts recall of the words, whether complete, partial, or uncertain.",
+        "One brief repetition of the request has been used if the patient did not respond.",
+        "The stage ends after the recall attempt so the conversation can close cleanly."
+      ],
+      "max_follow_ups": 1
+    }
+  ]
+}

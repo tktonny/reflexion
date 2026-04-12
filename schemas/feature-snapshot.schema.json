@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reflexion.local/schemas/feature-snapshot.schema.json",
+  "title": "Reflexion Feature Snapshot",
+  "type": "object",
+  "required": [
+    "snapshotId",
+    "patientId",
+    "sessionId",
+    "productMode",
+    "capturedAt",
+    "quality",
+    "features"
+  ],
+  "properties": {
+    "snapshotId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "patientId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sessionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "productMode": {
+      "type": "string",
+      "enum": [
+        "clinic",
+        "home"
+      ]
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "language": {
+      "type": "string"
+    },
+    "featurePipelineVersion": {
+      "type": "string"
+    },
+    "quality": {
+      "type": "object",
+      "required": [
+        "usability"
+      ],
+      "properties": {
+        "usability": {
+          "type": "string",
+          "enum": [
+            "usable",
+            "usable-with-caveats",
+            "unusable"
+          ]
+        },
+        "audioQualityScore": {
+          "type": "number"
+        },
+        "videoQualityScore": {
+          "type": "number"
+        },
+        "coverageScore": {
+          "type": "number"
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "embeddings": {
+      "type": "object",
+      "properties": {
+        "speech": {
+          "$ref": "#/$defs/embeddingRef"
+        },
+        "conversation": {
+          "$ref": "#/$defs/embeddingRef"
+        },
+        "face": {
+          "$ref": "#/$defs/embeddingRef"
+        }
+      },
+      "additionalProperties": false
+    },
+    "features": {
+      "type": "object",
+      "properties": {
+        "speech": {
+          "type": "object"
+        },
+        "conversation": {
+          "type": "object"
+        },
+        "taskBehavior": {
+          "type": "object"
+        },
+        "visualFace": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "trendContext": {
+      "type": "object",
+      "properties": {
+        "baselineState": {
+          "type": "string",
+          "enum": [
+            "not-started",
+            "building",
+            "complete",
+            "stale"
+          ]
+        },
+        "windowLabel": {
+          "type": "string"
+        },
+        "daysSinceEnrollment": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "embeddingRef": {
+      "type": "object",
+      "required": [
+        "vectorUri"
+      ],
+      "properties": {
+        "vectorUri": {
+          "type": "string"
+        },
+        "dimensions": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "modelVersion": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

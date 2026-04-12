@@ -1,0 +1,109 @@
+"""Unit tests for staged media preparation behavior."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from clinic.configs.settings import Settings
+from backend.src.app.models import PreparedMedia
+from backend.src.app.services.media_preparer import MediaPreparer
+
+
+def make_settings(tmp_path: Path) -> Settings:
+    return Settings(
+        app_name="test",
+        storage_dir=tmp_path,
+        uploads_dir=tmp_path / "uploads",
+        prepared_dir=tmp_path / "prepared",
+        assessments_dir=tmp_path / "assessments",
+        server_host="127.0.0.1",
+        server_port=8000,
+        server_reload=False,
+        max_upload_mb=100,
+        max_inline_video_mb=5,
+        allow_mock_providers=False,
+        default_provider="qwen_omni",
+        fallback_order=("qwen_omni", "gemini", "fusion", "audio_only"),
+        ffmpeg_binary="ffmpeg",
+        ffprobe_binary="ffprobe",
+        qwen_omni_api_key=None,
+        qwen_omni_base_url="https://example.com/qwen",
+        qwen_omni_model="qwen3.5-omni-plus",
+        gemini_api_key=None,
+        gemini_base_url="https://example.com/gemini",
+        gemini_model="gemini-3.1-pro-preview",
+        openai_api_key=None,
+        openai_base_url="https://example.com/openai",
+        openai_fusion_model="gpt-4.1",
+        openai_text_model="gpt-4.1",
+        openai_transcription_model="gpt-4o-transcribe",
+    )
+
+
+@pytest.fixture
+def base_media(tmp_path: Path) -> PreparedMedia:
+    return PreparedMedia(
+        original_path="/tmp/input.mp4",
+        standardized_path=str(tmp_path / "prepared" / "a1" / "standardized.mp4"),
+        mime_type="video/mp4",
+        size_bytes=1024,
+        duration_seconds=12.3,
+    )
+
+
+def test_prepare_for_provider_keeps_omni_lightweight(
+    tmp_path: Path,
+    base_media: PreparedMedia,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preparer = MediaPreparer(make_settings(tmp_path))
+    calls: list[str] = []
+
+    def fake_ensure_audio(media: PreparedMedia) -> PreparedMedia:
+        calls.append("audio")
+        return media
+
+    def fake_ensure_frames(media: PreparedMedia) -> PreparedMedia:
+        calls.append("frames")
+        return media
+
+    monkeypatch.setattr(preparer, "ensure_audio_artifact", fake_ensure_audio)
+    monkeypatch.setattr(preparer, "ensure_frame_artifacts", fake_ensure_frames)
+
+    qwen_media = preparer.prepare_for_provider("qwen_omni", base_media)
+    gemini_media = preparer.prepare_for_provider("gemini", base_media)
+
+    assert qwen_media == base_media
+    assert gemini_media == base_media
+    assert calls == []
+
+
+def test_prepare_for_provider_builds_only_needed_fallback_artifacts(
+    tmp_path: Path,
+    base_media: PreparedMedia,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preparer = MediaPreparer(make_settings(tmp_path))
+    calls: list[str] = []
+
+    def fake_ensure_audio(media: PreparedMedia) -> PreparedMedia:
+        calls.append("audio")
+        return media.model_copy(update={"extracted_audio_path": "/tmp/audio.wav"})
+
+    def fake_ensure_frames(media: PreparedMedia) -> PreparedMedia:
+        calls.append("frames")
+        return media.model_copy(update={"frame_paths": ["/tmp/frame-001.jpg"]})
+
+    monkeypatch.setattr(preparer, "ensure_audio_artifact", fake_ensure_audio)
+    monkeypatch.setattr(preparer, "ensure_frame_artifacts", fake_ensure_frames)
+
+    fusion_media = preparer.prepare_for_provider("fusion", base_media)
+    audio_only_media = preparer.prepare_for_provider("audio_only", base_media)
+
+    assert fusion_media.extracted_audio_path == "/tmp/audio.wav"
+    assert fusion_media.frame_paths == ["/tmp/frame-001.jpg"]
+    assert audio_only_media.extracted_audio_path == "/tmp/audio.wav"
+    assert audio_only_media.frame_paths == []
+    assert calls == ["audio", "frames", "audio"]

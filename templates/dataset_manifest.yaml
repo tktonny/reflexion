@@ -1,0 +1,30 @@
+dataset_name: ""
+dataset_version: ""
+created_at: ""
+owner: ""
+purpose: ""
+sources:
+  - name: ""
+    type: "public|partner|internal"
+    access_basis: ""
+participants:
+  total: 0
+  cohorts:
+    healthy_control: 0
+    mci: 0
+    mild_dementia: 0
+languages:
+  - ""
+sites:
+  - ""
+devices:
+  - ""
+modalities:
+  - speech
+splits:
+  train: ""
+  validation: ""
+  test: ""
+label_definition: ""
+exclusions: []
+notes: ""
