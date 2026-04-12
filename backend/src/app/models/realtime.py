@@ -22,6 +22,7 @@ class RealtimePromptStep(BaseModel):
     goal: str
     prompt: str
     rationale: str
+    guided_transition: str | None = None
     exit_when: list[str] = Field(default_factory=list)
     max_follow_ups: int = Field(default=1, ge=0, le=3)
 

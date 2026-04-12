@@ -18,6 +18,7 @@ from backend.src.app.models.longitudinal import LongitudinalDirection
 
 CareSignal = Literal["stable", "watch", "urgent"]
 CareRiskLabel = Literal["HIGH RISK", "LOW RISK"]
+CareScoreMetricKey = Literal["speak", "content", "pose", "face"]
 
 
 class SurfaceAssessmentSummary(BaseModel):
@@ -83,6 +84,12 @@ class CaregiverTimelinePoint(BaseModel):
     shareable_summary: str
 
 
+class CareScoreMetric(BaseModel):
+    key: CareScoreMetricKey
+    label: str
+    value: float = Field(..., ge=0.0, le=1.0)
+
+
 class CaregiverDashboardResponse(BaseModel):
     generated_at: datetime
     patient_id: str
@@ -91,6 +98,7 @@ class CaregiverDashboardResponse(BaseModel):
     last_updated_at: datetime | None = None
     risk_label: CareRiskLabel
     risk_score: float = Field(..., ge=0.0, le=1.0)
+    score_breakdown: list[CareScoreMetric] = Field(default_factory=list)
     top_reasons: list[str] = Field(default_factory=list)
     recommendation: str
     baseline_comparison: str = "Compared to your baseline (3 months ago), no longitudinal trend is available yet."

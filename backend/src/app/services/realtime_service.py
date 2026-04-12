@@ -126,10 +126,35 @@ class RealtimeConversationService:
         "提醒我吃药",
         "帮我预约",
     )
-    RECALL_WORDS: tuple[tuple[str, ...], ...] = (
-        ("apple", "苹果"),
-        ("bridge", "桥"),
-        ("candle", "蜡烛"),
+    LOW_SIGNAL_TOKENS: frozenset[str] = frozenset(
+        {
+            "about",
+            "after",
+            "again",
+            "also",
+            "and",
+            "before",
+            "earlier",
+            "from",
+            "have",
+            "just",
+            "later",
+            "mentioned",
+            "morning",
+            "really",
+            "said",
+            "that",
+            "then",
+            "there",
+            "they",
+            "thing",
+            "this",
+            "today",
+            "what",
+            "with",
+            "would",
+            "your",
+        }
     )
     LANGUAGE_HINT_ALIASES: dict[str, tuple[str, ...]] = {
         "english": ("en", "en-us", "en-gb", "english"),
@@ -240,7 +265,7 @@ class RealtimeConversationService:
                 prompt_steps=self.orchestrator.prompt_steps,
                 processing_steps=self._processing_steps(),
                 fallback_note=(
-                    "If the live relay drops, the screen stays in guided demo mode and still produces the final risk story."
+                    "If the live relay drops, the screen stays in guided conversation mode and still produces the final risk story."
                 ),
             )
         return RealtimeSessionStatus(
@@ -259,7 +284,7 @@ class RealtimeConversationService:
             prompt_steps=self.orchestrator.prompt_steps,
             processing_steps=self._processing_steps(),
             fallback_note=(
-                "Live Qwen relay is unavailable, so the interface keeps the structured interview and local risk narrative active."
+                "Live Qwen relay is unavailable, so the interface keeps the guided conversation and local risk narrative active."
             ),
         )
 
@@ -325,13 +350,16 @@ class RealtimeConversationService:
         lexical_richness = min(1.0, len(set(tokens)) / max(1, word_count))
         turn_elaboration = min(1.0, average_turn_length / 18.0)
 
-        delayed_recall_text = " ".join(
-            turn.text.lower() for turn in patient_turns if turn.stage == "delayed_recall"
+        recent_story_text = " ".join(
+            turn.text for turn in patient_turns if turn.stage == "recent_story"
         )
-        delayed_recall_source = delayed_recall_text or patient_text.lower()
-        delayed_recall_score = sum(
-            1 for variants in self.RECALL_WORDS if any(item in delayed_recall_source for item in variants)
-        ) / len(self.RECALL_WORDS)
+        delayed_recall_text = " ".join(
+            turn.text for turn in patient_turns if turn.stage == "delayed_recall"
+        )
+        delayed_recall_score = self._score_delayed_recall_response(
+            delayed_recall_text,
+            reference_text=recent_story_text,
+        )
 
         frames_captured = request.visual_metrics.frames_captured
         face_detection_rate = request.visual_metrics.face_detection_rate
@@ -466,9 +494,9 @@ class RealtimeConversationService:
                 summary="Higher values mean the patient gave more sequenced detail during recent-event prompts.",
             ),
             FeatureSignal(
-                label="Delayed Recall Preservation",
+                label="Conversation Recall",
                 value=delayed_recall_score,
-                summary="Measures how many of the anchor words were recovered during the delayed recall step.",
+                summary="Measures whether the patient could briefly return to an earlier conversation detail near the end.",
             ),
         ]
         visual_features = [
@@ -492,7 +520,7 @@ class RealtimeConversationService:
         trend = self._build_trend(patient_turns, overall_risk=risk_score)
         processing_summary = [
             f"Captured {request.audio_metrics.speech_seconds:.1f}s of speech and {frames_captured} sampled visual frames.",
-            "Extracted speech cues from hesitation rate, delayed recall, daily-function language, and narrative detail.",
+            "Extracted speech cues from hesitation rate, wrap-up recall, daily-function language, and narrative detail.",
             "Compressed speech and face-stream proxies into embeddings and compared them with dementia and non-dementia centroids.",
             "Produced a single demo risk label, score, reasons, recommendation, and within-session trend.",
         ]
@@ -691,12 +719,18 @@ class RealtimeConversationService:
 
     async def _run_guided_demo(self, websocket: WebSocket) -> None:
         committed_turns = 0
+        last_patient_text = ""
+        patient_name: str | None = None
 
         while True:
             event = await websocket.receive_json()
             event_type = str(event.get("type", ""))
             if event_type == "reflexion.close":
                 return
+            if event_type == "reflexion.patient_turn":
+                last_patient_text = str(event.get("text", "")).strip()
+                patient_name = patient_name or self.orchestrator.extract_patient_name(last_patient_text)
+                continue
             if event_type == "input_audio_buffer.commit":
                 committed_turns += 1
                 await websocket.send_json(
@@ -710,7 +744,11 @@ class RealtimeConversationService:
                 continue
 
             response_id = f"guided-{committed_turns}"
-            message = self._mock_reply(committed_turns)
+            message = self._mock_reply(
+                committed_turns,
+                patient_text=last_patient_text,
+                patient_name=patient_name,
+            )
             await websocket.send_json({"type": "response.created", "response": {"id": response_id}})
             assembled = []
             for chunk in self._chunk_text(message):
@@ -720,6 +758,7 @@ class RealtimeConversationService:
             full_text = "".join(assembled)
             await websocket.send_json({"type": "response.text.done", "text": full_text})
             await websocket.send_json({"type": "response.done", "response": {"id": response_id}})
+            last_patient_text = ""
 
     def _build_live_session_update(
         self,
@@ -756,8 +795,18 @@ class RealtimeConversationService:
     def _processing_steps(self) -> list[str]:
         return self.orchestrator.processing_steps
 
-    def _mock_reply(self, committed_turns: int) -> str:
-        return self.orchestrator.guided_reply(committed_turns)
+    def _mock_reply(
+        self,
+        committed_turns: int,
+        *,
+        patient_text: str | None = None,
+        patient_name: str | None = None,
+    ) -> str:
+        return self.orchestrator.guided_reply(
+            committed_turns,
+            patient_text=patient_text,
+            patient_name=patient_name,
+        )
 
     def _build_top_reasons(
         self,
@@ -774,7 +823,10 @@ class RealtimeConversationService:
         if risk_score >= 0.5:
             candidates = [
                 (memory_difficulty, "The transcript contained repeated uncertainty or memory-retrieval language."),
-                (1.0 - delayed_recall_score, "Delayed recall of the anchor words was limited by the end of the session."),
+                (
+                    1.0 - delayed_recall_score,
+                    "The patient struggled to recall an earlier conversation detail near the end of the session.",
+                ),
                 (support_dependency, "Daily-function answers suggested reliance on reminders or help from others."),
                 (hesitation_rate, "Speech contained multiple hesitations or verbal restarts."),
                 (1.0 - detail_density, "Recent-event answers were sparse or weakly sequenced."),
@@ -782,7 +834,10 @@ class RealtimeConversationService:
         else:
             candidates = [
                 (detail_density, "The patient maintained a sequenced narrative when describing recent events."),
-                (delayed_recall_score, "Delayed recall retained several or all anchor words."),
+                (
+                    delayed_recall_score,
+                    "The patient could return to an earlier conversation detail during the wrap-up recall.",
+                ),
                 (turn_elaboration, "Patient turns stayed reasonably elaborated for a brief screening conversation."),
                 (lexical_richness, "Language variety remained intact across the short interview."),
                 (1.0 - hesitation_rate, "Speech showed limited hesitation relative to the conversation length."),
@@ -798,6 +853,32 @@ class RealtimeConversationService:
         if risk_band == "medium":
             return "Mixed demo signal. Repeat the session or escalate to formal cognitive screening if concerns persist."
         return "Elevated demo risk. Recommend clinician review and formal cognitive evaluation rather than relying on this demo alone."
+
+    def _score_delayed_recall_response(self, recall_text: str | None, *, reference_text: str | None = None) -> float:
+        normalized_recall = str(recall_text or "").strip()
+        if not normalized_recall:
+            return 0.5
+
+        lowered_recall = f" {normalized_recall.lower()} "
+        memory_penalty = min(0.7, self._count_markers(lowered_recall, self.MEMORY_MARKERS) * 0.32)
+        detail_bonus = min(0.2, self._count_markers(lowered_recall, self.DETAIL_MARKERS) * 0.04)
+        recall_tokens = self._content_tokens(normalized_recall)
+        token_bonus = min(0.3, len(recall_tokens) * 0.06)
+
+        overlap_bonus = 0.0
+        reference_tokens = self._content_tokens(reference_text or "")
+        if recall_tokens and reference_tokens:
+            overlap_bonus = min(0.4, len(recall_tokens & reference_tokens) * 0.16)
+
+        answered_bonus = 0.18 if len(self._tokenize(normalized_recall)) >= 3 else 0.08
+        return self._clip(answered_bonus + token_bonus + detail_bonus + overlap_bonus - memory_penalty)
+
+    def _content_tokens(self, text: str) -> set[str]:
+        return {
+            token
+            for token in self._tokenize(text)
+            if len(token) >= 4 and token not in self.LOW_SIGNAL_TOKENS
+        }
 
     def _build_trend(self, patient_turns: list[Any], *, overall_risk: float) -> list[TrendPoint]:
         scores_by_stage: dict[str, float] = {}
@@ -822,11 +903,14 @@ class RealtimeConversationService:
             elif step.key == "daily_function":
                 score = 0.36 + self._count_markers(lowered, self.SUPPORT_MARKERS) * 0.18
             else:
-                recall_text = stage_text.lower()
-                recalled_words = sum(
-                    1 for variants in self.RECALL_WORDS if any(item in recall_text for item in variants)
+                recent_story_text = " ".join(
+                    turn.text for turn in patient_turns if getattr(turn, "stage", None) == "recent_story" and turn.text
                 )
-                score = 0.25 + (1.0 - (recalled_words / len(self.RECALL_WORDS))) * 0.55
+                recall_score = self._score_delayed_recall_response(
+                    stage_text,
+                    reference_text=recent_story_text,
+                )
+                score = 0.25 + (1.0 - recall_score) * 0.55
             scores_by_stage[step.key] = self._clip(score)
 
         return [

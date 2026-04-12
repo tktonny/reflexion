@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -38,6 +39,34 @@ class QwenOmniProvider(BaseProvider):
         provider_input = await super().prepare(context)
         if not self.is_configured():
             return provider_input
+        if context.media.mime_type == "video/webm":
+            raise ProviderError(
+                "unsupported_media",
+                (
+                    "qwen_omni cannot analyze browser-recorded WebM uploads directly. "
+                    "Install ffmpeg on the server so the upload can be standardized to MP4 first."
+                ),
+                debug_details={
+                    "standardized_path": context.media.standardized_path,
+                    "mime_type": context.media.mime_type,
+                },
+            )
+        provider_limit_bytes = self.settings.qwen_omni_inline_video_mb * 1024 * 1024
+        if context.media.size_bytes > provider_limit_bytes:
+            raise ProviderError(
+                "unsupported_media",
+                (
+                    f"qwen_omni inline video exceeds the provider limit of "
+                    f"{self.settings.qwen_omni_inline_video_mb}MB."
+                ),
+                debug_details={
+                    "standardized_path": context.media.standardized_path,
+                    "mime_type": context.media.mime_type,
+                    "size_bytes": context.media.size_bytes,
+                    "provider_limit_bytes": provider_limit_bytes,
+                    "file_name": Path(context.media.standardized_path).name,
+                },
+            )
         provider_input["inline_video_url"] = self._encode_data_url(
             context.media.standardized_path,
             context.media.mime_type,

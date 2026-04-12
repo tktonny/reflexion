@@ -1,10 +1,31 @@
 {
-  "profile_id": "patient-001-identity",
+  "link_id": "0a68f6c9d2b44e9b99d3ba981e96ad42-identity-link",
   "patient_id": "patient-001",
-  "created_at": "2026-04-07T10:52:52.526734Z",
-  "updated_at": "2026-04-12T16:37:48.515529Z",
-  "enrollment_assessment_id": "0a68f6c9d2b44e9b99d3ba981e96ad42",
-  "canonical_face_embedding": [
+  "assessment_id": "0a68f6c9d2b44e9b99d3ba981e96ad42",
+  "session_id": "live-1776011848794",
+  "assessed_at": "2026-04-12T16:37:48.515320Z",
+  "enrollment_profile_id": "patient-001-identity",
+  "target_presence": "clear",
+  "dominant_track_id": "primary-face-a13b0c88",
+  "within_session_attribution_confidence": 0.9,
+  "face_sample_count": 11,
+  "face_recognition_method": "opencv_hog_lbp_v2",
+  "face_match_confidence": 0.85,
+  "voice_match_confidence": 0.76,
+  "final_linkage_confidence": 0.85,
+  "linkage_verdict": "confirmed",
+  "timeline_inclusion": "include",
+  "reasons": [
+    "No enrolled face existed yet, so this session established the initial patient face reference.",
+    "A primary patient track was visible for most of the session.",
+    "Extracted a face descriptor from 11 sampled frame(s) for identity matching.",
+    "The current face descriptor stays close to the enrolled patient face profile.",
+    "Speech cadence and lexical patterns stay close to prior sessions."
+  ],
+  "quality_flags": [
+    "face_detection_unavailable"
+  ],
+  "face_embedding": [
     0.008,
     0.0017,
     0.0016,
@@ -1690,27 +1711,14 @@
     -0.1076,
     -0.1149
   ],
-  "canonical_face_recognition_method": "opencv_hog_lbp_v2",
-  "canonical_voice_embedding": [
-    0.111,
-    0.0508,
-    -0.0558,
-    -0.2431,
-    -0.2,
-    0.3359,
-    0.326,
-    0.1223
-  ],
-  "sessions_linked": 9,
-  "sessions_included": 8,
-  "sessions_manual_review": 1,
-  "sessions_excluded": 0,
-  "latest_link_id": "0a68f6c9d2b44e9b99d3ba981e96ad42-identity-link",
-  "latest_linkage_verdict": "confirmed",
-  "latest_linkage_confidence": 0.85,
-  "notes": [
-    "One or more sessions were held for identity review before longitudinal aggregation.",
-    "Initial identity enrollment was created from the first includable session.",
-    "Legacy face profile was cleared because the previous embedding format was too permissive and must be re-enrolled with the current face encoder."
+  "voice_embedding": [
+    0.3138,
+    0.1824,
+    -0.3269,
+    -0.1061,
+    -0.5449,
+    0.3007,
+    0.5988,
+    -0.065
   ]
 }

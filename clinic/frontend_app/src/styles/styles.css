@@ -58,12 +58,23 @@ select {
   border-radius: 22px;
   background: var(--panel);
   box-shadow: var(--shadow);
+  position: sticky;
+  top: max(0px, env(safe-area-inset-top, 0px));
+  z-index: 40;
+}
+
+.surface-nav-main {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
 }
 
 .surface-brand {
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  justify-self: center;
   color: var(--ink);
   text-decoration: none;
   font-weight: 700;
@@ -79,10 +90,150 @@ select {
   background: linear-gradient(135deg, #0e7c66, #145c76);
 }
 
-.surface-links {
+.surface-nav-spacer {
+  width: 42px;
+  height: 42px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sidebar-shell {
+  position: relative;
+}
+
+.sidebar-shell summary {
+  list-style: none;
+}
+
+.sidebar-shell summary::-webkit-details-marker {
+  display: none;
+}
+
+.sidebar-toggle {
   display: inline-flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  cursor: pointer;
+  position: relative;
+  z-index: 61;
+}
+
+.sidebar-toggle-icon {
+  display: grid;
+  gap: 4px;
+}
+
+.sidebar-toggle-icon span {
+  display: block;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.sidebar-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 34, 40, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+  z-index: 50;
+}
+
+.sidebar-shell[open]::before {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar-panel {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  width: min(360px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(14, 124, 102, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(255, 252, 246, 0.98), rgba(244, 239, 230, 0.98));
+  box-shadow: 0 26px 70px rgba(28, 34, 40, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-18px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+  z-index: 60;
+}
+
+.sidebar-shell[open] .sidebar-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+
+.sidebar-card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 14px 32px rgba(28, 34, 40, 0.08);
+}
+
+.sidebar-nav-card {
+  gap: 12px;
+}
+
+.sidebar-links {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.sidebar-links a {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(14, 124, 102, 0.08);
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.sidebar-links a.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, #0e7c66, #145c76);
+}
+
+.sidebar-copy {
+  margin-top: 12px;
+}
+
+.surface-links {
+  display: none;
 }
 
 .surface-links a {
@@ -900,6 +1051,7 @@ ul {
   .surface-nav {
     flex-direction: column;
     align-items: stretch;
+    top: 0;
   }
 
   .workspace-toolbar,
@@ -921,17 +1073,11 @@ ul {
     width: 100%;
   }
 
-  .surface-links {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .surface-links a {
-    flex: initial;
-    min-width: 0;
-    text-align: center;
+  .sidebar-panel {
+    top: 12px;
+    left: 12px;
+    width: min(360px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
   }
 
   .video-overlay,
@@ -952,6 +1098,14 @@ ul {
   h1 {
     max-width: none;
     font-size: clamp(2.3rem, 11vw, 3.4rem);
+  }
+}
+
+@media (min-width: 721px) {
+  .surface-links {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 }
 

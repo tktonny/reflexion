@@ -88,6 +88,7 @@ class Settings:
     openai_fusion_model: str
     openai_text_model: str
     openai_transcription_model: str
+    qwen_omni_inline_video_mb: int = 10
     qwen_omni_realtime_url: str = "wss://dashscope.aliyuncs.com/api-ws/v1/realtime"
     qwen_omni_realtime_model: str = "qwen3-omni-flash-realtime"
     qwen_omni_realtime_transcription_model: str = "gummy-realtime-v1"
@@ -157,6 +158,9 @@ def get_settings() -> Settings:
         openai_transcription_model=os.getenv(
             "REFLEXION_OPENAI_TRANSCRIPTION_MODEL",
             "gpt-4o-transcribe",
+        ),
+        qwen_omni_inline_video_mb=int(
+            os.getenv("REFLEXION_QWEN_OMNI_INLINE_VIDEO_MB", "10")
         ),
         qwen_omni_realtime_url=os.getenv(
             "REFLEXION_QWEN_OMNI_REALTIME_URL",

@@ -56,6 +56,12 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
 
+   Also install these system binaries on any deployment host:
+   - `ffmpeg`
+   - `ffprobe`
+
+   They are required for browser-recorded video uploads. Without them, the server cannot reliably standardize `webm` recordings to `mp4`, cannot compress oversized uploads for the Qwen batch path, and batch clinic analysis may fail even when the Python dependencies are installed.
+
 3. Configure provider keys as needed:
    - `QWEN_API_KEY` or `DASHSCOPE_API_KEY`
    - `GEMINI_API_KEY`
@@ -88,6 +94,7 @@ uvicorn backend.src.app.main:app --reload
 
 - `Qwen 3.5 Omni Plus` is the preferred true full-modality path for MP4 video plus audio.
 - `Gemini` is the secondary true full-modality path.
+- The Qwen batch upload path has a stricter inline video limit than the generic app upload limit. Large session recordings should be standardized and compressed server-side with `ffmpeg`.
 - `fusion` uses transcript plus extracted key frames and is intentionally preprocessing-based.
 - `audio_only` is the final fallback when video-grounded review fails.
 - `REFLEXION_ALLOW_MOCK_PROVIDERS=true` lets the UI and fallback chain run even if provider keys are absent, but the results are placeholders.

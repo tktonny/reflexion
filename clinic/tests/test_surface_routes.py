@@ -213,6 +213,8 @@ def test_care_routes_return_known_patients_and_patient_dashboard(tmp_path: Path,
     assert payload["signal"] == "urgent"
     assert payload["risk_label"] == "HIGH RISK"
     assert payload["risk_score"] == 0.72
+    assert [item["key"] for item in payload["score_breakdown"]] == ["speak", "content", "pose", "face"]
+    assert all(0.0 <= item["value"] <= 1.0 for item in payload["score_breakdown"])
     assert payload["baseline_comparison"].startswith("Compared to your baseline (3 months ago)")
     assert payload["longitudinal_direction"] == "declining"
     assert payload["longitudinal_direction_label"] == "Declining"
@@ -237,6 +239,7 @@ def test_care_demo_cases_are_hard_coded_for_reliable_presentations(tmp_path: Pat
     dementia_payload = dementia_response.json()
     assert dementia_payload["risk_label"] == "HIGH RISK"
     assert dementia_payload["risk_score"] >= 0.7
+    assert [item["key"] for item in dementia_payload["score_breakdown"]] == ["speak", "content", "pose", "face"]
     assert dementia_payload["baseline_comparison"].startswith("Compared to your baseline (3 months ago)")
     assert dementia_payload["longitudinal_direction"] == "declining"
     assert len(dementia_payload["longitudinal_points"]) >= 4
@@ -251,6 +254,7 @@ def test_care_demo_cases_are_hard_coded_for_reliable_presentations(tmp_path: Pat
     healthy_payload = healthy_response.json()
     assert healthy_payload["risk_label"] == "LOW RISK"
     assert healthy_payload["risk_score"] <= 0.35
+    assert [item["key"] for item in healthy_payload["score_breakdown"]] == ["speak", "content", "pose", "face"]
     assert healthy_payload["baseline_comparison"].startswith("Compared to your baseline (3 months ago)")
     assert healthy_payload["longitudinal_direction"] == "stable"
     assert len(healthy_payload["longitudinal_points"]) >= 4

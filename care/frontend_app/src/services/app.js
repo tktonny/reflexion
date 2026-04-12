@@ -10,12 +10,14 @@ const refreshButton = document.getElementById("refresh-dashboard");
 const careStatus = document.getElementById("care-status");
 const riskLabel = document.getElementById("risk-label");
 const careSummary = document.getElementById("care-summary");
+const heroPatient = document.getElementById("hero-patient");
 const lastUpdatedAt = document.getElementById("last-updated-at");
 const sessionsCompleted = document.getElementById("sessions-completed");
 const heroStatusLabel = document.getElementById("hero-status-label");
 const riskScore = document.getElementById("risk-score");
 const scoreRing = document.getElementById("score-ring");
 const scoreSupport = document.getElementById("score-support");
+const scoreBreakdown = document.getElementById("score-breakdown");
 const heroReasons = document.getElementById("hero-reasons");
 const statusLabel = document.getElementById("status-label");
 const reasonSummary = document.getElementById("reason-summary");
@@ -42,6 +44,10 @@ function formatDateTime(value) {
 
 function formatScore(value) {
   return value === null || value === undefined || Number.isNaN(value) ? "-" : Number(value).toFixed(2);
+}
+
+function formatMetricValue(value) {
+  return value === null || value === undefined || Number.isNaN(value) ? "-" : `${Math.round(Number(value) * 100)}%`;
 }
 
 function clearNode(node) {
@@ -125,6 +131,45 @@ function renderReasonTags(items) {
     item.className = "reason-chip";
     item.textContent = entry;
     heroReasons.appendChild(item);
+  });
+}
+
+function renderScoreBreakdown(items) {
+  clearNode(scoreBreakdown);
+
+  if (!items?.length) {
+    return;
+  }
+
+  items.forEach((entry) => {
+    const item = document.createElement("li");
+    item.className = "score-breakdown-item";
+
+    const head = document.createElement("div");
+    head.className = "score-breakdown-head";
+
+    const label = document.createElement("span");
+    label.className = "score-breakdown-label";
+    label.textContent = entry.label || entry.key || "Metric";
+
+    const value = document.createElement("strong");
+    value.className = "score-breakdown-value";
+    value.textContent = formatMetricValue(entry.value);
+
+    head.appendChild(label);
+    head.appendChild(value);
+
+    const track = document.createElement("div");
+    track.className = "score-breakdown-track";
+
+    const fill = document.createElement("span");
+    fill.className = "score-breakdown-fill";
+    fill.style.setProperty("--metric-fill", `${Math.max(0, Math.min(1, Number(entry.value || 0))) * 100}%`);
+    track.appendChild(fill);
+
+    item.appendChild(head);
+    item.appendChild(track);
+    scoreBreakdown.appendChild(item);
   });
 }
 
@@ -381,16 +426,19 @@ async function loadDashboard(patientId) {
   riskLabel.textContent = payload.risk_label || "-";
   riskLabel.className = riskLabelClass(payload.risk_label || "");
   careSummary.textContent = payload.care_summary || "-";
+  heroPatient.textContent = displayPatientLabel(patientId);
   heroStatusLabel.textContent = payload.status_label || "-";
   lastUpdatedAt.textContent = formatDateTime(payload.last_updated_at);
   sessionsCompleted.textContent = payload.sessions_completed ?? "-";
   riskScore.textContent = formatScore(payload.risk_score);
+  document.body.dataset.riskState = payload.risk_label === "HIGH RISK" ? "high" : "low";
   scoreRing.style.setProperty("--score-angle", `${Math.max(0, Math.min(1, Number(payload.risk_score || 0))) * 360}deg`);
   scoreRing.style.setProperty(
     "--score-color",
     payload.risk_label === "HIGH RISK" ? "#d5432f" : "#19775c",
   );
   scoreSupport.textContent = buildScoreSupport(payload);
+  renderScoreBreakdown(payload.score_breakdown);
   reasonSummary.textContent = buildReasonSummary(payload);
   renderReasonTags(payload.top_reasons);
 

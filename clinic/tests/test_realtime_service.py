@@ -66,10 +66,10 @@ def write_flow_config(tmp_path: Path) -> Path:
                     },
                     {
                         "key": "delayed_recall",
-                        "title": "Delayed Recall",
-                        "goal": "Check delayed recall near the end of the interview.",
-                        "prompt": "Before we finish, what were the three words: apple, bridge, candle?",
-                        "rationale": "Checks delayed recall.",
+                        "title": "Wrap-up Recall",
+                        "goal": "Check short recall near the end of the interview.",
+                        "prompt": "Before we finish, can you tell me one thing you mentioned earlier about your day?",
+                        "rationale": "Checks short recall.",
                         "exit_when": [
                             "The patient attempts recall.",
                         ],
@@ -147,6 +147,7 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     assert payload["session"]["turn_detection"]["silence_duration_ms"] == 800
     assert payload["session"]["input_audio_transcription"]["model"] == "gummy-realtime-v1"
     assert "Conversation goal: Collect a short structured intake" in payload["session"]["instructions"]
+    assert "hidden guidance" in payload["session"]["instructions"]
     assert "Exit when:" in payload["session"]["instructions"]
     assert "Confirm self and place." in payload["session"]["instructions"]
 
@@ -251,8 +252,99 @@ def test_live_relay_drops_image_until_first_audio_append(tmp_path: Path) -> None
 def test_guided_demo_reply_uses_configured_flow_order(tmp_path: Path) -> None:
     service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
 
-    assert service._mock_reply(1) == "Thank you. Walk me through what you did earlier today."
+    assert service._mock_reply(
+        1,
+        patient_text="My name is Tony and I'm at home.",
+        patient_name="Tony",
+    ) == "Walk me through what you did earlier today."
     assert service._mock_reply(4) == "Thanks. The structured intake is complete."
+
+
+def test_guided_demo_reply_uses_name_aware_transition_when_configured(tmp_path: Path) -> None:
+    flow_path = tmp_path / "realtime_flow.json"
+    flow_path.write_text(
+        json.dumps(
+            {
+                "flow_id": "test-flow",
+                "title": "Test Intake Flow",
+                "opening_message": "Hi there. What should I call you, and where are you right now?",
+                "conversation_goal": "Collect a short structured intake across the four required stages.",
+                "completion_rule": "Finish all stages unless the patient cannot continue.",
+                "completion_message": "Thanks{patient_name_clause}. We are done.",
+                "assistant_response_rules": [
+                    "Keep it conversational.",
+                ],
+                "processing_steps": [
+                    "Capture audio and frames.",
+                ],
+                "steps": [
+                    {
+                        "key": "orientation",
+                        "title": "Orientation",
+                        "goal": "Confirm self and place.",
+                        "prompt": "What should I call you, and where are you right now?",
+                        "rationale": "Checks orientation.",
+                        "exit_when": [
+                            "The patient gives a name or self-reference.",
+                            "The patient gives a place or states uncertainty.",
+                        ],
+                        "max_follow_ups": 1,
+                    },
+                    {
+                        "key": "recent_story",
+                        "title": "Recent Story",
+                        "goal": "Collect a sequenced narrative from earlier today.",
+                        "guided_transition": "Thanks{patient_name_clause}. I'd like to hear a little about how your day has been going.",
+                        "prompt": "How has your day been so far?",
+                        "rationale": "Checks narrative continuity.",
+                        "exit_when": [
+                            "The patient gives at least two events.",
+                        ],
+                        "max_follow_ups": 1,
+                    },
+                    {
+                        "key": "daily_function",
+                        "title": "Daily Function",
+                        "goal": "Understand how routines are managed.",
+                        "prompt": "How are meals, medicines, or appointments handled at home?",
+                        "rationale": "Checks daily-function support.",
+                        "exit_when": [
+                            "The patient describes at least one routine.",
+                        ],
+                        "max_follow_ups": 1,
+                    },
+                    {
+                        "key": "delayed_recall",
+                        "title": "Wrap-up Recall",
+                        "goal": "Check short recall near the end of the interview.",
+                        "prompt": "Before we finish, can you tell me one thing you mentioned earlier about your day?",
+                        "rationale": "Checks short recall.",
+                        "exit_when": [
+                            "The patient attempts recall.",
+                        ],
+                        "max_follow_ups": 1,
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=flow_path))
+
+    reply = service._mock_reply(
+        1,
+        patient_text="My name is Tony and I'm at home.",
+        patient_name="Tony",
+    )
+
+    assert reply == "Thanks, Tony. I'd like to hear a little about how your day has been going. How has your day been so far?"
+
+
+def test_extract_patient_name_handles_english_and_chinese(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    assert service.orchestrator.extract_patient_name("My name is Tony and I'm at home.") == "Tony"
+    assert service.orchestrator.extract_patient_name("我叫小明，我现在在家。") == "小明"
 
 
 def test_analysis_elevates_risk_for_memory_heavy_conversation(tmp_path: Path) -> None:
@@ -280,7 +372,7 @@ def test_analysis_elevates_risk_for_memory_heavy_conversation(tmp_path: Path) ->
                 {
                     "role": "patient",
                     "stage": "delayed_recall",
-                    "text": "I do not remember, maybe apple only.",
+                    "text": "I do not remember what I mentioned earlier.",
                 },
             ],
             "audio_metrics": {
@@ -303,7 +395,7 @@ def test_analysis_elevates_risk_for_memory_heavy_conversation(tmp_path: Path) ->
 
     assert result.risk_band == "high"
     assert result.risk_score >= 0.6
-    assert any("Delayed recall" in reason or "memory" in reason.lower() for reason in result.top_reasons)
+    assert any("recall" in reason.lower() or "memory" in reason.lower() for reason in result.top_reasons)
 
 
 def test_analysis_lowers_risk_for_coherent_detailed_conversation(tmp_path: Path) -> None:
@@ -334,7 +426,7 @@ def test_analysis_lowers_risk_for_coherent_detailed_conversation(tmp_path: Path)
                 {
                     "role": "patient",
                     "stage": "delayed_recall",
-                    "text": "The words were apple, bridge, and candle.",
+                    "text": "Earlier I said I made breakfast and bought fruit.",
                 },
             ],
             "audio_metrics": {
@@ -357,4 +449,4 @@ def test_analysis_lowers_risk_for_coherent_detailed_conversation(tmp_path: Path)
 
     assert result.risk_band == "low"
     assert result.risk_score <= 0.4
-    assert any("Delayed recall" in reason or "narrative" in reason.lower() for reason in result.top_reasons)
+    assert any("recall" in reason.lower() or "narrative" in reason.lower() for reason in result.top_reasons)

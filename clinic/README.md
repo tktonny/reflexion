@@ -36,6 +36,15 @@ pip install -r requirements.txt
 uvicorn backend.src.app.main:app --reload
 ```
 
+Install these system binaries on local and server environments as well:
+
+```bash
+ffmpeg
+ffprobe
+```
+
+They are required for clinic batch analysis of browser-recorded sessions. Without them, `webm` uploads cannot be standardized to `mp4`, oversized recordings cannot be compressed for the Qwen batch path, and provider fallback quality drops sharply.
+
 Open [http://localhost:8000](http://localhost:8000) for the realtime UI.
 
 For local tests:

@@ -56,6 +56,7 @@ from backend.src.app.models.realtime import (
     VisualCaptureMetrics,
 )
 from backend.src.app.models.surfaces import (
+    CareScoreMetric,
     CaregiverTrendPoint,
     CaregiverDashboardResponse,
     CaregiverTimelinePoint,
@@ -74,6 +75,7 @@ __all__ = [
     "ConversationRole",
     "ConversationStage",
     "CaregiverDashboardResponse",
+    "CareScoreMetric",
     "CaregiverTrendPoint",
     "CaregiverTimelinePoint",
     "Finding",

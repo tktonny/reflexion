@@ -9,10 +9,41 @@
   <body>
     <main class="shell">
       <header class="topbar">
-        <a class="brand" href="/clinic">
-          <span class="brand-mark">R</span>
-          <span>Reflexion</span>
-        </a>
+        <div class="topbar-main">
+          <details class="sidebar-shell">
+            <summary class="sidebar-toggle" aria-label="Open sidebar">
+              <span class="sr-only">Open sidebar</span>
+              <span class="sidebar-toggle-icon" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </summary>
+            <aside class="sidebar-panel">
+              <div class="sidebar-card sidebar-nav-card">
+                <p class="mini-label">Surfaces</p>
+                <nav class="sidebar-links" aria-label="Product surfaces">
+                  <a class="is-active" href="/doctor">Doctor</a>
+                  <a href="/care">Care</a>
+                  <a href="/clinic">Clinic</a>
+                </nav>
+              </div>
+              <div class="sidebar-card">
+                <p class="eyebrow">Doctor Console</p>
+                <h2>Review formal results and patient screening flow.</h2>
+                <p class="support-copy sidebar-copy">
+                  This provider-facing surface summarizes recent assessments, patient watchlists,
+                  and routing workload from the formal multimodal analysis layer.
+                </p>
+              </div>
+            </aside>
+          </details>
+          <a class="brand" href="/clinic">
+            <span class="brand-mark">R</span>
+            <span>Reflexion</span>
+          </a>
+          <span class="topbar-spacer" aria-hidden="true"></span>
+        </div>
         <nav class="nav-links" aria-label="Product surfaces">
           <a class="is-active" href="/doctor">Doctor</a>
           <a href="/care">Care</a>

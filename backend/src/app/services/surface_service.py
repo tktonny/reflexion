@@ -6,6 +6,7 @@ from collections import Counter, defaultdict
 from datetime import timedelta
 
 from backend.src.app.models import (
+    CareScoreMetric,
     CaregiverDashboardResponse,
     CaregiverTrendPoint,
     CaregiverTimelinePoint,
@@ -124,6 +125,7 @@ class SurfaceService:
                 last_updated_at=None,
                 risk_label="LOW RISK",
                 risk_score=0.0,
+                score_breakdown=self._default_score_breakdown(),
                 top_reasons=["No completed assessment is available yet."],
                 recommendation="Complete a mirror or clinic session to generate the first formal assessment.",
                 baseline_comparison=(
@@ -158,6 +160,7 @@ class SurfaceService:
         signal = self._care_signal(latest)
         risk_label = self._care_risk_label(latest)
         risk_score = round(latest.risk_score if latest.risk_score is not None else 0.0, 2)
+        score_breakdown = self._care_score_breakdown(latest, longitudinal.snapshots)
         top_reasons = self._care_top_reasons(latest)
         recommendation = self._care_recommendation(latest, risk_label)
         status_label = self._care_status_label(signal)
@@ -179,6 +182,7 @@ class SurfaceService:
             last_updated_at=latest.created_at,
             risk_label=risk_label,
             risk_score=risk_score,
+            score_breakdown=score_breakdown,
             top_reasons=top_reasons,
             recommendation=recommendation,
             baseline_comparison=longitudinal.baseline_comparison,
@@ -228,6 +232,12 @@ class SurfaceService:
                 last_updated_at=generated_at,
                 risk_label="HIGH RISK",
                 risk_score=0.78,
+                score_breakdown=[
+                    CareScoreMetric(key="speak", label="Speak", value=0.82),
+                    CareScoreMetric(key="content", label="Content", value=0.75),
+                    CareScoreMetric(key="pose", label="Pose", value=0.44),
+                    CareScoreMetric(key="face", label="Face", value=0.28),
+                ],
                 top_reasons=[
                     "Frequent pauses",
                     "Reduced fluency",
@@ -289,6 +299,12 @@ class SurfaceService:
             last_updated_at=generated_at,
             risk_label="LOW RISK",
             risk_score=0.24,
+            score_breakdown=[
+                CareScoreMetric(key="speak", label="Speak", value=0.18),
+                CareScoreMetric(key="content", label="Content", value=0.16),
+                CareScoreMetric(key="pose", label="Pose", value=0.11),
+                CareScoreMetric(key="face", label="Face", value=0.09),
+            ],
             top_reasons=[
                 "Normal pause duration",
                 "Coherent narrative",
@@ -374,6 +390,48 @@ class SurfaceService:
         if not filtered:
             return None
         return round(sum(filtered) / len(filtered), 2)
+
+    def _bounded_score(self, value: float) -> float:
+        return round(max(0.0, min(1.0, value)), 2)
+
+    def _default_score_breakdown(self) -> list[CareScoreMetric]:
+        return [
+            CareScoreMetric(key="speak", label="Speak", value=0.0),
+            CareScoreMetric(key="content", label="Content", value=0.0),
+            CareScoreMetric(key="pose", label="Pose", value=0.0),
+            CareScoreMetric(key="face", label="Face", value=0.0),
+        ]
+
+    def _care_score_breakdown(
+        self,
+        assessment: ClinicAssessment,
+        snapshots,
+    ) -> list[CareScoreMetric]:
+        latest_snapshot = next(
+            (item for item in reversed(list(snapshots)) if item.assessment_id == assessment.assessment_id),
+            None,
+        )
+        if latest_snapshot is None:
+            risk_score = float(assessment.risk_score or 0.0)
+            return [
+                CareScoreMetric(key="speak", label="Speak", value=self._bounded_score((risk_score * 0.82) + 0.08)),
+                CareScoreMetric(key="content", label="Content", value=self._bounded_score((risk_score * 0.76) + 0.08)),
+                CareScoreMetric(key="pose", label="Pose", value=self._bounded_score((risk_score * 0.48) + 0.05)),
+                CareScoreMetric(key="face", label="Face", value=self._bounded_score((risk_score * 0.32) + 0.05)),
+            ]
+
+        task = latest_snapshot.task_behavior_features
+        visual = latest_snapshot.visual_face_features
+        speak = (task.pause_burden + (1.0 - task.speech_fluency)) / 2
+        content = ((1.0 - task.narrative_coherence) + (1.0 - task.recall_consistency)) / 2
+        pose = 1.0 - visual.motion_regularity
+        face = ((1.0 - visual.face_visibility) + (1.0 - visual.face_stability)) / 2
+        return [
+            CareScoreMetric(key="speak", label="Speak", value=self._bounded_score(speak)),
+            CareScoreMetric(key="content", label="Content", value=self._bounded_score(content)),
+            CareScoreMetric(key="pose", label="Pose", value=self._bounded_score(pose)),
+            CareScoreMetric(key="face", label="Face", value=self._bounded_score(face)),
+        ]
 
     def _care_signal(self, assessment: ClinicAssessment) -> str:
         if assessment.screening_classification == "dementia" or assessment.risk_tier == "high":

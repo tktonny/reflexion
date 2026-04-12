@@ -9,10 +9,41 @@
   <body>
     <main class="page">
       <header class="surface-nav">
-        <a class="surface-brand" href="/clinic">
-          <span class="surface-brand-mark">R</span>
-          <span>Reflexion</span>
-        </a>
+        <div class="surface-nav-main">
+          <details class="sidebar-shell">
+            <summary class="sidebar-toggle" aria-label="Open sidebar">
+              <span class="sr-only">Open sidebar</span>
+              <span class="sidebar-toggle-icon" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </summary>
+            <aside class="sidebar-panel">
+              <div class="sidebar-card sidebar-nav-card">
+                <p class="mini-label">Surfaces</p>
+                <nav class="sidebar-links" aria-label="Product surfaces">
+                  <a href="/doctor">Doctor</a>
+                  <a href="/care">Care</a>
+                  <a class="is-active" href="/clinic">Clinic</a>
+                </nav>
+              </div>
+              <div class="sidebar-card">
+                <p class="eyebrow">Clinic Terminal</p>
+                <h2>Run the live interview. Upload the full session.</h2>
+                <p class="lede sidebar-copy">
+                  This surface handles the guided realtime interaction first, then uploads the full
+                  session into the batch multimodal pipeline for formal assessment.
+                </p>
+              </div>
+            </aside>
+          </details>
+          <a class="surface-brand" href="/clinic">
+            <span class="surface-brand-mark">R</span>
+            <span>Reflexion</span>
+          </a>
+          <span class="surface-nav-spacer" aria-hidden="true"></span>
+        </div>
         <nav class="surface-links" aria-label="Product surfaces">
           <a href="/doctor">Doctor</a>
           <a href="/care">Care</a>

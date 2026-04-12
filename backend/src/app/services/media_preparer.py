@@ -24,10 +24,10 @@ class MediaPreparer:
         prepared_dir = self.settings.prepared_dir / assessment_id
         prepared_dir.mkdir(parents=True, exist_ok=True)
 
-        standardized_path = prepared_dir / "standardized.mp4"
-        mime_type = mimetypes.guess_type(input_path.name)[0] or "video/mp4"
+        input_mime = mimetypes.guess_type(input_path.name)[0] or "video/mp4"
 
         if shutil.which(self.settings.ffmpeg_binary):
+            standardized_path = prepared_dir / "standardized.mp4"
             command = [
                 self.settings.ffmpeg_binary,
                 "-y",
@@ -51,6 +51,7 @@ class MediaPreparer:
             ]
             self._run(command, "unsupported_media", "ffmpeg standardization failed")
         else:
+            standardized_path = self._build_passthrough_target(prepared_dir, input_path)
             shutil.copy2(input_path, standardized_path)
 
         duration_seconds = None
@@ -61,7 +62,7 @@ class MediaPreparer:
                 duration_seconds = None
 
         size_bytes = standardized_path.stat().st_size
-        final_mime = mimetypes.guess_type(standardized_path.name)[0] or mime_type
+        final_mime = mimetypes.guess_type(standardized_path.name)[0] or input_mime
 
         return PreparedMedia(
             original_path=str(input_path),
@@ -165,3 +166,11 @@ class MediaPreparer:
         proc = subprocess.run(command, capture_output=True, text=True, check=False)
         if proc.returncode != 0:
             raise ProviderError(code, proc.stderr.strip() or message)
+
+    def _build_passthrough_target(self, prepared_dir: Path, input_path: Path) -> Path:
+        suffix = input_path.suffix.lower()
+        if suffix == ".mp4":
+            return prepared_dir / "standardized.mp4"
+        if not suffix:
+            suffix = ".bin"
+        return prepared_dir / f"standardized{suffix}"

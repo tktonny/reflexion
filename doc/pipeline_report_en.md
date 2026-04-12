@@ -289,47 +289,63 @@ This is a two-layer identity pipeline. The first layer is multi-frame face quali
 
 ## Realtime Conversation: Natural Guidance Instead of Hardcoded Dialogue
 
-Our realtime interaction is not a fixed list of hardcoded prompts. We let the realtime model execute a **goal-driven staged conversation plan**.
+Our realtime interaction should feel like a short human conversation first, with the required probes woven into it quietly in the background. The system therefore uses a **goal-driven conversation plan with hidden objectives**, not a patient-facing script.
 
-### 1. The system defines objectives, not a rigid script
+### 1. The system defines hidden goals, not lines to recite
 
-For each stage, we specify:
+For each stage, we define:
 
-- what information should be collected
-- the primary prompt
+- what signal needs to be collected
+- a natural way to enter that topic
 - when the stage can end
-- how many short follow-ups are allowed
+- how many gentle follow-ups are allowed
 
-Example stages:
+Example hidden stages:
 
 - Orientation
 - Recent Story
 - Daily Function
-- Delayed Recall
+- Wrap-up Recall
 
-The model does not mechanically replay the same exact script. It acknowledges, follows up briefly when needed, and moves on when the exit rule is satisfied.
+The patient should never hear those stage labels. The model uses them internally to stay on track while the conversation sounds normal.
 
-### 2. The realtime model guides, but does not diagnose live
+### 2. Specific questions are blended into natural conversation
+
+The design goal is not “ask question 1, then question 2.” It is:
+
+- acknowledge what the patient just said
+- bridge naturally into the next topic
+- ask one thing at a time
+- keep the structure invisible to the patient
+
+For example, instead of a blunt scripted jump, the guide can say:
+
+> “Thanks, Tony. I'd like to hear a little about how your day has been going. How has your day been so far?”
+
+This keeps the conversation human while still collecting structured cues in a clinically useful way.
+
+### 3. The realtime model guides, but does not diagnose live
 
 Its role is to:
 
 - interact naturally with the patient
-- maintain flow and reduce the feeling of being tested
-- ask adaptive follow-up questions
+- reduce the feeling of being tested
+- adapt phrasing and language in real time
 - capture high-quality audio, video, and behavioral signals
 
-It does **not** issue a final dementia probability or medical conclusion during the live exchange. Formal scoring happens after the session in the post-session screening pipeline.
+It does **not** deliver a live dementia judgment, risk probability, or diagnostic conclusion. Formal scoring happens after the session in the post-session screening pipeline.
 
-### 3. Why this feels more natural than hardcoded logic
+### 4. Why this feels more human than hardcoded logic
 
-Because we delegate the phrasing and conversational adaptation to the model:
+Because the phrasing is delegated to the realtime model under clear style rules:
 
-- it can acknowledge hesitation or confusion naturally
+- it can sound warm instead of robotic
+- it can use the patient’s name naturally once known
+- it can respond to hesitation without breaking flow
 - it can switch language when the patient does
-- it can clarify briefly without breaking the flow
-- it still preserves a structured and auditable screening design
+- it still stays inside a structured, auditable screening design
 
-### 4. Technical path for realtime guidance
+### 5. Technical path for realtime guidance
 
 ```mermaid
 flowchart TD
@@ -342,7 +358,7 @@ flowchart TD
     E --> F["Formal post-session multimodal assessment"]
 ```
 
-Implementation-wise, the conversation plan is injected through the realtime API via `session.update`, and `server_vad` is used for turn detection so the interaction feels conversational rather than button-based or script-replay based.
+Implementation-wise, the conversation plan is injected through the realtime API via `session.update`, but the instructions explicitly tell the model to treat the stage plan as hidden guidance rather than patient-facing dialogue. `server_vad` is used for turn detection so the interaction feels conversational rather than button-based or script-replay based.
 
 ---
 

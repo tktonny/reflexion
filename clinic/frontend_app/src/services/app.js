@@ -318,7 +318,7 @@ function createMessageElement(role, text) {
 
   const label = document.createElement("span");
   label.className = "message-label";
-  label.textContent = role === "assistant" ? "AI Guide" : "Patient";
+  label.textContent = role === "assistant" ? "Guide" : "Patient";
 
   const body = document.createElement("p");
   body.textContent = text;
@@ -1266,10 +1266,12 @@ function chooseRecordingMimeType() {
     return "";
   }
   const candidates = [
+    "video/mp4;codecs=h264,aac",
+    "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
+    "video/mp4",
     "video/webm;codecs=vp9,opus",
     "video/webm;codecs=vp8,opus",
     "video/webm",
-    "video/mp4",
   ];
   return candidates.find((candidate) => MediaRecorder.isTypeSupported(candidate)) || "";
 }
@@ -1533,11 +1535,21 @@ function stopRecordingTurn() {
   queueTranscriptFallback(stage, fallbackText, timeoutMs);
   state.currentRecognitionText = "";
 
+  if (state.blueprint?.session_mode !== "live_qwen") {
+    state.socket.send(
+      JSON.stringify({
+        type: "reflexion.patient_turn",
+        text: fallbackText,
+        stage,
+      }),
+    );
+  }
+
   state.socket.send(JSON.stringify({ type: "input_audio_buffer.commit" }));
   window.setTimeout(() => {
     if (state.socket && state.socket.readyState === WebSocket.OPEN) {
       state.socket.send(JSON.stringify({ type: "response.create" }));
-      setStatus("Generating AI reply...");
+      setStatus("Generating reply...");
     }
   }, 180);
   refreshButtons();
@@ -1590,7 +1602,7 @@ function handleRealtimeEvent(event) {
       setStatus("Connecting live relay...");
     } else {
       disableLiveAutoMode();
-      setStatus("Guided demo ready");
+      setStatus("Guided conversation ready");
     }
     refreshButtons();
     return;
@@ -1609,7 +1621,7 @@ function handleRealtimeEvent(event) {
     const note = event.session.fallback_note || "";
     setFallback(reason ? `${note} Reason: ${reason}` : note);
     renderPromptSteps();
-    setStatus("Live relay degraded to guided demo");
+    setStatus("Live relay degraded to guided conversation");
     return;
   }
 
@@ -1643,14 +1655,14 @@ function handleRealtimeEvent(event) {
       const stage = currentStage()?.key || null;
       const fallbackText = buildTurnFallbackText(stage, state.currentRecognitionText || "");
       queueTranscriptFallback(stage, fallbackText, 1800);
-      setStatus("Turn detected, waiting for AI reply...");
+      setStatus("Turn detected, waiting for reply...");
     }
     return;
   }
 
   if (type === "input_audio_buffer.committed") {
     if (state.liveAutoMode) {
-      setStatus("Turn committed, AI is responding...");
+      setStatus("Turn committed, response in progress...");
     }
     return;
   }
@@ -1807,7 +1819,7 @@ function buildErrorMessage(payload, fallbackText) {
 
   if (providerTrace.some((entry) => entry.failure_reason === "unsupported_media")) {
     message +=
-      " The recorded session may be too large for the inline Qwen batch path. Shorten the session, lower recording bitrate, or configure Gemini/OpenAI fallbacks.";
+      " The recorded session may exceed Qwen's inline batch limit. Shorten the session, lower recording bitrate, install ffmpeg for server-side standardization, or configure Gemini/OpenAI fallbacks.";
   }
 
   return message;

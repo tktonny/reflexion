@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 
 import pytest
@@ -107,3 +108,52 @@ def test_prepare_for_provider_builds_only_needed_fallback_artifacts(
     assert audio_only_media.extracted_audio_path == "/tmp/audio.wav"
     assert audio_only_media.frame_paths == []
     assert calls == ["audio", "frames", "audio"]
+
+
+def test_prepare_base_preserves_non_mp4_suffix_without_ffmpeg(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preparer = MediaPreparer(make_settings(tmp_path))
+    source = tmp_path / "input.webm"
+    source.write_bytes(b"webm-bytes")
+
+    original_which = shutil.which
+
+    def fake_which(binary: str) -> str | None:
+        if binary in {preparer.settings.ffmpeg_binary, preparer.settings.ffprobe_binary}:
+            return None
+        return original_which(binary)
+
+    monkeypatch.setattr(shutil, "which", fake_which)
+
+    prepared = preparer.prepare_base("a1", source)
+
+    assert prepared.standardized_path.endswith("standardized.webm")
+    assert prepared.mime_type == "video/webm"
+    assert Path(prepared.standardized_path).read_bytes() == b"webm-bytes"
+    assert prepared.duration_seconds is None
+
+
+def test_prepare_base_keeps_mp4_passthrough_name_without_ffmpeg(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preparer = MediaPreparer(make_settings(tmp_path))
+    source = tmp_path / "input.mp4"
+    source.write_bytes(b"mp4-bytes")
+
+    original_which = shutil.which
+
+    def fake_which(binary: str) -> str | None:
+        if binary in {preparer.settings.ffmpeg_binary, preparer.settings.ffprobe_binary}:
+            return None
+        return original_which(binary)
+
+    monkeypatch.setattr(shutil, "which", fake_which)
+
+    prepared = preparer.prepare_base("a2", source)
+
+    assert prepared.standardized_path.endswith("standardized.mp4")
+    assert prepared.mime_type == "video/mp4"
+    assert Path(prepared.standardized_path).read_bytes() == b"mp4-bytes"
