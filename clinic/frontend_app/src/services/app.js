@@ -1386,16 +1386,41 @@ function openRealtimeSocket(patientId, language) {
     };
 
     socket.onmessage = (event) => {
-      handleRealtimeEvent(JSON.parse(event.data));
+      try {
+        handleRealtimeEvent(JSON.parse(event.data));
+      } catch (error) {
+        setStatus("Realtime message error");
+        setFallback(
+          error instanceof Error ? error.message : "Received an invalid realtime message.",
+        );
+      }
     };
 
     socket.onerror = () => {
       reject(new Error("Realtime socket failed to connect."));
     };
 
-    socket.onclose = () => {
+    socket.onclose = (event) => {
       if (state.socket === socket) {
         state.socket = null;
+      }
+      const code = Number(event?.code || 0);
+      const reason = String(event?.reason || "").trim();
+      const detailParts = [];
+      if (code) {
+        detailParts.push(`code ${code}`);
+      }
+      if (reason) {
+        detailParts.push(reason);
+      }
+      if (event && !event.wasClean) {
+        detailParts.push("unclean close");
+      }
+      if (detailParts.length > 0) {
+        setFallback(`Realtime socket closed: ${detailParts.join(", ")}`);
+      }
+      if (!state.uploadInFlight) {
+        setStatus("Realtime disconnected");
       }
       disableLiveAutoMode();
       refreshButtons();

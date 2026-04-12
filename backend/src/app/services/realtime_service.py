@@ -34,7 +34,7 @@ except ImportError:  # pragma: no cover - covered by runtime fallback mode
     websockets = None
 
 
-logger = logging.getLogger("clinic.realtime")
+logger = logging.getLogger("uvicorn.error")
 
 
 @dataclass(frozen=True)
