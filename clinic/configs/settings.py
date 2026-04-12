@@ -21,22 +21,18 @@ SUPPORTED_PROVIDERS: tuple[ProviderName, ...] = (
 def _load_local_env() -> None:
     settings_path = Path(__file__).resolve()
     project_root = settings_path.parents[2]
-    for env_path in (
-        project_root / ".secret" / ".env",
-        project_root / ".env",
-        settings_path.with_name(".env"),
-    ):
-        if not env_path.exists():
+    env_path = project_root / ".secret" / ".env"
+    if not env_path.exists():
+        return
+    for raw_line in env_path.read_text().splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
             continue
-        for raw_line in env_path.read_text().splitlines():
-            line = raw_line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, value = line.split("=", 1)
-            key = key.strip()
-            if not key or key in os.environ:
-                continue
-            os.environ[key] = value.strip()
+        key, value = line.split("=", 1)
+        key = key.strip()
+        if not key or key in os.environ:
+            continue
+        os.environ[key] = value.strip()
 
 
 def _as_bool(value: str | None, default: bool = False) -> bool:

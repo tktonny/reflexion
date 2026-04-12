@@ -717,6 +717,16 @@ function average(values) {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
+function applyRecognitionFallbackNote(message) {
+  const base = String(state.blueprint?.fallback_note || "").trim();
+  const detail = String(message || "").trim();
+  if (!detail) {
+    setFallback(base);
+    return;
+  }
+  setFallback(base ? `${base} ${detail}` : detail);
+}
+
 function currentVisualMetrics() {
   return {
     faceDetectionRate:
@@ -1180,7 +1190,7 @@ function ensureRecognition() {
 
   recognition.onresult = (event) => {
     let transcriptText = "";
-    for (let index = event.resultIndex; index < event.results.length; index += 1) {
+    for (let index = 0; index < event.results.length; index += 1) {
       transcriptText += event.results[index][0].transcript;
     }
     state.currentRecognitionText = transcriptText.trim();
@@ -1188,15 +1198,27 @@ function ensureRecognition() {
 
   recognition.onend = () => {
     state.recognitionActive = false;
-    if (state.isRecording && state.liveAutoMode) {
+    if (state.isRecording) {
       window.setTimeout(() => {
         startRecognition();
       }, 120);
     }
   };
 
-  recognition.onerror = () => {
+  recognition.onerror = (event) => {
     state.recognitionActive = false;
+    const errorCode = String(event?.error || "").trim();
+    if (errorCode === "not-allowed" || errorCode === "service-not-allowed") {
+      applyRecognitionFallbackNote(
+        "Browser speech recognition is blocked for this page, so guided-mode transcript capture may be incomplete.",
+      );
+      return;
+    }
+    if (errorCode) {
+      applyRecognitionFallbackNote(
+        `Browser speech recognition reported "${errorCode}", so guided-mode transcript capture may be incomplete.`,
+      );
+    }
   };
 
   state.recognition = recognition;
@@ -1204,6 +1226,12 @@ function ensureRecognition() {
 
 function startRecognition() {
   ensureRecognition();
+  if (!RecognitionConstructor) {
+    applyRecognitionFallbackNote(
+      "This browser does not expose SpeechRecognition, so guided-mode transcript capture falls back to placeholders unless live relay is enabled.",
+    );
+    return;
+  }
   if (!state.recognition || state.recognitionActive) {
     return;
   }
@@ -1216,6 +1244,9 @@ function startRecognition() {
     state.recognitionActive = true;
   } catch {
     state.recognitionActive = false;
+    applyRecognitionFallbackNote(
+      "Browser speech recognition could not start, so guided-mode transcript capture may be incomplete.",
+    );
   }
 }
 

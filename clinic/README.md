@@ -44,7 +44,7 @@ For local tests:
 pip install -r requirements-dev.txt
 ```
 
-Store local secrets in `.secret/.env`.
+Store all local and server environment variables only in `.secret/.env`.
 
 Realtime Qwen knobs:
 
