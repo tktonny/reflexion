@@ -19,6 +19,8 @@ const scoreRing = document.getElementById("score-ring");
 const scoreSupport = document.getElementById("score-support");
 const scoreBreakdown = document.getElementById("score-breakdown");
 const heroReasons = document.getElementById("hero-reasons");
+const desktopTrendCard = document.getElementById("desktop-trend-card");
+const mobileTrendSlot = document.getElementById("mobile-trend-slot");
 const statusLabel = document.getElementById("status-label");
 const reasonSummary = document.getElementById("reason-summary");
 const baselineComparison = document.getElementById("baseline-comparison");
@@ -393,6 +395,19 @@ function renderTrendChart(points, direction) {
   });
 }
 
+function syncMobileTrendCard() {
+  if (!desktopTrendCard || !mobileTrendSlot) {
+    return;
+  }
+
+  const clone = desktopTrendCard.cloneNode(true);
+  clone.removeAttribute("id");
+  clone.classList.remove("hero-chart-card");
+  clone.classList.add("mobile-trend-card");
+  clone.querySelectorAll("[id]").forEach((node) => node.removeAttribute("id"));
+  mobileTrendSlot.replaceChildren(clone);
+}
+
 async function loadPatients() {
   const response = await fetch("/api/care/patients");
   const payload = await response.json();
@@ -459,6 +474,7 @@ async function loadDashboard(patientId) {
     "No extra longitudinal monitoring notes are active right now.",
   );
   renderTrendChart(payload.longitudinal_points, payload.longitudinal_direction);
+  syncMobileTrendCard();
   renderHistory(payload.history);
 
   careStatus.textContent = `Showing ${displayPatientLabel(patientId)}. Updated ${formatDateTime(payload.generated_at)}.`;

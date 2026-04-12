@@ -134,6 +134,20 @@ def test_status_defaults_to_guided_demo_when_live_qwen_is_unavailable(tmp_path: 
     assert status.prompt_steps[0].exit_when[0] == "The patient gives a name or self-reference."
 
 
+def test_freetalk_status_uses_open_mode_without_prompt_steps(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    status = service.build_session_status(surface_mode="freetalk")
+
+    assert status.session_mode == "guided_demo"
+    assert status.conversation_provider == "guided_demo"
+    assert status.flow_id == "freetalk_open_session_v1"
+    assert status.flow_title == "Open Free Talk Session"
+    assert status.prompt_steps == []
+    assert "speak freely" in status.conversation_goal.lower()
+    assert status.greeting == "Hi."
+
+
 def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
 
@@ -150,6 +164,18 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     assert "hidden guidance" in payload["session"]["instructions"]
     assert "Exit when:" in payload["session"]["instructions"]
     assert "Confirm self and place." in payload["session"]["instructions"]
+
+
+def test_freetalk_live_session_update_uses_open_instructions(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    payload = service._build_live_session_update("patient-001", "en", surface_mode="freetalk")
+
+    instructions = payload["session"]["instructions"]
+    assert "Do not run a structured interview or checklist." in instructions
+    assert "Do not force orientation, memory, or daily-function questions." in instructions
+    assert "The next patient audio turn begins an open-ended conversation." in instructions
+    assert "Staged plan:" not in instructions
 
 
 def test_live_status_reports_selected_voice_from_language_hint(tmp_path: Path) -> None:

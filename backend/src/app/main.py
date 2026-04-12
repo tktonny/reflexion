@@ -69,6 +69,12 @@ async def clinic_index() -> FileResponse:
     return page_response("index.html")
 
 
+@app.get("/freetalk")
+@app.get("/clinic/freetalk")
+async def freetalk_index() -> FileResponse:
+    return page_response("freetalk.html")
+
+
 @app.get("/doctor")
 async def doctor_index() -> FileResponse:
     return doctor_page_response("index.html")

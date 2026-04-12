@@ -353,9 +353,11 @@ h3 {
 .intro-copy,
 .controls-card,
 .hero-main,
+.hero-copy,
+.hero-chart-card,
 .hero-meta,
 .card-head,
-.stack-column {
+.support-grid {
   position: relative;
   z-index: 1;
 }
@@ -414,6 +416,8 @@ h3 {
 }
 
 .hero-card {
+  display: grid;
+  gap: 18px;
   padding: 18px;
   border-color: rgba(58, 82, 198, 0.1);
   background:
@@ -458,6 +462,12 @@ h3 {
   margin-top: 12px;
   font-size: 1.06rem;
   line-height: 1.68;
+}
+
+.detail-note {
+  margin-top: 12px;
+  color: var(--muted);
+  line-height: 1.65;
 }
 
 .reason-tags {
@@ -515,7 +525,7 @@ h3 {
   display: grid;
   justify-items: center;
   gap: 10px;
-  padding: 18px 16px;
+  padding: 20px 16px;
   border-radius: 26px;
   border: 1px solid rgba(28, 35, 64, 0.08);
   background: rgba(252, 253, 255, 0.9);
@@ -525,9 +535,9 @@ h3 {
 .score-ring {
   --score-angle: 0deg;
   --score-color: var(--accent);
-  width: 160px;
-  height: 160px;
-  padding: 16px;
+  width: 188px;
+  height: 188px;
+  padding: 18px;
   display: grid;
   place-items: center;
   text-align: center;
@@ -552,13 +562,13 @@ h3 {
 .score-ring strong {
   display: block;
   margin-top: 6px;
-  font-size: 2.15rem;
+  font-size: 2.5rem;
   line-height: 1;
   color: var(--ink);
 }
 
 .score-support {
-  max-width: 24ch;
+  max-width: 28ch;
   text-align: center;
 }
 
@@ -618,10 +628,20 @@ h3 {
 }
 
 .priority-grid,
-.insight-grid,
-.stack-column {
+.support-grid {
   display: grid;
   gap: 16px;
+}
+
+.hero-chart-card {
+  border-color: rgba(28, 35, 64, 0.08);
+  background:
+    linear-gradient(180deg, rgba(244, 247, 255, 0.96), rgba(255, 255, 255, 0.98)),
+    var(--panel-strong);
+}
+
+.mobile-trend-slot {
+  display: none;
 }
 
 .app-card {
@@ -847,26 +867,39 @@ h3 {
     padding: 24px;
   }
 
-  .hero-main {
-    grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
+  .hero-card {
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 300px);
     align-items: start;
     gap: 22px;
   }
 
+  .hero-main {
+    display: contents;
+  }
+
   .hero-meta {
+    grid-column: 1 / -1;
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .score-card {
+    grid-column: 2;
+    grid-row: 1 / span 2;
     align-self: stretch;
+  }
+
+  .hero-chart-card {
+    grid-column: 1;
+    grid-row: 2;
+    min-height: 100%;
   }
 
   .priority-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .insight-grid {
-    grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.85fr);
+  .support-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
   }
 }
@@ -877,12 +910,12 @@ h3 {
   }
 
   .score-card {
-    padding: 20px 18px;
+    padding: 22px 18px;
   }
 
   .score-ring {
-    width: 172px;
-    height: 172px;
+    width: 204px;
+    height: 204px;
   }
 }
 
@@ -931,6 +964,14 @@ h3 {
     grid-template-columns: 1fr;
   }
 
+  .hero-chart-card {
+    display: none;
+  }
+
+  .mobile-trend-slot {
+    display: block;
+  }
+
   .hero-card,
   .app-card {
     padding: 16px;
@@ -944,8 +985,8 @@ h3 {
   }
 
   .score-ring {
-    width: 132px;
-    height: 132px;
+    width: 156px;
+    height: 156px;
   }
 
   h1 {
@@ -968,8 +1009,8 @@ h3 {
   }
 
   .score-ring {
-    width: 124px;
-    height: 124px;
+    width: 148px;
+    height: 148px;
   }
 
   .chart-labels {

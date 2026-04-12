@@ -10,7 +10,7 @@ import re
 import uuid
 from contextlib import suppress
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import WebSocket, WebSocketDisconnect
 
@@ -35,6 +35,9 @@ except ImportError:  # pragma: no cover - covered by runtime fallback mode
 
 
 logger = logging.getLogger("uvicorn.error")
+
+
+RealtimeSurfaceMode = Literal["clinic", "freetalk"]
 
 
 @dataclass(frozen=True)
@@ -245,6 +248,7 @@ class RealtimeConversationService:
         *,
         force_guided_demo: bool = False,
         preferred_language: str | None = None,
+        surface_mode: RealtimeSurfaceMode = "clinic",
     ) -> RealtimeSessionStatus:
         live_relay_available = bool(not force_guided_demo and self._live_qwen_ready())
         if live_relay_available:
@@ -257,16 +261,14 @@ class RealtimeConversationService:
                 selected_voice=voice_profile.voice,
                 selected_language=voice_profile.language_label,
                 voice_selection_source=voice_profile.source,
-                flow_id=self.orchestrator.flow_id,
-                flow_title=self.orchestrator.flow_title,
-                conversation_goal=self.orchestrator.conversation_goal,
-                completion_rule=self.orchestrator.completion_rule,
-                greeting=self._opening_message(),
-                prompt_steps=self.orchestrator.prompt_steps,
-                processing_steps=self._processing_steps(),
-                fallback_note=(
-                    "If the live relay drops, the screen stays in guided conversation mode and still produces the final risk story."
-                ),
+                flow_id=self._flow_id(surface_mode),
+                flow_title=self._flow_title(surface_mode),
+                conversation_goal=self._conversation_goal(surface_mode),
+                completion_rule=self._completion_rule(surface_mode),
+                greeting=self._opening_message(surface_mode),
+                prompt_steps=self._prompt_steps(surface_mode),
+                processing_steps=self._processing_steps(surface_mode),
+                fallback_note=self._fallback_note(surface_mode, live_relay_available=True),
             )
         return RealtimeSessionStatus(
             session_mode="guided_demo",
@@ -276,27 +278,33 @@ class RealtimeConversationService:
             selected_voice=None,
             selected_language=None,
             voice_selection_source=None,
-            flow_id=self.orchestrator.flow_id,
-            flow_title=self.orchestrator.flow_title,
-            conversation_goal=self.orchestrator.conversation_goal,
-            completion_rule=self.orchestrator.completion_rule,
-            greeting=self._opening_message(),
-            prompt_steps=self.orchestrator.prompt_steps,
-            processing_steps=self._processing_steps(),
-            fallback_note=(
-                "Live Qwen relay is unavailable, so the interface keeps the guided conversation and local risk narrative active."
-            ),
+            flow_id=self._flow_id(surface_mode),
+            flow_title=self._flow_title(surface_mode),
+            conversation_goal=self._conversation_goal(surface_mode),
+            completion_rule=self._completion_rule(surface_mode),
+            greeting=self._opening_message(surface_mode),
+            prompt_steps=self._prompt_steps(surface_mode),
+            processing_steps=self._processing_steps(surface_mode),
+            fallback_note=self._fallback_note(surface_mode, live_relay_available=False),
         )
 
-    async def run_session(self, websocket: WebSocket, patient_id: str, language: str) -> None:
+    async def run_session(
+        self,
+        websocket: WebSocket,
+        patient_id: str,
+        language: str,
+        *,
+        surface_mode: RealtimeSurfaceMode = "clinic",
+    ) -> None:
         """Accept one browser session and serve either live or guided mode."""
 
         await websocket.accept()
-        status = self.build_session_status(preferred_language=language)
+        status = self.build_session_status(preferred_language=language, surface_mode=surface_mode)
         logger.info(
-            "Realtime browser session accepted patient_id=%s language=%s mode=%s provider=%s live=%s",
+            "Realtime browser session accepted patient_id=%s language=%s surface_mode=%s mode=%s provider=%s live=%s",
             patient_id,
             language,
+            surface_mode,
             status.session_mode,
             status.conversation_provider,
             status.live_relay_available,
@@ -305,14 +313,23 @@ class RealtimeConversationService:
 
         if status.session_mode == "live_qwen":
             try:
-                await self._run_live_qwen(websocket, patient_id=patient_id, language=language)
+                await self._run_live_qwen(
+                    websocket,
+                    patient_id=patient_id,
+                    language=language,
+                    surface_mode=surface_mode,
+                )
                 return
             except WebSocketDisconnect:
                 logger.info("Realtime browser websocket disconnected during live session")
                 return
             except Exception as exc:  # noqa: BLE001
                 logger.exception("Realtime live relay degraded to guided demo: %s", exc)
-                degraded = self.build_session_status(force_guided_demo=True, preferred_language=language)
+                degraded = self.build_session_status(
+                    force_guided_demo=True,
+                    preferred_language=language,
+                    surface_mode=surface_mode,
+                )
                 await websocket.send_json(
                     {
                         "type": "reflexion.session.degraded",
@@ -323,7 +340,7 @@ class RealtimeConversationService:
 
         logger.warning("Realtime session running in guided demo mode")
         with suppress(WebSocketDisconnect):
-            await self._run_guided_demo(websocket)
+            await self._run_guided_demo(websocket, surface_mode=surface_mode)
 
     def analyze_session(self, request: RealtimeAnalysisRequest) -> RealtimeAssessment:
         """Convert one captured conversation into a deterministic demo assessment."""
@@ -550,7 +567,14 @@ class RealtimeConversationService:
             quality_flags=quality_flags,
         )
 
-    async def _run_live_qwen(self, websocket: WebSocket, patient_id: str, language: str) -> None:
+    async def _run_live_qwen(
+        self,
+        websocket: WebSocket,
+        patient_id: str,
+        language: str,
+        *,
+        surface_mode: RealtimeSurfaceMode = "clinic",
+    ) -> None:
         assert websockets is not None
 
         url = f"{self.settings.qwen_omni_realtime_url}?model={self.settings.qwen_omni_realtime_model}"
@@ -596,6 +620,7 @@ class RealtimeConversationService:
                         patient_id,
                         profile.language_label,
                         voice=profile.voice,
+                        surface_mode=surface_mode,
                     )
                 )
 
@@ -717,7 +742,12 @@ class RealtimeConversationService:
                 task.result()
             logger.info("Qwen realtime upstream relay finished cleanly")
 
-    async def _run_guided_demo(self, websocket: WebSocket) -> None:
+    async def _run_guided_demo(
+        self,
+        websocket: WebSocket,
+        *,
+        surface_mode: RealtimeSurfaceMode = "clinic",
+    ) -> None:
         committed_turns = 0
         last_patient_text = ""
         patient_name: str | None = None
@@ -748,6 +778,7 @@ class RealtimeConversationService:
                 committed_turns,
                 patient_text=last_patient_text,
                 patient_name=patient_name,
+                surface_mode=surface_mode,
             )
             await websocket.send_json({"type": "response.created", "response": {"id": response_id}})
             assembled = []
@@ -766,8 +797,12 @@ class RealtimeConversationService:
         language: str,
         *,
         voice: str | None = None,
+        surface_mode: RealtimeSurfaceMode = "clinic",
     ) -> dict[str, Any]:
-        instructions = self.orchestrator.build_live_instructions(patient_id, language)
+        if surface_mode == "freetalk":
+            instructions = self._build_free_talk_instructions(patient_id, language)
+        else:
+            instructions = self.orchestrator.build_live_instructions(patient_id, language)
         return {
             "event_id": f"event_{uuid.uuid4().hex[:12]}",
             "type": "session.update",
@@ -789,11 +824,75 @@ class RealtimeConversationService:
             },
         }
 
-    def _opening_message(self) -> str:
+    def _flow_id(self, surface_mode: RealtimeSurfaceMode) -> str:
+        if surface_mode == "freetalk":
+            return "freetalk_open_session_v1"
+        return self.orchestrator.flow_id
+
+    def _flow_title(self, surface_mode: RealtimeSurfaceMode) -> str:
+        if surface_mode == "freetalk":
+            return "Open Free Talk Session"
+        return self.orchestrator.flow_title
+
+    def _conversation_goal(self, surface_mode: RealtimeSurfaceMode) -> str:
+        if surface_mode == "freetalk":
+            return (
+                "Let the patient speak freely with realtime Omni in an open conversation without a scripted intake flow."
+            )
+        return self.orchestrator.conversation_goal
+
+    def _completion_rule(self, surface_mode: RealtimeSurfaceMode) -> str:
+        if surface_mode == "freetalk":
+            return "Continue the open conversation until the patient or operator ends the session."
+        return self.orchestrator.completion_rule
+
+    def _opening_message(self, surface_mode: RealtimeSurfaceMode) -> str:
+        if surface_mode == "freetalk":
+            return "Hi."
         return self.orchestrator.opening_message
 
-    def _processing_steps(self) -> list[str]:
+    def _processing_steps(self, surface_mode: RealtimeSurfaceMode) -> list[str]:
+        if surface_mode == "freetalk":
+            return [
+                "Audio and webcam frames are captured continuously during the free conversation.",
+                "Realtime Omni stays open-ended and responds naturally instead of following a staged intake flow.",
+                "Speech and face-stream proxies are converted into compact feature embeddings.",
+                "The full recorded session is uploaded for formal multimodal assessment after the live conversation.",
+            ]
         return self.orchestrator.processing_steps
+
+    def _prompt_steps(self, surface_mode: RealtimeSurfaceMode) -> list[Any]:
+        if surface_mode == "freetalk":
+            return []
+        return self.orchestrator.prompt_steps
+
+    def _fallback_note(self, surface_mode: RealtimeSurfaceMode, *, live_relay_available: bool) -> str:
+        if live_relay_available:
+            return (
+                "If the live relay drops, the screen stays in guided conversation mode and still produces the final risk story."
+            )
+        return (
+            "Live Qwen relay is unavailable, so the interface keeps the guided conversation and local risk narrative active."
+        )
+
+    def _build_free_talk_instructions(self, patient_id: str, language: str) -> str:
+        language_name = language.strip() or "en"
+        return (
+            "You are Reflexion, a calm, warm, natural conversation partner in a clinical capture setting.\n"
+            f"The patient identifier is {patient_id}.\n"
+            f"Respond in {language_name} unless the patient clearly switches languages.\n"
+            "The local interface has already opened the conversation.\n"
+            "The next patient audio turn begins an open-ended conversation.\n"
+            "Live response rules:\n"
+            "- Do not run a structured interview or checklist.\n"
+            "- Do not force orientation, memory, or daily-function questions.\n"
+            "- Let the patient lead the topic and respond naturally to what they say.\n"
+            "- Ask gentle follow-up questions only when they fit the conversation.\n"
+            "- Keep replies concise, usually one or two short sentences.\n"
+            "- Never diagnose, score risk, or discuss dementia probability during the live conversation.\n"
+            "- If the patient slows down, reassure gently and leave space rather than pushing them.\n"
+            "- When the patient appears finished, close naturally and wait for the operator to end the session."
+        )
 
     def _mock_reply(
         self,
@@ -801,6 +900,7 @@ class RealtimeConversationService:
         *,
         patient_text: str | None = None,
         patient_name: str | None = None,
+        surface_mode: RealtimeSurfaceMode = "clinic",
     ) -> str:
         return self.orchestrator.guided_reply(
             committed_turns,

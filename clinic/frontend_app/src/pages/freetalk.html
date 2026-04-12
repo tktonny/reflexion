@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reflexion Clinic Terminal</title>
+    <title>Reflexion Free Talk</title>
     <link rel="stylesheet" href="/static/styles/styles.css" />
   </head>
-  <body data-surface-mode="clinic">
+  <body data-surface-mode="freetalk">
     <main class="page">
       <header class="surface-nav">
         <div class="surface-nav-main">
@@ -25,21 +25,21 @@
                 <nav class="sidebar-links" aria-label="Product surfaces">
                   <a href="/doctor">Doctor</a>
                   <a href="/care">Care</a>
-                  <a class="is-active" href="/clinic">Clinic</a>
-                  <a href="/freetalk">Freetalk</a>
+                  <a href="/clinic">Clinic</a>
+                  <a class="is-active" href="/freetalk">Freetalk</a>
                 </nav>
               </div>
               <div class="sidebar-card">
-                <p class="eyebrow">Clinic Terminal</p>
-                <h2>Run the live interview. Upload the full session.</h2>
+                <p class="eyebrow">Free Talk</p>
+                <h2>Let Omni talk openly. Upload the full session.</h2>
                 <p class="lede sidebar-copy">
-                  This surface handles the guided realtime interaction first, then uploads the full
-                  session into the batch multimodal pipeline for formal assessment.
+                  This surface removes the structured realtime intake and keeps the same full-session
+                  recording, upload, and batch multimodal assessment flow as clinic.
                 </p>
               </div>
             </aside>
           </details>
-          <a class="surface-brand" href="/clinic">
+          <a class="surface-brand" href="/freetalk">
             <span class="surface-brand-mark">R</span>
             <span>Reflexion</span>
           </a>
@@ -48,19 +48,19 @@
         <nav class="surface-links" aria-label="Product surfaces">
           <a href="/doctor">Doctor</a>
           <a href="/care">Care</a>
-          <a class="is-active" href="/clinic">Clinic</a>
-          <a href="/freetalk">Freetalk</a>
+          <a href="/clinic">Clinic</a>
+          <a class="is-active" href="/freetalk">Freetalk</a>
         </nav>
       </header>
 
       <section class="hero">
         <div>
-          <p class="eyebrow">Clinic Terminal</p>
-          <h1>Run the live interview. Upload the full session.</h1>
+          <p class="eyebrow">Free Talk</p>
+          <h1>Let Omni talk openly. Upload the full session.</h1>
           <p class="lede">
-            This is the mirror or assessment interaction surface. The realtime model handles the
-            guided patient conversation, then the browser uploads the full recording to the batch
-            multimodal pipeline for the formal provider-facing assessment.
+            This is the open realtime conversation surface. Qwen Omni stays unconstrained during the
+            live exchange, then the browser uploads the full recording into the same batch
+            multimodal pipeline used by clinic for formal assessment.
           </p>
           <div class="hero-meta">
             <div>
@@ -89,9 +89,9 @@
         <div class="section-head">
           <div>
             <p class="eyebrow">Live Session</p>
-            <h2>Structured realtime interview</h2>
+            <h2>Open realtime conversation</h2>
             <p>
-              Qwen conducts the patient interaction while the browser records the full webcam and
+              Omni responds freely in realtime while the browser records the full webcam and
               microphone stream for later multimodal review.
             </p>
           </div>
@@ -102,7 +102,7 @@
             <span class="mini-label identity-label">Identity Check</span>
             <p class="status status-secondary" id="identity-status">Not checked</p>
             <p class="subtle" id="identity-note">
-              We verify the opening face before the realtime interview starts.
+              We verify the opening face before the realtime conversation starts.
             </p>
           </div>
         </div>
@@ -191,7 +191,7 @@
             <p class="eyebrow">Manual Upload</p>
             <h2>Analyze existing video</h2>
             <p>
-              Keep a separate entry point for previously recorded clinic visits or externally
+              Keep a separate entry point for previously recorded conversations or externally
               captured patient videos.
             </p>
           </div>

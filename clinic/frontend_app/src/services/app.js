@@ -62,6 +62,7 @@ const disclaimer = document.getElementById("disclaimer");
 
 const RecognitionConstructor =
   window.SpeechRecognition || window.webkitSpeechRecognition || null;
+const pageMode = document.body?.dataset?.surfaceMode === "freetalk" ? "freetalk" : "clinic";
 
 const state = {
   blueprint: null,
@@ -836,7 +837,7 @@ async function runIdentityPreflight(patientId) {
 }
 
 async function loadRealtimeStatus() {
-  const response = await fetch("/api/clinic/realtime/status");
+  const response = await fetch(`/api/clinic/realtime/status?surface_mode=${encodeURIComponent(pageMode)}`);
   const payload = await parseJsonResponse(response);
 
   if (!response.ok) {
@@ -1377,7 +1378,7 @@ async function stopSessionRecording() {
 function openRealtimeSocket(patientId, language) {
   return new Promise((resolve, reject) => {
     const socket = new WebSocket(
-      `${wsBaseUrl()}/api/clinic/realtime/ws?patient_id=${encodeURIComponent(patientId)}&language=${encodeURIComponent(language)}`,
+      `${wsBaseUrl()}/api/clinic/realtime/ws?patient_id=${encodeURIComponent(patientId)}&language=${encodeURIComponent(language)}&surface_mode=${encodeURIComponent(pageMode)}`,
     );
 
     socket.onopen = () => {
