@@ -86,3 +86,49 @@ def test_parse_text_response_swaps_common_label_mixup(tmp_path: Path) -> None:
     assert payload.risk_label == "cognitive_risk"
     assert payload.screening_classification == "needs_observation"
     assert payload.risk_tier == "medium"
+
+
+def test_parse_text_response_infers_missing_risk_fields_from_classification(tmp_path: Path) -> None:
+    provider = ParsingTestProvider(make_settings(tmp_path))
+    raw_text = """
+    {
+      "session_usability": "usable_with_caveats",
+      "quality_flags": ["limited_speaking_time"],
+      "visual_findings": [],
+      "body_findings": [],
+      "voice_findings": [],
+      "content_findings": [],
+      "risk_tier": "medium",
+      "screening_classification": "needs_observation"
+    }
+    """
+
+    payload = provider._parse_text_response(raw_text)
+
+    assert payload.risk_score == 0.5
+    assert payload.risk_label == "cognitive_risk"
+    assert payload.risk_tier == "medium"
+    assert payload.screening_classification == "needs_observation"
+
+
+def test_parse_text_response_normalizes_percent_risk_score_and_infers_label(tmp_path: Path) -> None:
+    provider = ParsingTestProvider(make_settings(tmp_path))
+    raw_text = """
+    {
+      "session_usability": "usable",
+      "quality_flags": [],
+      "visual_findings": [],
+      "body_findings": [],
+      "voice_findings": [],
+      "content_findings": [],
+      "risk_score": "20%",
+      "screening_classification": "healthy"
+    }
+    """
+
+    payload = provider._parse_text_response(raw_text)
+
+    assert payload.risk_score == 0.2
+    assert payload.risk_label == "HC"
+    assert payload.screening_classification == "healthy"
+    assert payload.risk_tier == "low"

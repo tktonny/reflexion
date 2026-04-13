@@ -814,9 +814,11 @@ class RealtimeConversationService:
                 "output_audio_format": "pcm",
                 "turn_detection": {
                     "type": "server_vad",
-                    "threshold": 0.5,
-                    "prefix_padding_ms": 300,
-                    "silence_duration_ms": 800,
+                    "threshold": 0.1,
+                    "prefix_padding_ms": 500,
+                    "silence_duration_ms": 900,
+                    "create_response": True,
+                    "interrupt_response": True,
                 },
                 "input_audio_transcription": {
                     "model": self.settings.qwen_omni_realtime_transcription_model,

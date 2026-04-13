@@ -1,0 +1,67 @@
+{
+  "snapshotId": "05a089a0b93b4317b86eea03851ed14d-snapshot",
+  "patientId": "patient-002",
+  "sessionId": "live-1776047510540",
+  "productMode": "clinic",
+  "capturedAt": "2026-04-13T02:32:13.749831+00:00",
+  "language": "en",
+  "featurePipelineVersion": "longitudinal-engine-v1",
+  "quality": {
+    "usability": "usable-with-caveats",
+    "coverageScore": 0.5583333333333333,
+    "flags": [
+      "low_light",
+      "limited_speaking_time",
+      "face_detection_unavailable",
+      "short_structured_interview"
+    ]
+  },
+  "embeddings": {
+    "speech": {
+      "vectorUri": "inline://feature_snapshots/05a089a0b93b4317b86eea03851ed14d#speech",
+      "dimensions": 8,
+      "modelVersion": "mock-speech-v1"
+    },
+    "conversation": {
+      "vectorUri": "inline://feature_snapshots/05a089a0b93b4317b86eea03851ed14d#conversation",
+      "dimensions": 8,
+      "modelVersion": "mock-conversation-v1"
+    },
+    "face": {
+      "vectorUri": "inline://feature_snapshots/05a089a0b93b4317b86eea03851ed14d#face",
+      "dimensions": 1684,
+      "modelVersion": "opencv_hog_lbp_v2"
+    }
+  },
+  "features": {
+    "speech": {
+      "embeddingReady": true,
+      "sessionRecordAvailable": true
+    },
+    "conversation": {
+      "riskScore": 0.15,
+      "screeningClassification": "healthy"
+    },
+    "taskBehavior": {
+      "pause_burden": 0.26999999999999996,
+      "speech_fluency": 0.681092,
+      "narrative_coherence": 0.858,
+      "recall_consistency": 0.619,
+      "support_dependency": 0.23500000000000004
+    },
+    "visualFace": {
+      "face_visibility": 0.88,
+      "face_stability": 0.8614283537994321,
+      "motion_regularity": 0.5186128045157458,
+      "identity_confidence": 0.9152183689014326,
+      "identityLinkId": "05a089a0b93b4317b86eea03851ed14d-identity-link",
+      "timelineInclusion": "include",
+      "identityConfidence": 0.85
+    }
+  },
+  "trendContext": {
+    "baselineState": "building",
+    "windowLabel": "3 months",
+    "daysSinceEnrollment": 0
+  }
+}

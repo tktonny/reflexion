@@ -252,7 +252,96 @@ class BaseProvider(ABC):
         if normalized_risk_tier is not None:
             normalized["risk_tier"] = normalized_risk_tier
 
+        normalized_risk_score = self._normalize_risk_score(normalized.get("risk_score"))
+        if normalized_risk_score is None:
+            normalized_risk_score = self._infer_risk_score(
+                risk_tier=normalized_risk_tier,
+                screening_classification=normalized_screening_classification,
+            )
+        if normalized_risk_score is not None:
+            normalized["risk_score"] = normalized_risk_score
+
+        if normalized_risk_label is None:
+            normalized_risk_label = self._infer_risk_label(
+                screening_classification=normalized_screening_classification,
+                risk_tier=normalized_risk_tier,
+                risk_score=normalized.get("risk_score"),
+            )
+        if normalized_risk_label is not None:
+            normalized["risk_label"] = normalized_risk_label
+
         return normalized
+
+    def _normalize_risk_score(self, value: Any) -> float | None:
+        if isinstance(value, bool) or value is None:
+            return None
+
+        numeric: float | None = None
+        if isinstance(value, (int, float)):
+            numeric = float(value)
+        elif isinstance(value, str):
+            cleaned = value.strip()
+            if not cleaned:
+                return None
+            is_percent = cleaned.endswith("%")
+            if is_percent:
+                cleaned = cleaned[:-1].strip()
+            try:
+                numeric = float(cleaned)
+            except ValueError:
+                return None
+            if is_percent:
+                numeric /= 100.0
+
+        if numeric is None:
+            return None
+        if 0.0 <= numeric <= 1.0:
+            return round(numeric, 4)
+        if 1.0 < numeric <= 100.0:
+            return round(numeric / 100.0, 4)
+        return None
+
+    def _infer_risk_score(
+        self,
+        *,
+        risk_tier: str | None,
+        screening_classification: str | None,
+    ) -> float | None:
+        if risk_tier == "low":
+            return 0.2
+        if risk_tier == "medium":
+            return 0.5
+        if risk_tier == "high":
+            return 0.8
+        if screening_classification == "healthy":
+            return 0.2
+        if screening_classification == "needs_observation":
+            return 0.5
+        if screening_classification == "dementia":
+            return 0.85
+        return None
+
+    def _infer_risk_label(
+        self,
+        *,
+        screening_classification: str | None,
+        risk_tier: str | None,
+        risk_score: Any,
+    ) -> str | None:
+        if screening_classification == "healthy":
+            return "HC"
+        if screening_classification == "dementia":
+            return "cognitive_risk"
+
+        normalized_risk_score = self._normalize_risk_score(risk_score)
+        if normalized_risk_score is not None:
+            return "HC" if normalized_risk_score < 0.35 else "cognitive_risk"
+
+        if risk_tier == "low":
+            return "HC"
+        if risk_tier in {"medium", "high"}:
+            return "cognitive_risk"
+        return None
 
     def _normalize_risk_label(self, value: Any) -> str | None:
         if not isinstance(value, str):
