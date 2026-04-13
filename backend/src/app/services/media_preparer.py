@@ -15,6 +15,11 @@ from backend.src.app.models import PreparedMedia
 class MediaPreparer:
     """Standardize video inputs and extract artifacts for fallback providers."""
 
+    STANDARDIZED_MAX_WIDTH = 854
+    STANDARDIZED_VIDEO_BITRATE_MIN_KBPS = 420
+    STANDARDIZED_VIDEO_BITRATE_MAX_KBPS = 2800
+    STANDARDIZED_CONTAINER_OVERHEAD_BYTES = 160 * 1024
+
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
 
@@ -25,30 +30,20 @@ class MediaPreparer:
         prepared_dir.mkdir(parents=True, exist_ok=True)
 
         input_mime = mimetypes.guess_type(input_path.name)[0] or "video/mp4"
+        input_duration_seconds = None
+        if shutil.which(self.settings.ffprobe_binary):
+            try:
+                input_duration_seconds = self._probe_duration(input_path)
+            except ProviderError:
+                input_duration_seconds = None
 
         if shutil.which(self.settings.ffmpeg_binary):
             standardized_path = prepared_dir / "standardized.mp4"
-            command = [
-                self.settings.ffmpeg_binary,
-                "-y",
-                "-i",
-                str(input_path),
-                "-vf",
-                "scale='min(854,iw)':-2",
-                "-c:v",
-                "libx264",
-                "-preset",
-                "veryfast",
-                "-crf",
-                "30",
-                "-movflags",
-                "+faststart",
-                "-c:a",
-                "aac",
-                "-b:a",
-                "64k",
-                str(standardized_path),
-            ]
+            command = self._build_standardize_command(
+                input_path,
+                standardized_path,
+                duration_seconds=input_duration_seconds,
+            )
             self._run(command, "unsupported_media", "ffmpeg standardization failed")
         else:
             standardized_path = self._build_passthrough_target(prepared_dir, input_path)
@@ -161,6 +156,71 @@ class MediaPreparer:
         if proc.returncode != 0:
             raise ProviderError("ffprobe_failed", proc.stderr.strip() or "ffprobe failed")
         return float(proc.stdout.strip())
+
+    def _estimate_standardized_total_bytes(self, duration_seconds: float | None) -> int:
+        min_bytes = max(1, self.settings.standardized_video_min_mb) * 1024 * 1024
+        max_bytes = max(self.settings.standardized_video_max_mb, self.settings.standardized_video_min_mb) * 1024 * 1024
+        if not duration_seconds or duration_seconds <= 0:
+            return min(max_bytes, max(min_bytes, 6 * 1024 * 1024))
+        target_total_kbps = max(600, self.settings.standardized_video_target_total_kbps)
+        estimated = int(duration_seconds * target_total_kbps * 1000 / 8)
+        return max(min_bytes, min(max_bytes, estimated))
+
+    def _standardized_bitrate_profile(self, duration_seconds: float | None) -> tuple[int, int]:
+        audio_kbps = max(48, self.settings.standardized_audio_bitrate_kbps)
+        if not duration_seconds or duration_seconds <= 0:
+            return 1400, audio_kbps
+
+        target_total_bytes = self._estimate_standardized_total_bytes(duration_seconds)
+        audio_bytes = int(duration_seconds * audio_kbps * 1000 / 8)
+        video_bytes = max(
+            256 * 1024,
+            target_total_bytes - audio_bytes - self.STANDARDIZED_CONTAINER_OVERHEAD_BYTES,
+        )
+        video_kbps = int((video_bytes * 8) / max(duration_seconds, 1.0) / 1000)
+        video_kbps = max(
+            self.STANDARDIZED_VIDEO_BITRATE_MIN_KBPS,
+            min(self.STANDARDIZED_VIDEO_BITRATE_MAX_KBPS, video_kbps),
+        )
+        return video_kbps, audio_kbps
+
+    def _build_standardize_command(
+        self,
+        input_path: Path,
+        standardized_path: Path,
+        *,
+        duration_seconds: float | None,
+    ) -> list[str]:
+        video_kbps, audio_kbps = self._standardized_bitrate_profile(duration_seconds)
+        maxrate_kbps = int(video_kbps * 1.15)
+        bufsize_kbps = max(video_kbps * 2, 900)
+        return [
+            self.settings.ffmpeg_binary,
+            "-y",
+            "-i",
+            str(input_path),
+            "-vf",
+            f"scale='min({self.STANDARDIZED_MAX_WIDTH},iw)':-2",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "medium",
+            "-pix_fmt",
+            "yuv420p",
+            "-b:v",
+            f"{video_kbps}k",
+            "-maxrate",
+            f"{maxrate_kbps}k",
+            "-bufsize",
+            f"{bufsize_kbps}k",
+            "-movflags",
+            "+faststart",
+            "-c:a",
+            "aac",
+            "-b:a",
+            f"{audio_kbps}k",
+            str(standardized_path),
+        ]
 
     def _run(self, command: list[str], code: str, message: str) -> None:
         proc = subprocess.run(command, capture_output=True, text=True, check=False)

@@ -63,6 +63,9 @@ const disclaimer = document.getElementById("disclaimer");
 const RecognitionConstructor =
   window.SpeechRecognition || window.webkitSpeechRecognition || null;
 const pageMode = document.body?.dataset?.surfaceMode === "freetalk" ? "freetalk" : "clinic";
+const MIN_QWEN_SPEECH_SECONDS = 3.5;
+const MIN_QWEN_RECORDING_BYTES = 48 * 1024;
+const MIN_QWEN_PATIENT_TURNS = 1;
 
 const state = {
   blueprint: null,
@@ -1303,8 +1306,8 @@ function prepareSessionRecorder() {
 
   const mimeType = chooseRecordingMimeType();
   const options = {
-    videoBitsPerSecond: 220_000,
-    audioBitsPerSecond: 32_000,
+    videoBitsPerSecond: 1_200_000,
+    audioBitsPerSecond: 96_000,
   };
   if (mimeType) {
     options.mimeType = mimeType;
@@ -1823,7 +1826,58 @@ function buildErrorMessage(payload, fallbackText) {
       " The recorded session may exceed Qwen's inline batch limit. Shorten the session, lower recording bitrate, install ffmpeg for server-side standardization, or configure Gemini/OpenAI fallbacks.";
   }
 
+  const qwenUnusable = providerTrace.find(
+    (entry) => entry.provider === "qwen_omni" && entry.failure_reason === "unusable_result",
+  );
+  const qwenFlags = Array.isArray(qwenUnusable?.debug_details?.quality_flags)
+    ? qwenUnusable.debug_details.quality_flags
+    : [];
+  if (qwenFlags.length > 0) {
+    const advice = [];
+    if (qwenFlags.includes("video_too_short")) {
+      advice.push("keep the session running longer before ending it");
+    }
+    if (qwenFlags.includes("speech_unintelligible") || qwenFlags.includes("transcript_unavailable")) {
+      advice.push("make sure the patient speaks clearly for a few seconds");
+    }
+    if (qwenFlags.includes("face_not_visible") || qwenFlags.includes("low_light")) {
+      advice.push("keep the patient centered in brighter light");
+    }
+    if (advice.length > 0) {
+      message += ` Qwen judged the clip unusable; ${advice.join(", ")}.`;
+    }
+  }
+
   return message;
+}
+
+function validateLiveSessionForQwen(blob) {
+  const patientTurns = patientTurnCount();
+  const recordingBytes = Number(blob?.size || 0);
+  const speechSeconds = Number(state.speechDurationSeconds || 0);
+
+  if (patientTurns >= MIN_QWEN_PATIENT_TURNS && speechSeconds >= MIN_QWEN_SPEECH_SECONDS) {
+    return;
+  }
+
+  if (recordingBytes >= MIN_QWEN_RECORDING_BYTES && speechSeconds >= MIN_QWEN_SPEECH_SECONDS) {
+    return;
+  }
+
+  const reasons = [];
+  if (patientTurns < MIN_QWEN_PATIENT_TURNS) {
+    reasons.push("no clear patient speech was captured");
+  }
+  if (speechSeconds < MIN_QWEN_SPEECH_SECONDS) {
+    reasons.push(`captured speech was only ${speechSeconds.toFixed(1)}s`);
+  }
+  if (recordingBytes < MIN_QWEN_RECORDING_BYTES) {
+    reasons.push(`the recording is only ${formatBytes(recordingBytes)}`);
+  }
+
+  throw new Error(
+    `The recorded clinic session is too limited for qwen_omni: ${reasons.join(", ")}. Keep the patient visible, let them answer naturally for a bit longer, then end the session again.`,
+  );
 }
 
 function buildSessionRecord(filename, blob) {
@@ -2012,6 +2066,7 @@ async function endSessionAndAnalyze() {
   if (!blob || blob.size === 0) {
     throw new Error("No full session recording was produced. Try the manual upload flow instead.");
   }
+  validateLiveSessionForQwen(blob);
 
   state.recordedBlob = blob;
   const filename = buildRecordingFilename(state.recordingMimeType || blob.type);

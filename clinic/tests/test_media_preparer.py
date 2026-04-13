@@ -157,3 +157,34 @@ def test_prepare_base_keeps_mp4_passthrough_name_without_ffmpeg(
     assert prepared.standardized_path.endswith("standardized.mp4")
     assert prepared.mime_type == "video/mp4"
     assert Path(prepared.standardized_path).read_bytes() == b"mp4-bytes"
+
+
+def test_estimated_standardized_size_stays_within_target_window(tmp_path: Path) -> None:
+    preparer = MediaPreparer(make_settings(tmp_path))
+
+    short_clip_bytes = preparer._estimate_standardized_total_bytes(8.0)
+    typical_clip_bytes = preparer._estimate_standardized_total_bytes(30.0)
+    long_clip_bytes = preparer._estimate_standardized_total_bytes(120.0)
+
+    assert 2 * 1024 * 1024 <= short_clip_bytes <= 10 * 1024 * 1024
+    assert 2 * 1024 * 1024 <= typical_clip_bytes <= 10 * 1024 * 1024
+    assert long_clip_bytes == 10 * 1024 * 1024
+
+
+def test_build_standardize_command_uses_adaptive_bitrate_targets(tmp_path: Path) -> None:
+    preparer = MediaPreparer(make_settings(tmp_path))
+
+    command = preparer._build_standardize_command(
+        tmp_path / "input.webm",
+        tmp_path / "prepared" / "a1" / "standardized.mp4",
+        duration_seconds=30.0,
+    )
+
+    assert "-b:v" in command
+    assert "-maxrate" in command
+    assert "-bufsize" in command
+    assert "libx264" in command
+    assert "aac" in command
+    assert "96k" in command
+    assert "scale='min(854,iw)':-2" in command
+    assert "-crf" not in command

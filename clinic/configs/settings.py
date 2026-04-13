@@ -93,6 +93,10 @@ class Settings:
     qwen_omni_realtime_model: str = "qwen3-omni-flash-realtime"
     qwen_omni_realtime_transcription_model: str = "gummy-realtime-v1"
     qwen_omni_realtime_default_voice: str = "Cherry"
+    standardized_video_min_mb: int = 2
+    standardized_video_max_mb: int = 10
+    standardized_video_target_total_kbps: int = 1500
+    standardized_audio_bitrate_kbps: int = 96
     realtime_flow_path: Path | None = None
 
 
@@ -177,6 +181,18 @@ def get_settings() -> Settings:
         qwen_omni_realtime_default_voice=os.getenv(
             "REFLEXION_QWEN_OMNI_REALTIME_DEFAULT_VOICE",
             "Cherry",
+        ),
+        standardized_video_min_mb=int(
+            os.getenv("REFLEXION_STANDARDIZED_VIDEO_MIN_MB", "2")
+        ),
+        standardized_video_max_mb=int(
+            os.getenv("REFLEXION_STANDARDIZED_VIDEO_MAX_MB", "10")
+        ),
+        standardized_video_target_total_kbps=int(
+            os.getenv("REFLEXION_STANDARDIZED_VIDEO_TARGET_TOTAL_KBPS", "1500")
+        ),
+        standardized_audio_bitrate_kbps=int(
+            os.getenv("REFLEXION_STANDARDIZED_AUDIO_BITRATE_KBPS", "96")
         ),
         realtime_flow_path=(
             Path(raw_path).resolve()
