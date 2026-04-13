@@ -63,9 +63,6 @@ const disclaimer = document.getElementById("disclaimer");
 const RecognitionConstructor =
   window.SpeechRecognition || window.webkitSpeechRecognition || null;
 const pageMode = document.body?.dataset?.surfaceMode === "freetalk" ? "freetalk" : "clinic";
-const MIN_QWEN_SPEECH_SECONDS = 3.5;
-const MIN_QWEN_RECORDING_BYTES = 48 * 1024;
-const MIN_QWEN_PATIENT_TURNS = 1;
 
 const state = {
   blueprint: null,
@@ -466,8 +463,10 @@ function renderFormalAssessment(result, sourceLabel) {
   reviewerConfidence.textContent = formatPercent(result.reviewer_confidence);
 
   screeningSummary.textContent = result.screening_summary || "-";
-  fallbackMessage.textContent = result.fallback_message || "";
-  fallbackMessage.classList.toggle("hidden", !result.fallback_message);
+  const qualityWarning = buildAssessmentQualityMessage(result);
+  const supplementalMessage = [result.fallback_message, qualityWarning].filter(Boolean).join(" ");
+  fallbackMessage.textContent = supplementalMessage;
+  fallbackMessage.classList.toggle("hidden", !supplementalMessage);
   visitRecommendation.textContent = result.visit_recommendation || "-";
   futureRiskTrendSummary.textContent = result.future_risk_trend_summary || "-";
   disclaimer.textContent = result.disclaimer || "";
@@ -1851,33 +1850,42 @@ function buildErrorMessage(payload, fallbackText) {
   return message;
 }
 
-function validateLiveSessionForQwen(blob) {
-  const patientTurns = patientTurnCount();
-  const recordingBytes = Number(blob?.size || 0);
-  const speechSeconds = Number(state.speechDurationSeconds || 0);
-
-  if (patientTurns >= MIN_QWEN_PATIENT_TURNS && speechSeconds >= MIN_QWEN_SPEECH_SECONDS) {
-    return;
+function buildAssessmentQualityMessage(result) {
+  const flags = Array.isArray(result?.quality_flags) ? result.quality_flags : [];
+  const usability = String(result?.session_usability || "").trim().toLowerCase();
+  if (!flags.length && usability !== "unusable") {
+    return "";
   }
 
-  if (recordingBytes >= MIN_QWEN_RECORDING_BYTES && speechSeconds >= MIN_QWEN_SPEECH_SECONDS) {
-    return;
+  const flagLabels = flags.map((flag) => {
+    switch (String(flag || "").trim()) {
+      case "video_too_short":
+        return "the video was too short";
+      case "transcript_unavailable":
+        return "no transcript was available";
+      case "speech_unintelligible":
+        return "speech could not be understood";
+      case "face_not_visible":
+        return "the patient face was not clearly visible";
+      case "low_light":
+        return "lighting was poor";
+      case "limited_speaking_time":
+        return "there was very little patient speech";
+      default:
+        return toTitleCase(flag);
+    }
+  });
+
+  if (usability === "unusable") {
+    const issues = flagLabels.length ? ` Possible quality issues: ${flagLabels.join(", ")}.` : "";
+    return `Quality note: this clip was marked unusable for reliable screening interpretation.${issues}`;
   }
 
-  const reasons = [];
-  if (patientTurns < MIN_QWEN_PATIENT_TURNS) {
-    reasons.push("no clear patient speech was captured");
-  }
-  if (speechSeconds < MIN_QWEN_SPEECH_SECONDS) {
-    reasons.push(`captured speech was only ${speechSeconds.toFixed(1)}s`);
-  }
-  if (recordingBytes < MIN_QWEN_RECORDING_BYTES) {
-    reasons.push(`the recording is only ${formatBytes(recordingBytes)}`);
+  if (flagLabels.length) {
+    return `Quality note: review this result with caution because ${flagLabels.join(", ")}.`;
   }
 
-  throw new Error(
-    `The recorded clinic session is too limited for qwen_omni: ${reasons.join(", ")}. Keep the patient visible, let them answer naturally for a bit longer, then end the session again.`,
-  );
+  return "";
 }
 
 function buildSessionRecord(filename, blob) {
@@ -2066,7 +2074,6 @@ async function endSessionAndAnalyze() {
   if (!blob || blob.size === 0) {
     throw new Error("No full session recording was produced. Try the manual upload flow instead.");
   }
-  validateLiveSessionForQwen(blob);
 
   state.recordedBlob = blob;
   const filename = buildRecordingFilename(state.recordingMimeType || blob.type);

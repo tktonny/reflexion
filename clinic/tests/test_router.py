@@ -253,6 +253,37 @@ def test_router_falls_back_after_unusable_payload(
     assert assessment.fallback_message == "Processed by gemini after qwen_omni unusable_result."
 
 
+def test_router_accepts_structured_unusable_result(
+    settings: Settings,
+    provider_context: ProviderContext,
+) -> None:
+    router = make_router(
+        settings,
+        {
+            "qwen_omni": FakeProvider(
+                "qwen_omni",
+                result=make_result(
+                    risk_score=0.1,
+                    risk_label="HC",
+                    risk_tier="low",
+                    screening_classification="healthy",
+                    quality_flags=["video_too_short", "transcript_unavailable"],
+                    session_usability="unusable",
+                ),
+            ),
+            "gemini": FakeProvider("gemini", result=make_result()),
+            "fusion": FakeProvider("fusion", result=make_result()),
+            "audio_only": FakeProvider("audio_only", result=make_result()),
+        },
+    )
+
+    assessment = asyncio.run(router.analyze(provider_context))
+
+    assert assessment.provider_meta.final_provider == "qwen_omni"
+    assert assessment.session_usability == "unusable"
+    assert assessment.quality_flags == ["video_too_short", "transcript_unavailable"]
+
+
 def test_router_preserves_unusable_payload_debug_details(
     settings: Settings,
     provider_context: ProviderContext,

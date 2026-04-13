@@ -67,8 +67,6 @@ class ProviderAssessmentPayload(BaseModel):
 
     def should_fallback(self) -> bool:
         """Return True when the payload is too incomplete to serve as a final assessment."""
-        if self.session_usability == "unusable":
-            return True
         return self.risk_score is None or self.risk_label is None
 
     def fallback_debug_details(self) -> dict[str, object]:
