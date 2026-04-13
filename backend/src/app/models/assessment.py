@@ -71,6 +71,28 @@ class ProviderAssessmentPayload(BaseModel):
             return True
         return self.risk_score is None or self.risk_label is None
 
+    def fallback_debug_details(self) -> dict[str, object]:
+        missing_required = []
+        if self.risk_score is None:
+            missing_required.append("risk_score")
+        if self.risk_label is None:
+            missing_required.append("risk_label")
+        return {
+            "session_usability": self.session_usability,
+            "missing_required_fields": missing_required,
+            "risk_score": self.risk_score,
+            "risk_label": self.risk_label,
+            "risk_tier": self.risk_tier,
+            "screening_classification": self.screening_classification,
+            "quality_flags": list(self.quality_flags),
+            "finding_counts": {
+                "visual": len(self.visual_findings),
+                "body": len(self.body_findings),
+                "voice": len(self.voice_findings),
+                "content": len(self.content_findings),
+            },
+        }
+
     def model_post_init(self, __context) -> None:
         if self.risk_tier is None and self.risk_score is not None:
             if self.risk_score < 0.35:
@@ -266,6 +288,7 @@ class ProviderRawResult(BaseModel):
     payload: ProviderAssessmentPayload
     request_id: str | None = None
     raw_status: str = "ok"
+    debug_details: dict[str, object] | None = None
 
 
 class ProviderContext(BaseModel):

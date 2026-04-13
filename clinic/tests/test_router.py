@@ -253,6 +253,59 @@ def test_router_falls_back_after_unusable_payload(
     assert assessment.fallback_message == "Processed by gemini after qwen_omni unusable_result."
 
 
+def test_router_preserves_unusable_payload_debug_details(
+    settings: Settings,
+    provider_context: ProviderContext,
+) -> None:
+    router = make_router(
+        settings,
+        {
+            "qwen_omni": FakeProvider(
+                "qwen_omni",
+                result=ProviderRawResult(
+                    payload=ProviderAssessmentPayload(
+                        visual_findings=[],
+                        body_findings=[],
+                        voice_findings=[],
+                        content_findings=[],
+                        risk_score=None,
+                        risk_label=None,
+                        session_usability="usable_with_caveats",
+                        quality_flags=["limited_speaking_time"],
+                    ),
+                    request_id="req-qwen-1",
+                    raw_status="ok",
+                    debug_details={
+                        "provider": "qwen_omni",
+                        "raw_text_preview": "{\"session_usability\":\"usable_with_caveats\"}",
+                    },
+                ),
+            ),
+            "gemini": FakeProvider(
+                "gemini",
+                error=ProviderError("provider_unavailable", "gemini is not configured"),
+            ),
+            "fusion": FakeProvider(
+                "fusion",
+                error=ProviderError("provider_unavailable", "fusion provider is not configured"),
+            ),
+            "audio_only": FakeProvider(
+                "audio_only",
+                error=ProviderError("provider_unavailable", "audio_only provider is not configured"),
+            ),
+        },
+    )
+
+    with pytest.raises(RoutingError) as exc_info:
+        asyncio.run(router.analyze(provider_context))
+
+    trace = exc_info.value.provider_trace
+    assert trace[0]["failure_reason"] == "unusable_result"
+    assert trace[0]["request_id"] == "req-qwen-1"
+    assert trace[0]["debug_details"]["missing_required_fields"] == ["risk_score", "risk_label"]
+    assert trace[0]["debug_details"]["raw_text_preview"].startswith("{\"session_usability\"")
+
+
 def test_router_strict_provider_stops_on_failure(
     settings: Settings,
     provider_context: ProviderContext,

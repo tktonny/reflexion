@@ -106,6 +106,11 @@ class QwenOmniProvider(BaseProvider):
                 payload=self._parse_text_response(text),
                 request_id=request_id,
                 raw_status="ok",
+                debug_details={
+                    "provider": "qwen_omni",
+                    "raw_text_length": len(text),
+                    "raw_text_preview": text[:12000],
+                },
             )
         except ProviderError as exc:
             debug_details = dict(exc.debug_details or {})

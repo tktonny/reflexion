@@ -85,7 +85,13 @@ class ProviderMeshRouter:
                         latency_ms=latency_ms,
                     )
                     trace.append(trace_entry)
-                    error_trace.append(trace_entry.model_dump())
+                    trace_payload = trace_entry.model_dump()
+                    trace_payload["debug_details"] = payload.fallback_debug_details()
+                    if raw_result.debug_details:
+                        trace_payload["debug_details"].update(raw_result.debug_details)
+                    trace_payload["raw_status"] = raw_result.raw_status
+                    trace_payload["request_id"] = raw_result.request_id
+                    error_trace.append(trace_payload)
                     if context.strict_provider:
                         break
                     continue
@@ -159,6 +165,7 @@ class ProviderMeshRouter:
                 )
                 trace.append(trace_entry)
                 trace_payload = trace_entry.model_dump()
+                trace_payload["message"] = exc.message
                 if exc.debug_details:
                     trace_payload["debug_details"] = exc.debug_details
                 error_trace.append(trace_payload)

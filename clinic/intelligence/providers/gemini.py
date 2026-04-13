@@ -109,12 +109,41 @@ class GeminiProvider(BaseProvider):
                     headers=headers,
                     json=metadata,
                 )
+        except httpx.TimeoutException as exc:
+            raise ProviderError(
+                "upload_failed",
+                "gemini upload initialization timed out",
+                debug_details={
+                    "stage": "upload_init",
+                    "timeout_seconds": 120.0,
+                    "file_name": path.name,
+                    "mime_type": mime_type,
+                    "size_bytes": path.stat().st_size,
+                },
+            ) from exc
         except httpx.HTTPError as exc:
-            raise ProviderError("upload_failed", f"gemini upload initialization failed: {exc}") from exc
+            raise ProviderError(
+                "upload_failed",
+                f"gemini upload initialization failed: {exc}",
+                debug_details={
+                    "stage": "upload_init",
+                    "file_name": path.name,
+                    "mime_type": mime_type,
+                    "size_bytes": path.stat().st_size,
+                },
+            ) from exc
         if start_response.status_code >= 400:
             raise ProviderError(
                 "upload_failed",
                 f"gemini upload initialization failed: {start_response.text[:400]}",
+                debug_details={
+                    "stage": "upload_init",
+                    "response_status_code": start_response.status_code,
+                    "response_body_preview": start_response.text[:400],
+                    "file_name": path.name,
+                    "mime_type": mime_type,
+                    "size_bytes": path.stat().st_size,
+                },
             )
         upload_url = start_response.headers.get("X-Goog-Upload-URL")
         if not upload_url:
@@ -131,10 +160,42 @@ class GeminiProvider(BaseProvider):
                     },
                     content=path.read_bytes(),
                 )
+        except httpx.TimeoutException as exc:
+            raise ProviderError(
+                "upload_failed",
+                "gemini upload finalize timed out",
+                debug_details={
+                    "stage": "upload_finalize",
+                    "timeout_seconds": 300.0,
+                    "file_name": path.name,
+                    "mime_type": mime_type,
+                    "size_bytes": path.stat().st_size,
+                },
+            ) from exc
         except httpx.HTTPError as exc:
-            raise ProviderError("upload_failed", f"gemini upload failed: {exc}") from exc
+            raise ProviderError(
+                "upload_failed",
+                f"gemini upload failed: {exc}",
+                debug_details={
+                    "stage": "upload_finalize",
+                    "file_name": path.name,
+                    "mime_type": mime_type,
+                    "size_bytes": path.stat().st_size,
+                },
+            ) from exc
         if upload_response.status_code >= 400:
-            raise ProviderError("upload_failed", f"gemini upload failed: {upload_response.text[:400]}")
+            raise ProviderError(
+                "upload_failed",
+                f"gemini upload failed: {upload_response.text[:400]}",
+                debug_details={
+                    "stage": "upload_finalize",
+                    "response_status_code": upload_response.status_code,
+                    "response_body_preview": upload_response.text[:400],
+                    "file_name": path.name,
+                    "mime_type": mime_type,
+                    "size_bytes": path.stat().st_size,
+                },
+            )
         payload = upload_response.json()
         file_uri = payload.get("file", {}).get("uri")
         if not file_uri:
