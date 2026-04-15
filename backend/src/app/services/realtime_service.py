@@ -48,6 +48,13 @@ class RealtimeVoiceProfile:
     source: str
 
 
+@dataclass(frozen=True)
+class RealtimeLanguageSignal:
+    language_key: str
+    confidence: float
+    source: str
+
+
 class RealtimeConversationService:
     """Power the live Qwen relay and the post-session demo scoring flow."""
 
@@ -261,6 +268,9 @@ class RealtimeConversationService:
                 selected_voice=voice_profile.voice,
                 selected_language=voice_profile.language_label,
                 voice_selection_source=voice_profile.source,
+                max_session_seconds=self.settings.realtime_max_session_seconds,
+                max_reply_seconds=self.settings.realtime_max_assistant_response_seconds,
+                max_reply_chars=self.settings.realtime_max_assistant_response_chars,
                 flow_id=self._flow_id(surface_mode),
                 flow_title=self._flow_title(surface_mode),
                 conversation_goal=self._conversation_goal(surface_mode),
@@ -278,6 +288,9 @@ class RealtimeConversationService:
             selected_voice=None,
             selected_language=None,
             voice_selection_source=None,
+            max_session_seconds=self.settings.realtime_max_session_seconds,
+            max_reply_seconds=self.settings.realtime_max_assistant_response_seconds,
+            max_reply_chars=self.settings.realtime_max_assistant_response_chars,
             flow_id=self._flow_id(surface_mode),
             flow_title=self._flow_title(surface_mode),
             conversation_goal=self._conversation_goal(surface_mode),
@@ -624,13 +637,31 @@ class RealtimeConversationService:
                     )
                 )
 
+            async def send_wrap_up_response() -> None:
+                logger.info(
+                    "Requesting realtime wrap-up patient_id=%s voice=%s language=%s",
+                    patient_id,
+                    selected_voice_profile.voice,
+                    selected_voice_profile.language_label,
+                )
+                await send_upstream_event(
+                    self._build_live_session_update(
+                        patient_id,
+                        selected_voice_profile.language_label,
+                        voice=selected_voice_profile.voice,
+                        surface_mode=surface_mode,
+                        wrap_up=True,
+                    )
+                )
+                await send_upstream_event({"type": "response.create"})
+
             await send_session_update(selected_voice_profile, reason=selected_voice_profile.source)
 
             async def pump_upstream_to_client() -> None:
                 nonlocal selected_voice_profile
                 pending_voice_profile: RealtimeVoiceProfile | None = None
                 deferred_voice_profile: RealtimeVoiceProfile | None = None
-                first_transcript_seen = False
+                recent_language_signals: list[RealtimeLanguageSignal] = []
                 session_ready = False
                 async for message in upstream:
                     try:
@@ -641,13 +672,19 @@ class RealtimeConversationService:
                     self._log_upstream_event(payload)
                     event_type = str(payload.get("type", ""))
 
-                    if event_type == "conversation.item.input_audio_transcription.completed" and not first_transcript_seen:
-                        first_transcript_seen = True
-                        detected_voice_profile = self._voice_profile_for_session(
+                    if event_type == "conversation.item.input_audio_transcription.completed":
+                        transcript_text = str(payload.get("transcript", ""))
+                        language_signal = self._detect_language_signal_from_transcript(transcript_text)
+                        if language_signal is not None:
+                            recent_language_signals.append(language_signal)
+                            recent_language_signals = recent_language_signals[-3:]
+
+                        detected_voice_profile = self._voice_profile_from_recent_signals(
                             language_hint=language,
-                            transcript=str(payload.get("transcript", "")),
+                            recent_signals=recent_language_signals,
+                            current_profile=selected_voice_profile,
                         )
-                        if (
+                        if detected_voice_profile is not None and (
                             detected_voice_profile.voice != selected_voice_profile.voice
                             or detected_voice_profile.language_label != selected_voice_profile.language_label
                         ):
@@ -658,17 +695,17 @@ class RealtimeConversationService:
                                 detected_voice_profile.voice,
                                 selected_voice_profile.language_label,
                                 detected_voice_profile.language_label,
-                                str(payload.get("transcript", ""))[:120],
+                                transcript_text[:120],
                             )
                             if session_ready:
                                 try:
                                     await send_session_update(
                                         detected_voice_profile,
-                                        reason="initial_transcript",
+                                        reason="transcript_reassessment",
                                     )
                                 except Exception as exc:  # noqa: BLE001
                                     logger.warning(
-                                        "Failed to update realtime voice from first transcript: %s",
+                                        "Failed to update realtime voice from transcript reassessment: %s",
                                         exc,
                                     )
                                 else:
@@ -683,7 +720,7 @@ class RealtimeConversationService:
                                 try:
                                     await send_session_update(
                                         deferred_voice_profile,
-                                        reason="initial_transcript",
+                                        reason="transcript_reassessment",
                                     )
                                 except Exception as exc:  # noqa: BLE001
                                     logger.warning(
@@ -702,6 +739,11 @@ class RealtimeConversationService:
                                     "type": "reflexion.voice.selected",
                                     "voice": selected_voice_profile.voice,
                                     "language": selected_voice_profile.language_label,
+                                    "language_key": selected_voice_profile.language_key,
+                                    "language_input": self._language_input_value(
+                                        selected_voice_profile.language_key,
+                                        selected_voice_profile.language_label,
+                                    ),
                                     "source": selected_voice_profile.source,
                                 }
                             )
@@ -720,6 +762,9 @@ class RealtimeConversationService:
                         continue
                     event = prepared_event
                     event_type = str(event.get("type", ""))
+                    if event_type == "reflexion.wrap_up":
+                        await send_wrap_up_response()
+                        continue
                     if event_type == "reflexion.close":
                         logger.info("Browser requested realtime upstream close")
                         await upstream.close()
@@ -798,11 +843,17 @@ class RealtimeConversationService:
         *,
         voice: str | None = None,
         surface_mode: RealtimeSurfaceMode = "clinic",
+        wrap_up: bool = False,
     ) -> dict[str, Any]:
         if surface_mode == "freetalk":
             instructions = self._build_free_talk_instructions(patient_id, language)
         else:
             instructions = self.orchestrator.build_live_instructions(patient_id, language)
+        if wrap_up:
+            instructions += (
+                "\nThe live capture is ending now. In your next reply, briefly thank the patient, "
+                "say the conversation is ending, and do not ask another question."
+            )
         return {
             "event_id": f"event_{uuid.uuid4().hex[:12]}",
             "type": "session.update",
@@ -810,6 +861,9 @@ class RealtimeConversationService:
                 "modalities": ["text", "audio"],
                 "voice": voice or self._voice_profile_for_session(language_hint=language).voice,
                 "instructions": instructions,
+                "max_tokens": self.settings.qwen_omni_realtime_max_tokens,
+                "temperature": self.settings.qwen_omni_realtime_temperature,
+                "top_p": self.settings.qwen_omni_realtime_top_p,
                 "input_audio_format": "pcm",
                 "output_audio_format": "pcm",
                 "turn_detection": {
@@ -890,7 +944,9 @@ class RealtimeConversationService:
             "- Do not force orientation, memory, or daily-function questions.\n"
             "- Let the patient lead the topic and respond naturally to what they say.\n"
             "- Ask gentle follow-up questions only when they fit the conversation.\n"
-            "- Keep replies concise, usually one or two short sentences.\n"
+            "- Keep replies extremely brief, usually one short sentence.\n"
+            "- If the patient switches language or dialect, switch immediately on the next turn.\n"
+            "- Stop speaking as soon as the next question or acknowledgement is clear.\n"
             "- Never diagnose, score risk, or discuss dementia probability during the live conversation.\n"
             "- If the patient slows down, reassure gently and leave space rather than pushing them.\n"
             "- When the patient appears finished, close naturally and wait for the operator to end the session."
@@ -1039,6 +1095,7 @@ class RealtimeConversationService:
             "input_image_buffer.append",
             "response.create",
             "response.cancel",
+            "reflexion.wrap_up",
         }:
             logger.debug("Skipping unsupported browser realtime event type=%s", event_type)
             return None, audio_append_started
@@ -1067,15 +1124,94 @@ class RealtimeConversationService:
                 return language_key
         return None
 
-    def _detect_language_key_from_transcript(self, transcript: str | None) -> str | None:
+    def _detect_language_signal_from_transcript(self, transcript: str | None) -> RealtimeLanguageSignal | None:
         normalized = str(transcript or "").strip().lower()
         if not normalized:
             return None
-        if self._count_unique_markers(normalized, self.MINNAN_MARKERS) >= 1:
-            return "minnan"
-        if self._count_unique_markers(normalized, self.CANTONESE_MARKERS) >= 1:
-            return "cantonese"
+        minnan_hits = self._count_unique_markers(normalized, self.MINNAN_MARKERS)
+        if minnan_hits >= 1:
+            return RealtimeLanguageSignal(
+                language_key="minnan",
+                confidence=0.95 if minnan_hits >= 2 else 0.82,
+                source="transcript_reassessment",
+            )
+        cantonese_hits = self._count_unique_markers(normalized, self.CANTONESE_MARKERS)
+        if cantonese_hits >= 1:
+            return RealtimeLanguageSignal(
+                language_key="cantonese",
+                confidence=0.95 if cantonese_hits >= 2 else 0.82,
+                source="transcript_reassessment",
+            )
+        english_words = len(re.findall(r"[a-z]+(?:'[a-z]+)?", normalized))
+        contains_cjk = any("\u4e00" <= char <= "\u9fff" for char in normalized)
+        if english_words >= 3 and not contains_cjk:
+            return RealtimeLanguageSignal(
+                language_key="english",
+                confidence=0.8 if english_words >= 6 else 0.65,
+                source="transcript_reassessment",
+            )
+        if contains_cjk:
+            return RealtimeLanguageSignal(
+                language_key="mandarin",
+                confidence=0.62,
+                source="transcript_reassessment",
+            )
         return None
+
+    def _detect_language_key_from_transcript(self, transcript: str | None) -> str | None:
+        signal = self._detect_language_signal_from_transcript(transcript)
+        return signal.language_key if signal is not None else None
+
+    def _voice_profile_from_recent_signals(
+        self,
+        *,
+        language_hint: str | None,
+        recent_signals: list[RealtimeLanguageSignal],
+        current_profile: RealtimeVoiceProfile,
+    ) -> RealtimeVoiceProfile | None:
+        if not recent_signals:
+            return None
+
+        latest_signal = recent_signals[-1]
+        if latest_signal.language_key == current_profile.language_key:
+            return None
+
+        if latest_signal.confidence >= 0.9:
+            return self._voice_profile_for_language_key(
+                latest_signal.language_key,
+                source=latest_signal.source,
+            )
+
+        if len(recent_signals) >= 2:
+            last_two = recent_signals[-2:]
+            if all(signal.language_key == latest_signal.language_key for signal in last_two):
+                return self._voice_profile_for_language_key(
+                    latest_signal.language_key,
+                    source=latest_signal.source,
+                )
+
+        hinted_key = self._normalize_language_key(language_hint)
+        if (
+            hinted_key == current_profile.language_key
+            and latest_signal.confidence >= 0.65
+        ):
+            return self._voice_profile_for_language_key(
+                latest_signal.language_key,
+                source=latest_signal.source,
+            )
+
+        return None
+
+    def _language_input_value(self, language_key: str, language_label: str) -> str:
+        if language_key == "english":
+            return "en"
+        if language_key == "mandarin":
+            return "zh"
+        if language_key == "minnan":
+            return "nan"
+        if language_key == "cantonese":
+            return "yue"
+        return language_label
 
     def _default_voice_profile(self, *, source: str = "default") -> RealtimeVoiceProfile:
         return RealtimeVoiceProfile(
@@ -1126,7 +1262,7 @@ class RealtimeConversationService:
         if detected_key is not None:
             return self._voice_profile_for_language_key(
                 detected_key,
-                source="initial_transcript",
+                source="transcript_reassessment",
             )
 
         hinted_key = self._normalize_language_key(language_hint)

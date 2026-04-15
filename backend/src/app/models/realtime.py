@@ -67,6 +67,9 @@ class RealtimeSessionStatus(BaseModel):
     selected_voice: str | None = None
     selected_language: str | None = None
     voice_selection_source: str | None = None
+    max_session_seconds: int | None = None
+    max_reply_seconds: int | None = None
+    max_reply_chars: int | None = None
     flow_id: str
     flow_title: str
     conversation_goal: str

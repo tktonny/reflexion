@@ -93,6 +93,12 @@ class Settings:
     qwen_omni_realtime_model: str = "qwen3-omni-flash-realtime"
     qwen_omni_realtime_transcription_model: str = "gummy-realtime-v1"
     qwen_omni_realtime_default_voice: str = "Cherry"
+    qwen_omni_realtime_max_tokens: int = 48
+    qwen_omni_realtime_temperature: float = 0.25
+    qwen_omni_realtime_top_p: float = 0.7
+    realtime_max_session_seconds: int = 90
+    realtime_max_assistant_response_seconds: int = 7
+    realtime_max_assistant_response_chars: int = 140
     standardized_video_min_mb: int = 2
     standardized_video_max_mb: int = 10
     standardized_video_target_total_kbps: int = 1500
@@ -181,6 +187,24 @@ def get_settings() -> Settings:
         qwen_omni_realtime_default_voice=os.getenv(
             "REFLEXION_QWEN_OMNI_REALTIME_DEFAULT_VOICE",
             "Cherry",
+        ),
+        qwen_omni_realtime_max_tokens=int(
+            os.getenv("REFLEXION_QWEN_OMNI_REALTIME_MAX_TOKENS", "48")
+        ),
+        qwen_omni_realtime_temperature=float(
+            os.getenv("REFLEXION_QWEN_OMNI_REALTIME_TEMPERATURE", "0.25")
+        ),
+        qwen_omni_realtime_top_p=float(
+            os.getenv("REFLEXION_QWEN_OMNI_REALTIME_TOP_P", "0.7")
+        ),
+        realtime_max_session_seconds=int(
+            os.getenv("REFLEXION_REALTIME_MAX_SESSION_SECONDS", "90")
+        ),
+        realtime_max_assistant_response_seconds=int(
+            os.getenv("REFLEXION_REALTIME_MAX_ASSISTANT_RESPONSE_SECONDS", "7")
+        ),
+        realtime_max_assistant_response_chars=int(
+            os.getenv("REFLEXION_REALTIME_MAX_ASSISTANT_RESPONSE_CHARS", "140")
         ),
         standardized_video_min_mb=int(
             os.getenv("REFLEXION_STANDARDIZED_VIDEO_MIN_MB", "2")

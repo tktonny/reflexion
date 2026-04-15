@@ -117,7 +117,9 @@ class RealtimeConversationOrchestrator:
             "Sound like a calm, warm human guide rather than a robotic assistant.",
             "Treat the stage plan as hidden objectives, not lines to recite.",
             "Use a brief acknowledgement that fits what the patient just said before steering to the next topic.",
-            "Keep replies concise, usually one or two short sentences.",
+            "Keep replies extremely brief: usually one short sentence, never more than one short sentence plus one short question.",
+            "Use plain everyday wording and stop speaking as soon as the next question is clear.",
+            "Do not give summaries, long explanations, or multiple follow-up ideas in one turn.",
             "Do not diagnose, score risk, or discuss dementia probability during the live conversation.",
             "After the final stage is complete, thank the patient and say the session is complete.",
         ]
@@ -131,6 +133,7 @@ class RealtimeConversationOrchestrator:
             "You are Reflexion, a calm and natural conversation guide conducting a short clinical intake.\n"
             f"The patient identifier is {patient_id}.\n"
             f"Respond in {language_name} unless the patient clearly switches languages.\n"
+            "If the patient switches languages or dialects, immediately continue in that language on the next turn.\n"
             f"Conversation flow: {self.flow.title}.\n"
             f"Conversation goal: {self.flow.conversation_goal}\n"
             f"Completion rule: {self.flow.completion_rule}\n"

@@ -156,6 +156,9 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     assert payload["type"] == "session.update"
     assert payload["session"]["modalities"] == ["text", "audio"]
     assert payload["session"]["voice"] == "Jennifer"
+    assert payload["session"]["max_tokens"] == 48
+    assert payload["session"]["temperature"] == 0.25
+    assert payload["session"]["top_p"] == 0.7
     assert payload["session"]["output_audio_format"] == "pcm"
     assert payload["session"]["turn_detection"]["type"] == "server_vad"
     assert payload["session"]["turn_detection"]["threshold"] == 0.1
@@ -197,6 +200,9 @@ def test_live_status_reports_selected_voice_from_language_hint(tmp_path: Path) -
     assert status.selected_voice == "Kiki"
     assert status.selected_language == "Cantonese"
     assert status.voice_selection_source == "language_hint"
+    assert status.max_session_seconds == 90
+    assert status.max_reply_seconds == 7
+    assert status.max_reply_chars == 140
 
 
 def test_voice_profile_uses_english_voice_for_language_hint(tmp_path: Path) -> None:
@@ -229,7 +235,7 @@ def test_voice_profile_detects_minnan_voice_from_transcript(tmp_path: Path) -> N
 
     assert profile.voice == "Roy"
     assert profile.language_label == "Minnan Chinese"
-    assert profile.source == "initial_transcript"
+    assert profile.source == "transcript_reassessment"
 
 
 def test_voice_profile_detects_cantonese_voice_from_transcript(tmp_path: Path) -> None:
@@ -242,7 +248,33 @@ def test_voice_profile_detects_cantonese_voice_from_transcript(tmp_path: Path) -
 
     assert profile.voice == "Kiki"
     assert profile.language_label == "Cantonese"
-    assert profile.source == "initial_transcript"
+    assert profile.source == "transcript_reassessment"
+
+
+def test_voice_profile_detects_english_voice_from_transcript(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    profile = service._voice_profile_for_session(
+        language_hint="zh",
+        transcript="I had breakfast at home and then I went for a walk outside.",
+    )
+
+    assert profile.voice == "Jennifer"
+    assert profile.language_label == "English"
+    assert profile.source == "transcript_reassessment"
+
+
+def test_voice_profile_detects_mandarin_voice_from_transcript(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    profile = service._voice_profile_for_session(
+        language_hint="en",
+        transcript="我今天在家里吃了早饭，然后出去散步。",
+    )
+
+    assert profile.voice == "Cherry"
+    assert profile.language_label == "Mandarin Chinese"
+    assert profile.source == "transcript_reassessment"
 
 
 def test_live_session_update_accepts_voice_override(tmp_path: Path) -> None:
@@ -252,6 +284,15 @@ def test_live_session_update_accepts_voice_override(tmp_path: Path) -> None:
 
     assert payload["session"]["voice"] == "Kiki"
     assert "Respond in Cantonese" in payload["session"]["instructions"]
+
+
+def test_live_session_update_wrap_up_instruction_is_brief(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    payload = service._build_live_session_update("patient-001", "Mandarin Chinese", wrap_up=True)
+
+    assert "The live capture is ending now." in payload["session"]["instructions"]
+    assert "do not ask another question" in payload["session"]["instructions"]
 
 
 def test_live_relay_drops_image_until_first_audio_append(tmp_path: Path) -> None:

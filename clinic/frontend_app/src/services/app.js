@@ -82,6 +82,9 @@ const state = {
   assistantDraftElement: null,
   assistantDraftBody: null,
   assistantDraftText: "",
+  assistantResponseTimer: null,
+  assistantResponseActive: false,
+  assistantResponseCancelSent: false,
   audioChunkCount: 0,
   speechDurationSeconds: 0,
   utteranceCount: 0,
@@ -116,6 +119,10 @@ const state = {
   recordingStopPromise: null,
   resolveRecordingStop: null,
   rejectRecordingStop: null,
+  sessionAutoEndTimer: null,
+  wrapUpTimer: null,
+  wrapUpRequested: false,
+  sessionEndRequested: false,
   uploadInFlight: false,
 };
 
@@ -146,6 +153,133 @@ function setStatus(text) {
 
 function setFallback(text) {
   fallbackNote.textContent = text || "";
+}
+
+function currentMaxSessionSeconds() {
+  return Number(state.blueprint?.max_session_seconds || 90);
+}
+
+function currentMaxReplySeconds() {
+  return Number(state.blueprint?.max_reply_seconds || 7);
+}
+
+function currentMaxReplyChars() {
+  return Number(state.blueprint?.max_reply_chars || 140);
+}
+
+function clearAssistantResponseGuard() {
+  if (state.assistantResponseTimer) {
+    window.clearTimeout(state.assistantResponseTimer);
+    state.assistantResponseTimer = null;
+  }
+  state.assistantResponseCancelSent = false;
+}
+
+function clearSessionAutoEndTimer() {
+  if (state.sessionAutoEndTimer) {
+    window.clearTimeout(state.sessionAutoEndTimer);
+    state.sessionAutoEndTimer = null;
+  }
+}
+
+function clearWrapUpTimer() {
+  if (state.wrapUpTimer) {
+    window.clearTimeout(state.wrapUpTimer);
+    state.wrapUpTimer = null;
+  }
+}
+
+function requestAssistantResponseCancel(reason) {
+  if (
+    state.assistantResponseCancelSent ||
+    !state.socket ||
+    state.socket.readyState !== WebSocket.OPEN
+  ) {
+    return;
+  }
+  state.assistantResponseCancelSent = true;
+  try {
+    state.socket.send(JSON.stringify({ type: "response.cancel" }));
+    if (reason) {
+      setStatus(reason);
+    }
+  } catch {
+    // Ignore best-effort cancel failures.
+  }
+}
+
+function scheduleAssistantResponseGuard() {
+  clearAssistantResponseGuard();
+  const maxReplySeconds = currentMaxReplySeconds();
+  if (!Number.isFinite(maxReplySeconds) || maxReplySeconds <= 0) {
+    return;
+  }
+  state.assistantResponseTimer = window.setTimeout(() => {
+    requestAssistantResponseCancel("Reply shortened to keep the conversation moving...");
+  }, maxReplySeconds * 1000);
+}
+
+function scheduleSessionAutoEnd() {
+  clearSessionAutoEndTimer();
+  const maxSessionSeconds = currentMaxSessionSeconds();
+  if (!Number.isFinite(maxSessionSeconds) || maxSessionSeconds <= 0) {
+    return;
+  }
+  state.sessionAutoEndTimer = window.setTimeout(() => {
+    if (state.sessionEndRequested || state.wrapUpRequested || state.uploadInFlight) {
+      return;
+    }
+    requestSessionWrapUp();
+  }, maxSessionSeconds * 1000);
+}
+
+function handleSessionEndFailure(error) {
+  analysisLoading.classList.add("hidden");
+  analysisEmpty.classList.remove("hidden");
+  state.sessionEndRequested = false;
+  state.wrapUpRequested = false;
+  clearWrapUpTimer();
+  setStatus("Analysis failed");
+  setFallback(error instanceof Error ? error.message : "Failed to upload the session for analysis.");
+}
+
+function requestSessionWrapUp() {
+  if (
+    state.wrapUpRequested ||
+    state.sessionEndRequested ||
+    !state.socket ||
+    state.socket.readyState !== WebSocket.OPEN
+  ) {
+    return;
+  }
+
+  state.wrapUpRequested = true;
+  clearAssistantResponseGuard();
+  clearSessionAutoEndTimer();
+  setStatus("Conversation limit reached. Wrapping up...");
+
+  const sendWrapUp = () => {
+    if (!state.socket || state.socket.readyState !== WebSocket.OPEN) {
+      return;
+    }
+    try {
+      state.socket.send(JSON.stringify({ type: "reflexion.wrap_up" }));
+    } catch {
+      // Ignore best-effort wrap-up failures and let the fallback timer end the session.
+    }
+  };
+
+  if (state.assistantResponseActive) {
+    requestAssistantResponseCancel("Conversation limit reached. Wrapping up...");
+    window.setTimeout(sendWrapUp, 220);
+  } else {
+    sendWrapUp();
+  }
+
+  clearWrapUpTimer();
+  state.wrapUpTimer = window.setTimeout(() => {
+    endSessionAndAnalyze().catch(handleSessionEndFailure);
+  }, Math.max((currentMaxReplySeconds() + 2) * 1000, 7000));
 }
 
 function setIdentityCheck(text, note = "", tone = "secondary") {
@@ -586,6 +720,9 @@ function renderProviders(providerStatuses, defaultProvider) {
 }
 
 function resetSessionState() {
+  clearAssistantResponseGuard();
+  clearSessionAutoEndTimer();
+  clearWrapUpTimer();
   clearNode(transcript);
   state.transcriptTurns = [];
   state.pendingTurns = [];
@@ -594,6 +731,8 @@ function resetSessionState() {
   state.assistantDraftElement = null;
   state.assistantDraftBody = null;
   state.assistantDraftText = "";
+  state.assistantResponseActive = false;
+  state.assistantResponseCancelSent = false;
   state.audioChunkCount = 0;
   state.speechDurationSeconds = 0;
   state.utteranceCount = 0;
@@ -618,6 +757,8 @@ function resetSessionState() {
   state.recordingMimeType = "";
   state.sessionStartedAt = null;
   state.sessionEndedAt = null;
+  state.wrapUpRequested = false;
+  state.sessionEndRequested = false;
   updateCaptureMetrics();
   renderPromptSteps();
   analysisEmpty.classList.remove("hidden");
@@ -699,7 +840,23 @@ function mapRecognitionLanguage(rawLanguage) {
   if (clean === "zh" || clean === "zh-cn") {
     return "zh-CN";
   }
+  if (clean === "yue" || clean === "zh-hk") {
+    return "zh-HK";
+  }
   return rawLanguage;
+}
+
+function applyDetectedLanguage(languageInputValue) {
+  const nextLanguage = String(languageInputValue || "").trim();
+  if (!nextLanguage || nextLanguage === state.currentLanguage) {
+    return;
+  }
+  state.currentLanguage = nextLanguage;
+  languageInput.value = nextLanguage;
+  manualLanguageInput.value = nextLanguage;
+  if (state.recognitionActive) {
+    stopRecognition();
+  }
 }
 
 function buildTurnFallbackText(stage, recognitionText) {
@@ -1409,6 +1566,9 @@ function openRealtimeSocket(patientId, language) {
       if (state.socket === socket) {
         state.socket = null;
       }
+      clearAssistantResponseGuard();
+      clearSessionAutoEndTimer();
+      clearWrapUpTimer();
       const code = Number(event?.code || 0);
       const reason = String(event?.reason || "").trim();
       const detailParts = [];
@@ -1434,6 +1594,9 @@ function openRealtimeSocket(patientId, language) {
 }
 
 async function closeRealtimeSocket() {
+  clearAssistantResponseGuard();
+  clearSessionAutoEndTimer();
+  clearWrapUpTimer();
   if (!state.socket) {
     return;
   }
@@ -1602,8 +1765,11 @@ function handleRealtimeEvent(event) {
       state.openingInjected = true;
     }
     if (event.session.session_mode === "live_qwen") {
+      state.wrapUpRequested = false;
+      scheduleSessionAutoEnd();
       setStatus("Connecting live relay...");
     } else {
+      clearSessionAutoEndTimer();
       disableLiveAutoMode();
       setStatus("Guided conversation ready");
     }
@@ -1612,6 +1778,10 @@ function handleRealtimeEvent(event) {
   }
 
   if (type === "reflexion.session.degraded") {
+    clearSessionAutoEndTimer();
+    clearAssistantResponseGuard();
+    clearWrapUpTimer();
+    state.wrapUpRequested = false;
     disableLiveAutoMode();
     state.blueprint = event.session;
     conversationProvider.textContent = event.session.conversation_provider;
@@ -1629,10 +1799,15 @@ function handleRealtimeEvent(event) {
   }
 
   if (type === "reflexion.voice.selected") {
+    if (state.blueprint) {
+      state.blueprint.selected_voice = event.voice || state.blueprint.selected_voice;
+      state.blueprint.selected_language = event.language || state.blueprint.selected_language;
+    }
     liveModelName.textContent = formatLiveModelLabel(
       state.blueprint?.model_name || liveModelName.textContent,
       event.voice,
     );
+    applyDetectedLanguage(event.language_input);
     return;
   }
 
@@ -1685,7 +1860,9 @@ function handleRealtimeEvent(event) {
   }
 
   if (type === "response.created") {
+    state.assistantResponseActive = true;
     beginAssistantDraft();
+    scheduleAssistantResponseGuard();
     return;
   }
 
@@ -1696,26 +1873,40 @@ function handleRealtimeEvent(event) {
 
   if (type === "response.audio_transcript.delta") {
     updateAssistantDraft(String(event.delta || ""));
+    if (state.assistantDraftText.trim().length > currentMaxReplyChars()) {
+      requestAssistantResponseCancel("Reply shortened to keep the conversation moving...");
+    }
     return;
   }
 
   if (type === "response.audio_transcript.done") {
+    clearAssistantResponseGuard();
     finalizeAssistantDraft(String(event.transcript || state.assistantDraftText || ""));
     return;
   }
 
   if (type === "response.text.delta") {
     updateAssistantDraft(String(event.delta || ""));
+    if (state.assistantDraftText.trim().length > currentMaxReplyChars()) {
+      requestAssistantResponseCancel("Reply shortened to keep the conversation moving...");
+    }
     return;
   }
 
   if (type === "response.text.done") {
+    clearAssistantResponseGuard();
     finalizeAssistantDraft(String(event.text || state.assistantDraftText || ""));
     return;
   }
 
   if (type === "response.done") {
+    state.assistantResponseActive = false;
+    clearAssistantResponseGuard();
     finalizeAssistantDraft(state.assistantDraftText);
+    if (state.wrapUpRequested && !state.sessionEndRequested) {
+      endSessionAndAnalyze().catch(handleSessionEndFailure);
+      return;
+    }
     if (state.liveAutoMode && state.isRecording) {
       setStatus("Mic live, waiting for speech...");
     }
@@ -1726,11 +1917,15 @@ function handleRealtimeEvent(event) {
     if (state.blueprint?.session_mode === "live_qwen" && !state.liveAutoMode) {
       enableLiveAutoMode();
     }
-    setStatus("Session ready");
+    if (!state.wrapUpRequested) {
+      setStatus("Session ready");
+    }
     return;
   }
 
   if (type === "error") {
+    state.assistantResponseActive = false;
+    clearAssistantResponseGuard();
     const message = event.error?.message || event.error || "Realtime error.";
     setStatus("Error");
     setFallback(String(message));
@@ -2043,10 +2238,17 @@ async function submitBatchAssessment({
 }
 
 async function endSessionAndAnalyze() {
+  if (state.sessionEndRequested || state.uploadInFlight) {
+    return;
+  }
   if (!state.socket || state.socket.readyState !== WebSocket.OPEN) {
     throw new Error("Start a session before ending and analyzing it.");
   }
 
+  state.sessionEndRequested = true;
+  clearAssistantResponseGuard();
+  clearSessionAutoEndTimer();
+  clearWrapUpTimer();
   setStatus("Stopping live session and packaging the recording...");
   setFallback("");
   state.sessionEndedAt = new Date().toISOString();

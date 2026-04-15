@@ -2,6 +2,7 @@
 # System binaries are also required in production:
 # - ffmpeg and ffprobe for browser-recorded video standardization and compression
 # - These are not installed by pip and must be provided by the host OS
+Flask>=3.0.0
 fastapi>=0.115.0
 httpx>=0.27.0
 numpy>=1.26.0
