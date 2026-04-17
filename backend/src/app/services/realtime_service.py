@@ -650,7 +650,6 @@ class RealtimeConversationService:
 
             async def pump_upstream_to_client() -> None:
                 nonlocal selected_voice_profile
-                pending_voice_profile: RealtimeVoiceProfile | None = None
                 deferred_voice_profile: RealtimeVoiceProfile | None = None
                 recent_language_signals: list[RealtimeLanguageSignal] = []
                 session_ready = False
@@ -683,6 +682,28 @@ class RealtimeConversationService:
                         reason,
                     )
                     await send_upstream_event({"type": "response.create"})
+
+                async def apply_voice_profile_to_session(
+                    profile: RealtimeVoiceProfile,
+                    *,
+                    reason: str,
+                ) -> None:
+                    nonlocal selected_voice_profile
+                    await send_session_update(profile, reason=reason)
+                    selected_voice_profile = profile
+                    await websocket.send_json(
+                        {
+                            "type": "reflexion.voice.selected",
+                            "voice": selected_voice_profile.voice,
+                            "language": selected_voice_profile.language_label,
+                            "language_key": selected_voice_profile.language_key,
+                            "language_input": self._language_input_value(
+                                selected_voice_profile.language_key,
+                                selected_voice_profile.language_label,
+                            ),
+                            "source": selected_voice_profile.source,
+                        }
+                    )
 
                 def schedule_response_fallback() -> None:
                     nonlocal response_fallback_task
@@ -756,7 +777,7 @@ class RealtimeConversationService:
                             )
                             if session_ready:
                                 try:
-                                    await send_session_update(
+                                    await apply_voice_profile_to_session(
                                         detected_voice_profile,
                                         reason="transcript_reassessment",
                                     )
@@ -770,10 +791,10 @@ class RealtimeConversationService:
                                             reason="transcript_reassessment_failed",
                                         )
                                 else:
-                                    pending_voice_profile = detected_voice_profile
                                     if awaiting_manual_response:
-                                        pending_response_after_update = True
-                                        schedule_response_fallback()
+                                        await send_manual_response_create(
+                                            reason="transcript_reassessment"
+                                        )
                             else:
                                 deferred_voice_profile = detected_voice_profile
                                 if awaiting_manual_response:
@@ -791,7 +812,7 @@ class RealtimeConversationService:
                             session_ready = True
                             if deferred_voice_profile is not None:
                                 try:
-                                    await send_session_update(
+                                    await apply_voice_profile_to_session(
                                         deferred_voice_profile,
                                         reason="transcript_reassessment",
                                     )
@@ -805,32 +826,14 @@ class RealtimeConversationService:
                                             reason="deferred_reassessment_failed",
                                         )
                                 else:
-                                    pending_voice_profile = deferred_voice_profile
                                     if awaiting_manual_response:
-                                        pending_response_after_update = True
-                                        schedule_response_fallback()
+                                        await send_manual_response_create(
+                                            reason="deferred_language_switch"
+                                        )
                                 finally:
                                     deferred_voice_profile = None
                             elif awaiting_manual_response and pending_response_after_update:
                                 await send_manual_response_create(reason="session_ready")
-                        elif pending_voice_profile is not None:
-                            selected_voice_profile = pending_voice_profile
-                            pending_voice_profile = None
-                            await websocket.send_json(
-                                {
-                                    "type": "reflexion.voice.selected",
-                                    "voice": selected_voice_profile.voice,
-                                    "language": selected_voice_profile.language_label,
-                                    "language_key": selected_voice_profile.language_key,
-                                    "language_input": self._language_input_value(
-                                        selected_voice_profile.language_key,
-                                        selected_voice_profile.language_label,
-                                    ),
-                                    "source": selected_voice_profile.source,
-                                }
-                            )
-                            if awaiting_manual_response and pending_response_after_update:
-                                await send_manual_response_create(reason="post_language_switch")
                         elif awaiting_manual_response and pending_response_after_update:
                             await send_manual_response_create(reason="session_updated")
 
