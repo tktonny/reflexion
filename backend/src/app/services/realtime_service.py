@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import base64
+import binascii
 import json
 import logging
 import math
@@ -10,7 +12,7 @@ import re
 import uuid
 from contextlib import suppress
 from dataclasses import dataclass
-from typing import Any, Literal
+from typing import Any
 
 from fastapi import WebSocket, WebSocketDisconnect
 
@@ -35,9 +37,6 @@ except ImportError:  # pragma: no cover - covered by runtime fallback mode
 
 
 logger = logging.getLogger("uvicorn.error")
-
-
-RealtimeSurfaceMode = Literal["clinic", "freetalk"]
 
 
 @dataclass(frozen=True)
@@ -255,7 +254,6 @@ class RealtimeConversationService:
         *,
         force_guided_demo: bool = False,
         preferred_language: str | None = None,
-        surface_mode: RealtimeSurfaceMode = "clinic",
     ) -> RealtimeSessionStatus:
         live_relay_available = bool(not force_guided_demo and self._live_qwen_ready())
         if live_relay_available:
@@ -271,14 +269,16 @@ class RealtimeConversationService:
                 max_session_seconds=self.settings.realtime_max_session_seconds,
                 max_reply_seconds=self.settings.realtime_max_assistant_response_seconds,
                 max_reply_chars=self.settings.realtime_max_assistant_response_chars,
-                flow_id=self._flow_id(surface_mode),
-                flow_title=self._flow_title(surface_mode),
-                conversation_goal=self._conversation_goal(surface_mode),
-                completion_rule=self._completion_rule(surface_mode),
-                greeting=self._opening_message(surface_mode),
-                prompt_steps=self._prompt_steps(surface_mode),
-                processing_steps=self._processing_steps(surface_mode),
-                fallback_note=self._fallback_note(surface_mode, live_relay_available=True),
+                flow_id=self.orchestrator.flow_id,
+                flow_title=self.orchestrator.flow_title,
+                conversation_goal=self.orchestrator.conversation_goal,
+                completion_rule=self.orchestrator.completion_rule,
+                greeting=self.orchestrator.opening_message,
+                prompt_steps=self.orchestrator.prompt_steps,
+                processing_steps=self.orchestrator.processing_steps,
+                fallback_note=(
+                    "If the live relay drops, the screen stays in guided conversation mode and still produces the final risk story."
+                ),
             )
         return RealtimeSessionStatus(
             session_mode="guided_demo",
@@ -291,14 +291,16 @@ class RealtimeConversationService:
             max_session_seconds=self.settings.realtime_max_session_seconds,
             max_reply_seconds=self.settings.realtime_max_assistant_response_seconds,
             max_reply_chars=self.settings.realtime_max_assistant_response_chars,
-            flow_id=self._flow_id(surface_mode),
-            flow_title=self._flow_title(surface_mode),
-            conversation_goal=self._conversation_goal(surface_mode),
-            completion_rule=self._completion_rule(surface_mode),
-            greeting=self._opening_message(surface_mode),
-            prompt_steps=self._prompt_steps(surface_mode),
-            processing_steps=self._processing_steps(surface_mode),
-            fallback_note=self._fallback_note(surface_mode, live_relay_available=False),
+            flow_id=self.orchestrator.flow_id,
+            flow_title=self.orchestrator.flow_title,
+            conversation_goal=self.orchestrator.conversation_goal,
+            completion_rule=self.orchestrator.completion_rule,
+            greeting=self.orchestrator.opening_message,
+            prompt_steps=self.orchestrator.prompt_steps,
+            processing_steps=self.orchestrator.processing_steps,
+            fallback_note=(
+                "Live Qwen relay is unavailable, so the interface keeps the guided conversation and local risk narrative active."
+            ),
         )
 
     async def run_session(
@@ -306,18 +308,15 @@ class RealtimeConversationService:
         websocket: WebSocket,
         patient_id: str,
         language: str,
-        *,
-        surface_mode: RealtimeSurfaceMode = "clinic",
     ) -> None:
         """Accept one browser session and serve either live or guided mode."""
 
         await websocket.accept()
-        status = self.build_session_status(preferred_language=language, surface_mode=surface_mode)
+        status = self.build_session_status(preferred_language=language)
         logger.info(
-            "Realtime browser session accepted patient_id=%s language=%s surface_mode=%s mode=%s provider=%s live=%s",
+            "Realtime browser session accepted patient_id=%s language=%s mode=%s provider=%s live=%s",
             patient_id,
             language,
-            surface_mode,
             status.session_mode,
             status.conversation_provider,
             status.live_relay_available,
@@ -330,7 +329,6 @@ class RealtimeConversationService:
                     websocket,
                     patient_id=patient_id,
                     language=language,
-                    surface_mode=surface_mode,
                 )
                 return
             except WebSocketDisconnect:
@@ -341,7 +339,6 @@ class RealtimeConversationService:
                 degraded = self.build_session_status(
                     force_guided_demo=True,
                     preferred_language=language,
-                    surface_mode=surface_mode,
                 )
                 await websocket.send_json(
                     {
@@ -353,7 +350,7 @@ class RealtimeConversationService:
 
         logger.warning("Realtime session running in guided demo mode")
         with suppress(WebSocketDisconnect):
-            await self._run_guided_demo(websocket, surface_mode=surface_mode)
+            await self._run_guided_demo(websocket)
 
     def analyze_session(self, request: RealtimeAnalysisRequest) -> RealtimeAssessment:
         """Convert one captured conversation into a deterministic demo assessment."""
@@ -585,8 +582,6 @@ class RealtimeConversationService:
         websocket: WebSocket,
         patient_id: str,
         language: str,
-        *,
-        surface_mode: RealtimeSurfaceMode = "clinic",
     ) -> None:
         assert websockets is not None
 
@@ -633,7 +628,6 @@ class RealtimeConversationService:
                         patient_id,
                         profile.language_label,
                         voice=profile.voice,
-                        surface_mode=surface_mode,
                     )
                 )
 
@@ -649,7 +643,6 @@ class RealtimeConversationService:
                         patient_id,
                         selected_voice_profile.language_label,
                         voice=selected_voice_profile.voice,
-                        surface_mode=surface_mode,
                         wrap_up=True,
                     )
                 )
@@ -752,6 +745,12 @@ class RealtimeConversationService:
 
             async def pump_client_to_upstream() -> None:
                 audio_append_started = False
+                audio_window_chunks = 0
+                audio_window_rms_total = 0.0
+                audio_window_peak = 0.0
+                audio_total_chunks = 0
+                audio_last_rms = 0.0
+                audio_window_started_at = asyncio.get_running_loop().time()
                 while True:
                     event = await websocket.receive_json()
                     prepared_event, audio_append_started = self._prepare_live_client_event(
@@ -769,6 +768,30 @@ class RealtimeConversationService:
                         logger.info("Browser requested realtime upstream close")
                         await upstream.close()
                         return
+                    if event_type == "input_audio_buffer.append":
+                        chunk_stats = self._audio_chunk_stats(str(event.get("audio", "")))
+                        if chunk_stats is not None:
+                            audio_total_chunks += 1
+                            audio_window_chunks += 1
+                            audio_window_rms_total += chunk_stats["rms"]
+                            audio_window_peak = max(audio_window_peak, chunk_stats["peak"])
+                            audio_last_rms = chunk_stats["rms"]
+                            now = asyncio.get_running_loop().time()
+                            if audio_window_chunks >= 12 or (now - audio_window_started_at) >= 1.0:
+                                average_rms = audio_window_rms_total / max(1, audio_window_chunks)
+                                logger.info(
+                                    "Browser->Qwen audio append stats total_chunks=%s window_chunks=%s avg_rms=%.4f last_rms=%.4f peak=%.4f samples_per_chunk=%s",
+                                    audio_total_chunks,
+                                    audio_window_chunks,
+                                    average_rms,
+                                    audio_last_rms,
+                                    audio_window_peak,
+                                    chunk_stats["samples"],
+                                )
+                                audio_window_chunks = 0
+                                audio_window_rms_total = 0.0
+                                audio_window_peak = 0.0
+                                audio_window_started_at = now
                     if "event_id" not in event:
                         event["event_id"] = f"event_{uuid.uuid4().hex[:12]}"
                     await send_upstream_event(event)
@@ -790,8 +813,6 @@ class RealtimeConversationService:
     async def _run_guided_demo(
         self,
         websocket: WebSocket,
-        *,
-        surface_mode: RealtimeSurfaceMode = "clinic",
     ) -> None:
         committed_turns = 0
         last_patient_text = ""
@@ -823,7 +844,6 @@ class RealtimeConversationService:
                 committed_turns,
                 patient_text=last_patient_text,
                 patient_name=patient_name,
-                surface_mode=surface_mode,
             )
             await websocket.send_json({"type": "response.created", "response": {"id": response_id}})
             assembled = []
@@ -842,13 +862,9 @@ class RealtimeConversationService:
         language: str,
         *,
         voice: str | None = None,
-        surface_mode: RealtimeSurfaceMode = "clinic",
         wrap_up: bool = False,
     ) -> dict[str, Any]:
-        if surface_mode == "freetalk":
-            instructions = self._build_free_talk_instructions(patient_id, language)
-        else:
-            instructions = self.orchestrator.build_live_instructions(patient_id, language)
+        instructions = self.orchestrator.build_live_instructions(patient_id, language)
         if wrap_up:
             instructions += (
                 "\nThe live capture is ending now. In your next reply, briefly thank the patient, "
@@ -880,85 +896,12 @@ class RealtimeConversationService:
             },
         }
 
-    def _flow_id(self, surface_mode: RealtimeSurfaceMode) -> str:
-        if surface_mode == "freetalk":
-            return "freetalk_open_session_v1"
-        return self.orchestrator.flow_id
-
-    def _flow_title(self, surface_mode: RealtimeSurfaceMode) -> str:
-        if surface_mode == "freetalk":
-            return "Open Free Talk Session"
-        return self.orchestrator.flow_title
-
-    def _conversation_goal(self, surface_mode: RealtimeSurfaceMode) -> str:
-        if surface_mode == "freetalk":
-            return (
-                "Let the patient speak freely with realtime Omni in an open conversation without a scripted intake flow."
-            )
-        return self.orchestrator.conversation_goal
-
-    def _completion_rule(self, surface_mode: RealtimeSurfaceMode) -> str:
-        if surface_mode == "freetalk":
-            return "Continue the open conversation until the patient or operator ends the session."
-        return self.orchestrator.completion_rule
-
-    def _opening_message(self, surface_mode: RealtimeSurfaceMode) -> str:
-        if surface_mode == "freetalk":
-            return "Hi."
-        return self.orchestrator.opening_message
-
-    def _processing_steps(self, surface_mode: RealtimeSurfaceMode) -> list[str]:
-        if surface_mode == "freetalk":
-            return [
-                "Audio and webcam frames are captured continuously during the free conversation.",
-                "Realtime Omni stays open-ended and responds naturally instead of following a staged intake flow.",
-                "Speech and face-stream proxies are converted into compact feature embeddings.",
-                "The full recorded session is uploaded for formal multimodal assessment after the live conversation.",
-            ]
-        return self.orchestrator.processing_steps
-
-    def _prompt_steps(self, surface_mode: RealtimeSurfaceMode) -> list[Any]:
-        if surface_mode == "freetalk":
-            return []
-        return self.orchestrator.prompt_steps
-
-    def _fallback_note(self, surface_mode: RealtimeSurfaceMode, *, live_relay_available: bool) -> str:
-        if live_relay_available:
-            return (
-                "If the live relay drops, the screen stays in guided conversation mode and still produces the final risk story."
-            )
-        return (
-            "Live Qwen relay is unavailable, so the interface keeps the guided conversation and local risk narrative active."
-        )
-
-    def _build_free_talk_instructions(self, patient_id: str, language: str) -> str:
-        language_name = language.strip() or "en"
-        return (
-            "You are Reflexion, a calm, warm, natural conversation partner in a clinical capture setting.\n"
-            f"The patient identifier is {patient_id}.\n"
-            f"Respond in {language_name} unless the patient clearly switches languages.\n"
-            "The local interface has already opened the conversation.\n"
-            "The next patient audio turn begins an open-ended conversation.\n"
-            "Live response rules:\n"
-            "- Do not run a structured interview or checklist.\n"
-            "- Do not force orientation, memory, or daily-function questions.\n"
-            "- Let the patient lead the topic and respond naturally to what they say.\n"
-            "- Ask gentle follow-up questions only when they fit the conversation.\n"
-            "- Keep replies extremely brief, usually one short sentence.\n"
-            "- If the patient switches language or dialect, switch immediately on the next turn.\n"
-            "- Stop speaking as soon as the next question or acknowledgement is clear.\n"
-            "- Never diagnose, score risk, or discuss dementia probability during the live conversation.\n"
-            "- If the patient slows down, reassure gently and leave space rather than pushing them.\n"
-            "- When the patient appears finished, close naturally and wait for the operator to end the session."
-        )
-
     def _mock_reply(
         self,
         committed_turns: int,
         *,
         patient_text: str | None = None,
         patient_name: str | None = None,
-        surface_mode: RealtimeSurfaceMode = "clinic",
     ) -> str:
         return self.orchestrator.guided_reply(
             committed_turns,
@@ -1312,6 +1255,35 @@ class RealtimeConversationService:
         if current:
             chunks.append(" ".join(current))
         return chunks or [text]
+
+    def _audio_chunk_stats(self, audio_b64: str) -> dict[str, float | int] | None:
+        if not audio_b64:
+            return None
+        try:
+            raw = base64.b64decode(audio_b64)
+        except (binascii.Error, ValueError):
+            logger.info("Browser->Qwen audio append stats unavailable: invalid base64 audio payload")
+            return None
+
+        sample_count = len(raw) // 2
+        if sample_count <= 0:
+            return None
+
+        sum_squares = 0.0
+        peak = 0.0
+        for index in range(0, sample_count * 2, 2):
+            sample = int.from_bytes(raw[index : index + 2], byteorder="little", signed=True) / 32768.0
+            absolute = abs(sample)
+            sum_squares += sample * sample
+            if absolute > peak:
+                peak = absolute
+
+        rms = math.sqrt(sum_squares / sample_count)
+        return {
+            "samples": sample_count,
+            "rms": rms,
+            "peak": peak,
+        }
 
     def _log_client_event(self, event: dict[str, Any]) -> None:
         event_type = str(event.get("type", ""))

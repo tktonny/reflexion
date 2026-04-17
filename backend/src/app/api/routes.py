@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Literal
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile, WebSocket
 from fastapi.responses import JSONResponse
@@ -124,8 +123,8 @@ def build_api_router(service: ClinicAssessmentService) -> APIRouter:
         return surfaces.build_caregiver_dashboard(patient_id)
 
     @router.get("/clinic/realtime/status")
-    async def get_realtime_status(surface_mode: Literal["clinic", "freetalk"] = "clinic"):
-        return realtime.build_session_status(surface_mode=surface_mode)
+    async def get_realtime_status():
+        return realtime.build_session_status()
 
     @router.post("/clinic/realtime/identity/check", response_model=IdentityPreflightResult)
     async def check_realtime_identity(request: IdentityPreflightRequest):
@@ -154,13 +153,11 @@ def build_api_router(service: ClinicAssessmentService) -> APIRouter:
         websocket: WebSocket,
         patient_id: str = "demo-patient",
         language: str = "en",
-        surface_mode: Literal["clinic", "freetalk"] = "clinic",
     ):
         await realtime.run_session(
             websocket,
             patient_id=patient_id,
             language=language,
-            surface_mode=surface_mode,
         )
 
     return router

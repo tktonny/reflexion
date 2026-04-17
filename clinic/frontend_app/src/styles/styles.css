@@ -595,6 +595,50 @@ button:disabled {
   animation: pulse 1s infinite;
 }
 
+.video-monitor {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(12, 17, 20, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.video-monitor-label {
+  color: rgba(255, 255, 255, 0.76);
+  margin: 0;
+}
+
+.mic-level-meter {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.mic-level-fill {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #31b87d, #f1bf4c, #db6a3b);
+  transition: width 90ms linear;
+}
+
+.video-monitor strong {
+  color: #fff;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+
 .capture-metrics {
   display: none;
 }
@@ -1084,6 +1128,11 @@ ul {
   .trend-head,
   .step-title {
     flex-direction: column;
+    align-items: start;
+  }
+
+  .video-monitor {
+    grid-template-columns: 1fr;
     align-items: start;
   }
 

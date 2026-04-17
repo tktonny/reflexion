@@ -18,6 +18,8 @@ const recordingPill = document.getElementById("recording-pill");
 const frameCount = document.getElementById("frame-count");
 const speechSeconds = document.getElementById("speech-seconds");
 const audioChunks = document.getElementById("audio-chunks");
+const micLevelFill = document.getElementById("mic-level-fill");
+const micLevelValue = document.getElementById("mic-level-value");
 const promptSteps = document.getElementById("prompt-steps");
 const transcript = document.getElementById("transcript");
 const videoPreview = document.getElementById("camera-preview");
@@ -62,7 +64,6 @@ const disclaimer = document.getElementById("disclaimer");
 
 const RecognitionConstructor =
   window.SpeechRecognition || window.webkitSpeechRecognition || null;
-const pageMode = document.body?.dataset?.surfaceMode === "freetalk" ? "freetalk" : "clinic";
 
 const state = {
   blueprint: null,
@@ -85,6 +86,7 @@ const state = {
   assistantResponseTimer: null,
   assistantResponseActive: false,
   assistantResponseCancelSent: false,
+  micLevel: 0,
   audioChunkCount: 0,
   speechDurationSeconds: 0,
   utteranceCount: 0,
@@ -153,6 +155,54 @@ function setStatus(text) {
 
 function setFallback(text) {
   fallbackNote.textContent = text || "";
+}
+
+function updateMicLevel(level) {
+  const clamped = Math.max(0, Math.min(1, Number(level) || 0));
+  state.micLevel = clamped;
+  if (micLevelFill) {
+    micLevelFill.style.width = `${Math.round(clamped * 100)}%`;
+    micLevelFill.parentElement?.setAttribute("aria-valuenow", String(Math.round(clamped * 100)));
+  }
+  if (micLevelValue) {
+    micLevelValue.textContent = `${Math.round(clamped * 100)}%`;
+  }
+}
+
+function measureSignalLevel(samples) {
+  if (!samples?.length) {
+    return { rms: 0, peak: 0 };
+  }
+  let sumSquares = 0;
+  let peak = 0;
+  for (let index = 0; index < samples.length; index += 1) {
+    const sample = Math.abs(samples[index]);
+    sumSquares += sample * sample;
+    if (sample > peak) {
+      peak = sample;
+    }
+  }
+  return {
+    rms: Math.sqrt(sumSquares / samples.length),
+    peak,
+  };
+}
+
+async function ensureAudioContextRunning() {
+  if (!state.audioContext) {
+    return;
+  }
+  if (state.audioContext.state === "running") {
+    return;
+  }
+  try {
+    await state.audioContext.resume();
+  } catch (error) {
+    applyRecognitionFallbackNote(
+      "Microphone processing could not resume, so live speech capture may stay silent until the browser allows audio again.",
+    );
+    throw error;
+  }
 }
 
 function currentMaxSessionSeconds() {
@@ -723,6 +773,7 @@ function resetSessionState() {
   clearAssistantResponseGuard();
   clearSessionAutoEndTimer();
   clearWrapUpTimer();
+  updateMicLevel(0);
   clearNode(transcript);
   state.transcriptTurns = [];
   state.pendingTurns = [];
@@ -733,6 +784,7 @@ function resetSessionState() {
   state.assistantDraftText = "";
   state.assistantResponseActive = false;
   state.assistantResponseCancelSent = false;
+  state.micLevel = 0;
   state.audioChunkCount = 0;
   state.speechDurationSeconds = 0;
   state.utteranceCount = 0;
@@ -790,6 +842,9 @@ function refreshButtons() {
 }
 
 function setRecordingVisualState(recording) {
+  if (!recording) {
+    updateMicLevel(0);
+  }
   if (state.liveAutoMode) {
     recordingPill.textContent = recording ? "Mic Live" : "Mic Muted";
   } else {
@@ -996,7 +1051,7 @@ async function runIdentityPreflight(patientId) {
 }
 
 async function loadRealtimeStatus() {
-  const response = await fetch(`/api/clinic/realtime/status?surface_mode=${encodeURIComponent(pageMode)}`);
+  const response = await fetch("/api/clinic/realtime/status");
   const payload = await parseJsonResponse(response);
 
   if (!response.ok) {
@@ -1061,7 +1116,7 @@ async function ensureMediaReady() {
 async function initializeAudioPipeline(stream) {
   const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
   state.audioContext = new AudioContextConstructor();
-  await state.audioContext.resume();
+  await ensureAudioContextRunning();
 
   state.mediaSource = state.audioContext.createMediaStreamSource(stream);
   state.processorNode = state.audioContext.createScriptProcessor(4096, 1, 1);
@@ -1070,10 +1125,13 @@ async function initializeAudioPipeline(stream) {
 
   state.processorNode.onaudioprocess = (event) => {
     if (!state.isRecording || !state.socket || state.socket.readyState !== WebSocket.OPEN) {
+      updateMicLevel(0);
       return;
     }
 
     const inputData = event.inputBuffer.getChannelData(0);
+    const { rms } = measureSignalLevel(inputData);
+    updateMicLevel(Math.max(rms, state.micLevel * 0.78));
     const pcm16 = convertTo16kPcm(inputData, state.audioContext.sampleRate);
     if (!pcm16 || pcm16.length === 0) {
       return;
@@ -1537,7 +1595,7 @@ async function stopSessionRecording() {
 function openRealtimeSocket(patientId, language) {
   return new Promise((resolve, reject) => {
     const socket = new WebSocket(
-      `${wsBaseUrl()}/api/clinic/realtime/ws?patient_id=${encodeURIComponent(patientId)}&language=${encodeURIComponent(language)}&surface_mode=${encodeURIComponent(pageMode)}`,
+      `${wsBaseUrl()}/api/clinic/realtime/ws?patient_id=${encodeURIComponent(patientId)}&language=${encodeURIComponent(language)}`,
     );
 
     socket.onopen = () => {
@@ -1629,6 +1687,7 @@ function queueTranscriptFallback(stage, fallbackText, timeoutMs) {
 function enableLiveAutoMode() {
   state.liveAutoMode = true;
   state.isRecording = true;
+  ensureAudioContextRunning().catch(() => {});
   startFrameCaptureLoop();
   startRecognition();
   setRecordingVisualState(true);
@@ -1943,6 +2002,7 @@ async function startSession() {
   state.currentLanguage = languageInput.value.trim() || "en";
 
   await ensureMediaReady();
+  await ensureAudioContextRunning();
 
   const identityResult = await runIdentityPreflight(state.currentPatientId);
   if (!identityResult.can_start_session) {

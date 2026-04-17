@@ -26,7 +26,6 @@
                   <a href="/doctor">Doctor</a>
                   <a href="/care">Care</a>
                   <a class="is-active" href="/clinic">Clinic</a>
-                  <a href="/freetalk">Freetalk</a>
                 </nav>
               </div>
               <div class="sidebar-card">
@@ -49,7 +48,6 @@
           <a href="/doctor">Doctor</a>
           <a href="/care">Care</a>
           <a class="is-active" href="/clinic">Clinic</a>
-          <a href="/freetalk">Freetalk</a>
         </nav>
       </header>
 
@@ -150,6 +148,20 @@
                 <div class="video-overlay">
                   <strong>Patient Camera</strong>
                   <span class="recording-pill" id="recording-pill">Standby</span>
+                </div>
+                <div class="video-monitor" aria-live="polite">
+                  <span class="mini-label video-monitor-label">Mic Level</span>
+                  <div
+                    class="mic-level-meter"
+                    role="meter"
+                    aria-label="Microphone input level"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                  >
+                    <span class="mic-level-fill" id="mic-level-fill"></span>
+                  </div>
+                  <strong id="mic-level-value">0%</strong>
                 </div>
               </div>
 
