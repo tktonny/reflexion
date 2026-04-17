@@ -111,6 +111,11 @@ class Settings:
     standardized_video_target_total_kbps: int = 1500
     standardized_audio_bitrate_kbps: int = 96
     realtime_flow_path: Path | None = None
+    patient_memory_use_llm: bool = True
+    patient_memory_api_key: str | None = None
+    patient_memory_base_url: str = "https://coding.dashscope.aliyuncs.com/v1"
+    patient_memory_model: str = "qwen3.5-plus"
+    patient_memory_timeout_seconds: float = 20.0
 
 
 @lru_cache(maxsize=1)
@@ -254,5 +259,25 @@ def get_settings() -> Settings:
             Path(raw_path).resolve()
             if (raw_path := os.getenv("REFLEXION_REALTIME_FLOW_PATH"))
             else None
+        ),
+        patient_memory_use_llm=_as_bool(
+            os.getenv("REFLEXION_PATIENT_MEMORY_USE_LLM"),
+            default=True,
+        ),
+        patient_memory_api_key=(
+            os.getenv("DASHSCOPE_API_KEY")
+            or os.getenv("CODING_PLAN_API_KEY")
+            or os.getenv("REFLEXION_CODING_PLAN_API_KEY")
+        ),
+        patient_memory_base_url=os.getenv(
+            "REFLEXION_PATIENT_MEMORY_BASE_URL",
+            "https://coding.dashscope.aliyuncs.com/v1",
+        ).rstrip("/"),
+        patient_memory_model=os.getenv(
+            "REFLEXION_PATIENT_MEMORY_MODEL",
+            "qwen3.5-plus",
+        ),
+        patient_memory_timeout_seconds=float(
+            os.getenv("REFLEXION_PATIENT_MEMORY_TIMEOUT_SECONDS", "20")
         ),
     )

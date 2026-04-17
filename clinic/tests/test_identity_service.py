@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 import math
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -17,6 +18,7 @@ from backend.src.app.models.identity import IdentityProfile
 from backend.src.app.services.assessment_service import ClinicAssessmentService
 from backend.src.app.services.identity_service import FaceEvidence, IdentityLinkageService
 from backend.src.app.services.longitudinal_service import LongitudinalTrackingService
+from backend.src.app.services import patient_memory as patient_memory_service
 
 
 def make_settings(tmp_path: Path) -> Settings:
@@ -600,6 +602,127 @@ def test_identity_service_accumulates_memory_across_sessions(tmp_path: Path, mon
     assert "Recent activity mentioned: This morning I had breakfast and read the news." in profile.memory
     assert "Routine/support detail: I set reminders on my phone for medicine and appointments." in profile.memory
     assert len(profile.memory) == 5
+
+
+def test_identity_service_uses_llm_patient_memory_when_configured(tmp_path: Path, monkeypatch) -> None:
+    settings = replace(make_settings(tmp_path), patient_memory_api_key="test-key")
+    storage = LocalStorage(settings)
+    identity = IdentityLinkageService(storage)
+    patch_face_sequence(
+        monkeypatch,
+        make_face_evidence("llm-memory-face", [0.2, 0.1, 0.9, 0.0, 0.0, 0.0, 0.0, 0.0]),
+    )
+    observed: dict[str, str] = {}
+
+    def _fake_request_patient_memory_payload(*, transcript: str, settings) -> dict[str, object]:
+        observed["transcript"] = transcript
+        observed["model"] = settings.patient_memory_model
+        return {
+            "preferred_name": "Grace Lin",
+            "recent_activity": "Had breakfast and read the news with her sister",
+            "routine_support": "Uses phone reminders for medicine and appointments",
+            "other_memory_items": ["Prefers afternoon check-ins"],
+        }
+
+    monkeypatch.setattr(
+        patient_memory_service,
+        "_request_patient_memory_payload",
+        _fake_request_patient_memory_payload,
+    )
+
+    assessment = make_assessment(
+        assessment_id="visit-memory-llm",
+        patient_id="patient-memory-llm",
+        created_at=datetime(2026, 4, 8, 8, 0, tzinfo=timezone.utc),
+        risk_score=0.34,
+        risk_tier="low",
+        screening_classification="healthy",
+    )
+
+    identity.link_assessment(
+        assessment,
+        session_record=make_session_record(
+            session_id="session-memory-llm",
+            patient_name="Grace Lin",
+            patient_turns=4,
+            utterance_count=4,
+            face_detection_rate=0.82,
+            average_face_area=0.22,
+            motion_intensity=0.28,
+            transcript=[
+                "I am at home today.",
+                "This morning I had breakfast and read the news.",
+                "I set reminders on my phone for medicine and appointments.",
+            ],
+        ),
+    )
+
+    profile = identity.load_profile("patient-memory-llm")
+
+    assert observed["model"] == "qwen3.5-plus"
+    assert "[orientation]" in observed["transcript"]
+    assert "[stage-1]" in observed["transcript"]
+    assert profile.preferred_name == "Grace Lin"
+    assert profile.memory == [
+        "Preferred name: Grace Lin.",
+        "Recent activity mentioned: Had breakfast and read the news with her sister.",
+        "Routine/support detail: Uses phone reminders for medicine and appointments.",
+        "Patient detail: Prefers afternoon check-ins.",
+    ]
+
+
+def test_identity_service_falls_back_to_rule_based_memory_when_llm_fails(tmp_path: Path, monkeypatch) -> None:
+    settings = replace(make_settings(tmp_path), patient_memory_api_key="test-key")
+    storage = LocalStorage(settings)
+    identity = IdentityLinkageService(storage)
+    patch_face_sequence(
+        monkeypatch,
+        make_face_evidence("llm-fallback-face", [0.3, 0.1, 0.9, 0.0, 0.0, 0.0, 0.0, 0.0]),
+    )
+
+    def _raise_request_failure(*, transcript: str, settings) -> dict[str, object]:
+        del transcript, settings
+        raise RuntimeError("provider unavailable")
+
+    monkeypatch.setattr(
+        patient_memory_service,
+        "_request_patient_memory_payload",
+        _raise_request_failure,
+    )
+
+    assessment = make_assessment(
+        assessment_id="visit-memory-fallback",
+        patient_id="patient-memory-fallback",
+        created_at=datetime(2026, 4, 8, 8, 0, tzinfo=timezone.utc),
+        risk_score=0.34,
+        risk_tier="low",
+        screening_classification="healthy",
+    )
+
+    identity.link_assessment(
+        assessment,
+        session_record=make_session_record(
+            session_id="session-memory-fallback",
+            patient_name="Grace Lin",
+            patient_turns=4,
+            utterance_count=4,
+            face_detection_rate=0.82,
+            average_face_area=0.22,
+            motion_intensity=0.28,
+            transcript=[
+                "I am at home today.",
+                "This morning I had breakfast and read the news.",
+                "I set reminders on my phone for medicine and appointments.",
+            ],
+        ),
+    )
+
+    profile = identity.load_profile("patient-memory-fallback")
+
+    assert profile.preferred_name == "Grace Lin"
+    assert profile.memory[0] == "Preferred name: Grace Lin."
+    assert profile.memory[1] == "Recent activity mentioned: This morning I had breakfast and read the news."
+    assert profile.memory[2] == "Routine/support detail: I set reminders on my phone for medicine and appointments."
 
 
 def test_realtime_identity_preflight_verifies_enrolled_patient_face(tmp_path: Path, monkeypatch) -> None:

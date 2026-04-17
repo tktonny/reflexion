@@ -673,7 +673,10 @@ class IdentityLinkageService:
         *,
         session_record: dict[str, Any] | None,
     ) -> IdentityProfile:
-        preferred_name, memory = build_patient_memory(session_record)
+        preferred_name, memory = build_patient_memory(
+            session_record,
+            settings=self.storage.settings,
+        )
         resolved_name = normalize_patient_name(preferred_name) or normalize_patient_name(profile.preferred_name)
         merged_memory = merge_patient_memories(
             profile.memory,
