@@ -656,6 +656,7 @@ class RealtimeConversationService:
                 session_ready = False
                 pending_response_after_update = False
                 awaiting_manual_response = False
+                response_requested_for_turn = False
                 response_fallback_task: asyncio.Task[None] | None = None
 
                 def cancel_response_fallback() -> None:
@@ -666,13 +667,14 @@ class RealtimeConversationService:
                     response_fallback_task = None
 
                 async def send_manual_response_create(*, reason: str) -> None:
-                    nonlocal awaiting_manual_response, pending_response_after_update
+                    nonlocal awaiting_manual_response, pending_response_after_update, response_requested_for_turn
                     if not awaiting_manual_response:
                         pending_response_after_update = False
                         return
                     cancel_response_fallback()
                     awaiting_manual_response = False
                     pending_response_after_update = False
+                    response_requested_for_turn = True
                     logger.info(
                         "Sending realtime response.create patient_id=%s voice=%s language=%s reason=%s",
                         patient_id,
@@ -709,11 +711,24 @@ class RealtimeConversationService:
                     self._log_upstream_event(payload)
                     event_type = str(payload.get("type", ""))
 
+                    if event_type == "input_audio_buffer.speech_started":
+                        response_requested_for_turn = False
+
+                    if event_type == "input_audio_buffer.speech_stopped" and not response_requested_for_turn:
+                        awaiting_manual_response = True
+                        schedule_response_fallback()
+
                     if event_type == "input_audio_buffer.committed":
+                        if response_requested_for_turn:
+                            await websocket.send_json(payload)
+                            continue
                         awaiting_manual_response = True
                         schedule_response_fallback()
 
                     if event_type == "conversation.item.input_audio_transcription.completed":
+                        if not awaiting_manual_response and not response_requested_for_turn:
+                            awaiting_manual_response = True
+                            schedule_response_fallback()
                         cancel_response_fallback()
                         transcript_text = str(payload.get("transcript", ""))
                         language_signal = self._detect_language_signal_from_transcript(transcript_text)

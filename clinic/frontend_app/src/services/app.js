@@ -165,7 +165,7 @@ function updateMicLevel(level) {
   const clamped = Math.max(0, Math.min(1, Number(level) || 0));
   state.micLevel = clamped;
   if (micLevelFill) {
-    micLevelFill.style.width = `${Math.round(clamped * 100)}%`;
+    micLevelFill.style.height = `${Math.round(clamped * 100)}%`;
     micLevelFill.parentElement?.setAttribute("aria-valuenow", String(Math.round(clamped * 100)));
   }
   if (micLevelValue) {
