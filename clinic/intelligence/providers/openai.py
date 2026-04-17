@@ -107,12 +107,16 @@ class FusionProvider(_OpenAIFallbackBase):
         audio_path = provider_input.get("audio_path")
         if audio_path:
             transcript = await self._transcribe(Path(audio_path))
+        auxiliary_transcript = self._session_record_transcript_text(context.session_record)
+        if not transcript.strip() and auxiliary_transcript.strip():
+            transcript = auxiliary_transcript
 
         frame_paths = provider_input.get("frame_paths") or []
         if not frame_paths and not transcript:
             raise ProviderError("unsupported_media", "fusion provider requires audio or extracted frames")
 
         prompt = build_provider_prompt(context.patient_id, context.language, provider_mode="fusion")
+        session_context = self._session_record_context_text(context)
         user_content: list[dict[str, Any]] = [
             {
                 "type": "text",
@@ -121,6 +125,7 @@ class FusionProvider(_OpenAIFallbackBase):
                     "This is a fallback fusion review.\n"
                     "Use the attached video frames as the visual channel and the transcript as the speech channel.\n"
                     "Do not infer prosody beyond what is explicitly supported by transcript or clear audiovisual evidence.\n"
+                    f"{session_context + chr(10) + chr(10) if session_context else ''}"
                     f"Transcript:\n{transcript or '[transcript unavailable]'}"
                 ),
             }
@@ -152,10 +157,14 @@ class AudioOnlyProvider(_OpenAIFallbackBase):
         if not audio_path:
             raise ProviderError("unsupported_media", "audio_only provider requires extracted audio")
         transcript = await self._transcribe(Path(audio_path))
+        auxiliary_transcript = self._session_record_transcript_text(context.session_record)
+        if not transcript.strip() and auxiliary_transcript.strip():
+            transcript = auxiliary_transcript
         if not transcript.strip():
             raise ProviderError("unsupported_media", "audio_only provider could not obtain a transcript")
 
         prompt = build_provider_prompt(context.patient_id, context.language, provider_mode="audio_only")
+        session_context = self._session_record_context_text(context)
         user_content: list[dict[str, Any]] = [
             {
                 "type": "text",
@@ -165,6 +174,7 @@ class AudioOnlyProvider(_OpenAIFallbackBase):
                     "No visual channel is available for this review.\n"
                     "Return empty visual_findings and body_findings unless explicitly null because the session is unusable.\n"
                     "Downgrade confidence and prefer needs_observation when visual evidence is required for a stronger call.\n"
+                    f"{session_context + chr(10) + chr(10) if session_context else ''}"
                     f"Transcript:\n{transcript}"
                 ),
             }

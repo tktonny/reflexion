@@ -73,6 +73,7 @@ Stage 1: information extraction for the target patient only.
 - Include only directly supported, repeated, high-signal cues.
 - Leave a modality empty instead of guessing.
 - Do not hallucinate transcript content.
+- If auxiliary transcript or browser-capture metadata is provided, treat it as secondary evidence that can help recover speech/content when uploaded media audio is weak.
 - If speech is unclear or missing, keep voice and content conservative or empty.
 - If speaker attribution is uncertain, do not assign voice or content findings with high confidence.
 - Each finding object must contain: label, summary, evidence, confidence.

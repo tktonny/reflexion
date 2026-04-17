@@ -49,6 +49,10 @@ class GeminiProvider(BaseProvider):
             raise ProviderError("provider_unavailable", "gemini is not configured")
 
         prompt = build_provider_prompt(context.patient_id, context.language, provider_mode="omni")
+        session_context = self._session_record_context_text(context)
+        prompt_text = prompt.user_prompt
+        if session_context:
+            prompt_text = f"{prompt_text}\n\n{session_context}"
         payload = {
             "system_instruction": {"parts": [{"text": prompt.system_prompt}]},
             "contents": [
@@ -61,7 +65,7 @@ class GeminiProvider(BaseProvider):
                                 "file_uri": provider_input["file_uri"],
                             }
                         },
-                        {"text": prompt.user_prompt},
+                        {"text": prompt_text},
                     ],
                 }
             ],

@@ -213,6 +213,7 @@ class ClinicAssessmentService:
             preferred_provider=metadata.preferred_provider,
             strict_provider=metadata.strict_provider,
             media=prepared_media,
+            session_record=session_record,
         )
         assessment = await self.router.analyze(context)
         self.storage.save_assessment(assessment)

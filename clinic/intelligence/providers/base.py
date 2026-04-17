@@ -221,6 +221,74 @@ class BaseProvider(ABC):
             "raw_text_preview": text[:12000],
         }
 
+    def _session_record_value(self, session_record: dict[str, object] | None, *path: str) -> object | None:
+        current: object | None = session_record
+        for key in path:
+            if not isinstance(current, dict):
+                return None
+            current = current.get(key)
+        return current
+
+    def _session_record_transcript_text(self, session_record: dict[str, object] | None) -> str:
+        turns = self._session_record_value(
+            session_record,
+            "derivedFeatures",
+            "speech",
+            "transcriptTurns",
+        )
+        if not isinstance(turns, list):
+            return ""
+        transcript_lines: list[str] = []
+        for turn in turns[:16]:
+            if not isinstance(turn, dict):
+                continue
+            role = str(turn.get("role", "")).strip().lower() or "speaker"
+            text = str(turn.get("text", "")).strip()
+            if not text:
+                continue
+            transcript_lines.append(f"{role}: {text}")
+        return "\n".join(transcript_lines)
+
+    def _session_record_context_text(self, context: ProviderContext) -> str:
+        session_record = context.session_record
+        if not session_record:
+            return ""
+
+        transcript_text = self._session_record_transcript_text(session_record)
+        speech_seconds = self._session_record_value(session_record, "derivedFeatures", "speech", "speechSeconds")
+        utterance_count = self._session_record_value(session_record, "derivedFeatures", "speech", "utteranceCount")
+        frames_captured = self._session_record_value(session_record, "derivedFeatures", "facial", "framesCaptured")
+        face_detection_rate = self._session_record_value(
+            session_record,
+            "derivedFeatures",
+            "facial",
+            "faceDetectionRate",
+        )
+        completed_stages = self._session_record_value(session_record, "acquisition", "tasksCompleted")
+        quality_flags = self._session_record_value(session_record, "qualityControl", "flags")
+
+        lines = [
+            "Auxiliary live-session context from the browser capture is available.",
+            "Treat this as secondary evidence that can help recover patient speech/content when the uploaded video audio is weak.",
+            "Do not let the auxiliary transcript override clear contradictory audiovisual evidence.",
+        ]
+        if speech_seconds is not None:
+            lines.append(f"- Captured speech seconds: {speech_seconds}")
+        if utterance_count is not None:
+            lines.append(f"- Patient utterance count: {utterance_count}")
+        if frames_captured is not None:
+            lines.append(f"- Sampled visual frames: {frames_captured}")
+        if face_detection_rate is not None:
+            lines.append(f"- Face detection rate: {face_detection_rate}")
+        if isinstance(completed_stages, list) and completed_stages:
+            lines.append(f"- Conversation stages completed: {', '.join(str(item) for item in completed_stages)}")
+        if isinstance(quality_flags, list) and quality_flags:
+            lines.append(f"- Browser capture quality flags: {', '.join(str(item) for item in quality_flags)}")
+        if transcript_text:
+            lines.append("Auxiliary transcript excerpt:")
+            lines.append(transcript_text)
+        return "\n".join(lines)
+
     def _normalize_assessment_payload_dict(self, data: dict[str, Any]) -> dict[str, Any]:
         normalized = dict(data)
 

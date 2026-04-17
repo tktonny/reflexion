@@ -80,6 +80,10 @@ class QwenOmniProvider(BaseProvider):
             raise ProviderError("provider_unavailable", "qwen_omni is not configured")
 
         prompt = build_provider_prompt(context.patient_id, context.language, provider_mode="omni")
+        session_context = self._session_record_context_text(context)
+        prompt_text = prompt.user_prompt
+        if session_context:
+            prompt_text = f"{prompt_text}\n\n{session_context}"
         payload = {
             "model": self.model_name,
             "messages": [
@@ -87,7 +91,7 @@ class QwenOmniProvider(BaseProvider):
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": prompt.user_prompt},
+                        {"type": "text", "text": prompt_text},
                         {
                             "type": "video_url",
                             "video_url": {"url": provider_input["inline_video_url"]},

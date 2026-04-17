@@ -296,6 +296,7 @@ class ProviderContext(BaseModel):
     preferred_provider: ProviderName | None = None
     strict_provider: bool = False
     media: PreparedMedia
+    session_record: dict[str, object] | None = None
 
 
 class ProvidersResponse(BaseModel):
