@@ -660,7 +660,12 @@ def test_status_uses_stored_preferred_name_for_returning_patient(tmp_path: Path)
 
     status = service.build_session_status(preferred_language="en", patient_id="patient-001")
 
-    assert status.greeting == "Hi, Mary Chen. Nice to see you again. Where are you right now?"
+    assert status.flow_title == "Returning Patient Daily Check-In"
+    assert status.conversation_goal.startswith("Collect a natural 90 to 120 second spoken check-in")
+    assert len(status.prompt_steps) == 2
+    assert status.prompt_steps[0].title == "Open Check-In"
+    assert status.prompt_steps[0].prompt == "How are you feeling today? What's on your mind this morning?"
+    assert status.greeting == "Hi, Mary Chen. Nice to see you again. How are you feeling today? What's on your mind this morning?"
 
 
 def test_live_session_update_uses_stored_memory_for_returning_patient(tmp_path: Path) -> None:
@@ -684,10 +689,41 @@ def test_live_session_update_uses_stored_memory_for_returning_patient(tmp_path: 
     payload = service._build_live_session_update("patient-memory", "en")
     instructions = payload["session"]["instructions"]
 
-    assert 'say exactly this opening in en: "Hi, Grace Lin. Nice to see you again. Where are you right now?"' in instructions
+    assert "Conversation flow: Returning Patient Daily Check-In." in instructions
+    assert 'say exactly this opening in en: "Hi, Grace Lin. Nice to see you again. How are you feeling today? What\'s on your mind this morning?"' in instructions
     assert "Do not ask what to call them unless they correct you" in instructions
     assert "Known patient memory from earlier sessions" in instructions
     assert "- Preferred name: Grace Lin." in instructions
+    assert "ask one open check-in prompt, allow them to speak freely, and use at most one brief follow-up before closing" in instructions
+
+
+def test_guided_demo_reply_uses_returning_patient_check_in_flow(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    opening = service._mock_reply(
+        0,
+        language="en",
+        patient_name="Mary Chen",
+        returning_patient=True,
+    )
+    follow_up = service._mock_reply(
+        1,
+        language="en",
+        patient_text="I feel okay.",
+        patient_name="Mary Chen",
+        returning_patient=True,
+    )
+    completion = service._mock_reply(
+        1,
+        language="en",
+        patient_text="I've been feeling alright today. I had breakfast, read a little, and was thinking about my grandson's visit later this afternoon.",
+        patient_name="Mary Chen",
+        returning_patient=True,
+    )
+
+    assert opening == "Hi, Mary Chen. Nice to see you again. How are you feeling today? What's on your mind this morning?"
+    assert follow_up == "Tell me a little more about that."
+    assert completion == "Thanks. The structured intake is complete."
 
 
 def test_analysis_elevates_risk_for_memory_heavy_conversation(tmp_path: Path) -> None:

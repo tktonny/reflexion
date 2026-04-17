@@ -332,7 +332,7 @@ class RealtimeConversationService:
         preferred_language: str | None = None,
         patient_id: str | None = None,
     ) -> RealtimeSessionStatus:
-        known_name, _ = self._known_patient_context(patient_id)
+        known_name, known_memory = self._known_patient_context(patient_id)
         live_relay_available = bool(not force_guided_demo and self._live_qwen_ready())
         if live_relay_available:
             voice_profile = self._voice_profile_for_session(language_hint=preferred_language)
@@ -348,14 +348,31 @@ class RealtimeConversationService:
                 max_reply_seconds=self.settings.realtime_max_assistant_response_seconds,
                 max_reply_chars=self.settings.realtime_max_assistant_response_chars,
                 flow_id=self.orchestrator.flow_id,
-                flow_title=self.orchestrator.flow_title,
-                conversation_goal=self.orchestrator.conversation_goal,
-                completion_rule=self.orchestrator.completion_rule,
+                flow_title=self.orchestrator.flow_title_for_session(
+                    patient_name=known_name,
+                    memory=known_memory,
+                ),
+                conversation_goal=self.orchestrator.conversation_goal_for_session(
+                    patient_name=known_name,
+                    memory=known_memory,
+                ),
+                completion_rule=self.orchestrator.completion_rule_for_session(
+                    patient_name=known_name,
+                    memory=known_memory,
+                ),
                 greeting=self.orchestrator.opening_message_for_language(
                     preferred_language,
                     patient_name=known_name,
+                    returning_patient=self.orchestrator._is_returning_patient(
+                        patient_name=known_name,
+                        memory=known_memory,
+                    ),
                 ),
-                prompt_steps=self.orchestrator.prompt_steps,
+                prompt_steps=self.orchestrator.prompt_steps_for_session(
+                    language=preferred_language,
+                    patient_name=known_name,
+                    memory=known_memory,
+                ),
                 processing_steps=self.orchestrator.processing_steps,
                 fallback_note=None,
             )
@@ -371,14 +388,31 @@ class RealtimeConversationService:
             max_reply_seconds=self.settings.realtime_max_assistant_response_seconds,
             max_reply_chars=self.settings.realtime_max_assistant_response_chars,
             flow_id=self.orchestrator.flow_id,
-            flow_title=self.orchestrator.flow_title,
-            conversation_goal=self.orchestrator.conversation_goal,
-            completion_rule=self.orchestrator.completion_rule,
+            flow_title=self.orchestrator.flow_title_for_session(
+                patient_name=known_name,
+                memory=known_memory,
+            ),
+            conversation_goal=self.orchestrator.conversation_goal_for_session(
+                patient_name=known_name,
+                memory=known_memory,
+            ),
+            completion_rule=self.orchestrator.completion_rule_for_session(
+                patient_name=known_name,
+                memory=known_memory,
+            ),
             greeting=self.orchestrator.opening_message_for_language(
                 preferred_language,
                 patient_name=known_name,
+                returning_patient=self.orchestrator._is_returning_patient(
+                    patient_name=known_name,
+                    memory=known_memory,
+                ),
             ),
-            prompt_steps=self.orchestrator.prompt_steps,
+            prompt_steps=self.orchestrator.prompt_steps_for_session(
+                language=preferred_language,
+                patient_name=known_name,
+                memory=known_memory,
+            ),
             processing_steps=self.orchestrator.processing_steps,
             fallback_note=(
                 "Live Qwen relay is unavailable, so the interface keeps the guided conversation and local risk narrative active."
@@ -433,7 +467,11 @@ class RealtimeConversationService:
 
         logger.warning("Realtime session running in guided demo mode")
         with suppress(WebSocketDisconnect):
-            await self._run_guided_demo(websocket, language=language)
+            await self._run_guided_demo(
+                websocket,
+                language=language,
+                patient_id=patient_id,
+            )
 
     def analyze_session(self, request: RealtimeAnalysisRequest) -> RealtimeAssessment:
         """Convert one captured conversation into a deterministic demo assessment."""
@@ -1071,10 +1109,15 @@ class RealtimeConversationService:
         websocket: WebSocket,
         *,
         language: str,
+        patient_id: str | None = None,
     ) -> None:
         committed_turns = 0
         last_patient_text = ""
-        patient_name: str | None = None
+        patient_name, patient_memory = self._known_patient_context(patient_id)
+        returning_patient = self.orchestrator._is_returning_patient(
+            patient_name=patient_name,
+            memory=patient_memory,
+        )
 
         while True:
             event = await websocket.receive_json()
@@ -1103,6 +1146,7 @@ class RealtimeConversationService:
                 language=language,
                 patient_text=last_patient_text,
                 patient_name=patient_name,
+                returning_patient=returning_patient,
             )
             await websocket.send_json({"type": "response.created", "response": {"id": response_id}})
             assembled = []
@@ -1168,12 +1212,14 @@ class RealtimeConversationService:
         language: str | None = None,
         patient_text: str | None = None,
         patient_name: str | None = None,
+        returning_patient: bool = False,
     ) -> str:
         return self.orchestrator.guided_reply(
             committed_turns,
             language=language,
             patient_text=patient_text,
             patient_name=patient_name,
+            returning_patient=returning_patient,
         )
 
     def _known_patient_context(self, patient_id: str | None) -> tuple[str | None, list[str]]:
