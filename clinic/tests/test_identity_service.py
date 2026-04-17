@@ -485,6 +485,53 @@ def test_identity_service_holds_session_for_manual_review_when_face_is_missing_a
     assert profile.sessions_excluded == 0
 
 
+def test_identity_service_persists_preferred_name_and_memory_from_session_transcript(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    settings = make_settings(tmp_path)
+    storage = LocalStorage(settings)
+    identity = IdentityLinkageService(storage)
+    patch_face_sequence(
+        monkeypatch,
+        make_face_evidence("memory-face", [0.1, 0.1, 0.9, 0.0, 0.0, 0.0, 0.0, 0.0]),
+    )
+
+    assessment = make_assessment(
+        assessment_id="visit-memory",
+        patient_id="patient-memory",
+        created_at=datetime(2026, 4, 8, 8, 0, tzinfo=timezone.utc),
+        risk_score=0.34,
+        risk_tier="low",
+        screening_classification="healthy",
+    )
+
+    identity.link_assessment(
+        assessment,
+        session_record=make_session_record(
+            session_id="session-memory",
+            patient_name="Grace Lin",
+            patient_turns=4,
+            utterance_count=4,
+            face_detection_rate=0.82,
+            average_face_area=0.22,
+            motion_intensity=0.28,
+            transcript=[
+                "I am at home today.",
+                "This morning I had breakfast and read the news.",
+                "I set reminders on my phone for medicine and appointments.",
+            ],
+        ),
+    )
+
+    profile = identity.load_profile("patient-memory")
+
+    assert profile.preferred_name == "Grace Lin"
+    assert "Preferred name: Grace Lin." in profile.memory
+    assert any(item.startswith("Recent activity mentioned:") for item in profile.memory)
+    assert any(item.startswith("Routine/support detail:") for item in profile.memory)
+
+
 def test_realtime_identity_preflight_verifies_enrolled_patient_face(tmp_path: Path, monkeypatch) -> None:
     settings = make_settings(tmp_path)
     storage = LocalStorage(settings)

@@ -22,6 +22,7 @@ from backend.src.app.models.identity import (
     IdentityPreflightResult,
     IdentityProfile,
 )
+from backend.src.app.services.patient_memory import build_patient_memory
 from clinic.database.storage import LocalStorage
 
 try:  # pragma: no cover - import availability depends on local env
@@ -595,6 +596,7 @@ class IdentityLinkageService:
         )
 
         updated_profile = self._update_profile(profile, link)
+        updated_profile = self._update_profile_memory(updated_profile, session_record=session_record)
         self.storage.save_identity_profile(updated_profile)
         self.storage.save_identity_link(link)
         return link
@@ -645,6 +647,8 @@ class IdentityLinkageService:
             update={
                 "updated_at": utc_now(),
                 "enrollment_assessment_id": enrollment_assessment_id,
+                "preferred_name": profile.preferred_name,
+                "memory": list(profile.memory),
                 "canonical_face_embedding": canonical_face_embedding,
                 "canonical_face_recognition_method": canonical_face_recognition_method,
                 "canonical_voice_embedding": canonical_voice_embedding,
@@ -658,6 +662,23 @@ class IdentityLinkageService:
                 "notes": self._dedupe(notes),
             }
         )
+
+    def _update_profile_memory(
+        self,
+        profile: IdentityProfile,
+        *,
+        session_record: dict[str, Any] | None,
+    ) -> IdentityProfile:
+        preferred_name, memory = build_patient_memory(session_record)
+        updates: dict[str, Any] = {}
+        if preferred_name and preferred_name != profile.preferred_name:
+            updates["preferred_name"] = preferred_name
+        if memory:
+            updates["memory"] = memory
+        if not updates:
+            return profile
+        updates["updated_at"] = utc_now()
+        return profile.model_copy(update=updates)
 
     def _load_prepared_media(self, assessment_id: str) -> PreparedMedia | None:
         prepared_dir = self.storage.settings.prepared_dir / assessment_id

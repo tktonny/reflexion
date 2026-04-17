@@ -29,6 +29,9 @@ from backend.src.app.models import (
 from backend.src.app.services.realtime_orchestrator import (
     RealtimeConversationOrchestrator,
 )
+from backend.src.app.services.identity_service import IdentityLinkageService
+from backend.src.app.services.patient_memory import normalize_patient_name
+from clinic.database.storage import LocalStorage
 
 try:
     import websockets
@@ -318,6 +321,8 @@ class RealtimeConversationService:
 
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
+        self.storage = LocalStorage(settings)
+        self.identity = IdentityLinkageService(self.storage)
         self.orchestrator = RealtimeConversationOrchestrator(settings)
 
     def build_session_status(
@@ -325,7 +330,9 @@ class RealtimeConversationService:
         *,
         force_guided_demo: bool = False,
         preferred_language: str | None = None,
+        patient_id: str | None = None,
     ) -> RealtimeSessionStatus:
+        known_name, _ = self._known_patient_context(patient_id)
         live_relay_available = bool(not force_guided_demo and self._live_qwen_ready())
         if live_relay_available:
             voice_profile = self._voice_profile_for_session(language_hint=preferred_language)
@@ -344,7 +351,10 @@ class RealtimeConversationService:
                 flow_title=self.orchestrator.flow_title,
                 conversation_goal=self.orchestrator.conversation_goal,
                 completion_rule=self.orchestrator.completion_rule,
-                greeting=self.orchestrator.opening_message_for_language(preferred_language),
+                greeting=self.orchestrator.opening_message_for_language(
+                    preferred_language,
+                    patient_name=known_name,
+                ),
                 prompt_steps=self.orchestrator.prompt_steps,
                 processing_steps=self.orchestrator.processing_steps,
                 fallback_note=None,
@@ -364,7 +374,10 @@ class RealtimeConversationService:
             flow_title=self.orchestrator.flow_title,
             conversation_goal=self.orchestrator.conversation_goal,
             completion_rule=self.orchestrator.completion_rule,
-            greeting=self.orchestrator.opening_message_for_language(preferred_language),
+            greeting=self.orchestrator.opening_message_for_language(
+                preferred_language,
+                patient_name=known_name,
+            ),
             prompt_steps=self.orchestrator.prompt_steps,
             processing_steps=self.orchestrator.processing_steps,
             fallback_note=(
@@ -381,7 +394,7 @@ class RealtimeConversationService:
         """Accept one browser session and serve either live or guided mode."""
 
         await websocket.accept()
-        status = self.build_session_status(preferred_language=language)
+        status = self.build_session_status(preferred_language=language, patient_id=patient_id)
         logger.info(
             "Realtime browser session accepted patient_id=%s language=%s mode=%s provider=%s live=%s",
             patient_id,
@@ -408,6 +421,7 @@ class RealtimeConversationService:
                 degraded = self.build_session_status(
                     force_guided_demo=True,
                     preferred_language=language,
+                    patient_id=patient_id,
                 )
                 await websocket.send_json(
                     {
@@ -1109,7 +1123,13 @@ class RealtimeConversationService:
         voice: str | None = None,
         wrap_up: bool = False,
     ) -> dict[str, Any]:
-        instructions = self.orchestrator.build_live_instructions(patient_id, language)
+        known_name, known_memory = self._known_patient_context(patient_id)
+        instructions = self.orchestrator.build_live_instructions(
+            patient_id,
+            language,
+            patient_name=known_name,
+            memory=known_memory,
+        )
         if wrap_up:
             instructions += (
                 "\nThe live capture is ending now. In your next reply, briefly thank the patient, "
@@ -1155,6 +1175,13 @@ class RealtimeConversationService:
             patient_text=patient_text,
             patient_name=patient_name,
         )
+
+    def _known_patient_context(self, patient_id: str | None) -> tuple[str | None, list[str]]:
+        normalized_patient_id = str(patient_id or "").strip()
+        if not normalized_patient_id:
+            return None, []
+        profile = self.identity.load_profile(normalized_patient_id)
+        return normalize_patient_name(profile.preferred_name), [item for item in profile.memory if item]
 
     def _build_top_reasons(
         self,

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 from clinic.configs.settings import Settings
+from clinic.database.storage import LocalStorage
+from backend.src.app.models.identity import IdentityProfile
 from backend.src.app.models import RealtimeAnalysisRequest
 from backend.src.app.services.realtime_service import RealtimeConversationService
 
@@ -635,6 +638,56 @@ def test_extract_patient_name_handles_english_and_chinese(tmp_path: Path) -> Non
 
     assert service.orchestrator.extract_patient_name("My name is Tony and I'm at home.") == "Tony"
     assert service.orchestrator.extract_patient_name("我叫小明，我现在在家。") == "小明"
+
+
+def test_status_uses_stored_preferred_name_for_returning_patient(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path, flow_path=write_flow_config(tmp_path))
+    storage = LocalStorage(settings)
+    storage.save_identity_profile(
+        IdentityProfile(
+            profile_id="patient-001-identity",
+            patient_id="patient-001",
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+            preferred_name="Mary Chen",
+            memory=[
+                "Preferred name: Mary Chen.",
+                "Routine/support detail: I still manage my own appointments and medicine reminders.",
+            ],
+        )
+    )
+    service = RealtimeConversationService(settings)
+
+    status = service.build_session_status(preferred_language="en", patient_id="patient-001")
+
+    assert status.greeting == "Hi, Mary Chen. Nice to see you again. Where are you right now?"
+
+
+def test_live_session_update_uses_stored_memory_for_returning_patient(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path, flow_path=write_flow_config(tmp_path), qwen_api_key="test-key")
+    storage = LocalStorage(settings)
+    storage.save_identity_profile(
+        IdentityProfile(
+            profile_id="patient-memory-identity",
+            patient_id="patient-memory",
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+            preferred_name="Grace Lin",
+            memory=[
+                "Preferred name: Grace Lin.",
+                "Recent activity mentioned: This morning I had breakfast and read the news.",
+            ],
+        )
+    )
+    service = RealtimeConversationService(settings)
+
+    payload = service._build_live_session_update("patient-memory", "en")
+    instructions = payload["session"]["instructions"]
+
+    assert 'say exactly this opening in en: "Hi, Grace Lin. Nice to see you again. Where are you right now?"' in instructions
+    assert "Do not ask what to call them unless they correct you" in instructions
+    assert "Known patient memory from earlier sessions" in instructions
+    assert "- Preferred name: Grace Lin." in instructions
 
 
 def test_analysis_elevates_risk_for_memory_heavy_conversation(tmp_path: Path) -> None:

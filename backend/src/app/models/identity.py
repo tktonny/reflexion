@@ -44,6 +44,8 @@ class IdentityProfile(BaseModel):
     created_at: datetime
     updated_at: datetime
     enrollment_assessment_id: str | None = None
+    preferred_name: str | None = None
+    memory: list[str] = Field(default_factory=list)
     canonical_face_embedding: list[float] = Field(default_factory=list)
     canonical_face_recognition_method: str | None = None
     canonical_voice_embedding: list[float] = Field(default_factory=list)
