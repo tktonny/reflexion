@@ -67,6 +67,14 @@ class RealtimeConversationOrchestrator:
     NO_MARKDOWN_RULE = (
         "Do not use markdown, asterisks, underscores, bullets, numbered lists, or stage directions. Speak in plain conversational sentences only."
     )
+    GOODBYE_SENTENCES: dict[str, str] = {
+        "english": "Goodbye.",
+        "mandarin": "再见。",
+        "cantonese": "拜拜。",
+        "minnan": "再会。",
+        "malay": "Selamat tinggal.",
+        "tamil": "பிரியாவிடை.",
+    }
     LANGUAGE_HINT_ALIASES: dict[str, tuple[str, ...]] = {
         "english": ("en", "en-us", "en-gb", "english"),
         "mandarin": (
@@ -253,6 +261,9 @@ class RealtimeConversationOrchestrator:
         ]
         if self.NO_MARKDOWN_RULE not in response_rules:
             response_rules = [*response_rules, self.NO_MARKDOWN_RULE]
+        goodbye_rule = self.closing_goodbye_rule(language)
+        if goodbye_rule not in response_rules:
+            response_rules = [*response_rules, goodbye_rule]
         stage_blocks = "\n\n".join(
             self._format_stage_block(
                 index,
@@ -383,6 +394,18 @@ class RealtimeConversationOrchestrator:
             if normalized in aliases:
                 return language_key
         return None
+
+    def closing_goodbye_sentence(self, language: str | None) -> str:
+        language_key = self._normalize_language_key(language)
+        return self.GOODBYE_SENTENCES.get(language_key or "", self.GOODBYE_SENTENCES["english"])
+
+    def closing_goodbye_rule(self, language: str | None) -> str:
+        goodbye = self.closing_goodbye_sentence(language)
+        return (
+            "When you close the conversation, the final sentence of your final reply must be a brief goodbye in "
+            f'the patient\'s current language, for example "{goodbye}". '
+            "Do not ask another question after that goodbye."
+        )
 
     def _load_flow(self) -> RealtimeConversationFlow:
         path = self.settings.realtime_flow_path or self.default_flow_path()

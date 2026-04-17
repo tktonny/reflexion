@@ -191,6 +191,7 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     assert "Exit when:" in instructions
     assert "Confirm self and place." in instructions
     assert "Do not use markdown, asterisks, underscores, bullets, numbered lists, or stage directions." in instructions
+    assert 'the final sentence of your final reply must be a brief goodbye in the patient\'s current language, for example "Goodbye."' in instructions
     assert 'For your first turn only, say exactly this opening in en: "Hi, nice to meet you. What should I call you? And where are you right now?"' in instructions
     assert "The local interface has already delivered the opening greeting" not in instructions
 
@@ -509,7 +510,9 @@ def test_live_session_update_wrap_up_instruction_is_brief(tmp_path: Path) -> Non
     payload = service._build_live_session_update("patient-001", "Mandarin Chinese", wrap_up=True)
 
     assert "The live capture is ending now." in payload["session"]["instructions"]
-    assert "do not ask another question" in payload["session"]["instructions"]
+    assert 'end with exactly this goodbye sentence: "再见。"' in payload["session"]["instructions"]
+    assert "The goodbye must be the final sentence." in payload["session"]["instructions"]
+    assert "Do not ask another question after that goodbye." in payload["session"]["instructions"]
 
 
 def test_live_relay_drops_image_until_first_audio_append(tmp_path: Path) -> None:
@@ -696,6 +699,37 @@ def test_live_session_update_uses_stored_memory_for_returning_patient(tmp_path: 
     assert "Known patient memory from earlier sessions" in instructions
     assert "- Preferred name: Grace Lin." in instructions
     assert "ask one open check-in prompt, allow them to speak freely, and use at most one brief follow-up before closing" in instructions
+
+
+def test_live_session_update_prioritizes_latest_accumulated_memory(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path, flow_path=write_flow_config(tmp_path), qwen_api_key="test-key")
+    storage = LocalStorage(settings)
+    storage.save_identity_profile(
+        IdentityProfile(
+            profile_id="patient-memory-identity",
+            patient_id="patient-memory",
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+            preferred_name="Grace Lin",
+            memory=[
+                "Preferred name: Grace Lin.",
+                "Recent activity mentioned: This afternoon I watered the garden and called my daughter.",
+                "Routine/support detail: My son helps me double-check the family calendar on weekends.",
+                "Recent activity mentioned: This morning I had breakfast and read the news.",
+                "Routine/support detail: I set reminders on my phone for medicine and appointments.",
+            ],
+        )
+    )
+    service = RealtimeConversationService(settings)
+
+    payload = service._build_live_session_update("patient-memory", "en")
+    instructions = payload["session"]["instructions"]
+
+    assert "- Preferred name: Grace Lin." in instructions
+    assert "- Recent activity mentioned: This afternoon I watered the garden and called my daughter." in instructions
+    assert "- Routine/support detail: My son helps me double-check the family calendar on weekends." in instructions
+    assert "- Recent activity mentioned: This morning I had breakfast and read the news." in instructions
+    assert "I set reminders on my phone for medicine and appointments." not in instructions
 
 
 def test_guided_demo_reply_uses_returning_patient_check_in_flow(tmp_path: Path) -> None:

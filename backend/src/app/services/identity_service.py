@@ -22,7 +22,11 @@ from backend.src.app.models.identity import (
     IdentityPreflightResult,
     IdentityProfile,
 )
-from backend.src.app.services.patient_memory import build_patient_memory
+from backend.src.app.services.patient_memory import (
+    build_patient_memory,
+    merge_patient_memories,
+    normalize_patient_name,
+)
 from clinic.database.storage import LocalStorage
 
 try:  # pragma: no cover - import availability depends on local env
@@ -670,11 +674,17 @@ class IdentityLinkageService:
         session_record: dict[str, Any] | None,
     ) -> IdentityProfile:
         preferred_name, memory = build_patient_memory(session_record)
+        resolved_name = normalize_patient_name(preferred_name) or normalize_patient_name(profile.preferred_name)
+        merged_memory = merge_patient_memories(
+            profile.memory,
+            memory,
+            preferred_name=resolved_name,
+        )
         updates: dict[str, Any] = {}
-        if preferred_name and preferred_name != profile.preferred_name:
-            updates["preferred_name"] = preferred_name
-        if memory:
-            updates["memory"] = memory
+        if resolved_name and resolved_name != profile.preferred_name:
+            updates["preferred_name"] = resolved_name
+        if merged_memory != list(profile.memory):
+            updates["memory"] = merged_memory
         if not updates:
             return profile
         updates["updated_at"] = utc_now()
@@ -1027,6 +1037,19 @@ class IdentityLinkageService:
         return array / norm
 
     def _normalize_profile(self, profile: IdentityProfile) -> IdentityProfile:
+        normalized_name = normalize_patient_name(profile.preferred_name)
+        normalized_memory = merge_patient_memories(
+            profile.memory,
+            [],
+            preferred_name=normalized_name,
+        )
+        updates: dict[str, Any] = {}
+        if normalized_name != profile.preferred_name:
+            updates["preferred_name"] = normalized_name
+        if normalized_memory != list(profile.memory):
+            updates["memory"] = normalized_memory
+        if updates:
+            profile = profile.model_copy(update=updates)
         if not profile.canonical_face_embedding:
             return profile
         if self._is_legacy_face_profile(profile):

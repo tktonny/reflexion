@@ -1175,9 +1175,12 @@ class RealtimeConversationService:
             memory=known_memory,
         )
         if wrap_up:
+            goodbye = self.orchestrator.closing_goodbye_sentence(language)
             instructions += (
                 "\nThe live capture is ending now. In your next reply, briefly thank the patient, "
-                "say the conversation is ending, and do not ask another question."
+                "say the conversation is ending, and end with exactly this goodbye sentence: "
+                f'"{goodbye}" The goodbye must be the final sentence. '
+                "Do not ask another question after that goodbye."
             )
         return {
             "event_id": f"event_{uuid.uuid4().hex[:12]}",

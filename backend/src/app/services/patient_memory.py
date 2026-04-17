@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
+PREFERRED_NAME_PREFIX = "Preferred name:"
+
 
 def normalize_patient_name(name: str | None) -> str | None:
     candidate = re.sub(r"\s+", " ", str(name or "")).strip(" ,.")
@@ -77,13 +79,36 @@ def build_patient_memory(session_record: dict[str, Any] | None) -> tuple[str | N
     )
 
     memory: list[str] = []
-    if preferred_name:
-        memory.append(f"Preferred name: {preferred_name}.")
+    preferred_name_entry = preferred_name_memory_entry(preferred_name)
+    if preferred_name_entry:
+        memory.append(preferred_name_entry)
     if recent_story:
         memory.append(f"Recent activity mentioned: {_summarize_memory_text(recent_story)}")
     if daily_function:
         memory.append(f"Routine/support detail: {_summarize_memory_text(daily_function)}")
     return preferred_name, _dedupe(memory)
+
+
+def preferred_name_memory_entry(name: str | None) -> str | None:
+    normalized_name = normalize_patient_name(name)
+    if not normalized_name:
+        return None
+    return f"{PREFERRED_NAME_PREFIX} {normalized_name}."
+
+
+def merge_patient_memories(
+    existing_memory: list[str] | None,
+    new_memory: list[str] | None,
+    *,
+    preferred_name: str | None = None,
+) -> list[str]:
+    merged: list[str] = []
+    preferred_entry = preferred_name_memory_entry(preferred_name)
+    if preferred_entry:
+        merged.append(preferred_entry)
+    merged.extend(_without_preferred_name_entries(new_memory or []))
+    merged.extend(_without_preferred_name_entries(existing_memory or []))
+    return _dedupe(merged)
 
 
 def _patient_turns(session_record: dict[str, Any] | None) -> list[str]:
@@ -144,6 +169,14 @@ def _summarize_memory_text(text: str, *, max_chars: int = 140) -> str:
     if clean[-1] not in ".!?。！？…":
         clean += "."
     return clean
+
+
+def _without_preferred_name_entries(items: list[str]) -> list[str]:
+    return [item for item in items if not _is_preferred_name_entry(item)]
+
+
+def _is_preferred_name_entry(item: str) -> bool:
+    return str(item).strip().lower().startswith(PREFERRED_NAME_PREFIX.lower())
 
 
 def _dedupe(items: list[str]) -> list[str]:

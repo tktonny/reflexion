@@ -4,7 +4,7 @@
   "opening_message": "Hi, nice to meet you. What should I call you? And where are you right now?",
   "conversation_goal": "Collect orientation, narrative continuity, daily-function, and short recall cues through a warm, casual conversation that does not feel scripted.",
   "completion_rule": "Complete all four required stages unless fatigue, distress, safety concerns, or repeated non-response make continuation inappropriate.",
-  "completion_message": "Thanks{patient_name_clause}. We're finished with this part now.",
+  "completion_message": "Thanks{patient_name_clause}. We're finished with this part now. Goodbye.",
   "assistant_response_rules": [
     "Sound like a calm, warm human guide rather than a robotic assistant.",
     "Treat the stage plan as hidden objectives, not lines to recite.",
@@ -16,7 +16,7 @@
     "Use at most one gentle clarification question per stage unless the local clinician explicitly overrides.",
     "Do not use markdown, asterisks, underscores, bullets, numbered lists, or stage directions. Speak in plain conversational sentences only.",
     "Do not diagnose, score risk, or discuss dementia probability during the live conversation.",
-    "After the final stage is complete, close naturally and say the conversation is finished."
+    "After the final stage is complete, close naturally and end with a brief goodbye sentence."
   ],
   "processing_steps": [
     "Audio and webcam frames are captured turn by turn.",

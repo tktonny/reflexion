@@ -527,9 +527,79 @@ def test_identity_service_persists_preferred_name_and_memory_from_session_transc
     profile = identity.load_profile("patient-memory")
 
     assert profile.preferred_name == "Grace Lin"
-    assert "Preferred name: Grace Lin." in profile.memory
+    assert profile.memory[0] == "Preferred name: Grace Lin."
     assert any(item.startswith("Recent activity mentioned:") for item in profile.memory)
     assert any(item.startswith("Routine/support detail:") for item in profile.memory)
+
+
+def test_identity_service_accumulates_memory_across_sessions(tmp_path: Path, monkeypatch) -> None:
+    settings = make_settings(tmp_path)
+    storage = LocalStorage(settings)
+    identity = IdentityLinkageService(storage)
+    repeated_face = make_face_evidence("memory-face", [0.1, 0.1, 0.9, 0.0, 0.0, 0.0, 0.0, 0.0])
+    patch_face_sequence(monkeypatch, repeated_face, repeated_face)
+
+    first_assessment = make_assessment(
+        assessment_id="visit-memory-1",
+        patient_id="patient-memory",
+        created_at=datetime(2026, 4, 8, 8, 0, tzinfo=timezone.utc),
+        risk_score=0.34,
+        risk_tier="low",
+        screening_classification="healthy",
+    )
+    second_assessment = make_assessment(
+        assessment_id="visit-memory-2",
+        patient_id="patient-memory",
+        created_at=datetime(2026, 4, 15, 8, 0, tzinfo=timezone.utc),
+        risk_score=0.37,
+        risk_tier="medium",
+        screening_classification="needs_observation",
+    )
+
+    identity.link_assessment(
+        first_assessment,
+        session_record=make_session_record(
+            session_id="session-memory-1",
+            patient_name="Grace Lin",
+            patient_turns=4,
+            utterance_count=4,
+            face_detection_rate=0.82,
+            average_face_area=0.22,
+            motion_intensity=0.28,
+            transcript=[
+                "I am at home today.",
+                "This morning I had breakfast and read the news.",
+                "I set reminders on my phone for medicine and appointments.",
+            ],
+        ),
+    )
+    identity.link_assessment(
+        second_assessment,
+        session_record=make_session_record(
+            session_id="session-memory-2",
+            patient_name="Grace Lin",
+            patient_turns=4,
+            utterance_count=4,
+            face_detection_rate=0.84,
+            average_face_area=0.23,
+            motion_intensity=0.27,
+            transcript=[
+                "I am at home again today.",
+                "This afternoon I watered the garden and called my daughter.",
+                "My son helps me double-check the family calendar on weekends.",
+            ],
+        ),
+    )
+
+    profile = identity.load_profile("patient-memory")
+
+    assert profile.preferred_name == "Grace Lin"
+    assert profile.memory[0] == "Preferred name: Grace Lin."
+    assert profile.memory[1] == "Recent activity mentioned: This afternoon I watered the garden and called my daughter."
+    assert profile.memory[2] == "Routine/support detail: My son helps me double-check the family calendar on weekends."
+    assert "Recent activity mentioned: This morning I had breakfast and read the news." in profile.memory
+    assert "Routine/support detail: I set reminders on my phone for medicine and appointments." in profile.memory
+    assert len(profile.memory) == 5
 
 
 def test_realtime_identity_preflight_verifies_enrolled_patient_face(tmp_path: Path, monkeypatch) -> None:
