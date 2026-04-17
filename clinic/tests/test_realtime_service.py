@@ -147,10 +147,10 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     assert payload["session"]["top_p"] == 0.7
     assert payload["session"]["output_audio_format"] == "pcm"
     assert payload["session"]["turn_detection"]["type"] == "server_vad"
-    assert payload["session"]["turn_detection"]["threshold"] == 0.1
-    assert payload["session"]["turn_detection"]["prefix_padding_ms"] == 500
-    assert payload["session"]["turn_detection"]["silence_duration_ms"] == 900
-    assert payload["session"]["turn_detection"]["create_response"] is True
+    assert payload["session"]["turn_detection"]["threshold"] == 0.06
+    assert payload["session"]["turn_detection"]["prefix_padding_ms"] == 650
+    assert payload["session"]["turn_detection"]["silence_duration_ms"] == 1500
+    assert payload["session"]["turn_detection"]["create_response"] is False
     assert payload["session"]["turn_detection"]["interrupt_response"] is True
     assert payload["session"]["input_audio_transcription"]["model"] == "gummy-realtime-v1"
     assert "Conversation goal: Collect a short structured intake" in payload["session"]["instructions"]

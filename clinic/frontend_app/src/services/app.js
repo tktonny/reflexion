@@ -114,6 +114,7 @@ const state = {
   currentLanguage: "en",
   sessionStartedAt: null,
   sessionEndedAt: null,
+  sessionAutoEndArmed: false,
   mediaRecorder: null,
   recordedChunks: [],
   recordedBlob: null,
@@ -125,6 +126,9 @@ const state = {
   wrapUpTimer: null,
   wrapUpRequested: false,
   sessionEndRequested: false,
+  sessionStartInFlight: false,
+  socketSerial: 0,
+  activeSocketSerial: 0,
   uploadInFlight: false,
 };
 
@@ -230,6 +234,7 @@ function clearSessionAutoEndTimer() {
     window.clearTimeout(state.sessionAutoEndTimer);
     state.sessionAutoEndTimer = null;
   }
+  state.sessionAutoEndArmed = false;
 }
 
 function clearWrapUpTimer() {
@@ -270,12 +275,17 @@ function scheduleAssistantResponseGuard() {
 }
 
 function scheduleSessionAutoEnd() {
+  if (state.sessionAutoEndArmed) {
+    return;
+  }
   clearSessionAutoEndTimer();
   const maxSessionSeconds = currentMaxSessionSeconds();
   if (!Number.isFinite(maxSessionSeconds) || maxSessionSeconds <= 0) {
     return;
   }
+  state.sessionAutoEndArmed = true;
   state.sessionAutoEndTimer = window.setTimeout(() => {
+    state.sessionAutoEndArmed = false;
     if (state.sessionEndRequested || state.wrapUpRequested || state.uploadInFlight) {
       return;
     }
@@ -809,6 +819,7 @@ function resetSessionState() {
   state.recordingMimeType = "";
   state.sessionStartedAt = null;
   state.sessionEndedAt = null;
+  state.sessionAutoEndArmed = false;
   state.wrapUpRequested = false;
   state.sessionEndRequested = false;
   updateCaptureMetrics();
@@ -830,7 +841,7 @@ function updateCaptureMetrics() {
 
 function refreshButtons() {
   const sessionLive = Boolean(state.socket && state.socket.readyState === WebSocket.OPEN);
-  startSessionButton.disabled = state.uploadInFlight;
+  startSessionButton.disabled = state.uploadInFlight || state.sessionStartInFlight;
   micToggleButton.disabled = !sessionLive || state.uploadInFlight;
   endSessionButton.disabled = !sessionLive || state.uploadInFlight;
 
@@ -1594,11 +1605,20 @@ async function stopSessionRecording() {
 
 function openRealtimeSocket(patientId, language) {
   return new Promise((resolve, reject) => {
+    const socketSerial = state.socketSerial + 1;
+    state.socketSerial = socketSerial;
+    state.activeSocketSerial = socketSerial;
     const socket = new WebSocket(
       `${wsBaseUrl()}/api/clinic/realtime/ws?patient_id=${encodeURIComponent(patientId)}&language=${encodeURIComponent(language)}`,
     );
+    let settled = false;
 
     socket.onopen = () => {
+      if (state.activeSocketSerial !== socketSerial) {
+        socket.close();
+        return;
+      }
+      settled = true;
       state.socket = socket;
       state.realtimeAudioPrimed = false;
       refreshButtons();
@@ -1606,6 +1626,9 @@ function openRealtimeSocket(patientId, language) {
     };
 
     socket.onmessage = (event) => {
+      if (state.activeSocketSerial !== socketSerial || state.socket !== socket) {
+        return;
+      }
       try {
         handleRealtimeEvent(JSON.parse(event.data));
       } catch (error) {
@@ -1617,10 +1640,19 @@ function openRealtimeSocket(patientId, language) {
     };
 
     socket.onerror = () => {
+      if (state.activeSocketSerial !== socketSerial || settled) {
+        return;
+      }
+      settled = true;
+      state.activeSocketSerial = 0;
       reject(new Error("Realtime socket failed to connect."));
     };
 
     socket.onclose = (event) => {
+      if (state.activeSocketSerial !== socketSerial) {
+        return;
+      }
+      state.activeSocketSerial = 0;
       if (state.socket === socket) {
         state.socket = null;
       }
@@ -1655,16 +1687,18 @@ async function closeRealtimeSocket() {
   clearAssistantResponseGuard();
   clearSessionAutoEndTimer();
   clearWrapUpTimer();
-  if (!state.socket) {
+  const socket = state.socket;
+  state.socket = null;
+  state.activeSocketSerial = 0;
+  if (!socket) {
     return;
   }
   try {
-    state.socket.send(JSON.stringify({ type: "reflexion.close" }));
+    socket.send(JSON.stringify({ type: "reflexion.close" }));
   } catch {
     // Ignore best-effort close notifications.
   }
-  state.socket.close();
-  state.socket = null;
+  socket.close();
 }
 
 function queueTranscriptFallback(stage, fallbackText, timeoutMs) {
@@ -1716,6 +1750,7 @@ function toggleLiveMicrophone() {
   }
 
   state.isRecording = true;
+  ensureAudioContextRunning().catch(() => {});
   startFrameCaptureLoop();
   startRecognition();
   setRecordingVisualState(true);
@@ -1730,6 +1765,7 @@ function startRecordingTurn() {
 
   state.isRecording = true;
   state.recordingStartedAt = performance.now();
+  ensureAudioContextRunning().catch(() => {});
   setRecordingVisualState(true);
   setStatus("Listening for patient answer...");
   startFrameCaptureLoop();
@@ -1825,7 +1861,7 @@ function handleRealtimeEvent(event) {
     }
     if (event.session.session_mode === "live_qwen") {
       state.wrapUpRequested = false;
-      scheduleSessionAutoEnd();
+      clearSessionAutoEndTimer();
       setStatus("Connecting live relay...");
     } else {
       clearSessionAutoEndTimer();
@@ -1872,6 +1908,9 @@ function handleRealtimeEvent(event) {
 
   if (type === "input_audio_buffer.speech_started") {
     if (state.liveAutoMode) {
+      if (!state.wrapUpRequested && !state.sessionEndRequested) {
+        scheduleSessionAutoEnd();
+      }
       state.serverSpeechActive = true;
       state.serverSpeechStartedAt = performance.now();
       state.currentRecognitionText = "";
@@ -1992,58 +2031,68 @@ function handleRealtimeEvent(event) {
 }
 
 async function startSession() {
+  if (state.sessionStartInFlight) {
+    return;
+  }
+  state.sessionStartInFlight = true;
+  refreshButtons();
   setStatus("Preparing camera and microphone...");
   setFallback("");
 
-  await closeRealtimeSocket();
-  resetSessionState();
-
-  state.currentPatientId = patientIdInput.value.trim() || "patient-001";
-  state.currentLanguage = languageInput.value.trim() || "en";
-
-  await ensureMediaReady();
-  await ensureAudioContextRunning();
-
-  const identityResult = await runIdentityPreflight(state.currentPatientId);
-  if (!identityResult.can_start_session) {
-    const blockedStatus = identityResult.requires_patient_reentry ? "Identity mismatch" : "Identity retry needed";
-    setStatus(blockedStatus);
-    setFallback(identityResult.recommended_action || identityResult.summary || "Identity check blocked the session start.");
-    if (identityResult.requires_patient_reentry) {
-      patientIdInput.focus();
-      patientIdInput.select?.();
-    }
-    return;
-  }
-
-  setStatus(
-    identityResult.status === "verified"
-      ? "Identity verified. Preparing session..."
-      : "No enrolled face yet. Preparing session...",
-  );
-  setFallback(identityResult.summary || "");
-
   try {
-    startSessionRecording();
-  } catch (error) {
-    setSessionArtifact(
-      error instanceof Error
-        ? `${error.message} You can still run a live conversation and use manual upload.`
-        : "Session recording is unavailable in this browser.",
+    await closeRealtimeSocket();
+    resetSessionState();
+
+    state.currentPatientId = patientIdInput.value.trim() || "patient-001";
+    state.currentLanguage = languageInput.value.trim() || "en";
+
+    await ensureMediaReady();
+    await ensureAudioContextRunning();
+
+    const identityResult = await runIdentityPreflight(state.currentPatientId);
+    if (!identityResult.can_start_session) {
+      const blockedStatus = identityResult.requires_patient_reentry ? "Identity mismatch" : "Identity retry needed";
+      setStatus(blockedStatus);
+      setFallback(identityResult.recommended_action || identityResult.summary || "Identity check blocked the session start.");
+      if (identityResult.requires_patient_reentry) {
+        patientIdInput.focus();
+        patientIdInput.select?.();
+      }
+      return;
+    }
+
+    setStatus(
+      identityResult.status === "verified"
+        ? "Identity verified. Preparing session..."
+        : "No enrolled face yet. Preparing session...",
     );
-  }
+    setFallback(identityResult.summary || "");
 
-  try {
-    await openRealtimeSocket(state.currentPatientId, state.currentLanguage);
-  } catch (error) {
-    if (state.mediaRecorder?.state === "recording") {
-      await stopSessionRecording().catch(() => {});
+    try {
+      startSessionRecording();
+    } catch (error) {
+      setSessionArtifact(
+        error instanceof Error
+          ? `${error.message} You can still run a live conversation and use manual upload.`
+          : "Session recording is unavailable in this browser.",
+      );
     }
-    throw error;
-  }
 
-  startSessionButton.textContent = "Restart Session";
-  setStatus("Waiting for opening prompt...");
+    try {
+      await openRealtimeSocket(state.currentPatientId, state.currentLanguage);
+    } catch (error) {
+      if (state.mediaRecorder?.state === "recording") {
+        await stopSessionRecording().catch(() => {});
+      }
+      throw error;
+    }
+
+    startSessionButton.textContent = "Restart Session";
+    setStatus("Waiting for opening prompt...");
+  } finally {
+    state.sessionStartInFlight = false;
+    refreshButtons();
+  }
 }
 
 function buildErrorMessage(payload, fallbackText) {

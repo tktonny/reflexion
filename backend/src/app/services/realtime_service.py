@@ -656,6 +656,52 @@ class RealtimeConversationService:
                 deferred_voice_profile: RealtimeVoiceProfile | None = None
                 recent_language_signals: list[RealtimeLanguageSignal] = []
                 session_ready = False
+                pending_response_after_update = False
+                awaiting_manual_response = False
+                response_fallback_task: asyncio.Task[None] | None = None
+
+                def cancel_response_fallback() -> None:
+                    nonlocal response_fallback_task
+                    if response_fallback_task is None:
+                        return
+                    response_fallback_task.cancel()
+                    response_fallback_task = None
+
+                async def send_manual_response_create(*, reason: str) -> None:
+                    nonlocal awaiting_manual_response, pending_response_after_update
+                    if not awaiting_manual_response:
+                        pending_response_after_update = False
+                        return
+                    cancel_response_fallback()
+                    awaiting_manual_response = False
+                    pending_response_after_update = False
+                    logger.info(
+                        "Sending realtime response.create patient_id=%s voice=%s language=%s reason=%s",
+                        patient_id,
+                        selected_voice_profile.voice,
+                        selected_voice_profile.language_label,
+                        reason,
+                    )
+                    await send_upstream_event({"type": "response.create"})
+
+                def schedule_response_fallback() -> None:
+                    nonlocal response_fallback_task
+                    cancel_response_fallback()
+
+                    async def fallback() -> None:
+                        try:
+                            await asyncio.sleep(1.6)
+                            if awaiting_manual_response:
+                                logger.info(
+                                    "Realtime transcription timeout patient_id=%s; sending fallback response.create",
+                                    patient_id,
+                                )
+                                await send_manual_response_create(reason="transcription_timeout")
+                        except asyncio.CancelledError:
+                            raise
+
+                    response_fallback_task = asyncio.create_task(fallback())
+
                 async for message in upstream:
                     try:
                         payload = json.loads(message)
@@ -665,7 +711,12 @@ class RealtimeConversationService:
                     self._log_upstream_event(payload)
                     event_type = str(payload.get("type", ""))
 
+                    if event_type == "input_audio_buffer.committed":
+                        awaiting_manual_response = True
+                        schedule_response_fallback()
+
                     if event_type == "conversation.item.input_audio_transcription.completed":
+                        cancel_response_fallback()
                         transcript_text = str(payload.get("transcript", ""))
                         language_signal = self._detect_language_signal_from_transcript(transcript_text)
                         if language_signal is not None:
@@ -701,10 +752,26 @@ class RealtimeConversationService:
                                         "Failed to update realtime voice from transcript reassessment: %s",
                                         exc,
                                     )
+                                    if awaiting_manual_response:
+                                        await send_manual_response_create(
+                                            reason="transcript_reassessment_failed",
+                                        )
                                 else:
                                     pending_voice_profile = detected_voice_profile
+                                    if awaiting_manual_response:
+                                        pending_response_after_update = True
+                                        schedule_response_fallback()
                             else:
                                 deferred_voice_profile = detected_voice_profile
+                                if awaiting_manual_response:
+                                    pending_response_after_update = True
+                                    schedule_response_fallback()
+                        elif awaiting_manual_response:
+                            if session_ready:
+                                await send_manual_response_create(reason="transcription_completed")
+                            else:
+                                pending_response_after_update = True
+                                schedule_response_fallback()
 
                     if event_type in {"session.created", "session.updated"}:
                         if not session_ready:
@@ -720,10 +787,19 @@ class RealtimeConversationService:
                                         "Failed to apply deferred realtime voice update: %s",
                                         exc,
                                     )
+                                    if awaiting_manual_response:
+                                        await send_manual_response_create(
+                                            reason="deferred_reassessment_failed",
+                                        )
                                 else:
                                     pending_voice_profile = deferred_voice_profile
+                                    if awaiting_manual_response:
+                                        pending_response_after_update = True
+                                        schedule_response_fallback()
                                 finally:
                                     deferred_voice_profile = None
+                            elif awaiting_manual_response and pending_response_after_update:
+                                await send_manual_response_create(reason="session_ready")
                         elif pending_voice_profile is not None:
                             selected_voice_profile = pending_voice_profile
                             pending_voice_profile = None
@@ -740,8 +816,13 @@ class RealtimeConversationService:
                                     "source": selected_voice_profile.source,
                                 }
                             )
+                            if awaiting_manual_response and pending_response_after_update:
+                                await send_manual_response_create(reason="post_language_switch")
+                        elif awaiting_manual_response and pending_response_after_update:
+                            await send_manual_response_create(reason="session_updated")
 
                     await websocket.send_json(payload)
+                cancel_response_fallback()
 
             async def pump_client_to_upstream() -> None:
                 audio_append_started = False
@@ -884,10 +965,10 @@ class RealtimeConversationService:
                 "output_audio_format": "pcm",
                 "turn_detection": {
                     "type": "server_vad",
-                    "threshold": 0.1,
-                    "prefix_padding_ms": 500,
-                    "silence_duration_ms": 900,
-                    "create_response": True,
+                    "threshold": self.settings.qwen_omni_realtime_vad_threshold,
+                    "prefix_padding_ms": self.settings.qwen_omni_realtime_vad_prefix_padding_ms,
+                    "silence_duration_ms": self.settings.qwen_omni_realtime_vad_silence_duration_ms,
+                    "create_response": False,
                     "interrupt_response": True,
                 },
                 "input_audio_transcription": {

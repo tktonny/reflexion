@@ -96,6 +96,9 @@ class Settings:
     qwen_omni_realtime_max_tokens: int = 48
     qwen_omni_realtime_temperature: float = 0.25
     qwen_omni_realtime_top_p: float = 0.7
+    qwen_omni_realtime_vad_threshold: float = 0.06
+    qwen_omni_realtime_vad_prefix_padding_ms: int = 650
+    qwen_omni_realtime_vad_silence_duration_ms: int = 1500
     realtime_max_session_seconds: int = 90
     realtime_max_assistant_response_seconds: int = 7
     realtime_max_assistant_response_chars: int = 140
@@ -196,6 +199,15 @@ def get_settings() -> Settings:
         ),
         qwen_omni_realtime_top_p=float(
             os.getenv("REFLEXION_QWEN_OMNI_REALTIME_TOP_P", "0.7")
+        ),
+        qwen_omni_realtime_vad_threshold=float(
+            os.getenv("REFLEXION_QWEN_OMNI_REALTIME_VAD_THRESHOLD", "0.06")
+        ),
+        qwen_omni_realtime_vad_prefix_padding_ms=int(
+            os.getenv("REFLEXION_QWEN_OMNI_REALTIME_VAD_PREFIX_PADDING_MS", "650")
+        ),
+        qwen_omni_realtime_vad_silence_duration_ms=int(
+            os.getenv("REFLEXION_QWEN_OMNI_REALTIME_VAD_SILENCE_DURATION_MS", "1500")
         ),
         realtime_max_session_seconds=int(
             os.getenv("REFLEXION_REALTIME_MAX_SESSION_SECONDS", "90")
