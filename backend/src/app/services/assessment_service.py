@@ -74,6 +74,7 @@ class ProviderMeshRouter:
                 provider_input = await provider.prepare(provider_context)
                 raw_result = await provider.analyze(provider_input, provider_context)
                 payload = provider.normalize(raw_result)
+                payload = provider.augment_payload(payload, provider_context)
                 latency_ms = int((time.perf_counter() - started) * 1000)
                 if payload.should_fallback():
                     last_error = "unusable_result"

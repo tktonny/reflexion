@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from clinic.configs.settings import Settings
-from backend.src.app.models import ProviderCapabilities, ProviderContext, ProviderRawResult
+from backend.src.app.models import PreparedMedia, ProviderCapabilities, ProviderContext, ProviderRawResult
 from clinic.intelligence.providers.base import BaseProvider
 
 
@@ -132,3 +132,103 @@ def test_parse_text_response_normalizes_percent_risk_score_and_infers_label(tmp_
     assert payload.risk_label == "HC"
     assert payload.screening_classification == "healthy"
     assert payload.risk_tier == "low"
+
+
+def test_augment_payload_synthesizes_voice_findings_from_session_record(tmp_path: Path) -> None:
+    provider = ParsingTestProvider(make_settings(tmp_path))
+    payload = provider._parse_text_response(
+        """
+        {
+          "session_usability": "usable",
+          "quality_flags": [],
+          "visual_findings": [],
+          "body_findings": [],
+          "voice_findings": [],
+          "content_findings": [],
+          "risk_score": 0.42,
+          "risk_label": "cognitive_risk",
+          "screening_classification": "needs_observation"
+        }
+        """
+    )
+    context = ProviderContext(
+        assessment_id="a1",
+        patient_id="patient-001",
+        language="en",
+        media=PreparedMedia(
+            original_path="/tmp/input.mp4",
+            standardized_path="/tmp/standardized.mp4",
+            mime_type="video/mp4",
+            size_bytes=1024,
+        ),
+        session_record={
+            "qualityControl": {"flags": []},
+            "derivedFeatures": {
+                "speech": {
+                    "speechSeconds": 24.0,
+                    "utteranceCount": 5,
+                    "averageTurnSeconds": 2.8,
+                    "averageRms": 0.012,
+                    "peakRms": 0.054,
+                    "voicedChunkRatio": 0.41,
+                    "transcriptTurns": [
+                        {"role": "patient", "text": "Um, I had breakfast and then went outside."},
+                        {"role": "patient", "text": "I am not sure what happened after that."},
+                    ],
+                },
+                "interactionTiming": {
+                    "turnDurationsSeconds": [1.8, 3.1, 2.7, 4.4, 2.0],
+                },
+            },
+        },
+    )
+
+    augmented = provider.augment_payload(payload, context)
+
+    assert augmented.voice_findings
+    assert any(item.label == "transcript_derived_hesitation_pattern" for item in augmented.voice_findings)
+    assert "Voice findings were supplemented from live-session transcript and speech-timing metadata." in augmented.context_notes
+
+
+def test_augment_payload_does_not_invent_voice_findings_without_speech_evidence(tmp_path: Path) -> None:
+    provider = ParsingTestProvider(make_settings(tmp_path))
+    payload = provider._parse_text_response(
+        """
+        {
+          "session_usability": "usable_with_caveats",
+          "quality_flags": ["transcript_unavailable"],
+          "visual_findings": [],
+          "body_findings": [],
+          "voice_findings": [],
+          "content_findings": [],
+          "risk_score": 0.5,
+          "risk_label": "cognitive_risk",
+          "screening_classification": "needs_observation"
+        }
+        """
+    )
+    context = ProviderContext(
+        assessment_id="a2",
+        patient_id="patient-001",
+        language="en",
+        media=PreparedMedia(
+            original_path="/tmp/input.mp4",
+            standardized_path="/tmp/standardized.mp4",
+            mime_type="video/mp4",
+            size_bytes=1024,
+        ),
+        session_record={
+            "qualityControl": {"flags": ["transcript_unavailable"]},
+            "derivedFeatures": {
+                "speech": {
+                    "speechSeconds": 2.0,
+                    "utteranceCount": 0,
+                    "transcriptTurns": [],
+                }
+            },
+        },
+    )
+
+    augmented = provider.augment_payload(payload, context)
+
+    assert augmented.voice_findings == []

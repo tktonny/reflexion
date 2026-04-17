@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import math
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,7 @@ from backend.src.app.core.errors import ProviderError
 from backend.src.app.core.json_utils import parse_json_object
 from backend.src.app.models import (
     DEFAULT_DISCLAIMER,
+    Finding,
     ProviderAssessmentPayload,
     ProviderCapabilities,
     ProviderContext,
@@ -76,6 +78,16 @@ class BaseProvider(ABC):
         payload.quality_flags = normalize_quality_flags(payload.quality_flags)
         if not payload.disclaimer:
             payload.disclaimer = DEFAULT_DISCLAIMER
+        return payload
+
+    def augment_payload(self, payload: ProviderAssessmentPayload, context: ProviderContext) -> ProviderAssessmentPayload:
+        if not payload.voice_findings:
+            synthesized_voice_findings = self._synthesize_voice_findings_from_session_record(context)
+            if synthesized_voice_findings:
+                payload.voice_findings = synthesized_voice_findings
+                note = "Voice findings were supplemented from live-session transcript and speech-timing metadata."
+                if note not in payload.context_notes:
+                    payload.context_notes.append(note)
         return payload
 
     def mock_result(self, context: ProviderContext) -> ProviderRawResult:
@@ -257,6 +269,20 @@ class BaseProvider(ABC):
         transcript_text = self._session_record_transcript_text(session_record)
         speech_seconds = self._session_record_value(session_record, "derivedFeatures", "speech", "speechSeconds")
         utterance_count = self._session_record_value(session_record, "derivedFeatures", "speech", "utteranceCount")
+        average_turn_seconds = self._session_record_value(
+            session_record,
+            "derivedFeatures",
+            "speech",
+            "averageTurnSeconds",
+        )
+        average_rms = self._session_record_value(session_record, "derivedFeatures", "speech", "averageRms")
+        peak_rms = self._session_record_value(session_record, "derivedFeatures", "speech", "peakRms")
+        voiced_chunk_ratio = self._session_record_value(
+            session_record,
+            "derivedFeatures",
+            "speech",
+            "voicedChunkRatio",
+        )
         frames_captured = self._session_record_value(session_record, "derivedFeatures", "facial", "framesCaptured")
         face_detection_rate = self._session_record_value(
             session_record,
@@ -276,6 +302,14 @@ class BaseProvider(ABC):
             lines.append(f"- Captured speech seconds: {speech_seconds}")
         if utterance_count is not None:
             lines.append(f"- Patient utterance count: {utterance_count}")
+        if average_turn_seconds is not None:
+            lines.append(f"- Average patient turn seconds: {average_turn_seconds}")
+        if average_rms is not None:
+            lines.append(f"- Average mic RMS during speech capture: {average_rms}")
+        if peak_rms is not None:
+            lines.append(f"- Peak mic RMS during speech capture: {peak_rms}")
+        if voiced_chunk_ratio is not None:
+            lines.append(f"- Active speech chunk ratio: {voiced_chunk_ratio}")
         if frames_captured is not None:
             lines.append(f"- Sampled visual frames: {frames_captured}")
         if face_detection_rate is not None:
@@ -288,6 +322,183 @@ class BaseProvider(ABC):
             lines.append("Auxiliary transcript excerpt:")
             lines.append(transcript_text)
         return "\n".join(lines)
+
+    def _synthesize_voice_findings_from_session_record(self, context: ProviderContext) -> list[Finding]:
+        session_record = context.session_record
+        if not session_record:
+            return []
+
+        speech_seconds = self._float_or_none(
+            self._session_record_value(session_record, "derivedFeatures", "speech", "speechSeconds")
+        )
+        utterance_count = self._int_or_none(
+            self._session_record_value(session_record, "derivedFeatures", "speech", "utteranceCount")
+        )
+        average_turn_seconds = self._float_or_none(
+            self._session_record_value(session_record, "derivedFeatures", "speech", "averageTurnSeconds")
+        )
+        average_rms = self._float_or_none(
+            self._session_record_value(session_record, "derivedFeatures", "speech", "averageRms")
+        )
+        peak_rms = self._float_or_none(
+            self._session_record_value(session_record, "derivedFeatures", "speech", "peakRms")
+        )
+        voiced_chunk_ratio = self._float_or_none(
+            self._session_record_value(session_record, "derivedFeatures", "speech", "voicedChunkRatio")
+        )
+        turn_durations = self._float_list(
+            self._session_record_value(session_record, "derivedFeatures", "interactionTiming", "turnDurationsSeconds")
+        )
+        transcript_text = self._session_record_transcript_text(session_record)
+        quality_flags = {
+            str(flag).strip().lower()
+            for flag in self._list_or_empty(self._session_record_value(session_record, "qualityControl", "flags"))
+        }
+
+        if "speech_unintelligible" in quality_flags or "transcript_unavailable" in quality_flags:
+            return []
+        if speech_seconds is not None and speech_seconds < 4:
+            return []
+        if utterance_count is not None and utterance_count < 1:
+            return []
+
+        findings: list[Finding] = []
+        transcript_lower = transcript_text.lower()
+        hesitation_markers = (
+            " um ",
+            " uh ",
+            " er ",
+            " ah ",
+            " hmm ",
+            " not sure ",
+            " don't remember ",
+            " can't remember ",
+            " 不记得 ",
+            " 記不得 ",
+            " 想不起来 ",
+            " 想不起來 ",
+            " 记不清 ",
+            " 記不清 ",
+            " 呃 ",
+            " 嗯 ",
+        )
+        hesitation_hits = sum(transcript_lower.count(marker.strip()) for marker in hesitation_markers)
+        if hesitation_hits >= 2 and (speech_seconds or 0) >= 8:
+            findings.append(
+                Finding(
+                    label="transcript_derived_hesitation_pattern",
+                    summary=(
+                        "Transcript-derived speech sample contained repeated hesitation or retrieval markers."
+                    ),
+                    evidence=(
+                        f"speech_seconds={self._fmt_float(speech_seconds)}, "
+                        f"utterance_count={utterance_count or 0}, hesitation_hits={hesitation_hits}"
+                    ),
+                    confidence=0.56,
+                )
+            )
+
+        if len(turn_durations) >= 3:
+            mean_turn = average_turn_seconds or (sum(turn_durations) / len(turn_durations))
+            if mean_turn > 0:
+                variance = sum((value - mean_turn) ** 2 for value in turn_durations) / len(turn_durations)
+                turn_cv = math.sqrt(variance) / mean_turn
+                if turn_cv >= 0.55:
+                    findings.append(
+                        Finding(
+                            label="variable_turn_cadence",
+                            summary=(
+                                "Turn timing varied noticeably across the captured speech sample, suggesting uneven cadence."
+                            ),
+                            evidence=(
+                                f"average_turn_seconds={self._fmt_float(mean_turn)}, "
+                                f"turn_count={len(turn_durations)}, turn_cv={self._fmt_float(turn_cv)}"
+                            ),
+                            confidence=0.48,
+                        )
+                    )
+                elif (
+                    mean_turn >= 1.5
+                    and mean_turn <= 4.2
+                    and (speech_seconds or 0) >= 15
+                    and hesitation_hits == 0
+                ):
+                    findings.append(
+                        Finding(
+                            label="steady_turn_pacing",
+                            summary=(
+                                "Speech timing remained fairly steady across the captured turns without repeated hesitation markers."
+                            ),
+                            evidence=(
+                                f"average_turn_seconds={self._fmt_float(mean_turn)}, "
+                                f"turn_count={len(turn_durations)}, speech_seconds={self._fmt_float(speech_seconds)}"
+                            ),
+                            confidence=0.44,
+                        )
+                    )
+
+        if (
+            average_rms is not None
+            and peak_rms is not None
+            and voiced_chunk_ratio is not None
+            and "poor_audio" not in quality_flags
+            and (speech_seconds or 0) >= 8
+        ):
+            if average_rms < 0.006 and peak_rms < 0.035:
+                findings.append(
+                    Finding(
+                        label="low_vocal_energy_capture",
+                        summary=(
+                            "Speech was captured with consistently low mic energy, which may reflect quiet delivery."
+                        ),
+                        evidence=(
+                            f"average_rms={self._fmt_float(average_rms)}, "
+                            f"peak_rms={self._fmt_float(peak_rms)}, voiced_chunk_ratio={self._fmt_float(voiced_chunk_ratio)}"
+                        ),
+                        confidence=0.38,
+                    )
+                )
+            elif average_rms >= 0.01 and voiced_chunk_ratio >= 0.25 and not findings:
+                findings.append(
+                    Finding(
+                        label="audible_speech_sample_available",
+                        summary=(
+                            "The live capture contained a sustained audible speech sample suitable for cautious voice review."
+                        ),
+                        evidence=(
+                            f"average_rms={self._fmt_float(average_rms)}, "
+                            f"peak_rms={self._fmt_float(peak_rms)}, voiced_chunk_ratio={self._fmt_float(voiced_chunk_ratio)}"
+                        ),
+                        confidence=0.36,
+                    )
+                )
+
+        return findings[:3]
+
+    def _float_or_none(self, value: object) -> float | None:
+        if isinstance(value, (int, float)):
+            return float(value)
+        return None
+
+    def _int_or_none(self, value: object) -> int | None:
+        if isinstance(value, int):
+            return value
+        if isinstance(value, float) and value.is_integer():
+            return int(value)
+        return None
+
+    def _float_list(self, value: object) -> list[float]:
+        if not isinstance(value, list):
+            return []
+        return [float(item) for item in value if isinstance(item, (int, float))]
+
+    def _list_or_empty(self, value: object) -> list[object]:
+        return value if isinstance(value, list) else []
+
+    def _fmt_float(self, value: float | None) -> str:
+        if value is None:
+            return "n/a"
+        return f"{value:.3f}"
 
     def _normalize_assessment_payload_dict(self, data: dict[str, Any]) -> dict[str, Any]:
         normalized = dict(data)

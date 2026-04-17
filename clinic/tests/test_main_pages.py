@@ -11,3 +11,5 @@ def test_clinic_page_route_returns_html() -> None:
 
     assert response.status_code == 200
     assert "text/html" in response.headers["content-type"]
+    assert '<select id="language">' in response.text
+    assert '<select id="manual-language">' in response.text

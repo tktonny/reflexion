@@ -64,6 +64,39 @@ const disclaimer = document.getElementById("disclaimer");
 
 const RecognitionConstructor =
   window.SpeechRecognition || window.webkitSpeechRecognition || null;
+const LANGUAGE_VALUE_ALIASES = {
+  en: "en",
+  "en-us": "en",
+  "en-gb": "en",
+  english: "en",
+  zh: "zh",
+  "zh-cn": "zh",
+  "zh-hans": "zh",
+  cmn: "zh",
+  chinese: "zh",
+  mandarin: "zh",
+  "mandarin chinese": "zh",
+  putonghua: "zh",
+  "mandarin chinese ": "zh",
+  "普通话": "zh",
+  "国语": "zh",
+  "中文": "zh",
+  yue: "yue",
+  "zh-hk": "yue",
+  cantonese: "yue",
+  "cantonese chinese": "yue",
+  "粤语": "yue",
+  "粵語": "yue",
+  nan: "nan",
+  minnan: "nan",
+  hokkien: "nan",
+  taiwanese: "nan",
+  "minnan chinese": "nan",
+  "闽南语": "nan",
+  "閩南語": "nan",
+  "台语": "nan",
+  "台語": "nan",
+};
 
 const state = {
   blueprint: null,
@@ -88,6 +121,9 @@ const state = {
   assistantResponseCancelSent: false,
   micLevel: 0,
   audioChunkCount: 0,
+  audioRmsSum: 0,
+  audioRmsPeak: 0,
+  audioActiveChunkCount: 0,
   speechDurationSeconds: 0,
   utteranceCount: 0,
   turnDurations: [],
@@ -144,9 +180,24 @@ function applyInitialUrlState() {
     manualPatientIdInput.value = patientId;
   }
   if (language) {
-    languageInput.value = language;
-    manualLanguageInput.value = language;
+    setLanguageSelection(language);
   }
+}
+
+function normalizeLanguageValue(rawLanguage) {
+  const clean = String(rawLanguage || "").trim();
+  if (!clean) {
+    return "en";
+  }
+  const normalized = clean.toLowerCase();
+  return LANGUAGE_VALUE_ALIASES[normalized] || "en";
+}
+
+function setLanguageSelection(rawLanguage) {
+  const nextLanguage = normalizeLanguageValue(rawLanguage);
+  languageInput.value = nextLanguage;
+  manualLanguageInput.value = nextLanguage;
+  return nextLanguage;
 }
 
 function clearNode(node) {
@@ -828,6 +879,9 @@ function resetSessionState() {
   state.assistantResponseCancelSent = false;
   state.micLevel = 0;
   state.audioChunkCount = 0;
+  state.audioRmsSum = 0;
+  state.audioRmsPeak = 0;
+  state.audioActiveChunkCount = 0;
   state.speechDurationSeconds = 0;
   state.utteranceCount = 0;
   state.turnDurations = [];
@@ -933,7 +987,7 @@ function wsBaseUrl() {
 }
 
 function mapRecognitionLanguage(rawLanguage) {
-  const clean = String(rawLanguage || "").trim().toLowerCase();
+  const clean = normalizeLanguageValue(rawLanguage);
   if (!clean || clean === "en") {
     return "en-US";
   }
@@ -943,17 +997,19 @@ function mapRecognitionLanguage(rawLanguage) {
   if (clean === "yue" || clean === "zh-hk") {
     return "zh-HK";
   }
+  if (clean === "nan") {
+    return "zh-TW";
+  }
   return rawLanguage;
 }
 
 function applyDetectedLanguage(languageInputValue) {
-  const nextLanguage = String(languageInputValue || "").trim();
-  if (!nextLanguage || nextLanguage === state.currentLanguage) {
+  const nextLanguage = normalizeLanguageValue(languageInputValue);
+  if (nextLanguage === state.currentLanguage) {
     return;
   }
   state.currentLanguage = nextLanguage;
-  languageInput.value = nextLanguage;
-  manualLanguageInput.value = nextLanguage;
+  setLanguageSelection(nextLanguage);
   if (state.recognitionActive) {
     stopRecognition();
   }
@@ -1183,6 +1239,11 @@ async function initializeAudioPipeline(stream) {
     }
 
     state.audioChunkCount += 1;
+    state.audioRmsSum += rms;
+    state.audioRmsPeak = Math.max(state.audioRmsPeak, rms);
+    if (rms >= 0.008) {
+      state.audioActiveChunkCount += 1;
+    }
     state.realtimeAudioPrimed = true;
     updateCaptureMetrics();
     state.socket.send(
@@ -2080,7 +2141,8 @@ async function startSession() {
     resetSessionState();
 
     state.currentPatientId = patientIdInput.value.trim() || "patient-001";
-    state.currentLanguage = languageInput.value.trim() || "en";
+    state.currentLanguage = normalizeLanguageValue(languageInput.value);
+    setLanguageSelection(state.currentLanguage);
 
     await ensureMediaReady();
     await ensureAudioContextRunning();
@@ -2297,6 +2359,11 @@ function buildSessionRecord(filename, blob) {
         utteranceCount: state.utteranceCount,
         speechSeconds: state.speechDurationSeconds,
         averageTurnSeconds: audio.averageTurnSeconds,
+        averageRms: state.audioChunkCount > 0 ? state.audioRmsSum / state.audioChunkCount : null,
+        peakRms: state.audioChunkCount > 0 ? state.audioRmsPeak : null,
+        voicedChunkRatio:
+          state.audioChunkCount > 0 ? state.audioActiveChunkCount / state.audioChunkCount : null,
+        audioChunkCount: state.audioChunkCount,
         transcriptTurns: state.transcriptTurns,
       },
       task: {
@@ -2450,7 +2517,8 @@ async function handleManualUpload(event) {
   }
 
   const patientId = manualPatientIdInput.value.trim() || "patient-001";
-  const language = manualLanguageInput.value.trim() || "en";
+  const language = normalizeLanguageValue(manualLanguageInput.value);
+  setLanguageSelection(language);
   setManualUploadStatus(`Uploading ${file.name} (${formatBytes(file.size)})...`);
 
   const result = await submitBatchAssessment({
@@ -2495,6 +2563,16 @@ manualUploadForm.addEventListener("submit", (event) => {
     setStatus("Analysis failed");
     setManualUploadStatus(error instanceof Error ? error.message : "Manual upload failed.");
   });
+});
+
+languageInput.addEventListener("change", () => {
+  const nextLanguage = setLanguageSelection(languageInput.value);
+  state.currentLanguage = nextLanguage;
+});
+
+manualLanguageInput.addEventListener("change", () => {
+  const nextLanguage = setLanguageSelection(manualLanguageInput.value);
+  state.currentLanguage = nextLanguage;
 });
 
 window.addEventListener("beforeunload", () => {

@@ -238,6 +238,16 @@ def test_voice_profile_detects_english_voice_from_transcript(tmp_path: Path) -> 
     assert profile.source == "transcript_reassessment"
 
 
+def test_detect_language_signal_scores_short_clear_english_as_switchable(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    signal = service._detect_language_signal_from_transcript("I am Tony and I am home now.")
+
+    assert signal is not None
+    assert signal.language_key == "english"
+    assert signal.confidence >= 0.75
+
+
 def test_voice_profile_detects_mandarin_voice_from_transcript(tmp_path: Path) -> None:
     service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
 
@@ -265,6 +275,104 @@ def test_recent_language_signal_switches_to_mandarin_after_single_cjk_turn(tmp_p
     assert profile is not None
     assert profile.voice == "Cherry"
     assert profile.language_label == "Mandarin Chinese"
+
+
+def test_recent_language_signal_switches_to_cantonese_after_single_strong_turn(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    profile = service._voice_profile_from_recent_signals(
+        language_hint="en",
+        recent_signals=[
+            service._detect_language_signal_from_transcript("我依家返屋企啦，頭先啱啱食咗飯。")
+        ],
+        current_profile=service._voice_profile_for_session(language_hint="en"),
+    )
+
+    assert profile is not None
+    assert profile.voice == "Kiki"
+    assert profile.language_label == "Cantonese"
+
+
+def test_recent_language_signal_switches_to_minnan_after_single_strong_turn(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    profile = service._voice_profile_from_recent_signals(
+        language_hint="zh",
+        recent_signals=[
+            service._detect_language_signal_from_transcript("阮這馬欲轉去，今仔日有夠熱。")
+        ],
+        current_profile=service._voice_profile_for_session(language_hint="zh"),
+    )
+
+    assert profile is not None
+    assert profile.voice == "Roy"
+    assert profile.language_label == "Minnan Chinese"
+
+
+def test_recent_language_signal_switches_to_english_after_single_clear_turn(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    profile = service._voice_profile_from_recent_signals(
+        language_hint="zh",
+        recent_signals=[
+            service._detect_language_signal_from_transcript(
+                "I am at home right now and I had breakfast a little earlier today."
+            )
+        ],
+        current_profile=service._voice_profile_for_session(language_hint="zh"),
+    )
+
+    assert profile is not None
+    assert profile.voice == "Jennifer"
+    assert profile.language_label == "English"
+
+
+def test_recent_language_signal_switches_to_english_after_short_clear_turn(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    profile = service._voice_profile_from_recent_signals(
+        language_hint="zh",
+        recent_signals=[
+            service._detect_language_signal_from_transcript("I am Tony and I am home now.")
+        ],
+        current_profile=service._voice_profile_for_session(language_hint="zh"),
+    )
+
+    assert profile is not None
+    assert profile.voice == "Jennifer"
+    assert profile.language_label == "English"
+
+
+def test_first_turn_language_switch_requests_response_restart(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    should_restart = service._should_restart_response_for_language_switch(
+        transcript_turn_index=1,
+        current_profile=service._voice_profile_for_session(language_hint="zh"),
+        detected_profile=service._voice_profile_for_session(
+            language_hint="zh",
+            transcript="I am Tony and I am home now.",
+        ),
+        assistant_response_done_count=0,
+    )
+
+    assert should_restart is True
+
+
+def test_completed_first_reply_does_not_restart_for_language_switch(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    should_restart = service._should_restart_response_for_language_switch(
+        transcript_turn_index=1,
+        current_profile=service._voice_profile_for_session(language_hint="zh"),
+        detected_profile=service._voice_profile_for_session(
+            language_hint="zh",
+            transcript="I am Tony and I am home now.",
+        ),
+        assistant_response_done_count=1,
+    )
+
+    assert should_restart is False
 
 
 def test_live_session_update_accepts_voice_override(tmp_path: Path) -> None:

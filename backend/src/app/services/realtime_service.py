@@ -227,6 +227,19 @@ class RealtimeConversationService:
         "昨昏",
         "恁",
         "阮",
+        "咱",
+        "這馬",
+        "这马",
+        "家己",
+        "逐家",
+        "伊",
+        "彼个",
+        "啥人",
+        "無啥",
+        "无啥",
+        "有夠",
+        "真濟",
+        "遐",
         "食饱未",
         "食飽未",
     )
@@ -236,13 +249,57 @@ class RealtimeConversationService:
         "唔",
         "喺",
         "而家",
+        "依家",
         "有冇",
         "咩",
         "乜",
         "嘅",
         "咗",
         "嚟",
+        "係",
+        "呢",
+        "啦",
+        "喇",
+        "喎",
+        "啱啱",
+        "頭先",
+        "返屋企",
+        "佢哋",
+        "唔係",
         "咁樣",
+    )
+    ENGLISH_FUNCTION_WORDS: frozenset[str] = frozenset(
+        {
+            "a",
+            "am",
+            "and",
+            "are",
+            "at",
+            "did",
+            "for",
+            "had",
+            "have",
+            "hello",
+            "home",
+            "i",
+            "i'm",
+            "im",
+            "in",
+            "is",
+            "it",
+            "me",
+            "my",
+            "name",
+            "now",
+            "right",
+            "the",
+            "this",
+            "today",
+            "was",
+            "went",
+            "where",
+            "you",
+        }
     )
 
     def __init__(self, settings: Settings) -> None:
@@ -672,9 +729,19 @@ class RealtimeConversationService:
             deferred_voice_profile: RealtimeVoiceProfile | None = None
             recent_language_signals: list[RealtimeLanguageSignal] = []
             session_ready = False
+            assistant_response_active = False
+            assistant_response_done_count = 0
+            transcript_turn_count = 0
+            pending_first_response_restart = False
 
             async def pump_upstream_to_client() -> None:
-                nonlocal deferred_voice_profile, recent_language_signals, session_ready
+                nonlocal assistant_response_active
+                nonlocal assistant_response_done_count
+                nonlocal deferred_voice_profile
+                nonlocal pending_first_response_restart
+                nonlocal recent_language_signals
+                nonlocal session_ready
+                nonlocal transcript_turn_count
                 async for message in upstream:
                     try:
                         payload = json.loads(message)
@@ -685,27 +752,35 @@ class RealtimeConversationService:
                     event_type = str(payload.get("type", ""))
 
                     if event_type == "conversation.item.input_audio_transcription.completed":
+                        transcript_turn_count += 1
                         transcript_text = str(payload.get("transcript", ""))
                         language_signal = self._detect_language_signal_from_transcript(transcript_text)
                         if language_signal is not None:
                             recent_language_signals.append(language_signal)
                             recent_language_signals = recent_language_signals[-3:]
 
+                        current_voice_profile = selected_voice_profile
                         detected_voice_profile = self._voice_profile_from_recent_signals(
                             language_hint=language,
                             recent_signals=recent_language_signals,
-                            current_profile=selected_voice_profile,
+                            current_profile=current_voice_profile,
                         )
                         if detected_voice_profile is not None and (
-                            detected_voice_profile.voice != selected_voice_profile.voice
-                            or detected_voice_profile.language_label != selected_voice_profile.language_label
+                            detected_voice_profile.voice != current_voice_profile.voice
+                            or detected_voice_profile.language_label != current_voice_profile.language_label
                         ):
+                            should_restart_first_response = self._should_restart_response_for_language_switch(
+                                transcript_turn_index=transcript_turn_count,
+                                current_profile=current_voice_profile,
+                                detected_profile=detected_voice_profile,
+                                assistant_response_done_count=assistant_response_done_count,
+                            )
                             logger.info(
                                 "Realtime voice reassessment patient_id=%s from_voice=%s to_voice=%s from_language=%s to_language=%s transcript_preview=%r",
                                 patient_id,
-                                selected_voice_profile.voice,
+                                current_voice_profile.voice,
                                 detected_voice_profile.voice,
-                                selected_voice_profile.language_label,
+                                current_voice_profile.language_label,
                                 detected_voice_profile.language_label,
                                 transcript_text[:120],
                             )
@@ -722,6 +797,20 @@ class RealtimeConversationService:
                                     )
                             else:
                                 deferred_voice_profile = detected_voice_profile
+                            if should_restart_first_response:
+                                if assistant_response_active and session_ready:
+                                    logger.info(
+                                        "Restarting first realtime reply patient_id=%s from_language=%s to_language=%s",
+                                        patient_id,
+                                        current_voice_profile.language_label,
+                                        detected_voice_profile.language_label,
+                                    )
+                                    pending_first_response_restart = False
+                                    assistant_response_active = False
+                                    await send_upstream_event({"type": "response.cancel"})
+                                    await send_upstream_event({"type": "response.create"})
+                                else:
+                                    pending_first_response_restart = True
 
                     if event_type in {"session.created", "session.updated"}:
                         if not session_ready:
@@ -739,6 +828,22 @@ class RealtimeConversationService:
                                     )
                                 finally:
                                     deferred_voice_profile = None
+                    if event_type == "response.created":
+                        assistant_response_active = True
+                        if pending_first_response_restart and assistant_response_done_count == 0:
+                            logger.info(
+                                "Restarting queued first realtime reply patient_id=%s voice=%s language=%s",
+                                patient_id,
+                                selected_voice_profile.voice,
+                                selected_voice_profile.language_label,
+                            )
+                            pending_first_response_restart = False
+                            assistant_response_active = False
+                            await send_upstream_event({"type": "response.cancel"})
+                            await send_upstream_event({"type": "response.create"})
+                    elif event_type == "response.done":
+                        assistant_response_active = False
+                        assistant_response_done_count += 1
 
                     await websocket.send_json(payload)
 
@@ -1126,12 +1231,24 @@ class RealtimeConversationService:
                 confidence=0.95 if cantonese_hits >= 2 else 0.82,
                 source="transcript_reassessment",
             )
-        english_words = len(re.findall(r"[a-z]+(?:'[a-z]+)?", normalized))
+        english_tokens = re.findall(r"[a-z]+(?:'[a-z]+)?", normalized)
+        english_words = len(english_tokens)
+        english_function_hits = len(set(english_tokens) & self.ENGLISH_FUNCTION_WORDS)
         contains_cjk = any("\u4e00" <= char <= "\u9fff" for char in normalized)
         if english_words >= 3 and not contains_cjk:
+            if english_words >= 4 and english_function_hits >= 2:
+                confidence = 0.84
+            elif english_words >= 3 and english_function_hits >= 2:
+                confidence = 0.79
+            elif english_words >= 6:
+                confidence = 0.8
+            elif english_function_hits >= 1:
+                confidence = 0.74
+            else:
+                confidence = 0.65
             return RealtimeLanguageSignal(
                 language_key="english",
-                confidence=0.8 if english_words >= 6 else 0.65,
+                confidence=confidence,
                 source="transcript_reassessment",
             )
         if contains_cjk:
@@ -1160,6 +1277,18 @@ class RealtimeConversationService:
         if latest_signal.language_key == current_profile.language_key:
             return None
 
+        if latest_signal.language_key in {"minnan", "cantonese"} and latest_signal.confidence >= 0.8:
+            return self._voice_profile_for_language_key(
+                latest_signal.language_key,
+                source=latest_signal.source,
+            )
+
+        if latest_signal.language_key == "english" and latest_signal.confidence >= 0.75:
+            return self._voice_profile_for_language_key(
+                latest_signal.language_key,
+                source=latest_signal.source,
+            )
+
         if latest_signal.confidence >= 0.9:
             return self._voice_profile_for_language_key(
                 latest_signal.language_key,
@@ -1185,6 +1314,23 @@ class RealtimeConversationService:
             )
 
         return None
+
+    def _should_restart_response_for_language_switch(
+        self,
+        *,
+        transcript_turn_index: int,
+        current_profile: RealtimeVoiceProfile,
+        detected_profile: RealtimeVoiceProfile,
+        assistant_response_done_count: int,
+    ) -> bool:
+        if transcript_turn_index != 1:
+            return False
+        if assistant_response_done_count > 0:
+            return False
+        return (
+            detected_profile.voice != current_profile.voice
+            or detected_profile.language_label != current_profile.language_label
+        )
 
     def _language_input_value(self, language_key: str, language_label: str) -> str:
         if language_key == "english":
