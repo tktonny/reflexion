@@ -89,7 +89,8 @@ class Settings:
     openai_text_model: str
     openai_transcription_model: str
     qwen_omni_inline_video_mb: int = 10
-    qwen_omni_realtime_url: str = "wss://dashscope.aliyuncs.com/api-ws/v1/realtime"
+    qwen_omni_realtime_url: str = "wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime"
+    qwen_omni_realtime_url_china: str = "wss://dashscope.aliyuncs.com/api-ws/v1/realtime"
     qwen_omni_realtime_model: str = "qwen3-omni-flash-realtime"
     qwen_omni_realtime_transcription_model: str = "gummy-realtime-v1"
     qwen_omni_realtime_default_voice: str = "Cherry"
@@ -180,7 +181,7 @@ def get_settings() -> Settings:
         ),
         qwen_omni_realtime_url=os.getenv(
             "REFLEXION_QWEN_OMNI_REALTIME_URL",
-            "wss://dashscope.aliyuncs.com/api-ws/v1/realtime",
+            "wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime",
         ),
         qwen_omni_realtime_model=os.getenv(
             "REFLEXION_QWEN_OMNI_REALTIME_MODEL",

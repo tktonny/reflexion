@@ -330,7 +330,7 @@ class RealtimeConversationService:
                 flow_title=self.orchestrator.flow_title,
                 conversation_goal=self.orchestrator.conversation_goal,
                 completion_rule=self.orchestrator.completion_rule,
-                greeting=self.orchestrator.opening_message,
+                greeting=self.orchestrator.opening_message_for_language(preferred_language),
                 prompt_steps=self.orchestrator.prompt_steps,
                 processing_steps=self.orchestrator.processing_steps,
                 fallback_note=None,
@@ -350,7 +350,7 @@ class RealtimeConversationService:
             flow_title=self.orchestrator.flow_title,
             conversation_goal=self.orchestrator.conversation_goal,
             completion_rule=self.orchestrator.completion_rule,
-            greeting=self.orchestrator.opening_message,
+            greeting=self.orchestrator.opening_message_for_language(preferred_language),
             prompt_steps=self.orchestrator.prompt_steps,
             processing_steps=self.orchestrator.processing_steps,
             fallback_note=(
@@ -405,7 +405,7 @@ class RealtimeConversationService:
 
         logger.warning("Realtime session running in guided demo mode")
         with suppress(WebSocketDisconnect):
-            await self._run_guided_demo(websocket)
+            await self._run_guided_demo(websocket, language=language)
 
     def analyze_session(self, request: RealtimeAnalysisRequest) -> RealtimeAssessment:
         """Convert one captured conversation into a deterministic demo assessment."""
@@ -703,6 +703,15 @@ class RealtimeConversationService:
                 )
                 await send_upstream_event({"type": "response.create"})
 
+            async def send_opening_response() -> None:
+                logger.info(
+                    "Requesting realtime opening patient_id=%s voice=%s language=%s",
+                    patient_id,
+                    selected_voice_profile.voice,
+                    selected_voice_profile.language_label,
+                )
+                await send_upstream_event({"type": "response.create"})
+
             async def apply_voice_profile_to_session(
                 profile: RealtimeVoiceProfile,
                 *,
@@ -733,11 +742,13 @@ class RealtimeConversationService:
             assistant_response_done_count = 0
             transcript_turn_count = 0
             pending_first_response_restart = False
+            opening_response_requested = False
 
             async def pump_upstream_to_client() -> None:
                 nonlocal assistant_response_active
                 nonlocal assistant_response_done_count
                 nonlocal deferred_voice_profile
+                nonlocal opening_response_requested
                 nonlocal pending_first_response_restart
                 nonlocal recent_language_signals
                 nonlocal session_ready
@@ -812,22 +823,25 @@ class RealtimeConversationService:
                                 else:
                                     pending_first_response_restart = True
 
-                    if event_type in {"session.created", "session.updated"}:
+                    if event_type == "session.updated":
                         if not session_ready:
                             session_ready = True
-                            if deferred_voice_profile is not None:
-                                try:
-                                    await apply_voice_profile_to_session(
-                                        deferred_voice_profile,
-                                        reason="transcript_reassessment",
-                                    )
-                                except Exception as exc:  # noqa: BLE001
-                                    logger.warning(
-                                        "Failed to apply deferred realtime voice update: %s",
-                                        exc,
-                                    )
-                                finally:
-                                    deferred_voice_profile = None
+                        if deferred_voice_profile is not None:
+                            try:
+                                await apply_voice_profile_to_session(
+                                    deferred_voice_profile,
+                                    reason="transcript_reassessment",
+                                )
+                            except Exception as exc:  # noqa: BLE001
+                                logger.warning(
+                                    "Failed to apply deferred realtime voice update: %s",
+                                    exc,
+                                )
+                            finally:
+                                deferred_voice_profile = None
+                        elif not opening_response_requested:
+                            opening_response_requested = True
+                            await send_opening_response()
                     if event_type == "response.created":
                         assistant_response_active = True
                         if pending_first_response_restart and assistant_response_done_count == 0:
@@ -958,6 +972,8 @@ class RealtimeConversationService:
     async def _run_guided_demo(
         self,
         websocket: WebSocket,
+        *,
+        language: str,
     ) -> None:
         committed_turns = 0
         last_patient_text = ""
@@ -987,6 +1003,7 @@ class RealtimeConversationService:
             response_id = f"guided-{committed_turns}"
             message = self._mock_reply(
                 committed_turns,
+                language=language,
                 patient_text=last_patient_text,
                 patient_name=patient_name,
             )
@@ -1045,11 +1062,13 @@ class RealtimeConversationService:
         self,
         committed_turns: int,
         *,
+        language: str | None = None,
         patient_text: str | None = None,
         patient_name: str | None = None,
     ) -> str:
         return self.orchestrator.guided_reply(
             committed_turns,
+            language=language,
             patient_text=patient_text,
             patient_name=patient_name,
         )

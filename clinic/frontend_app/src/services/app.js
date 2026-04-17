@@ -1950,7 +1950,7 @@ function handleRealtimeEvent(event) {
     renderProcessingSteps(event.session.processing_steps);
     setFallback(event.session.fallback_note || "");
     renderPromptSteps();
-    if (!state.openingInjected) {
+    if (!state.openingInjected && event.session.session_mode !== "live_qwen") {
       addTranscriptTurn("assistant", event.session.greeting);
       speakText(event.session.greeting);
       state.openingInjected = true;
@@ -1985,6 +1985,11 @@ function handleRealtimeEvent(event) {
     const note = event.session.fallback_note || "";
     setFallback(reason ? `${note} Reason: ${reason}` : note);
     renderPromptSteps();
+    if (!state.openingInjected && event.session.greeting) {
+      addTranscriptTurn("assistant", event.session.greeting);
+      speakText(event.session.greeting);
+      state.openingInjected = true;
+    }
     setStatus("Live relay degraded to guided conversation");
     return;
   }

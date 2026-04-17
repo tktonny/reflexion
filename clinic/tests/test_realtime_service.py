@@ -138,6 +138,7 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
 
     payload = service._build_live_session_update("patient-001", "en")
+    instructions = payload["session"]["instructions"]
 
     assert payload["type"] == "session.update"
     assert payload["session"]["modalities"] == ["text", "audio"]
@@ -153,10 +154,12 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     assert payload["session"]["turn_detection"]["create_response"] is True
     assert payload["session"]["turn_detection"]["interrupt_response"] is True
     assert payload["session"]["input_audio_transcription"]["model"] == "gummy-realtime-v1"
-    assert "Conversation goal: Collect a short structured intake" in payload["session"]["instructions"]
-    assert "hidden guidance" in payload["session"]["instructions"]
-    assert "Exit when:" in payload["session"]["instructions"]
-    assert "Confirm self and place." in payload["session"]["instructions"]
+    assert "Conversation goal: Collect a short structured intake" in instructions
+    assert "hidden guidance" in instructions
+    assert "Exit when:" in instructions
+    assert "Confirm self and place." in instructions
+    assert 'For your first turn only, say exactly this opening in en: "Hi, nice to meet you. What should I call you? And where are you right now?"' in instructions
+    assert "The local interface has already delivered the opening greeting" not in instructions
 
 
 def test_live_status_reports_selected_voice_from_language_hint(tmp_path: Path) -> None:
@@ -177,6 +180,20 @@ def test_live_status_reports_selected_voice_from_language_hint(tmp_path: Path) -
     assert status.max_session_seconds == 90
     assert status.max_reply_seconds == 7
     assert status.max_reply_chars == 140
+
+
+def test_live_status_localizes_opening_greeting_for_cantonese(tmp_path: Path) -> None:
+    service = RealtimeConversationService(
+        make_settings(
+            tmp_path,
+            flow_path=write_flow_config(tmp_path),
+            qwen_api_key="test-key",
+        )
+    )
+
+    status = service.build_session_status(preferred_language="粤语")
+
+    assert status.greeting == "你好，好高兴见到你。我应该点称呼你？你而家喺边度？"
 
 
 def test_voice_profile_uses_english_voice_for_language_hint(tmp_path: Path) -> None:
@@ -444,6 +461,12 @@ def test_guided_demo_reply_uses_configured_flow_order(tmp_path: Path) -> None:
         patient_name="Tony",
     ) == "Walk me through what you did earlier today."
     assert service._mock_reply(4) == "Thanks. The structured intake is complete."
+
+
+def test_guided_demo_opening_reply_localizes_for_minnan(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    assert service._mock_reply(0, language="nan") == "你好，很欢喜见着你。我欲按怎称呼你？你这马佇佗位？"
 
 
 def test_guided_demo_reply_uses_name_aware_transition_when_configured(tmp_path: Path) -> None:

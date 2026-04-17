@@ -17,6 +17,59 @@ class RealtimeConversationOrchestrator:
     """Load and expose the shared staged conversation plan used by live and guided modes."""
 
     DEFAULT_FLOW_FILENAME = "realtime_conversation_flow.json"
+    OPENING_MESSAGES: dict[str, str] = {
+        "english": "Hi, nice to meet you. What should I call you? And where are you right now?",
+        "mandarin": "你好，很高兴见到你。我该怎么称呼你？你现在在哪里？",
+        "cantonese": "你好，好高兴见到你。我应该点称呼你？你而家喺边度？",
+        "minnan": "你好，很欢喜见着你。我欲按怎称呼你？你这马佇佗位？",
+    }
+    LANGUAGE_HINT_ALIASES: dict[str, tuple[str, ...]] = {
+        "english": ("en", "en-us", "en-gb", "english"),
+        "mandarin": (
+            "zh",
+            "zh-cn",
+            "zh-hans",
+            "cmn",
+            "chinese",
+            "mandarin",
+            "mandarin chinese",
+            "putonghua",
+            "普通话",
+            "国语",
+            "中文",
+            "汉语",
+            "漢語",
+        ),
+        "cantonese": (
+            "yue",
+            "zh-hk",
+            "cantonese",
+            "cantonese chinese",
+            "guangdonghua",
+            "广东话",
+            "廣東話",
+            "粤语",
+            "粵語",
+        ),
+        "minnan": (
+            "nan",
+            "minnan",
+            "hokkien",
+            "taiwanese",
+            "taiyu",
+            "min nan",
+            "minnan chinese",
+            "闽南",
+            "闽南话",
+            "闽南语",
+            "閩南",
+            "閩南話",
+            "閩南語",
+            "台语",
+            "台語",
+            "臺語",
+        ),
+    }
 
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
@@ -29,6 +82,12 @@ class RealtimeConversationOrchestrator:
     @property
     def opening_message(self) -> str:
         return self.flow.opening_message
+
+    def opening_message_for_language(self, language: str | None) -> str:
+        language_key = self._normalize_language_key(language)
+        if language_key is None:
+            return self.flow.opening_message
+        return self.OPENING_MESSAGES.get(language_key, self.flow.opening_message)
 
     @property
     def processing_steps(self) -> list[str]:
@@ -54,13 +113,14 @@ class RealtimeConversationOrchestrator:
         self,
         committed_turns: int,
         *,
+        language: str | None = None,
         patient_text: str | None = None,
         patient_name: str | None = None,
     ) -> str:
         """Return the next guided-demo reply while keeping the flow conversational."""
 
         if committed_turns <= 0:
-            return self.flow.opening_message
+            return self.opening_message_for_language(language)
         if committed_turns >= len(self.flow.steps):
             return self._render_template(self.flow.completion_message, patient_name=patient_name)
 
@@ -113,6 +173,7 @@ class RealtimeConversationOrchestrator:
         """Render the staged orchestration plan into one live-realtime instruction block."""
 
         language_name = language.strip() or "en"
+        opening_message = self.opening_message_for_language(language)
         response_rules = self.flow.assistant_response_rules or [
             "Sound like a calm, warm human guide rather than a robotic assistant.",
             "Treat the stage plan as hidden objectives, not lines to recite.",
@@ -139,13 +200,22 @@ class RealtimeConversationOrchestrator:
             f"Completion rule: {self.flow.completion_rule}\n"
             "The stage plan below is hidden guidance. The patient should feel like they are in a natural human conversation, not a checklist.\n"
             "Never mention stage names, scoring, assessment logic, or that you are an AI.\n"
-            "The local interface has already delivered the opening greeting and the first question.\n"
-            "The next patient audio turn answers the opening orientation question.\n"
+            f'For your first turn only, say exactly this opening in {language_name}: "{opening_message}"\n'
+            "After the opening question, stop and wait for the patient's answer.\n"
             "Live response rules:\n"
             f"{rule_lines}\n"
             "Staged plan:\n"
             f"{stage_blocks}"
         )
+
+    def _normalize_language_key(self, language_hint: str | None) -> str | None:
+        normalized = re.sub(r"[\s_]+", " ", str(language_hint or "")).strip().lower()
+        if not normalized:
+            return None
+        for language_key, aliases in self.LANGUAGE_HINT_ALIASES.items():
+            if normalized in aliases:
+                return language_key
+        return None
 
     def _load_flow(self) -> RealtimeConversationFlow:
         path = self.settings.realtime_flow_path or self.default_flow_path()
