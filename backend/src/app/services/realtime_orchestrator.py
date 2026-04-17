@@ -64,6 +64,9 @@ class RealtimeConversationOrchestrator:
     RETURNING_COMPLETION_RULE = (
         "Greet the returning patient, ask one open check-in prompt, allow them to speak freely, and use at most one brief follow-up before closing."
     )
+    NO_MARKDOWN_RULE = (
+        "Do not use markdown, asterisks, underscores, bullets, numbered lists, or stage directions. Speak in plain conversational sentences only."
+    )
     LANGUAGE_HINT_ALIASES: dict[str, tuple[str, ...]] = {
         "english": ("en", "en-us", "en-gb", "english"),
         "mandarin": (
@@ -248,6 +251,8 @@ class RealtimeConversationOrchestrator:
             "Do not diagnose, score risk, or discuss dementia probability during the live conversation.",
             "After the final stage is complete, thank the patient and say the session is complete.",
         ]
+        if self.NO_MARKDOWN_RULE not in response_rules:
+            response_rules = [*response_rules, self.NO_MARKDOWN_RULE]
         stage_blocks = "\n\n".join(
             self._format_stage_block(
                 index,

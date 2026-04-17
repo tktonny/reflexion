@@ -657,8 +657,18 @@ function createMessageElement(role, text) {
   return { container, body };
 }
 
+function sanitizeAssistantText(text) {
+  const raw = String(text || "");
+  if (!raw) {
+    return "";
+  }
+  const stripped = raw.replace(/[*_`~]+/g, "");
+  return stripped.replace(/[ \t]{2,}/g, " ");
+}
+
 function addTranscriptTurn(role, text, stage = null) {
-  const cleanText = String(text || "").trim();
+  const normalizedText = role === "assistant" ? sanitizeAssistantText(text) : String(text || "");
+  const cleanText = normalizedText.trim();
   if (!cleanText) {
     return;
   }
@@ -681,13 +691,13 @@ function beginAssistantDraft() {
 
 function updateAssistantDraft(delta) {
   beginAssistantDraft();
-  state.assistantDraftText += delta;
+  state.assistantDraftText = sanitizeAssistantText(state.assistantDraftText + delta);
   state.assistantDraftBody.textContent = state.assistantDraftText;
   scrollTranscriptToBottom();
 }
 
 function finalizeAssistantDraft(text) {
-  const finalText = String(text || state.assistantDraftText || "").trim();
+  const finalText = sanitizeAssistantText(text || state.assistantDraftText || "").trim();
   if (!state.assistantDraftElement || !finalText) {
     return;
   }

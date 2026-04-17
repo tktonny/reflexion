@@ -190,6 +190,7 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     assert "hidden guidance" in instructions
     assert "Exit when:" in instructions
     assert "Confirm self and place." in instructions
+    assert "Do not use markdown, asterisks, underscores, bullets, numbered lists, or stage directions." in instructions
     assert 'For your first turn only, say exactly this opening in en: "Hi, nice to meet you. What should I call you? And where are you right now?"' in instructions
     assert "The local interface has already delivered the opening greeting" not in instructions
 
