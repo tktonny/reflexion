@@ -141,7 +141,7 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
 
     assert payload["type"] == "session.update"
     assert payload["session"]["modalities"] == ["text", "audio"]
-    assert payload["session"]["voice"] == "Jennifer"
+    assert payload["session"]["voice"] == "Cherry"
     assert payload["session"]["max_tokens"] == 48
     assert payload["session"]["temperature"] == 0.25
     assert payload["session"]["top_p"] == 0.7
@@ -181,6 +181,23 @@ def test_live_status_reports_selected_voice_from_language_hint(tmp_path: Path) -
 
 def test_voice_profile_uses_english_voice_for_language_hint(tmp_path: Path) -> None:
     service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    profile = service._voice_profile_for_session(language_hint="English")
+
+    assert profile.voice == "Cherry"
+    assert profile.language_label == "English"
+    assert profile.source == "language_hint"
+
+
+def test_voice_profile_uses_configured_english_voice_override(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path, flow_path=write_flow_config(tmp_path))
+    settings = Settings(
+        **{
+            **settings.__dict__,
+            "qwen_omni_realtime_english_voice": "Jennifer",
+        }
+    )
+    service = RealtimeConversationService(settings)
 
     profile = service._voice_profile_for_session(language_hint="English")
 
@@ -233,7 +250,7 @@ def test_voice_profile_detects_english_voice_from_transcript(tmp_path: Path) -> 
         transcript="I had breakfast at home and then I went for a walk outside.",
     )
 
-    assert profile.voice == "Jennifer"
+    assert profile.voice == "Cherry"
     assert profile.language_label == "English"
     assert profile.source == "transcript_reassessment"
 
@@ -323,7 +340,7 @@ def test_recent_language_signal_switches_to_english_after_single_clear_turn(tmp_
     )
 
     assert profile is not None
-    assert profile.voice == "Jennifer"
+    assert profile.voice == "Cherry"
     assert profile.language_label == "English"
 
 
@@ -339,7 +356,7 @@ def test_recent_language_signal_switches_to_english_after_short_clear_turn(tmp_p
     )
 
     assert profile is not None
-    assert profile.voice == "Jennifer"
+    assert profile.voice == "Cherry"
     assert profile.language_label == "English"
 
 

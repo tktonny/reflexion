@@ -1356,7 +1356,7 @@ class RealtimeConversationService:
             return RealtimeVoiceProfile(
                 language_key="english",
                 language_label="English",
-                voice="Jennifer",
+                voice=self.settings.qwen_omni_realtime_english_voice,
                 source=source,
             )
         if language_key == "mandarin":
@@ -1370,14 +1370,14 @@ class RealtimeConversationService:
             return RealtimeVoiceProfile(
                 language_key="minnan",
                 language_label="Minnan Chinese",
-                voice="Roy",
+                voice=self.settings.qwen_omni_realtime_minnan_voice,
                 source=source,
             )
         if language_key == "cantonese":
             return RealtimeVoiceProfile(
                 language_key="cantonese",
                 language_label="Cantonese",
-                voice="Kiki",
+                voice=self.settings.qwen_omni_realtime_cantonese_voice,
                 source=source,
             )
         return self._default_voice_profile(source=source)

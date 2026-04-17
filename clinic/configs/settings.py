@@ -93,6 +93,9 @@ class Settings:
     qwen_omni_realtime_model: str = "qwen3-omni-flash-realtime"
     qwen_omni_realtime_transcription_model: str = "gummy-realtime-v1"
     qwen_omni_realtime_default_voice: str = "Cherry"
+    qwen_omni_realtime_english_voice: str = "Cherry"
+    qwen_omni_realtime_minnan_voice: str = "Roy"
+    qwen_omni_realtime_cantonese_voice: str = "Kiki"
     qwen_omni_realtime_max_tokens: int = 48
     qwen_omni_realtime_temperature: float = 0.25
     qwen_omni_realtime_top_p: float = 0.7
@@ -190,6 +193,18 @@ def get_settings() -> Settings:
         qwen_omni_realtime_default_voice=os.getenv(
             "REFLEXION_QWEN_OMNI_REALTIME_DEFAULT_VOICE",
             "Cherry",
+        ),
+        qwen_omni_realtime_english_voice=os.getenv(
+            "REFLEXION_QWEN_OMNI_REALTIME_ENGLISH_VOICE",
+            "Cherry",
+        ),
+        qwen_omni_realtime_minnan_voice=os.getenv(
+            "REFLEXION_QWEN_OMNI_REALTIME_MINNAN_VOICE",
+            "Roy",
+        ),
+        qwen_omni_realtime_cantonese_voice=os.getenv(
+            "REFLEXION_QWEN_OMNI_REALTIME_CANTONESE_VOICE",
+            "Kiki",
         ),
         qwen_omni_realtime_max_tokens=int(
             os.getenv("REFLEXION_QWEN_OMNI_REALTIME_MAX_TOKENS", "48")
