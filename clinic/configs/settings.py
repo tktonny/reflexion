@@ -183,6 +183,10 @@ def get_settings() -> Settings:
             "REFLEXION_QWEN_OMNI_REALTIME_URL",
             "wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime",
         ),
+        qwen_omni_realtime_url_china=os.getenv(
+            "REFLEXION_QWEN_OMNI_REALTIME_URL_CHINA",
+            "wss://dashscope.aliyuncs.com/api-ws/v1/realtime",
+        ),
         qwen_omni_realtime_model=os.getenv(
             "REFLEXION_QWEN_OMNI_REALTIME_MODEL",
             "qwen3-omni-flash-realtime",

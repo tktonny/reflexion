@@ -134,6 +134,35 @@ def test_status_defaults_to_guided_demo_when_live_qwen_is_unavailable(tmp_path: 
     assert status.prompt_steps[0].exit_when[0] == "The patient gives a name or self-reference."
 
 
+def test_realtime_upstream_urls_include_china_backup_after_primary(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path, flow_path=write_flow_config(tmp_path))
+    settings = Settings(
+        **{
+            **settings.__dict__,
+            "qwen_omni_realtime_url": "wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime",
+            "qwen_omni_realtime_url_china": "wss://dashscope.aliyuncs.com/api-ws/v1/realtime",
+        }
+    )
+    service = RealtimeConversationService(settings)
+
+    assert service._realtime_upstream_urls() == [
+        "wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime",
+        "wss://dashscope.aliyuncs.com/api-ws/v1/realtime",
+    ]
+
+
+def test_realtime_retry_switches_on_handshake_401_or_403(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    class DummyError(Exception):
+        def __init__(self, message: str) -> None:
+            super().__init__(message)
+
+    assert service._should_retry_live_qwen_on_china_backup(DummyError("server rejected WebSocket connection: HTTP 401"))
+    assert service._should_retry_live_qwen_on_china_backup(DummyError("server rejected WebSocket connection: HTTP 403"))
+    assert not service._should_retry_live_qwen_on_china_backup(DummyError("server rejected WebSocket connection: HTTP 500"))
+
+
 def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
 

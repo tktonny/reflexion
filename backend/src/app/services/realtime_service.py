@@ -640,26 +640,67 @@ class RealtimeConversationService:
     ) -> None:
         assert websockets is not None
 
-        url = f"{self.settings.qwen_omni_realtime_url}?model={self.settings.qwen_omni_realtime_model}"
         headers = {"Authorization": f"Bearer {self.settings.qwen_omni_api_key}"}
         selected_voice_profile = self._voice_profile_for_session(language_hint=language)
-        logger.info(
-            "Opening Qwen realtime upstream connection patient_id=%s language=%s url=%s model=%s",
-            patient_id,
-            language,
-            self.settings.qwen_omni_realtime_url,
-            self.settings.qwen_omni_realtime_model,
-        )
+        realtime_urls = self._realtime_upstream_urls()
+        last_error: Exception | None = None
 
-        async with websockets.connect(
-            url,
-            additional_headers=headers,
-            max_size=None,
-            ping_interval=20,
-            ping_timeout=20,
-            proxy=None,
-        ) as upstream:
-            logger.info("Qwen realtime upstream connected")
+        for attempt_index, realtime_url in enumerate(realtime_urls):
+            url = f"{realtime_url}?model={self.settings.qwen_omni_realtime_model}"
+            logger.info(
+                "Opening Qwen realtime upstream connection patient_id=%s language=%s url=%s model=%s attempt=%s/%s",
+                patient_id,
+                language,
+                realtime_url,
+                self.settings.qwen_omni_realtime_model,
+                attempt_index + 1,
+                len(realtime_urls),
+            )
+            try:
+                async with websockets.connect(
+                    url,
+                    additional_headers=headers,
+                    max_size=None,
+                    ping_interval=20,
+                    ping_timeout=20,
+                    proxy=None,
+                ) as upstream:
+                    logger.info("Qwen realtime upstream connected url=%s", realtime_url)
+                    await self._relay_live_qwen_session(
+                        websocket,
+                        upstream,
+                        patient_id=patient_id,
+                        language=language,
+                        selected_voice_profile=selected_voice_profile,
+                    )
+                    return
+            except Exception as exc:  # noqa: BLE001
+                last_error = exc
+                if (
+                    attempt_index + 1 < len(realtime_urls)
+                    and self._should_retry_live_qwen_on_china_backup(exc)
+                ):
+                    logger.warning(
+                        "Qwen realtime upstream handshake failed url=%s status=%s, retrying on China backup url=%s",
+                        realtime_url,
+                        self._realtime_handshake_status_code(exc),
+                        realtime_urls[attempt_index + 1],
+                    )
+                    continue
+                raise
+
+        if last_error is not None:
+            raise last_error
+
+    async def _relay_live_qwen_session(
+        self,
+        websocket: WebSocket,
+        upstream: Any,
+        *,
+        patient_id: str,
+        language: str,
+        selected_voice_profile: RealtimeVoiceProfile,
+    ) -> None:
             upstream_send_lock = asyncio.Lock()
 
             async def send_upstream_event(event: dict[str, Any]) -> None:
@@ -968,6 +1009,34 @@ class RealtimeConversationService:
             for task in done:
                 task.result()
             logger.info("Qwen realtime upstream relay finished cleanly")
+
+    def _realtime_upstream_urls(self) -> list[str]:
+        candidates = [
+            str(self.settings.qwen_omni_realtime_url).strip(),
+            str(self.settings.qwen_omni_realtime_url_china).strip(),
+        ]
+        urls: list[str] = []
+        for candidate in candidates:
+            if candidate and candidate not in urls:
+                urls.append(candidate)
+        return urls
+
+    def _realtime_handshake_status_code(self, exc: Exception) -> int | None:
+        response = getattr(exc, "response", None)
+        for attr in ("status_code", "status"):
+            value = getattr(response, attr, None)
+            if isinstance(value, int):
+                return value
+        value = getattr(exc, "status_code", None)
+        if isinstance(value, int):
+            return value
+        match = re.search(r"HTTP\s+(\d{3})", str(exc))
+        if match:
+            return int(match.group(1))
+        return None
+
+    def _should_retry_live_qwen_on_china_backup(self, exc: Exception) -> bool:
+        return self._realtime_handshake_status_code(exc) in {401, 403}
 
     async def _run_guided_demo(
         self,
