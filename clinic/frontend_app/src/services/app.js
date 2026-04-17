@@ -129,6 +129,8 @@ const state = {
   sessionStartInFlight: false,
   socketSerial: 0,
   activeSocketSerial: 0,
+  lastRealtimeLanguageHintText: "",
+  lastRealtimeLanguageHintAt: 0,
   uploadInFlight: false,
 };
 
@@ -159,6 +161,36 @@ function setStatus(text) {
 
 function setFallback(text) {
   fallbackNote.textContent = text || "";
+}
+
+function maybeSendRealtimeLanguageHint(text) {
+  const cleanText = String(text || "").trim();
+  if (
+    !cleanText ||
+    !state.liveAutoMode ||
+    !state.isRecording ||
+    !state.socket ||
+    state.socket.readyState !== WebSocket.OPEN
+  ) {
+    return;
+  }
+
+  const now = Date.now();
+  const normalized = cleanText.toLowerCase();
+  if (normalized === state.lastRealtimeLanguageHintText && now - state.lastRealtimeLanguageHintAt < 1200) {
+    return;
+  }
+  if (cleanText.length < 4) {
+    return;
+  }
+
+  state.lastRealtimeLanguageHintText = normalized;
+  state.lastRealtimeLanguageHintAt = now;
+  try {
+    state.socket.send(JSON.stringify({ type: "reflexion.language_hint", text: cleanText }));
+  } catch {
+    // Ignore best-effort hint failures.
+  }
 }
 
 function updateMicLevel(level) {
@@ -814,6 +846,8 @@ function resetSessionState() {
   state.identityPreflightCheckedAt = null;
   state.currentRecognitionText = "";
   state.openingInjected = false;
+  state.lastRealtimeLanguageHintText = "";
+  state.lastRealtimeLanguageHintAt = 0;
   state.recordedChunks = [];
   state.recordedBlob = null;
   state.recordingMimeType = "";
@@ -1423,6 +1457,7 @@ function ensureRecognition() {
       transcriptText += event.results[index][0].transcript;
     }
     state.currentRecognitionText = transcriptText.trim();
+    maybeSendRealtimeLanguageHint(state.currentRecognitionText);
   };
 
   recognition.onend = () => {

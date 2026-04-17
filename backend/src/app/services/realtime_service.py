@@ -646,83 +646,35 @@ class RealtimeConversationService:
                 )
                 await send_upstream_event({"type": "response.create"})
 
+            async def apply_voice_profile_to_session(
+                profile: RealtimeVoiceProfile,
+                *,
+                reason: str,
+            ) -> None:
+                nonlocal selected_voice_profile
+                await send_session_update(profile, reason=reason)
+                selected_voice_profile = profile
+                await websocket.send_json(
+                    {
+                        "type": "reflexion.voice.selected",
+                        "voice": selected_voice_profile.voice,
+                        "language": selected_voice_profile.language_label,
+                        "language_key": selected_voice_profile.language_key,
+                        "language_input": self._language_input_value(
+                            selected_voice_profile.language_key,
+                            selected_voice_profile.language_label,
+                        ),
+                        "source": selected_voice_profile.source,
+                    }
+                )
+
             await send_session_update(selected_voice_profile, reason=selected_voice_profile.source)
+            deferred_voice_profile: RealtimeVoiceProfile | None = None
+            recent_language_signals: list[RealtimeLanguageSignal] = []
+            session_ready = False
 
             async def pump_upstream_to_client() -> None:
-                nonlocal selected_voice_profile
-                deferred_voice_profile: RealtimeVoiceProfile | None = None
-                recent_language_signals: list[RealtimeLanguageSignal] = []
-                session_ready = False
-                pending_response_after_update = False
-                awaiting_manual_response = False
-                response_requested_for_turn = False
-                response_fallback_task: asyncio.Task[None] | None = None
-
-                def cancel_response_fallback() -> None:
-                    nonlocal response_fallback_task
-                    if response_fallback_task is None:
-                        return
-                    response_fallback_task.cancel()
-                    response_fallback_task = None
-
-                async def send_manual_response_create(*, reason: str) -> None:
-                    nonlocal awaiting_manual_response, pending_response_after_update, response_requested_for_turn
-                    if not awaiting_manual_response:
-                        pending_response_after_update = False
-                        return
-                    cancel_response_fallback()
-                    awaiting_manual_response = False
-                    pending_response_after_update = False
-                    response_requested_for_turn = True
-                    logger.info(
-                        "Sending realtime response.create patient_id=%s voice=%s language=%s reason=%s",
-                        patient_id,
-                        selected_voice_profile.voice,
-                        selected_voice_profile.language_label,
-                        reason,
-                    )
-                    await send_upstream_event({"type": "response.create"})
-
-                async def apply_voice_profile_to_session(
-                    profile: RealtimeVoiceProfile,
-                    *,
-                    reason: str,
-                ) -> None:
-                    nonlocal selected_voice_profile
-                    await send_session_update(profile, reason=reason)
-                    selected_voice_profile = profile
-                    await websocket.send_json(
-                        {
-                            "type": "reflexion.voice.selected",
-                            "voice": selected_voice_profile.voice,
-                            "language": selected_voice_profile.language_label,
-                            "language_key": selected_voice_profile.language_key,
-                            "language_input": self._language_input_value(
-                                selected_voice_profile.language_key,
-                                selected_voice_profile.language_label,
-                            ),
-                            "source": selected_voice_profile.source,
-                        }
-                    )
-
-                def schedule_response_fallback() -> None:
-                    nonlocal response_fallback_task
-                    cancel_response_fallback()
-
-                    async def fallback() -> None:
-                        try:
-                            await asyncio.sleep(1.6)
-                            if awaiting_manual_response:
-                                logger.info(
-                                    "Realtime transcription timeout patient_id=%s; sending fallback response.create",
-                                    patient_id,
-                                )
-                                await send_manual_response_create(reason="transcription_timeout")
-                        except asyncio.CancelledError:
-                            raise
-
-                    response_fallback_task = asyncio.create_task(fallback())
-
+                nonlocal deferred_voice_profile, recent_language_signals, session_ready
                 async for message in upstream:
                     try:
                         payload = json.loads(message)
@@ -732,25 +684,7 @@ class RealtimeConversationService:
                     self._log_upstream_event(payload)
                     event_type = str(payload.get("type", ""))
 
-                    if event_type == "input_audio_buffer.speech_started":
-                        response_requested_for_turn = False
-
-                    if event_type == "input_audio_buffer.speech_stopped" and not response_requested_for_turn:
-                        awaiting_manual_response = True
-                        schedule_response_fallback()
-
-                    if event_type == "input_audio_buffer.committed":
-                        if response_requested_for_turn:
-                            await websocket.send_json(payload)
-                            continue
-                        awaiting_manual_response = True
-                        schedule_response_fallback()
-
                     if event_type == "conversation.item.input_audio_transcription.completed":
-                        if not awaiting_manual_response and not response_requested_for_turn:
-                            awaiting_manual_response = True
-                            schedule_response_fallback()
-                        cancel_response_fallback()
                         transcript_text = str(payload.get("transcript", ""))
                         language_signal = self._detect_language_signal_from_transcript(transcript_text)
                         if language_signal is not None:
@@ -786,26 +720,8 @@ class RealtimeConversationService:
                                         "Failed to update realtime voice from transcript reassessment: %s",
                                         exc,
                                     )
-                                    if awaiting_manual_response:
-                                        await send_manual_response_create(
-                                            reason="transcript_reassessment_failed",
-                                        )
-                                else:
-                                    if awaiting_manual_response:
-                                        await send_manual_response_create(
-                                            reason="transcript_reassessment"
-                                        )
                             else:
                                 deferred_voice_profile = detected_voice_profile
-                                if awaiting_manual_response:
-                                    pending_response_after_update = True
-                                    schedule_response_fallback()
-                        elif awaiting_manual_response:
-                            if session_ready:
-                                await send_manual_response_create(reason="transcription_completed")
-                            else:
-                                pending_response_after_update = True
-                                schedule_response_fallback()
 
                     if event_type in {"session.created", "session.updated"}:
                         if not session_ready:
@@ -821,26 +737,13 @@ class RealtimeConversationService:
                                         "Failed to apply deferred realtime voice update: %s",
                                         exc,
                                     )
-                                    if awaiting_manual_response:
-                                        await send_manual_response_create(
-                                            reason="deferred_reassessment_failed",
-                                        )
-                                else:
-                                    if awaiting_manual_response:
-                                        await send_manual_response_create(
-                                            reason="deferred_language_switch"
-                                        )
                                 finally:
                                     deferred_voice_profile = None
-                            elif awaiting_manual_response and pending_response_after_update:
-                                await send_manual_response_create(reason="session_ready")
-                        elif awaiting_manual_response and pending_response_after_update:
-                            await send_manual_response_create(reason="session_updated")
 
                     await websocket.send_json(payload)
-                cancel_response_fallback()
 
             async def pump_client_to_upstream() -> None:
+                nonlocal deferred_voice_profile, recent_language_signals, session_ready
                 audio_append_started = False
                 audio_window_chunks = 0
                 audio_window_rms_total = 0.0
@@ -858,6 +761,46 @@ class RealtimeConversationService:
                         continue
                     event = prepared_event
                     event_type = str(event.get("type", ""))
+                    if event_type == "reflexion.language_hint":
+                        transcript_text = str(event.get("text", ""))
+                        language_signal = self._detect_language_signal_from_transcript(transcript_text)
+                        if language_signal is None:
+                            continue
+                        recent_language_signals.append(language_signal)
+                        recent_language_signals = recent_language_signals[-3:]
+                        detected_voice_profile = self._voice_profile_from_recent_signals(
+                            language_hint=language,
+                            recent_signals=recent_language_signals,
+                            current_profile=selected_voice_profile,
+                        )
+                        if detected_voice_profile is None or (
+                            detected_voice_profile.voice == selected_voice_profile.voice
+                            and detected_voice_profile.language_label == selected_voice_profile.language_label
+                        ):
+                            continue
+                        logger.info(
+                            "Realtime voice hint patient_id=%s from_voice=%s to_voice=%s from_language=%s to_language=%s transcript_preview=%r",
+                            patient_id,
+                            selected_voice_profile.voice,
+                            detected_voice_profile.voice,
+                            selected_voice_profile.language_label,
+                            detected_voice_profile.language_label,
+                            transcript_text[:120],
+                        )
+                        if session_ready:
+                            try:
+                                await apply_voice_profile_to_session(
+                                    detected_voice_profile,
+                                    reason="browser_hint",
+                                )
+                            except Exception as exc:  # noqa: BLE001
+                                logger.warning(
+                                    "Failed to update realtime voice from browser hint: %s",
+                                    exc,
+                                )
+                        else:
+                            deferred_voice_profile = detected_voice_profile
+                        continue
                     if event_type == "reflexion.wrap_up":
                         await send_wrap_up_response()
                         continue
@@ -984,7 +927,7 @@ class RealtimeConversationService:
                     "threshold": self.settings.qwen_omni_realtime_vad_threshold,
                     "prefix_padding_ms": self.settings.qwen_omni_realtime_vad_prefix_padding_ms,
                     "silence_duration_ms": self.settings.qwen_omni_realtime_vad_silence_duration_ms,
-                    "create_response": False,
+                    "create_response": True,
                     "interrupt_response": True,
                 },
                 "input_audio_transcription": {
@@ -1135,6 +1078,7 @@ class RealtimeConversationService:
             "input_image_buffer.append",
             "response.create",
             "response.cancel",
+            "reflexion.language_hint",
             "reflexion.wrap_up",
         }:
             logger.debug("Skipping unsupported browser realtime event type=%s", event_type)
@@ -1193,7 +1137,7 @@ class RealtimeConversationService:
         if contains_cjk:
             return RealtimeLanguageSignal(
                 language_key="mandarin",
-                confidence=0.62,
+                confidence=0.72,
                 source="transcript_reassessment",
             )
         return None
@@ -1233,7 +1177,7 @@ class RealtimeConversationService:
         hinted_key = self._normalize_language_key(language_hint)
         if (
             hinted_key == current_profile.language_key
-            and latest_signal.confidence >= 0.65
+            and latest_signal.confidence >= 0.6
         ):
             return self._voice_profile_for_language_key(
                 latest_signal.language_key,

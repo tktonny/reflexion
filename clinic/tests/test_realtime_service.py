@@ -150,7 +150,7 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     assert payload["session"]["turn_detection"]["threshold"] == 0.1
     assert payload["session"]["turn_detection"]["prefix_padding_ms"] == 500
     assert payload["session"]["turn_detection"]["silence_duration_ms"] == 900
-    assert payload["session"]["turn_detection"]["create_response"] is False
+    assert payload["session"]["turn_detection"]["create_response"] is True
     assert payload["session"]["turn_detection"]["interrupt_response"] is True
     assert payload["session"]["input_audio_transcription"]["model"] == "gummy-realtime-v1"
     assert "Conversation goal: Collect a short structured intake" in payload["session"]["instructions"]
@@ -249,6 +249,22 @@ def test_voice_profile_detects_mandarin_voice_from_transcript(tmp_path: Path) ->
     assert profile.voice == "Cherry"
     assert profile.language_label == "Mandarin Chinese"
     assert profile.source == "transcript_reassessment"
+
+
+def test_recent_language_signal_switches_to_mandarin_after_single_cjk_turn(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    profile = service._voice_profile_from_recent_signals(
+        language_hint="en",
+        recent_signals=[
+            service._detect_language_signal_from_transcript("你好，我叫夏一川，我现在在我家里。")
+        ],
+        current_profile=service._voice_profile_for_session(language_hint="en"),
+    )
+
+    assert profile is not None
+    assert profile.voice == "Cherry"
+    assert profile.language_label == "Mandarin Chinese"
 
 
 def test_live_session_update_accepts_voice_override(tmp_path: Path) -> None:
