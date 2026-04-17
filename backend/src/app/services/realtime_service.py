@@ -276,9 +276,7 @@ class RealtimeConversationService:
                 greeting=self.orchestrator.opening_message,
                 prompt_steps=self.orchestrator.prompt_steps,
                 processing_steps=self.orchestrator.processing_steps,
-                fallback_note=(
-                    "If the live relay drops, the screen stays in guided conversation mode and still produces the final risk story."
-                ),
+                fallback_note=None,
             )
         return RealtimeSessionStatus(
             session_mode="guided_demo",

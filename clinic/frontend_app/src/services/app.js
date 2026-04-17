@@ -1861,7 +1861,7 @@ function handleRealtimeEvent(event) {
     }
     if (event.session.session_mode === "live_qwen") {
       state.wrapUpRequested = false;
-      clearSessionAutoEndTimer();
+      scheduleSessionAutoEnd();
       setStatus("Connecting live relay...");
     } else {
       clearSessionAutoEndTimer();
@@ -1908,9 +1908,6 @@ function handleRealtimeEvent(event) {
 
   if (type === "input_audio_buffer.speech_started") {
     if (state.liveAutoMode) {
-      if (!state.wrapUpRequested && !state.sessionEndRequested) {
-        scheduleSessionAutoEnd();
-      }
       state.serverSpeechActive = true;
       state.serverSpeechStartedAt = performance.now();
       state.currentRecognitionText = "";
@@ -2016,7 +2013,11 @@ function handleRealtimeEvent(event) {
       enableLiveAutoMode();
     }
     if (!state.wrapUpRequested) {
-      setStatus("Session ready");
+      if (state.liveAutoMode) {
+        setStatus(state.isRecording ? "Mic live, waiting for speech..." : "Microphone paused");
+      } else {
+        setStatus("Session ready");
+      }
     }
     return;
   }
