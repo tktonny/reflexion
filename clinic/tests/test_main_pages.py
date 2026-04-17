@@ -13,3 +13,5 @@ def test_clinic_page_route_returns_html() -> None:
     assert "text/html" in response.headers["content-type"]
     assert '<select id="language">' in response.text
     assert '<select id="manual-language">' in response.text
+    assert '<option value="ms">Malay</option>' in response.text
+    assert '<option value="ta">Tamil</option>' in response.text

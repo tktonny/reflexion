@@ -22,6 +22,8 @@ class RealtimeConversationOrchestrator:
         "mandarin": "你好，很高兴见到你。我该怎么称呼你？你现在在哪里？",
         "cantonese": "你好，好高兴见到你。我应该点称呼你？你而家喺边度？",
         "minnan": "你好，很欢喜见着你。我欲按怎称呼你？你这马佇佗位？",
+        "malay": "Hai, gembira bertemu dengan anda. Saya patut panggil anda apa? Dan sekarang anda berada di mana?",
+        "tamil": "வணக்கம், உங்களை சந்தித்ததில் மகிழ்ச்சி. நான் உங்களை எப்படி அழைக்கலாம்? நீங்கள் இப்போது எங்கே இருக்கிறீர்கள்?",
     }
     LANGUAGE_HINT_ALIASES: dict[str, tuple[str, ...]] = {
         "english": ("en", "en-us", "en-gb", "english"),
@@ -68,6 +70,20 @@ class RealtimeConversationOrchestrator:
             "台语",
             "台語",
             "臺語",
+        ),
+        "malay": (
+            "ms",
+            "ms-my",
+            "malay",
+            "bahasa",
+            "bahasa melayu",
+            "melayu",
+        ),
+        "tamil": (
+            "ta",
+            "ta-in",
+            "tamil",
+            "தமிழ்",
         ),
     }
 

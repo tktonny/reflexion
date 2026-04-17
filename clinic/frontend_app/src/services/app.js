@@ -96,6 +96,16 @@ const LANGUAGE_VALUE_ALIASES = {
   "閩南語": "nan",
   "台语": "nan",
   "台語": "nan",
+  ms: "ms",
+  "ms-my": "ms",
+  malay: "ms",
+  bahasa: "ms",
+  "bahasa melayu": "ms",
+  melayu: "ms",
+  ta: "ta",
+  "ta-in": "ta",
+  tamil: "ta",
+  தமிழ்: "ta",
 };
 
 const state = {
@@ -117,8 +127,10 @@ const state = {
   assistantDraftBody: null,
   assistantDraftText: "",
   assistantResponseTimer: null,
+  assistantResponseHardTimer: null,
   assistantResponseActive: false,
   assistantResponseCancelSent: false,
+  assistantResponseSoftLimitReached: false,
   micLevel: 0,
   audioChunkCount: 0,
   audioRmsSum: 0,
@@ -304,12 +316,27 @@ function currentMaxReplyChars() {
   return Number(state.blueprint?.max_reply_chars || 140);
 }
 
+function currentMaxReplyHardSeconds() {
+  const softSeconds = currentMaxReplySeconds();
+  return Math.max(softSeconds + 5, Math.round(softSeconds * 1.7));
+}
+
+function currentMaxReplyHardChars() {
+  const softChars = currentMaxReplyChars();
+  return Math.max(softChars + 90, Math.round(softChars * 1.7));
+}
+
 function clearAssistantResponseGuard() {
   if (state.assistantResponseTimer) {
     window.clearTimeout(state.assistantResponseTimer);
     state.assistantResponseTimer = null;
   }
+  if (state.assistantResponseHardTimer) {
+    window.clearTimeout(state.assistantResponseHardTimer);
+    state.assistantResponseHardTimer = null;
+  }
   state.assistantResponseCancelSent = false;
+  state.assistantResponseSoftLimitReached = false;
 }
 
 function clearSessionAutoEndTimer() {
@@ -353,8 +380,29 @@ function scheduleAssistantResponseGuard() {
     return;
   }
   state.assistantResponseTimer = window.setTimeout(() => {
-    requestAssistantResponseCancel("Reply shortened to keep the conversation moving...");
+    state.assistantResponseSoftLimitReached = true;
+    maybeStopAssistantAtSentenceBoundary();
   }, maxReplySeconds * 1000);
+  state.assistantResponseHardTimer = window.setTimeout(() => {
+    requestAssistantResponseCancel();
+  }, currentMaxReplyHardSeconds() * 1000);
+}
+
+function assistantDraftEndsAtSentenceBoundary(text) {
+  return /[.!?。！？…]["')\]]*\s*$/.test(String(text || "").trim());
+}
+
+function maybeStopAssistantAtSentenceBoundary() {
+  if (state.assistantResponseCancelSent || !state.assistantResponseSoftLimitReached) {
+    return;
+  }
+  const text = state.assistantDraftText.trim();
+  if (!text) {
+    return;
+  }
+  if (assistantDraftEndsAtSentenceBoundary(text) || text.length >= currentMaxReplyHardChars()) {
+    requestAssistantResponseCancel();
+  }
 }
 
 function scheduleSessionAutoEnd() {
@@ -1000,6 +1048,12 @@ function mapRecognitionLanguage(rawLanguage) {
   if (clean === "nan") {
     return "zh-TW";
   }
+  if (clean === "ms") {
+    return "ms-MY";
+  }
+  if (clean === "ta") {
+    return "ta-IN";
+  }
   return rawLanguage;
 }
 
@@ -1189,7 +1243,12 @@ async function ensureMediaReady() {
   }
 
   const stream = await navigator.mediaDevices.getUserMedia({
-    audio: true,
+    audio: {
+      channelCount: 1,
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+    },
     video: {
       facingMode: "user",
       width: { ideal: 640 },
@@ -2069,9 +2128,10 @@ function handleRealtimeEvent(event) {
 
   if (type === "response.audio_transcript.delta") {
     updateAssistantDraft(String(event.delta || ""));
-    if (state.assistantDraftText.trim().length > currentMaxReplyChars()) {
-      requestAssistantResponseCancel("Reply shortened to keep the conversation moving...");
+    if (state.assistantDraftText.trim().length >= currentMaxReplyHardChars()) {
+      requestAssistantResponseCancel();
     }
+    maybeStopAssistantAtSentenceBoundary();
     return;
   }
 
@@ -2083,9 +2143,10 @@ function handleRealtimeEvent(event) {
 
   if (type === "response.text.delta") {
     updateAssistantDraft(String(event.delta || ""));
-    if (state.assistantDraftText.trim().length > currentMaxReplyChars()) {
-      requestAssistantResponseCancel("Reply shortened to keep the conversation moving...");
+    if (state.assistantDraftText.trim().length >= currentMaxReplyHardChars()) {
+      requestAssistantResponseCancel();
     }
+    maybeStopAssistantAtSentenceBoundary();
     return;
   }
 

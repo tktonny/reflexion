@@ -181,7 +181,7 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     assert payload["session"]["turn_detection"]["prefix_padding_ms"] == 500
     assert payload["session"]["turn_detection"]["silence_duration_ms"] == 900
     assert payload["session"]["turn_detection"]["create_response"] is True
-    assert payload["session"]["turn_detection"]["interrupt_response"] is True
+    assert payload["session"]["turn_detection"]["interrupt_response"] is False
     assert payload["session"]["input_audio_transcription"]["model"] == "gummy-realtime-v1"
     assert "Conversation goal: Collect a short structured intake" in instructions
     assert "hidden guidance" in instructions
@@ -225,6 +225,38 @@ def test_live_status_localizes_opening_greeting_for_cantonese(tmp_path: Path) ->
     assert status.greeting == "你好，好高兴见到你。我应该点称呼你？你而家喺边度？"
 
 
+def test_live_status_reports_malay_language_selection(tmp_path: Path) -> None:
+    service = RealtimeConversationService(
+        make_settings(
+            tmp_path,
+            flow_path=write_flow_config(tmp_path),
+            qwen_api_key="test-key",
+        )
+    )
+
+    status = service.build_session_status(preferred_language="ms")
+
+    assert status.selected_voice == "Cherry"
+    assert status.selected_language == "Malay"
+    assert status.greeting == "Hai, gembira bertemu dengan anda. Saya patut panggil anda apa? Dan sekarang anda berada di mana?"
+
+
+def test_live_status_reports_tamil_language_selection(tmp_path: Path) -> None:
+    service = RealtimeConversationService(
+        make_settings(
+            tmp_path,
+            flow_path=write_flow_config(tmp_path),
+            qwen_api_key="test-key",
+        )
+    )
+
+    status = service.build_session_status(preferred_language="ta")
+
+    assert status.selected_voice == "Cherry"
+    assert status.selected_language == "Tamil"
+    assert status.greeting == "வணக்கம், உங்களை சந்தித்ததில் மகிழ்ச்சி. நான் உங்களை எப்படி அழைக்கலாம்? நீங்கள் இப்போது எங்கே இருக்கிறீர்கள்?"
+
+
 def test_voice_profile_uses_english_voice_for_language_hint(tmp_path: Path) -> None:
     service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
 
@@ -259,6 +291,26 @@ def test_voice_profile_uses_minnan_voice_for_language_hint(tmp_path: Path) -> No
 
     assert profile.voice == "Roy"
     assert profile.language_label == "Minnan Chinese"
+    assert profile.source == "language_hint"
+
+
+def test_voice_profile_uses_malay_default_voice_for_language_hint(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    profile = service._voice_profile_for_session(language_hint="Malay")
+
+    assert profile.voice == "Cherry"
+    assert profile.language_label == "Malay"
+    assert profile.source == "language_hint"
+
+
+def test_voice_profile_uses_tamil_default_voice_for_language_hint(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    profile = service._voice_profile_for_session(language_hint="Tamil")
+
+    assert profile.voice == "Cherry"
+    assert profile.language_label == "Tamil"
     assert profile.source == "language_hint"
 
 

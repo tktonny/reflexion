@@ -214,6 +214,20 @@ class RealtimeConversationService:
             "白话",
             "白話",
         ),
+        "malay": (
+            "ms",
+            "ms-my",
+            "malay",
+            "bahasa",
+            "bahasa melayu",
+            "melayu",
+        ),
+        "tamil": (
+            "ta",
+            "ta-in",
+            "tamil",
+            "தமிழ்",
+        ),
     }
     MINNAN_MARKERS: tuple[str, ...] = (
         "按怎",
@@ -1119,7 +1133,7 @@ class RealtimeConversationService:
                     "prefix_padding_ms": self.settings.qwen_omni_realtime_vad_prefix_padding_ms,
                     "silence_duration_ms": self.settings.qwen_omni_realtime_vad_silence_duration_ms,
                     "create_response": True,
-                    "interrupt_response": True,
+                    "interrupt_response": False,
                 },
                 "input_audio_transcription": {
                     "model": self.settings.qwen_omni_realtime_transcription_model,
@@ -1429,6 +1443,10 @@ class RealtimeConversationService:
             return "nan"
         if language_key == "cantonese":
             return "yue"
+        if language_key == "malay":
+            return "ms"
+        if language_key == "tamil":
+            return "ta"
         return language_label
 
     def _default_voice_profile(self, *, source: str = "default") -> RealtimeVoiceProfile:
@@ -1466,6 +1484,20 @@ class RealtimeConversationService:
                 language_key="cantonese",
                 language_label="Cantonese",
                 voice=self.settings.qwen_omni_realtime_cantonese_voice,
+                source=source,
+            )
+        if language_key == "malay":
+            return RealtimeVoiceProfile(
+                language_key="malay",
+                language_label="Malay",
+                voice=self.settings.qwen_omni_realtime_default_voice,
+                source=source,
+            )
+        if language_key == "tamil":
+            return RealtimeVoiceProfile(
+                language_key="tamil",
+                language_label="Tamil",
+                voice=self.settings.qwen_omni_realtime_default_voice,
                 source=source,
             )
         return self._default_voice_profile(source=source)
