@@ -544,6 +544,14 @@ def test_live_relay_drops_image_until_first_audio_append(tmp_path: Path) -> None
     assert audio_started is True
 
 
+def test_live_session_ready_event_accepts_session_updated_and_created(tmp_path: Path) -> None:
+    service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
+
+    assert service._is_live_session_ready_event("session.updated") is True
+    assert service._is_live_session_ready_event("session.created") is True
+    assert service._is_live_session_ready_event("response.created") is False
+
+
 def test_guided_demo_reply_uses_configured_flow_order(tmp_path: Path) -> None:
     service = RealtimeConversationService(make_settings(tmp_path, flow_path=write_flow_config(tmp_path)))
 

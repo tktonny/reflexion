@@ -930,7 +930,7 @@ class RealtimeConversationService:
                                 else:
                                     pending_first_response_restart = True
 
-                    if event_type == "session.updated":
+                    if self._is_live_session_ready_event(event_type):
                         if not session_ready:
                             session_ready = True
                         if deferred_voice_profile is not None:
@@ -1103,6 +1103,9 @@ class RealtimeConversationService:
 
     def _should_retry_live_qwen_on_china_backup(self, exc: Exception) -> bool:
         return self._realtime_handshake_status_code(exc) in {401, 403}
+
+    def _is_live_session_ready_event(self, event_type: str) -> bool:
+        return event_type in {"session.updated", "session.created"}
 
     async def _run_guided_demo(
         self,
