@@ -191,7 +191,11 @@ def test_live_session_update_uses_server_vad(tmp_path: Path) -> None:
     assert "Exit when:" in instructions
     assert "Confirm self and place." in instructions
     assert "Do not use markdown, asterisks, underscores, bullets, numbered lists, or stage directions." in instructions
-    assert 'the final sentence of your final reply must be a brief goodbye in the patient\'s current language, for example "Goodbye."' in instructions
+    assert (
+        "Do not say goodbye, do not say the session is ending, and do not act like you are closing the conversation"
+        in instructions
+    )
+    assert 'the final sentence of your final reply must be a brief goodbye in the patient\'s current language' not in instructions
     assert 'For your first turn only, say exactly this opening in en: "Hi, nice to meet you. What should I call you? And where are you right now?"' in instructions
     assert "The local interface has already delivered the opening greeting" not in instructions
 

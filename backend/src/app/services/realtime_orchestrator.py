@@ -67,6 +67,9 @@ class RealtimeConversationOrchestrator:
     NO_MARKDOWN_RULE = (
         "Do not use markdown, asterisks, underscores, bullets, numbered lists, or stage directions. Speak in plain conversational sentences only."
     )
+    NO_PREMATURE_GOODBYE_RULE = (
+        "Do not say goodbye, do not say the session is ending, and do not act like you are closing the conversation unless you are explicitly told that the live capture is ending now."
+    )
     GOODBYE_SENTENCES: dict[str, str] = {
         "english": "Goodbye.",
         "mandarin": "再见。",
@@ -261,9 +264,8 @@ class RealtimeConversationOrchestrator:
         ]
         if self.NO_MARKDOWN_RULE not in response_rules:
             response_rules = [*response_rules, self.NO_MARKDOWN_RULE]
-        goodbye_rule = self.closing_goodbye_rule(language)
-        if goodbye_rule not in response_rules:
-            response_rules = [*response_rules, goodbye_rule]
+        if self.NO_PREMATURE_GOODBYE_RULE not in response_rules:
+            response_rules = [*response_rules, self.NO_PREMATURE_GOODBYE_RULE]
         stage_blocks = "\n\n".join(
             self._format_stage_block(
                 index,

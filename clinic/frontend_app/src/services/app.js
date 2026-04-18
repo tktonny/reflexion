@@ -131,6 +131,8 @@ const state = {
   assistantResponseActive: false,
   assistantResponseCancelSent: false,
   assistantResponseSoftLimitReached: false,
+  assistantPlaybackHoldUntil: 0,
+  assistantPlaybackReleaseTimer: null,
   micLevel: 0,
   audioChunkCount: 0,
   audioRmsSum: 0,
@@ -337,6 +339,82 @@ function clearAssistantResponseGuard() {
   }
   state.assistantResponseCancelSent = false;
   state.assistantResponseSoftLimitReached = false;
+}
+
+function clearAssistantPlaybackReleaseTimer() {
+  if (state.assistantPlaybackReleaseTimer) {
+    window.clearTimeout(state.assistantPlaybackReleaseTimer);
+    state.assistantPlaybackReleaseTimer = null;
+  }
+}
+
+function currentAudioClockTime() {
+  return state.audioContext ? state.audioContext.currentTime : 0;
+}
+
+function assistantPlaybackEndsAt() {
+  return Math.max(state.assistantPlaybackHoldUntil || 0, state.playbackCursorTime || 0);
+}
+
+function shouldSuppressUserCapture() {
+  if (state.assistantResponseActive) {
+    return true;
+  }
+  return assistantPlaybackEndsAt() > currentAudioClockTime() + 0.04;
+}
+
+function pauseUserCaptureForAssistantPlayback() {
+  state.currentRecognitionText = "";
+  stopRecognition();
+  updateMicLevel(0);
+  if (
+    state.liveAutoMode &&
+    state.socket &&
+    state.socket.readyState === WebSocket.OPEN
+  ) {
+    try {
+      state.socket.send(JSON.stringify({ type: "input_audio_buffer.clear" }));
+    } catch {
+      // Ignore best-effort buffer clears while suppressing assistant echo.
+    }
+  }
+}
+
+function resumeUserCaptureAfterAssistantPlayback() {
+  clearAssistantPlaybackReleaseTimer();
+  if (shouldSuppressUserCapture()) {
+    scheduleAssistantCaptureResume();
+    return;
+  }
+  if (
+    !state.liveAutoMode ||
+    !state.isRecording ||
+    !state.socket ||
+    state.socket.readyState !== WebSocket.OPEN
+  ) {
+    return;
+  }
+  state.currentRecognitionText = "";
+  if (!state.wrapUpRequested && !state.sessionEndRequested) {
+    setStatus("Mic live, waiting for speech...");
+  }
+  startRecognition();
+}
+
+function scheduleAssistantCaptureResume() {
+  clearAssistantPlaybackReleaseTimer();
+  if (!state.isRecording) {
+    return;
+  }
+  const remainingMs = Math.max(0, Math.ceil((assistantPlaybackEndsAt() - currentAudioClockTime()) * 1000));
+  if (remainingMs <= 40) {
+    resumeUserCaptureAfterAssistantPlayback();
+    return;
+  }
+  state.assistantPlaybackReleaseTimer = window.setTimeout(() => {
+    state.assistantPlaybackReleaseTimer = null;
+    resumeUserCaptureAfterAssistantPlayback();
+  }, remainingMs + 60);
 }
 
 function clearSessionAutoEndTimer() {
@@ -922,6 +1000,7 @@ function renderProviders(providerStatuses, defaultProvider) {
 
 function resetSessionState() {
   clearAssistantResponseGuard();
+  clearAssistantPlaybackReleaseTimer();
   clearSessionAutoEndTimer();
   clearWrapUpTimer();
   updateMicLevel(0);
@@ -944,6 +1023,7 @@ function resetSessionState() {
   state.utteranceCount = 0;
   state.turnDurations = [];
   state.playbackCursorTime = 0;
+  state.assistantPlaybackHoldUntil = 0;
   state.framesCaptured = 0;
   state.lastFrameSample = null;
   state.brightnessSamples = [];
@@ -1294,7 +1374,12 @@ async function initializeAudioPipeline(stream) {
   state.muteGain.gain.value = 0;
 
   state.processorNode.onaudioprocess = (event) => {
-    if (!state.isRecording || !state.socket || state.socket.readyState !== WebSocket.OPEN) {
+    if (
+      !state.isRecording ||
+      !state.socket ||
+      state.socket.readyState !== WebSocket.OPEN ||
+      shouldSuppressUserCapture()
+    ) {
       updateMicLevel(0);
       return;
     }
@@ -1404,6 +1489,11 @@ function playAssistantAudio(base64Audio) {
   const startAt = Math.max(state.audioContext.currentTime, state.playbackCursorTime || 0);
   source.start(startAt);
   state.playbackCursorTime = startAt + audioBuffer.duration;
+  state.assistantPlaybackHoldUntil = Math.max(
+    state.assistantPlaybackHoldUntil || 0,
+    state.playbackCursorTime + 0.12,
+  );
+  scheduleAssistantCaptureResume();
 }
 
 function startFrameCaptureLoop() {
@@ -1513,6 +1603,9 @@ async function captureFrame() {
     state.framesCaptured += 1;
     updateCaptureMetrics();
     if (state.liveAutoMode && state.realtimeAudioPrimed) {
+      if (shouldSuppressUserCapture()) {
+        return;
+      }
       state.socket.send(JSON.stringify({ type: "input_image_buffer.append", image: snapshot.base64 }));
     }
 
@@ -1592,7 +1685,7 @@ function ensureRecognition() {
 
   recognition.onend = () => {
     state.recognitionActive = false;
-    if (state.isRecording) {
+    if (state.isRecording && !shouldSuppressUserCapture()) {
       window.setTimeout(() => {
         startRecognition();
       }, 120);
@@ -1627,6 +1720,9 @@ function startRecognition() {
     return;
   }
   if (!state.recognition || state.recognitionActive) {
+    return;
+  }
+  if (shouldSuppressUserCapture()) {
     return;
   }
 
@@ -1842,6 +1938,7 @@ function openRealtimeSocket(patientId, language) {
       if (!state.uploadInFlight) {
         setStatus("Realtime disconnected");
       }
+      clearAssistantPlaybackReleaseTimer();
       disableLiveAutoMode();
       refreshButtons();
     };
@@ -1850,6 +1947,7 @@ function openRealtimeSocket(patientId, language) {
 
 async function closeRealtimeSocket() {
   clearAssistantResponseGuard();
+  clearAssistantPlaybackReleaseTimer();
   clearSessionAutoEndTimer();
   clearWrapUpTimer();
   const socket = state.socket;
@@ -2126,8 +2224,12 @@ function handleRealtimeEvent(event) {
 
   if (type === "response.created") {
     state.assistantResponseActive = true;
+    pauseUserCaptureForAssistantPlayback();
     beginAssistantDraft();
     scheduleAssistantResponseGuard();
+    if (state.liveAutoMode) {
+      setStatus("Guide speaking...");
+    }
     return;
   }
 
@@ -2175,7 +2277,7 @@ function handleRealtimeEvent(event) {
       return;
     }
     if (state.liveAutoMode && state.isRecording) {
-      setStatus("Mic live, waiting for speech...");
+      resumeUserCaptureAfterAssistantPlayback();
     }
     return;
   }
@@ -2197,6 +2299,7 @@ function handleRealtimeEvent(event) {
   if (type === "error") {
     state.assistantResponseActive = false;
     clearAssistantResponseGuard();
+    clearAssistantPlaybackReleaseTimer();
     const message = event.error?.message || event.error || "Realtime error.";
     setStatus("Error");
     setFallback(String(message));
