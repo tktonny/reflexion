@@ -1,0 +1,62 @@
+{
+  "snapshotId": "6b357414ead04688b37c73f267cda087-snapshot",
+  "patientId": "patient-001",
+  "sessionId": "6b357414ead04688b37c73f267cda087",
+  "productMode": "clinic",
+  "capturedAt": "2026-04-07T08:36:21.633668+00:00",
+  "language": "en",
+  "featurePipelineVersion": "longitudinal-engine-v1",
+  "quality": {
+    "usability": "usable",
+    "coverageScore": 0.77,
+    "flags": []
+  },
+  "embeddings": {
+    "speech": {
+      "vectorUri": "inline://feature_snapshots/6b357414ead04688b37c73f267cda087#speech",
+      "dimensions": 8,
+      "modelVersion": "mock-speech-v1"
+    },
+    "conversation": {
+      "vectorUri": "inline://feature_snapshots/6b357414ead04688b37c73f267cda087#conversation",
+      "dimensions": 8,
+      "modelVersion": "mock-conversation-v1"
+    },
+    "face": {
+      "vectorUri": "inline://feature_snapshots/6b357414ead04688b37c73f267cda087#face",
+      "dimensions": 176,
+      "modelVersion": "opencv-lbp-face-v1"
+    }
+  },
+  "features": {
+    "speech": {
+      "embeddingReady": true,
+      "sessionRecordAvailable": false
+    },
+    "conversation": {
+      "riskScore": 0.1,
+      "screeningClassification": "healthy"
+    },
+    "taskBehavior": {
+      "pause_burden": 0.26,
+      "speech_fluency": 0.6829999999999999,
+      "narrative_coherence": 0.852,
+      "recall_consistency": 0.756,
+      "support_dependency": 0.27999999999999997
+    },
+    "visualFace": {
+      "face_visibility": 0.88,
+      "face_stability": 0.7659999999999999,
+      "motion_regularity": 0.764,
+      "identity_confidence": 0.9158999999999999,
+      "identityLinkId": "6b357414ead04688b37c73f267cda087-identity-link",
+      "timelineInclusion": "include",
+      "identityConfidence": 0.94
+    }
+  },
+  "trendContext": {
+    "baselineState": "building",
+    "windowLabel": "3 months",
+    "daysSinceEnrollment": 0
+  }
+}

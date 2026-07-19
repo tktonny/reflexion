@@ -1,0 +1,6 @@
+requirement_id,category,requirement_text,source,owner,verification_method,verification_artifact,status
+REQ-001,intended-use,Product output must support provider-supervised early cognitive impairment assessment only,Startup Blueprint,Product Lead,Review,Intended Use Statement,DRAFT
+REQ-002,data,Every session must store consent state patient site device raw artifact references derived features QC and labels,Platform Architecture,Platform Lead,Inspection,Session Schema,DRAFT
+REQ-003,ml,Clinic model evaluation must enforce patient-level split isolation,ML Plan,ML Lead,Test,Evaluation Report,DRAFT
+REQ-004,clinical,All pilot sessions must have traceable clinician adjudication workflow,Clinical Validation Program,Clinical Ops Lead,Inspection,Label Workflow SOP,DRAFT
+REQ-005,regulatory,All released model versions must pass formal release checklist and approval,Regulatory And QMS Plan,Quality Lead,Review,Release Record,DRAFT

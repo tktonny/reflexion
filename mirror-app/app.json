@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Reflexion Mirror",
+    "slug": "reflexion-mobile-mirror-interface-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "reflexionmirror",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Reflexion uses the camera to scan or verify the mirror ID.",
+        "NSMicrophoneUsageDescription": "Reflexion uses the microphone for realtime AI conversations."
+      }
+    },
+    "android": {
+      "package": "com.reflexion.mirror",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "INTERNET"
+      ]
+    },
+    "web": {
+      "output": "server"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-camera"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      }
+    }
+  }
+}

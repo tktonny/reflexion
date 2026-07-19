@@ -1,0 +1,8 @@
+export const DB_NAME = 'ref'
+export const NURSE_CONFIG_COLLECTION = 'NursePatientConfig'
+export const CONVERSATION_COLLECTION = 'Conversation'
+export const CONVERSATION_MAP_COLLECTION = 'ConversationIdToPatientIdMap'
+export const DAILY_STATUS_COLLECTION = 'DailyPatientStatus'
+export const MIRROR_MAP_COLLECTION = 'MirrorIdToNurseIdMap'
+export const PAIRING_COLLECTION = 'MirrorPairingSessions'
+export const TIME_ZONE = 'Asia/Singapore'

@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.env
+old-api
+DS_Store

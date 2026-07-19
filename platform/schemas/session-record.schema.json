@@ -1,0 +1,349 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reflexion.local/schemas/session-record.schema.json",
+  "title": "Reflexion Session Record",
+  "type": "object",
+  "required": [
+    "sessionId",
+    "productMode",
+    "consent",
+    "patient",
+    "site",
+    "device",
+    "acquisition",
+    "rawArtifacts",
+    "qualityControl",
+    "modelContext"
+  ],
+  "properties": {
+    "sessionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "productMode": {
+      "type": "string",
+      "enum": [
+        "clinic",
+        "home"
+      ]
+    },
+    "intendedUseVersion": {
+      "type": "string"
+    },
+    "consent": {
+      "type": "object",
+      "required": [
+        "status",
+        "consentVersion"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "withdrawn",
+            "pending",
+            "not-required"
+          ]
+        },
+        "consentVersion": {
+          "type": "string"
+        },
+        "signedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "withdrawnAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "patient": {
+      "type": "object",
+      "required": [
+        "patientId"
+      ],
+      "properties": {
+        "patientId": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        },
+        "ageBand": {
+          "type": "string"
+        },
+        "sex": {
+          "type": "string"
+        },
+        "primaryLanguage": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "site": {
+      "type": "object",
+      "required": [
+        "siteId"
+      ],
+      "properties": {
+        "siteId": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "siteType": {
+          "type": "string",
+          "enum": [
+            "memory-clinic",
+            "hospital",
+            "community",
+            "home-program",
+            "research"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "device": {
+      "type": "object",
+      "required": [
+        "deviceId"
+      ],
+      "properties": {
+        "deviceId": {
+          "type": "string"
+        },
+        "hardwareRevision": {
+          "type": "string"
+        },
+        "softwareVersion": {
+          "type": "string"
+        },
+        "captureProfile": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "acquisition": {
+      "type": "object",
+      "required": [
+        "startedAt",
+        "endedAt",
+        "language",
+        "tasksCompleted"
+      ],
+      "properties": {
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "language": {
+          "type": "string"
+        },
+        "tasksCompleted": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "operatorId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "rawArtifacts": {
+      "type": "object",
+      "properties": {
+        "audio": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifactRef"
+          }
+        },
+        "video": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifactRef"
+          }
+        },
+        "transcript": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifactRef"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "derivedFeatures": {
+      "type": "object",
+      "properties": {
+        "speech": {
+          "type": "object"
+        },
+        "task": {
+          "type": "object"
+        },
+        "facial": {
+          "type": "object"
+        },
+        "interactionTiming": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "qualityControl": {
+      "type": "object",
+      "required": [
+        "usability"
+      ],
+      "properties": {
+        "usability": {
+          "type": "string",
+          "enum": [
+            "usable",
+            "usable-with-caveats",
+            "unusable"
+          ]
+        },
+        "audioQualityScore": {
+          "type": "number"
+        },
+        "videoQualityScore": {
+          "type": "number"
+        },
+        "speechDurationSeconds": {
+          "type": "number"
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "modelContext": {
+      "type": "object",
+      "required": [
+        "featurePipelineVersion"
+      ],
+      "properties": {
+        "featurePipelineVersion": {
+          "type": "string"
+        },
+        "clinicModelVersion": {
+          "type": "string"
+        },
+        "homeModelVersion": {
+          "type": "string"
+        },
+        "datasetVersion": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "labels": {
+      "type": "object",
+      "properties": {
+        "clinicianAdjudication": {
+          "type": "string"
+        },
+        "referenceTestSummary": {
+          "type": "object"
+        },
+        "followupOutcome": {
+          "type": "string"
+        },
+        "labeledAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "labelerId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "longitudinal": {
+      "type": "object",
+      "properties": {
+        "baselineState": {
+          "type": "string",
+          "enum": [
+            "not-started",
+            "building",
+            "complete",
+            "stale"
+          ]
+        },
+        "baselineCoverageDays": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sessionsInBaseline": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deviationScore": {
+          "type": "number"
+        },
+        "trendSlope": {
+          "type": "number"
+        },
+        "volatilityScore": {
+          "type": "number"
+        },
+        "riskTier": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "artifactRef": {
+      "type": "object",
+      "required": [
+        "artifactId",
+        "uri"
+      ],
+      "properties": {
+        "artifactId": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "checksum": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

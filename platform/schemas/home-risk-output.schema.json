@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reflexion.local/schemas/home-risk-output.schema.json",
+  "title": "Home Longitudinal Risk Output",
+  "type": "object",
+  "required": [
+    "patientId",
+    "windowEndDate",
+    "baselineState",
+    "adherenceScore",
+    "coverageState"
+  ],
+  "properties": {
+    "patientId": {
+      "type": "string"
+    },
+    "windowEndDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "baselineState": {
+      "type": "string",
+      "enum": [
+        "not-started",
+        "building",
+        "complete",
+        "stale"
+      ]
+    },
+    "coverageState": {
+      "type": "string",
+      "enum": [
+        "insufficient",
+        "partial",
+        "adequate"
+      ]
+    },
+    "adherenceScore": {
+      "type": "number"
+    },
+    "deviationScore": {
+      "type": "number"
+    },
+    "trendSlope": {
+      "type": "number"
+    },
+    "volatilityScore": {
+      "type": "number"
+    },
+    "riskTier": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommendedAction": {
+      "type": "string",
+      "enum": [
+        "continue-monitoring",
+        "provider-review",
+        "priority-provider-review"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

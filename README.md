@@ -27,28 +27,34 @@ This workspace includes a tiered clinic demo API and UI that implement the 48-ho
 - Manual provider override supported
 - Strict mode disables fallback
 
-## Product Layout
+## Repository Layout (top level)
 
-- `doctor/frontend_app/`
-  Doctor management console assets served at `/doctor`
-- `care/frontend_app/`
-  Caregiver or patient dashboard assets served at `/care`
-- `backend/`
-  API, domain models, backend orchestration, media preparation, and serving entrypoint
-- `clinic/frontend_app/`
-  Mirror or assessment terminal UI, result viewer, browser-side services, styles, and docs
-- `clinic/database/`
-  Persistence and storage access layer
-- `clinic/intelligence/`
-  Prompt design, output schemas, provider adapters, and multimodal inference logic
-- `clinic/configs/`
-  Shared configuration and environment loading
-- `clinic/tests/`
-  Product tests, local end-to-end validation, smoke-test entrypoints, and manual validation scripts
+- `README.md`, `docs/` — main project description and planning documents.
+- `mirror-app/` — Android/Expo **mirror device app** (smart-mirror client). Voice check-in uses the Qwen Omni Realtime relay under `mirror-app/server/`. See `mirror-app/docs/ECOSYSTEM.md`, `mirror-app/QWEN_RELAY.md`, `mirror-app/docs/ANDROID_BUILD.md`.
+- `caregiver-app/` — caregiver / family Expo app (source repo: reflexion-native-app).
+- `caregiver-server/` — caregiver Express + MongoDB backend (source repo: reflexion-caregiver-app-server).
+- `platform/` — the original **clinic platform** (Python FastAPI "AI brain"). Run all Python commands from inside this folder.
+
+### `platform/` sub-layout
+
+- `platform/doctor/frontend_app/` — Doctor console served at `/doctor`
+- `platform/care/frontend_app/` — Caregiver/patient dashboard served at `/care`
+- `platform/backend/` — API, domain models, orchestration, media preparation, serving entrypoint
+- `platform/clinic/frontend_app/` — Mirror/assessment terminal UI, result viewer, browser services
+- `platform/clinic/database/` — persistence and storage access layer
+- `platform/clinic/intelligence/` — prompt design, output schemas, provider adapters, multimodal inference
+- `platform/clinic/configs/` — shared configuration and environment loading
+- `platform/clinic/tests/` — product tests, local end-to-end validation, smoke entrypoints
+- `platform/verification/`, `platform/schemas/`, `platform/templates/`, `platform/data/`, `platform/audio_server.py`
 
 ## Run
 
-1. Create a Python 3.11+ environment.
+1. Create a Python 3.11+ environment. **All Python commands below run from the `platform/` folder:**
+
+```bash
+cd platform
+```
+
 2. Install dependencies:
 
 ```bash
@@ -67,7 +73,7 @@ pip install -r requirements-dev.txt
    - `GEMINI_API_KEY`
    - `OPENAI_API_KEY`
 
-Store all local and server environment variables only in `.secret/.env`.
+Store all local and server environment variables only in `platform/.secret/.env`.
 
 4. Optional local smoke-test mode:
 

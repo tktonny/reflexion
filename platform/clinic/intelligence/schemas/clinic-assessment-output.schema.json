@@ -1,0 +1,510 @@
+{
+  "$defs": {
+    "Finding": {
+      "properties": {
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        }
+      },
+      "required": [
+        "label",
+        "summary"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "ProviderMeta": {
+      "properties": {
+        "final_provider": {
+          "enum": [
+            "qwen_omni",
+            "gemini",
+            "fusion",
+            "audio_only"
+          ],
+          "title": "Final Provider",
+          "type": "string"
+        },
+        "model_name": {
+          "title": "Model Name",
+          "type": "string"
+        },
+        "request_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Id"
+        },
+        "latency_ms": {
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "raw_status": {
+          "title": "Raw Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "final_provider",
+        "model_name",
+        "latency_ms",
+        "raw_status"
+      ],
+      "title": "ProviderMeta",
+      "type": "object"
+    },
+    "ProviderTraceEntry": {
+      "properties": {
+        "provider": {
+          "enum": [
+            "qwen_omni",
+            "gemini",
+            "fusion",
+            "audio_only"
+          ],
+          "title": "Provider",
+          "type": "string"
+        },
+        "attempt_order": {
+          "title": "Attempt Order",
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "success",
+            "failed",
+            "skipped"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "failure_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Reason"
+        },
+        "latency_ms": {
+          "title": "Latency Ms",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "provider",
+        "attempt_order",
+        "status",
+        "latency_ms"
+      ],
+      "title": "ProviderTraceEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assessment_id": {
+      "title": "Assessment Id",
+      "type": "string"
+    },
+    "patient_id": {
+      "title": "Patient Id",
+      "type": "string"
+    },
+    "language": {
+      "title": "Language",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "visual_findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Visual Findings",
+      "type": "array"
+    },
+    "body_findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Body Findings",
+      "type": "array"
+    },
+    "voice_findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Voice Findings",
+      "type": "array"
+    },
+    "content_findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Content Findings",
+      "type": "array"
+    },
+    "speaker_structure": {
+      "anyOf": [
+        {
+          "enum": [
+            "single_speaker",
+            "multi_speaker",
+            "unclear"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Speaker Structure"
+    },
+    "target_patient_presence": {
+      "anyOf": [
+        {
+          "enum": [
+            "clear",
+            "probable",
+            "uncertain",
+            "absent"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Patient Presence"
+    },
+    "target_patient_basis": {
+      "anyOf": [
+        {
+          "enum": [
+            "visual_focus",
+            "speaking_time",
+            "interaction_role",
+            "externally_provided",
+            "unclear"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target Patient Basis"
+    },
+    "detected_languages": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Detected Languages",
+      "type": "array"
+    },
+    "language_confidence": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Language Confidence"
+    },
+    "risk_score": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Risk Score"
+    },
+    "risk_label": {
+      "anyOf": [
+        {
+          "enum": [
+            "HC",
+            "cognitive_risk"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Risk Label"
+    },
+    "risk_tier": {
+      "anyOf": [
+        {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Risk Tier"
+    },
+    "screening_classification": {
+      "anyOf": [
+        {
+          "enum": [
+            "healthy",
+            "needs_observation",
+            "dementia"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Screening Classification"
+    },
+    "screening_summary": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Screening Summary"
+    },
+    "evidence_for_risk": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence For Risk",
+      "type": "array"
+    },
+    "evidence_against_risk": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Against Risk",
+      "type": "array"
+    },
+    "alternative_explanations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Alternative Explanations",
+      "type": "array"
+    },
+    "risk_factor_findings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Risk Factor Findings",
+      "type": "array"
+    },
+    "subjective_assessment_findings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Subjective Assessment Findings",
+      "type": "array"
+    },
+    "emotional_assessment_findings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Emotional Assessment Findings",
+      "type": "array"
+    },
+    "risk_control_suggestions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Risk Control Suggestions",
+      "type": "array"
+    },
+    "visit_recommendation": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Visit Recommendation"
+    },
+    "future_risk_trend_summary": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Future Risk Trend Summary"
+    },
+    "reviewer_confidence": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reviewer Confidence"
+    },
+    "context_notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Context Notes",
+      "type": "array"
+    },
+    "quality_flags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Quality Flags",
+      "type": "array"
+    },
+    "session_usability": {
+      "enum": [
+        "usable",
+        "usable_with_caveats",
+        "unusable"
+      ],
+      "title": "Session Usability",
+      "type": "string"
+    },
+    "disclaimer": {
+      "default": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+      "title": "Disclaimer",
+      "type": "string"
+    },
+    "provider_meta": {
+      "$ref": "#/$defs/ProviderMeta"
+    },
+    "provider_trace": {
+      "items": {
+        "$ref": "#/$defs/ProviderTraceEntry"
+      },
+      "title": "Provider Trace",
+      "type": "array"
+    },
+    "fallback_message": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Fallback Message"
+    }
+  },
+  "required": [
+    "assessment_id",
+    "patient_id",
+    "language",
+    "created_at",
+    "visual_findings",
+    "body_findings",
+    "voice_findings",
+    "content_findings",
+    "detected_languages",
+    "evidence_for_risk",
+    "evidence_against_risk",
+    "alternative_explanations",
+    "risk_factor_findings",
+    "subjective_assessment_findings",
+    "emotional_assessment_findings",
+    "risk_control_suggestions",
+    "context_notes",
+    "quality_flags",
+    "session_usability",
+    "provider_meta",
+    "provider_trace"
+  ],
+  "title": "Clinic Assessment Output",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reflexion.local/clinic/intelligence/schemas/clinic-assessment-output.schema.json"
+}

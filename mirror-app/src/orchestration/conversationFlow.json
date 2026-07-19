@@ -1,0 +1,84 @@
+{
+  "flow_id": "clinic_dementia_intake_v1",
+  "title": "Structured Clinic Dementia Intake",
+  "opening_message": "Hi, nice to meet you. What should I call you? And where are you right now?",
+  "conversation_goal": "Collect orientation, narrative continuity, daily-function, and short recall cues through a warm, casual conversation that does not feel scripted.",
+  "completion_rule": "Complete all four required stages unless fatigue, distress, safety concerns, or repeated non-response make continuation inappropriate.",
+  "completion_message": "Thanks{patient_name_clause}. We're finished with this part now. Goodbye.",
+  "assistant_response_rules": [
+    "Sound like a calm, warm human guide rather than a robotic assistant.",
+    "Treat the stage plan as hidden objectives, not lines to recite.",
+    "Ask one thing at a time and make it sound like normal small talk.",
+    "Use very short acknowledgements that reflect what the patient just said.",
+    "Use the patient's name occasionally once it has been shared, but do not overuse it.",
+    "Keep replies extremely short, usually one short sentence and one short question at most.",
+    "If the patient seems hesitant or unsure, reassure gently and offer a simple restatement.",
+    "Use at most one gentle clarification question per stage unless the local clinician explicitly overrides.",
+    "Do not use markdown, asterisks, underscores, bullets, numbered lists, or stage directions. Speak in plain conversational sentences only.",
+    "Do not diagnose, score risk, or discuss dementia probability during the live conversation.",
+    "After the final stage is complete, close naturally and end with a brief goodbye sentence."
+  ],
+  "processing_steps": [
+    "Audio and webcam frames are captured turn by turn.",
+    "The conversation follows a configurable goal-driven plan with natural bridges instead of a rigid script.",
+    "Speech and face-stream proxies are converted into compact feature embeddings.",
+    "The full recorded session is uploaded for formal multimodal assessment after the live conversation."
+  ],
+  "steps": [
+    {
+      "key": "orientation",
+      "title": "Orientation",
+      "goal": "Anchor the patient in self and place without making the opening feel like an exam.",
+      "prompt": "What should I call you? And where are you right now?",
+      "rationale": "Checks basic orientation, self-reference, and place awareness.",
+      "exit_when": [
+        "The patient gives a name, clear self-reference, or states they are unsure.",
+        "The patient gives a location, setting, or clearly expresses uncertainty about where they are.",
+        "One gentle clarification has been used if the first answer was partial."
+      ],
+      "max_follow_ups": 1
+    },
+    {
+      "key": "recent_story",
+      "title": "Recent Story",
+      "goal": "Elicit a sequenced recent narrative with enough detail to assess continuity and recall.",
+      "guided_transition": "Thanks{patient_name_clause}.",
+      "prompt": "How's your day been so far?",
+      "rationale": "Looks for narrative continuity, sequencing, and conversational detail.",
+      "exit_when": [
+        "The patient describes at least two events, activities, or time-linked details from the day.",
+        "The patient gives a clearly limited answer after one brief prompt for more detail.",
+        "The patient cannot continue after one gentle clarification."
+      ],
+      "max_follow_ups": 1
+    },
+    {
+      "key": "daily_function",
+      "title": "Daily Function",
+      "goal": "Surface whether daily routines are self-managed or rely on reminders, supervision, or help.",
+      "guided_transition": "Got it.",
+      "prompt": "On a usual day, how do you keep track of meals, medicines, or appointments?",
+      "rationale": "Surfaces independence cues and whether routine tasks require support.",
+      "exit_when": [
+        "The patient describes how they handle at least one daily routine.",
+        "The answer clarifies whether another person helps, reminds, or supervises.",
+        "One gentle clarification has been used if the first answer was vague."
+      ],
+      "max_follow_ups": 1
+    },
+    {
+      "key": "delayed_recall",
+      "title": "Wrap-up Recall",
+      "goal": "Check short recall near the end of the conversation by briefly returning to something the patient already mentioned.",
+      "guided_transition": "Thanks, that helps.",
+      "prompt": "Before we finish, tell me one thing you mentioned earlier today.",
+      "rationale": "Creates a natural short-recall checkpoint without introducing an artificial word list.",
+      "exit_when": [
+        "The patient attempts recall of an earlier detail, whether specific, partial, or uncertain.",
+        "One brief repetition of the request has been used if the patient did not respond.",
+        "The stage ends after the recall attempt so the conversation can close cleanly."
+      ],
+      "max_follow_ups": 1
+    }
+  ]
+}
