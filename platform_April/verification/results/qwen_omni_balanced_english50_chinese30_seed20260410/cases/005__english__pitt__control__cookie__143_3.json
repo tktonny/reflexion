@@ -1,0 +1,129 @@
+{
+  "case_id": "english__pitt__control__cookie__143_3",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "Well, this little boy is up on this stool taking cookies, handing them down to his sister, and she's telling him to be quiet, and the stool is tipping over. The mother is washing or drying dishes. The water is running into the sink and running over down onto the floor. Ah, the wind must be blowing because the curtains look like they're. . . Kitchen door. . . The cabinet door is open. Mother's standing in water. That's it. Okay, good.",
+  "patient_only_transcript": "Well, this little boy is up on this stool taking cookies, handing them down to his sister, and she's telling him to be quiet, and the stool is tipping over. The mother is washing or drying dishes. The water is running into the sink and running over down onto the floor. Ah, the wind must be blowing because the curtains look like they're... Kitchen door... The cabinet door is open. Mother's standing in water. That's it. Okay, good.",
+  "speaker_turn_summary": [
+    "Patient describes scene: boy on stool, cookies, sister, stool tipping, mother washing dishes, sink overflowing, wind, curtains, cabinet door open, mother in water.",
+    "Examiner says: 'Okay, good.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides coherent, detailed scene description with multiple specific elements (stool, cookies, sister, mother, sink, wind, curtains, cabinet door).",
+    "Patient uses filler 'Ah' and pauses ('... Kitchen door...'), suggesting mild hesitation or search for words.",
+    "Patient’s description is largely self-contained and task-relevant, with minimal examiner prompting required.",
+    "No evidence of semantic vagueness, disorganization, or abandonment",
+    "patient completes the description with a closing phrase ('That's it.').",
+    "No signs of word-finding failure, circumlocution, or repetition beyond minor pauses and filler."
+  ],
+  "transcript_request_id": "chatcmpl-8881c3d4-33cc-9957-a5f9-8a11ec1b8a40",
+  "classification_request_id": "chatcmpl-676b38af-75ce-94d1-b048-a8ce7eea641f",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__143_3/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__143_3/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential description of a multi-element kitchen scene involving children, mother, and environmental details.",
+        "evidence": "Patient mentions boy on stool, cookies, sister, stool tipping, mother washing dishes, sink overflow, wind, curtains, cabinet door, mother standing in water — all relevant to the cookie-theft picture task.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Fluency",
+        "summary": "Patient retrieves and uses specific nouns and verbs accurately, with only minor pauses and fillers.",
+        "evidence": "Uses terms like 'stool', 'cookies', 'sink', 'cabinet door', 'mother', 'wind' — no semantic substitution or circumlocution observed.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes events logically, linking actions (boy taking cookies → stool tipping → mother in water) with minimal disruption.",
+        "evidence": "Describes cause-effect chain: boy’s action → stool tipping → water overflow → mother’s position. No disorganization or non-sequiturs.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, detailed, and task-relevant description of a complex kitchen scene. Minor pauses and fillers are present but do not indicate significant retrieval or organizational impairment. No persuasive signs of cognitive decline are observed in this single clip. Further observation or additional testing is recommended due to limited modality coverage and lack of visual confirmation.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent, detailed, and sequential description of scene elements",
+      "Accurate use of specific nouns and verbs",
+      "No semantic vagueness, repetition, or abandonment",
+      "Minimal examiner dependence"
+    ],
+    "alternative_explanations": [
+      "Minor pauses and fillers may reflect natural speech rhythm or slight hesitation, not cognitive impairment",
+      "Lack of visual data limits confidence in full assessment",
+      "Task may be challenging for some individuals without cognitive impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule follow-up session with visual component for full cognitive screening",
+      "Administer formal cognitive screening tools (e.g., MoCA, MMSE) if clinical concern persists",
+      "Consider repeating the picture-description task with structured prompts if needed"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single audio-only clip. No evidence of progressive decline is present in this clip.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient appears to be the primary respondent in a dialogue-style screening task.",
+      "Patient’s description is task-relevant and largely self-sufficient, with no signs of dementia-level impairment.",
+      "Classification as 'needs_observation' reflects modality limitations, not clinical risk."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, this little boy is up on this stool taking cookies, handing them down to his sister, and she's telling him to be quiet, and the stool is tipping over. The mother is washing or drying dishes. The water is running into the sink and running over down onto the floor. Ah, the wind must be blowing because the curtains look like they're... Kitchen door... The cabinet door is open. Mother's standing in water. That's it. Okay, good.",
+    "speaker_turn_summary": [
+      "Patient describes scene: boy on stool, cookies, sister, stool tipping, mother washing dishes, sink overflowing, wind, curtains, cabinet door open, mother in water.",
+      "Examiner says: 'Okay, good.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides coherent, detailed scene description with multiple specific elements (stool, cookies, sister, mother, sink, wind, curtains, cabinet door).",
+      "Patient uses filler 'Ah' and pauses ('... Kitchen door...'), suggesting mild hesitation or search for words.",
+      "Patient’s description is largely self-contained and task-relevant, with minimal examiner prompting required.",
+      "No evidence of semantic vagueness, disorganization, or abandonment",
+      "patient completes the description with a closing phrase ('That's it.').",
+      "No signs of word-finding failure, circumlocution, or repetition beyond minor pauses and filler."
+    ]
+  },
+  "latency_ms": 20369,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/143-3.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/143-3.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

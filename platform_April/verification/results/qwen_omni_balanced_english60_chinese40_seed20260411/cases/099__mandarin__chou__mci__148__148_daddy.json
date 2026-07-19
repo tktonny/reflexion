@@ -1,0 +1,127 @@
+{
+  "case_id": "mandarin__chou__mci__148__148_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.85,
+  "transcript": "爸爸在烫衣服，然后小朋友不懂要去拔那个插头，哥哥看到了想赶快救他，他冲过来，妈妈也吓了一跳，打打翻了那个桌上的那个什么瓶子，水都打出来了，把那衣服都弄弄湿的。这样要怎么讲故事？我不会讲故事，我只是可以讲出说他们在做什么事。",
+  "patient_only_transcript": "爸爸在烫衣服，然后小朋友不懂要去拔那个插头，哥哥看到了想赶快救他，他冲过来，妈妈也吓了一跳，打打翻了那个桌上的那个什么瓶子，水都打出来了，把那衣服都弄弄湿的。这样要怎么讲故事？我不会讲故事，我只是可以讲出说他们在做什么事。",
+  "speaker_turn_summary": [
+    "患者描述家庭场景：爸爸烫衣服、小朋友拔插头、哥哥冲过去、妈妈吓一跳、打翻瓶子、水洒了、衣服湿了。",
+    "患者自述：‘这样要怎么讲故事？我不会讲故事，我只是可以讲出说他们在做什么事。’"
+  ],
+  "patient_cue_summary": [
+    "患者能完整描述多个角色（爸爸、小朋友、哥哥、妈妈）和动作（烫衣服、拔插头、冲过来、打翻瓶子、水洒出、衣服湿）。",
+    "患者在描述中使用了口语化表达如‘那个什么瓶子’‘弄弄湿的’，但未出现命名崩溃或语义断裂。",
+    "患者主动承认‘不会讲故事’，但明确表示‘可以讲出他们在做什么事’，说明任务理解与执行能力基本完整。",
+    "无明显语义跳跃、重复重建失败、或严重逻辑断裂，符合普通口语化场景描述能力。",
+    "患者在结尾表达自我认知局限，但未表现出认知功能丧失或语言组织崩溃。"
+  ],
+  "transcript_request_id": "chatcmpl-c34641bc-225c-962b-ab98-d1c8b7cc2e51",
+  "classification_request_id": "chatcmpl-abaf2bc6-aaac-974a-81d1-7a672096ca32",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__148__148_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__148__148_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "场景描述完整性",
+        "summary": "患者能完整描述多个角色与动作，包括爸爸烫衣服、小朋友拔插头、哥哥冲过去、妈妈吓一跳、打翻瓶子、水洒出、衣服湿。",
+        "evidence": "患者在音频中清晰列出多个事件要素，无遗漏或语义断裂。",
+        "confidence": 0.75
+      },
+      {
+        "label": "自我认知表达",
+        "summary": "患者主动承认‘不会讲故事’，但明确表示‘可以讲出他们在做什么事’，表明任务理解与执行能力基本完整。",
+        "evidence": "患者在描述后补充说明其叙事能力局限，但未表现出认知功能丧失。",
+        "confidence": 0.75
+      },
+      {
+        "label": "语言风格与语义清晰度",
+        "summary": "语言为自然口语，使用‘那个什么瓶子’等模糊表达，但未导致语义崩溃或命名失败。",
+        "evidence": "患者语义完整，无语义跳跃或重复重建失败，符合健康口语表达。",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "患者能完整描述家庭场景中的多个角色与动作，虽自述‘不会讲故事’，但表达清晰、语义连贯、无命名或组织障碍，符合健康老年人口语描述能力。建议观察后续任务表现，不支持认知风险诊断。",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "患者能准确识别并描述多个角色与动作，无语义缺失或逻辑断裂。",
+      "患者使用口语化表达但未出现命名崩溃、语义模糊或重复重建失败。",
+      "患者主动承认叙事能力不足，但未表现出认知功能障碍的典型特征。"
+    ],
+    "alternative_explanations": [
+      "患者可能因任务要求（讲故事）而自我设限，非认知能力不足。",
+      "口语化表达和轻微模糊用词（如‘那个什么瓶子’）属正常语言习惯，非认知缺陷。",
+      "任务性质为场景描述而非叙事建构，患者完成核心任务要素，符合健康表现。"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "患者自述‘不会讲故事’，但能清晰描述事件流程与角色行为，表明任务理解与表达能力基本保留。"
+    ],
+    "emotional_assessment_findings": [
+      "患者语气平静，无明显焦虑、沮丧或情绪波动，表达中带有自我认知的谦逊而非情绪失控。"
+    ],
+    "risk_control_suggestions": [
+      "建议在后续评估中提供更结构化或提示性任务，避免纯叙事要求。",
+      "可增加重复描述或角色指认任务，以更全面评估语言与记忆功能。",
+      "观察患者在多任务或复杂场景描述中的表现，避免单一任务误判。"
+    ],
+    "visit_recommendation": "建议常规随访观察，不建议立即启动正式认知筛查或临床评估。",
+    "future_risk_trend_summary": "单次评估无法预测认知衰退趋势，建议纵向跟踪语言任务表现与生活功能变化。",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "视频不可用，仅依据音频内容评估，评估基于患者口语描述能力。",
+      "患者自述‘不会讲故事’但能完成场景描述，表明任务理解与表达能力保留。",
+      "语言风格为自然口语，非病理语言，不构成认知风险证据。"
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable",
+      "limited_speaking_time"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "爸爸在烫衣服，然后小朋友不懂要去拔那个插头，哥哥看到了想赶快救他，他冲过来，妈妈也吓了一跳，打打翻了那个桌上的那个什么瓶子，水都打出来了，把那衣服都弄弄湿的。这样要怎么讲故事？我不会讲故事，我只是可以讲出说他们在做什么事。",
+    "speaker_turn_summary": [
+      "患者描述家庭场景：爸爸烫衣服、小朋友拔插头、哥哥冲过去、妈妈吓一跳、打翻瓶子、水洒了、衣服湿了。",
+      "患者自述：‘这样要怎么讲故事？我不会讲故事，我只是可以讲出说他们在做什么事。’"
+    ],
+    "patient_cue_summary": [
+      "患者能完整描述多个角色（爸爸、小朋友、哥哥、妈妈）和动作（烫衣服、拔插头、冲过来、打翻瓶子、水洒出、衣服湿）。",
+      "患者在描述中使用了口语化表达如‘那个什么瓶子’‘弄弄湿的’，但未出现命名崩溃或语义断裂。",
+      "患者主动承认‘不会讲故事’，但明确表示‘可以讲出他们在做什么事’，说明任务理解与执行能力基本完整。",
+      "无明显语义跳跃、重复重建失败、或严重逻辑断裂，符合普通口语化场景描述能力。",
+      "患者在结尾表达自我认知局限，但未表现出认知功能丧失或语言组织崩溃。"
+    ]
+  },
+  "latency_ms": 22776,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/148/148_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/148/148_Daddy.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

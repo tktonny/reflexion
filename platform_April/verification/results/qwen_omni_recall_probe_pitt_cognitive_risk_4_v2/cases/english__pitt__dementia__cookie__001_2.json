@@ -1,0 +1,109 @@
+{
+  "case_id": "english__pitt__dementia__cookie__001_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "classification_request_id": "chatcmpl-1638094a-2d32-985d-9d9f-5d9de861a688",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "lexical_retrieval_difficulty",
+        "summary": "Patient exhibits circumlocution and filler terms while describing a picture task.",
+        "evidence": "Patient uses phrases like 'it's hard to tell anymore', 'I don't know about the this hickey here', and 'I can't think of the' while attempting to describe a scene involving a boy, cookie jar, stool, and sink.",
+        "confidence": 0.7
+      },
+      {
+        "label": "narrative_disorganization",
+        "summary": "Patient's description lacks coherent sequencing and causal linkage between scene elements.",
+        "evidence": "Patient describes the boy in the cookie jar, the stool falling, and the sink overflowing, but fails to connect these events logically or prioritize them in a structured narrative.",
+        "confidence": 0.65
+      },
+      {
+        "label": "examiner_dependence",
+        "summary": "Patient appears to rely on examiner prompts and provides minimal self-initiated detail.",
+        "evidence": "Patient responds to interviewer prompts with fragmented, incomplete, or vague statements rather than independently constructing a full description of the picture.",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates mild impairment-like features during a picture description task, including lexical retrieval difficulty, narrative disorganization, and examiner dependence. These are suggestive of early cognitive change but not conclusive. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Circumlocution and filler terms during task description",
+      "Lack of coherent narrative structure",
+      "Reliance on examiner prompts for task completion"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies some scene elements (boy, cookie jar, sink, stool)",
+      "No overt confusion or disorientation in task context",
+      "Affect remains neutral and engaged"
+    ],
+    "alternative_explanations": [
+      "Task difficulty or unfamiliarity with picture description format",
+      "Temporary cognitive load or distraction during recording",
+      "Non-clinical speech hesitancy or articulation style"
+    ],
+    "risk_factor_findings": [
+      "reported difficulty with scene description task",
+      "lexical retrieval hesitation",
+      "narrative disorganization"
+    ],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty about scene elements (e.g., 'hard to tell', 'can't think of the')",
+      "Patient appears to require examiner prompting to continue description"
+    ],
+    "emotional_assessment_findings": [
+      "neutral affect with mild hesitation",
+      "no signs of distress, frustration, or apathy"
+    ],
+    "risk_control_suggestions": [
+      "Repeat picture description task with structured prompts",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Obtain collateral history from caregiver or family member"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and caregiver input.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up assessments recommended to track progression.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component is unavailable; assessment based solely on audio from dialogue-style screening task.",
+      "Patient is likely the main respondent in a structured picture description task.",
+      "Findings are conservative and do not constitute diagnosis."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "video_too_short",
+      "limited_visual_sampling"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 24372,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/001-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/001-2.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "case_id": "english__pitt__control__cookie__132_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.6,
+  "transcript": "Here's the picture. Washing dishes or wiping dishes. The water's running over the sink. Here's stealing the cookies falling over on the stool. The wind is blowing outside the window. The girl is saying be quiet and looking for another cookie like Eve encouraging her to steal. She's standing in a puddle. She's thinking deeply about something. But that's my own interpretation.",
+  "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+  "speaker_turn_summary": [
+    "Examiner: 'Here's the picture.'",
+    "Patient: 'Washing dishes or wiping dishes. The water's running over the sink. Here's stealing the cookies falling over on the stool. The wind is blowing outside the window. The girl is saying be quiet and looking for another cookie like Eve encouraging her to steal. She's standing in a puddle. She's thinking deeply about something. But that's my own interpretation.'",
+    "Examiner: (silent or non-identifiable)"
+  ],
+  "patient_cue_summary": [
+    "Patient provides a detailed but slightly disorganized description of the picture.",
+    "Patient includes multiple scene elements (cookies, stool, mother, water, wind, girl, puddle, thinking).",
+    "Patient ends with self-qualification: 'But that's my own interpretation.' — indicating possible uncertainty or examiner dependence.",
+    "Speech is intelligible but contains some filler-like phrasing and narrative drift, not fully structured or task-focused.",
+    "No clear word-finding pauses, restarts, or semantic breakdowns detected in audio, but transcript reconstruction is noisy and may not reflect true patient speech."
+  ],
+  "transcript_request_id": "chatcmpl-c1e6538e-5705-9c4b-ade6-0a22dfc37076",
+  "classification_request_id": "chatcmpl-5d95eec6-d8f2-90d7-9011-96aa11c2f7fb",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__132_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__132_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a moderately detailed but slightly disorganized description of a picture involving cookies, a falling stool, and a mother at the sink. Speech is intelligible but includes self-qualification and narrative drift. No clear impairment-like cues are present, but transcript quality and audio noise limit confidence. Further observation or formal screening is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient identified multiple core scene elements (cookies, stool, mother, water, wind, girl, puddle).",
+      "Speech is coherent and task-relevant despite some narrative looseness.",
+      "No word-finding pauses, restarts, or semantic breakdowns detected in audio.",
+      "Patient did not appear confused, apathetic, or emotionally flat."
+    ],
+    "alternative_explanations": [
+      "Transcript noise and audio quality may have distorted patient speech.",
+      "Narrative drift and self-qualification may reflect natural conversational style rather than cognitive impairment.",
+      "Patient may have been prompted or scaffolded by examiner, leading to slightly extended but not impaired response."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the picture description task with clearer audio or visual support.",
+      "Use structured cueing or multiple-choice prompts to reduce ambiguity.",
+      "Consider follow-up screening with standardized cognitive tools if symptoms persist or escalate."
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation or multi-session assessment is needed.",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio with transcript reconstruction.",
+      "Patient speech is intelligible but contains narrative drift and self-qualification, not clear impairment.",
+      "Task context: cookie-theft picture description",
+      "patient described multiple elements but did not fully sustain task focus."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+    "speaker_turn_summary": [
+      "Examiner: 'Here's the picture.'",
+      "Patient: 'Washing dishes or wiping dishes. The water's running over the sink. Here's stealing the cookies falling over on the stool. The wind is blowing outside the window. The girl is saying be quiet and looking for another cookie like Eve encouraging her to steal. She's standing in a puddle. She's thinking deeply about something. But that's my own interpretation.'",
+      "Examiner: (silent or non-identifiable)"
+    ],
+    "patient_cue_summary": [
+      "Patient provides a detailed but slightly disorganized description of the picture.",
+      "Patient includes multiple scene elements (cookies, stool, mother, water, wind, girl, puddle, thinking).",
+      "Patient ends with self-qualification: 'But that's my own interpretation.' — indicating possible uncertainty or examiner dependence.",
+      "Speech is intelligible but contains some filler-like phrasing and narrative drift, not fully structured or task-focused.",
+      "No clear word-finding pauses, restarts, or semantic breakdowns detected in audio, but transcript reconstruction is noisy and may not reflect true patient speech."
+    ]
+  },
+  "latency_ms": 16921,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/132-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/132-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

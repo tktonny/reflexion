@@ -1,0 +1,118 @@
+{
+  "case_id": "mandarin__chou__hc__002__002_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.9,
+  "transcript": "有有两个小美眉，她们在打羽毛球，打羽毛球以后很很高兴的打羽毛球。哎，那个突然靠右边这个美眉，那个有只小狗去也跟她玩，就咬了她的衣服。嗯，她自己就吓了一跳，那对对面美眉打球过来以后，她就也没有也没有接到。嗯，那相对的对面那个那个美眉看到小狗咬她，她也觉得很很好笑。哦，原来这只小狗是有一个小男生牵着它的，嗯，有个牵绳，它不小心就跑到那个球场里面去去咬咬到那个小美眉。那里另外有个阿公阿嬷，他们在那个在那个应该是在在野外，哎，在那个在在在户外啦，一个凉亭，坐在那边喝茶，喝茶在下象棋。嗯，他们看到他们在打球的小狗咬她，她看到这一幕，他们也觉得很好笑啊。嗯。那另外还有两个小朋友，哎，我不敢走，可能是一个男生一个女生吧，在荡秋千，在一个树的旁边在荡秋千，还有一个溜滑梯，溜滑梯最后这这张哦，这张是一个一张椅一张长的靠背椅啦，木头的公园的椅子啦。嗯，这个图案里面有两棵树，还有一点花，嗯，花草。",
+  "patient_only_transcript": "有两个小美眉在打羽毛球，打完后很高兴。突然右边的美眉被小狗咬了衣服，她吓了一跳，没接到对面球。对面美眉觉得好笑。小狗是小男生牵着的，跑进球场。阿公阿嬷在凉亭喝茶下象棋，也觉得好笑。还有两个小朋友在荡秋千和滑梯，旁边有长椅，上面有树和花。",
+  "speaker_turn_summary": [
+    "患者描述公园场景，包括打羽毛球的美眉、小狗闯入、阿公阿嬷观棋、儿童玩秋千滑梯、长椅图案等。",
+    "患者语句连贯，虽有语气词如‘嗯’‘啊’‘哦’，但未出现明显语义断裂或命名失败。",
+    "患者未明显依赖 examiner 提示，能独立组织多线场景描述，虽非完美但信息完整。"
+  ],
+  "patient_cue_summary": [
+    "患者能识别并描述多个角色（美眉、小狗、小男生、阿公阿嬷、儿童）和动作（打球、咬衣、荡秋千、滑梯、下棋）。",
+    "患者使用正常口语化结构，如‘突然’‘觉得很好笑’‘应该是在户外’，非典型认知障碍语言模式。",
+    "虽有重复‘嗯’‘啊’‘哦’等语气词，但未影响核心信息传递，未出现命名困难、语义坍塌或严重断句。",
+    "患者未表现出明显认知障碍特征如语义模糊、逻辑断裂、自我纠正失败、任务放弃或无法完成场景描述。"
+  ],
+  "transcript_request_id": "chatcmpl-4ebcd83b-f557-9ff7-9418-fb9435e85e68",
+  "classification_request_id": "chatcmpl-ad9ca404-8b43-9c56-b12d-b7e32dbb4c18",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__002__002_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__002__002_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "患者能连贯描述公园内多组人物与活动，包括打球、小狗闯入、老人观棋、儿童游乐等，信息完整。",
+        "evidence": "患者依次描述了羽毛球比赛、小狗咬衣事件、对面美眉反应、小狗主人、凉亭老人、儿童秋千滑梯、长椅图案等，未遗漏核心元素。",
+        "confidence": 0.75
+      },
+      {
+        "label": "lexical_retrieval",
+        "summary": "患者使用具体名词（如‘美眉’‘小狗’‘凉亭’‘秋千’‘滑梯’‘长椅’‘树’‘花’）和动词（如‘咬’‘荡’‘滑’‘喝茶’‘下棋’），未出现命名困难或语义模糊。",
+        "evidence": "所有关键场景元素均被准确命名，无泛化或替代词（如‘那个东西’‘某个人’）。",
+        "confidence": 0.75
+      },
+      {
+        "label": "discourse_structure",
+        "summary": "患者采用线性叙事结构，按空间或事件顺序组织描述，虽有语气词但未影响逻辑连贯性。",
+        "evidence": "描述从打球开始，过渡到小狗事件，再扩展至凉亭老人和儿童游乐区，结构清晰，无明显跳跃或断裂。",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "externally_provided",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "患者能清晰、连贯、完整地描述公园内多组人物与活动，使用具体名词和动词，结构清晰，情绪表达自然，无认知障碍典型语言或行为特征。符合健康对照标准。",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "患者描述多个场景元素且无遗漏，信息密度高。",
+      "语言结构符合正常口语表达，无命名困难、语义模糊或逻辑断裂。",
+      "情绪反应与事件内容匹配，无异常情感淡漠或过度反应。"
+    ],
+    "alternative_explanations": [
+      "患者使用口语化表达和语气词属正常语言习惯，非认知障碍表现。",
+      "场景描述任务本身允许一定程度的非正式语言，患者完成度高，未出现任务失败或依赖提示。"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "患者语调自然，描述事件时带有轻松、好奇或略带惊讶的情绪，未表现出焦虑、沮丧或情感淡漠。",
+      "患者在描述小狗咬衣事件时使用‘吓了一跳’，在描述他人反应时使用‘觉得很好笑’，情绪表达符合情境，无异常情绪反应。"
+    ],
+    "risk_control_suggestions": [
+      "无需进一步临床评估，可继续常规随访。",
+      "建议保持当前活动参与度，鼓励社交与环境探索以维持认知功能。"
+    ],
+    "visit_recommendation": "routine_follow_up",
+    "future_risk_trend_summary": "单次评估无法预测长期认知趋势，建议定期进行认知筛查以监测变化。",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "视频不可用，仅依据音频内容评估，评估基于患者独立完成场景描述任务。",
+      "患者语言虽含口语化结构，但未影响信息传递，符合健康对照语言模式。",
+      "未发现任何认知障碍相关语言或行为信号，评估结果保守支持HC。"
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "有两个小美眉在打羽毛球，打完后很高兴。突然右边的美眉被小狗咬了衣服，她吓了一跳，没接到对面球。对面美眉觉得好笑。小狗是小男生牵着的，跑进球场。阿公阿嬷在凉亭喝茶下象棋，也觉得好笑。还有两个小朋友在荡秋千和滑梯，旁边有长椅，上面有树和花。",
+    "speaker_turn_summary": [
+      "患者描述公园场景，包括打羽毛球的美眉、小狗闯入、阿公阿嬷观棋、儿童玩秋千滑梯、长椅图案等。",
+      "患者语句连贯，虽有语气词如‘嗯’‘啊’‘哦’，但未出现明显语义断裂或命名失败。",
+      "患者未明显依赖 examiner 提示，能独立组织多线场景描述，虽非完美但信息完整。"
+    ],
+    "patient_cue_summary": [
+      "患者能识别并描述多个角色（美眉、小狗、小男生、阿公阿嬷、儿童）和动作（打球、咬衣、荡秋千、滑梯、下棋）。",
+      "患者使用正常口语化结构，如‘突然’‘觉得很好笑’‘应该是在户外’，非典型认知障碍语言模式。",
+      "虽有重复‘嗯’‘啊’‘哦’等语气词，但未影响核心信息传递，未出现命名困难、语义坍塌或严重断句。",
+      "患者未表现出明显认知障碍特征如语义模糊、逻辑断裂、自我纠正失败、任务放弃或无法完成场景描述。"
+    ]
+  },
+  "latency_ms": 22350,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/002/002_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/002/002_park.mp3?f=save",
+    "expected_group_audio_count": 120
+  }
+}

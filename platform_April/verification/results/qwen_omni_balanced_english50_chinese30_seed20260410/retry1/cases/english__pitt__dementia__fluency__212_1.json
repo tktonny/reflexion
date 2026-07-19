@@ -1,0 +1,136 @@
+{
+  "case_id": "english__pitt__dementia__fluency__212_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.85,
+  "transcript": "A trellis. Trellis, okay. And you can begin now. Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes. Okay, good. I'm going to change directions, but you can begin now. Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound. Okay, good. Very good.",
+  "patient_only_transcript": "Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes. Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound.",
+  "speaker_turn_summary": [
+    "Examiner: 'A trellis. Trellis, okay. And you can begin now.'",
+    "Patient: 'Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes.'",
+    "Examiner: 'Okay, good. I'm going to change directions, but you can begin now.'",
+    "Patient: 'Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound.'",
+    "Examiner: 'Okay, good. Very good.'"
+  ],
+  "patient_cue_summary": [
+    "Patient recites lists of items in two verbal fluency tasks without hesitation or pause.",
+    "Patient produces category-specific words (food, then 'S' words) with consistent lexical retrieval.",
+    "Patient speech is fluent, coherent, and fully task-relevant with no evidence of word-finding pauses, circumlocution, or disorganization.",
+    "Patient does not require prompting or correction",
+    "responds independently and completely to both task instructions.",
+    "No signs of semantic vagueness, repetition of core items beyond task design, or examiner dependence in content delivery."
+  ],
+  "transcript_request_id": "chatcmpl-576424ee-e9f0-9940-b1f4-ddd4a1608760",
+  "classification_request_id": "chatcmpl-eab693f5-bd81-9ff8-8900-938c9aac2b25",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__212_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__212_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Verbal Fluency Performance",
+        "summary": "Patient completed two category fluency tasks (food items, 'S' words) with full, accurate, and fluent output.",
+        "evidence": "Patient recited 'Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes' and 'Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound' without hesitation or correction.",
+        "confidence": null
+      },
+      {
+        "label": "Task Completion and Independence",
+        "summary": "Patient initiated and completed both tasks independently without examiner assistance or prompting.",
+        "evidence": "Patient responded immediately to examiner instructions and produced full lists without pauses, restarts, or need for clarification.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Coherence",
+        "summary": "Patient demonstrated full lexical retrieval and semantic coherence within each category.",
+        "evidence": "All items were correctly named and relevant to the category; no semantic confusion or repetition beyond task design.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient demonstrates fluent, coherent, and complete verbal fluency performance in two category-based tasks (food items and 'S' words). No observable signs of word-finding difficulty, disorganization, or examiner dependence. Speech is clear, task-relevant, and fully self-initiated. No impairment-like cues detected in the audio.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient completed both fluency tasks without pauses or restarts.",
+      "Patient produced full, accurate lists of category-specific items.",
+      "Patient did not exhibit circumlocution, vagueness, or semantic confusion.",
+      "Patient did not require prompting or correction from examiner.",
+      "Speech was fluent, organized, and fully task-compliant."
+    ],
+    "alternative_explanations": [
+      "Patient may be highly practiced or familiar with verbal fluency tasks.",
+      "Audio quality limitations may mask subtle cues, but no such cues are audible in the provided segment.",
+      "Task design may not be sensitive enough to detect early or mild cognitive changes."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention required.",
+      "Routine follow-up may be appropriate if other clinical concerns arise.",
+      "Consider repeating the task in a different modality or context if longitudinal monitoring is needed."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Limited predictive value from a single audio-only fluency task. Longitudinal assessment is recommended for any future concerns.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Examiner prompts are neutral context",
+      "patient performance is self-contained and complete.",
+      "No signs of cognitive impairment detected in this clip despite quality limitations."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes. Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound.",
+    "speaker_turn_summary": [
+      "Examiner: 'A trellis. Trellis, okay. And you can begin now.'",
+      "Patient: 'Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes.'",
+      "Examiner: 'Okay, good. I'm going to change directions, but you can begin now.'",
+      "Patient: 'Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound.'",
+      "Examiner: 'Okay, good. Very good.'"
+    ],
+    "patient_cue_summary": [
+      "Patient recites lists of items in two verbal fluency tasks without hesitation or pause.",
+      "Patient produces category-specific words (food, then 'S' words) with consistent lexical retrieval.",
+      "Patient speech is fluent, coherent, and fully task-relevant with no evidence of word-finding pauses, circumlocution, or disorganization.",
+      "Patient does not require prompting or correction",
+      "responds independently and completely to both task instructions.",
+      "No signs of semantic vagueness, repetition of core items beyond task design, or examiner dependence in content delivery."
+    ]
+  },
+  "latency_ms": 24926,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/212-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/212-1.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

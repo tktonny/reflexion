@@ -1,0 +1,131 @@
+{
+  "case_id": "english__pitt__dementia__cookie__235_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "And there's the picture. All the action that you can see. Hmm. The little boy climbing up against the cookie jar. And his little sister reaching for some. And the little boy standing on the ladder. And the big sister washing the dishes. At the sink. Big sister washing the dishes and she's got dishes sitting on the sink. I think she's running water. Can you tell me anything else that's going on over there? And like I said, the little sister is reaching. Johnny, he is up on the ladder getting some cookies and little sister reaching up after some. Anything. He's passing them down to her. Okay, anything else? And the ladder, the ladder about to turn over. Okay. Anything else going on over here? The cups, maybe she done washed them, but she got them sitting on the sink. Uh huh. And maybe running water on the sink and got a curtain pulled that she might get some light in there. Since the dishes are stacked up, they might be on the sink. Anything else? That'll be about all right. Okay, good.",
+  "patient_only_transcript": "The little boy climbing up against the cookie jar. And his little sister reaching for some. And the little boy standing on the ladder. And the big sister washing the dishes. At the sink. Big sister washing the dishes and she's got dishes sitting on the sink. I think she's running water. Johnny, he is up on the ladder getting some cookies and little sister reaching up after some. He's passing them down to her. The ladder, the ladder about to turn over. The cups, maybe she done washed them, but she got them sitting on the sink. Uh huh. And maybe running water on the sink and got a curtain pulled that she might get some light in there. Since the dishes are stacked up, they might be on the sink. That'll be about all right.",
+  "speaker_turn_summary": [
+    "Examiner: 'Can you tell me anything else that's going on over there?'",
+    "Patient: Describes boy climbing, sister reaching, ladder, sister washing dishes, water running, cups on sink, curtain for light, dishes stacked.",
+    "Examiner: 'Anything else?'",
+    "Patient: 'That'll be about all right.'"
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies multiple actors and actions in the scene.",
+    "Patient uses some filler words and pauses but remains largely coherent.",
+    "Patient provides a complete but brief summary with minor elaborations.",
+    "Patient ends with 'That'll be about all right' — suggests task completion, not breakdown.",
+    "No clear word-finding failure, semantic vagueness, or disorganization detected.",
+    "No evidence of examiner dependence beyond standard prompting."
+  ],
+  "transcript_request_id": "chatcmpl-5ed51805-0205-9653-9c5e-fdcee8d4f0b4",
+  "classification_request_id": "chatcmpl-ee215945-b4c1-9ef4-911d-99362beaf5dc",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__235_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__235_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identifies key actors (boy, sister, big sister), actions (climbing, reaching, washing dishes), and objects (cookie jar, ladder, sink, dishes, curtain).",
+        "evidence": "Patient states: 'The little boy climbing up against the cookie jar... little sister reaching for some... big sister washing the dishes... dishes sitting on the sink... ladder about to turn over... curtain pulled... dishes stacked.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Fluency",
+        "summary": "Patient completes the task with minimal prompting, ending with 'That'll be about all right.'",
+        "evidence": "Patient responds to examiner prompts without needing repeated scaffolding or correction.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Speech Clarity and Structure",
+        "summary": "Speech is mostly fluent with minor hesitations and filler words, but no breakdowns in syntax or semantics.",
+        "evidence": "Patient uses phrases like 'I think she's running water' and 'That'll be about all right' — coherent and contextually appropriate.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, task-relevant description of the pictured scene with accurate identification of key actors and actions. Speech is intelligible with minor hesitations and filler use, but no clear impairment-like cues are present. Task completion is achieved without examiner rescue or breakdown. Further observation or additional testing may be warranted due to limited visual context and audio quality.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Coherent narrative structure despite brevity",
+      "No word-finding failure or semantic vagueness",
+      "Task completion without examiner scaffolding beyond prompts",
+      "No signs of disorganization, tangentiality, or confusion"
+    ],
+    "alternative_explanations": [
+      "Limited visual context may reduce confidence in full cognitive assessment",
+      "Audio quality and lack of visual cues may mask subtle impairment",
+      "Patient may be fatigued or reserved, not cognitively impaired"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with additional picture description or memory tasks",
+      "Consider formal cognitive screening if clinical concern persists",
+      "Re-evaluate with full visual and behavioral observation if possible"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if clinical concern remains",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline observed.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-relevant despite minor pauses and fillers.",
+      "No convergence of impairment-like cues detected in patient-only content."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The little boy climbing up against the cookie jar. And his little sister reaching for some. And the little boy standing on the ladder. And the big sister washing the dishes. At the sink. Big sister washing the dishes and she's got dishes sitting on the sink. I think she's running water. Johnny, he is up on the ladder getting some cookies and little sister reaching up after some. He's passing them down to her. The ladder, the ladder about to turn over. The cups, maybe she done washed them, but she got them sitting on the sink. Uh huh. And maybe running water on the sink and got a curtain pulled that she might get some light in there. Since the dishes are stacked up, they might be on the sink. That'll be about all right.",
+    "speaker_turn_summary": [
+      "Examiner: 'Can you tell me anything else that's going on over there?'",
+      "Patient: Describes boy climbing, sister reaching, ladder, sister washing dishes, water running, cups on sink, curtain for light, dishes stacked.",
+      "Examiner: 'Anything else?'",
+      "Patient: 'That'll be about all right.'"
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies multiple actors and actions in the scene.",
+      "Patient uses some filler words and pauses but remains largely coherent.",
+      "Patient provides a complete but brief summary with minor elaborations.",
+      "Patient ends with 'That'll be about all right' — suggests task completion, not breakdown.",
+      "No clear word-finding failure, semantic vagueness, or disorganization detected.",
+      "No evidence of examiner dependence beyond standard prompting."
+    ]
+  },
+  "latency_ms": 20994,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/235-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/235-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

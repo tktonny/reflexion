@@ -1,0 +1,158 @@
+{
+  "case_id": "english__pitt__dementia__fluency__563_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.75,
+  "transcript": "For now, I'm going to give you one minute and I want you to tell me as many animals as you can think of in a minute's time. I want you to name as many animals. What kind? Any kind of animals except for fish and birds. No fish, no birds. Dogs, cats, rats. Ready? Go ahead. All right. Dogs, cats, squirrels. Holy cats, I know more than that. Gee, my mind's a blank. Are you timing me too? For a minute. Oh my God. Give you a minute. Huh? Why do I. . . Name all the animals as you can think of. Name all the animals you can think of. Wild animals too. Uh huh, sure. I can't think of any now. And you're timing me too. I gave you a minute. Honey, is that necessary? Nobody's going to know if I don't, if I cheat. Hey. Just say as many animals as you can think of. Yeah, but they got to be the animals that I've seen and played with. Just any name of any animal. Rabbit. Right. Squirrel. Uh huh. All right, let's try this one. In a minute's time, I want you to name as many words as you can think of beginning with the letter F. The letter F. Okay, all the words that start with F. Family, fight, famous, future, fine, forget, final, finish, fence, flower, father. Good, that's a minute. Boy, I'm famous. Good luck.",
+  "patient_only_transcript": "Dogs, cats, squirrels. Holy cats, I know more than that. Gee, my mind's a blank. I can't think of any now. Rabbit. Squirrel. Family, fight, famous, future, fine, forget, final, finish, fence, flower, father.",
+  "speaker_turn_summary": [
+    "Examiner: Give one-minute animal fluency task, exclude fish/birds.",
+    "Patient: Dogs, cats, squirrels. Says mind is blank.",
+    "Examiner: Ask if timing is necessary.",
+    "Patient: Says can't think of any. Mentions animals seen/played with.",
+    "Examiner: Switches to F-word fluency task.",
+    "Patient: Lists F-words: family, fight, famous, etc."
+  ],
+  "patient_cue_summary": [
+    "Low fluency productivity in animal task: only 3-4 items before blanking.",
+    "Explicit retrieval failure: 'my mind's a blank', 'can't think of any'.",
+    "Task drift: mentions 'animals I've seen and played with' as constraint.",
+    "In F-word task: moderate productivity (11 items), but includes filler/weak terms (fine, forget, final).",
+    "No evidence of semantic elaboration, coherence, or sustained fluency in either task.",
+    "No signs of intentional non-compliance or emotional resistance beyond mild frustration."
+  ],
+  "transcript_request_id": "chatcmpl-c121367e-dd6b-9c84-a85c-b068a2a7593e",
+  "classification_request_id": "chatcmpl-00809a08-8515-9679-9a98-eedad658205b",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__563_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__563_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "speech_fluency",
+        "summary": "Low item productivity in animal fluency task; pauses and self-admissions of blank mind.",
+        "evidence": "Patient lists only 3-4 animals before stating 'my mind's a blank' and 'can't think of any'.",
+        "confidence": 0.85
+      },
+      {
+        "label": "lexical_retrieval",
+        "summary": "Partial success in F-word fluency task, but includes generic/weak terms and no elaboration.",
+        "evidence": "Patient produces 11 F-words including 'fine', 'forget', 'final', 'father' — some semantically weak or non-specific.",
+        "confidence": 0.8
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "task_adherence",
+        "summary": "Patient attempts both tasks but fails to sustain fluency or generate sufficient items.",
+        "evidence": "Animal task: stops after 3-4 items and admits mental blank. F-word task: completes list but with low semantic richness.",
+        "confidence": 0.85
+      },
+      {
+        "label": "retrieval_failure",
+        "summary": "Explicit self-report of inability to retrieve items, consistent with cognitive fluency impairment.",
+        "evidence": "Patient says: 'I can't think of any now', 'my mind's a blank', 'I know more than that' — indicating awareness of deficit.",
+        "confidence": 0.9
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates low fluency productivity and explicit self-reported retrieval difficulty in two structured verbal fluency tasks. While some items were generated, the failure to sustain output and self-admission of mental blankness suggest possible cognitive impairment. Further clinical evaluation is warranted.",
+    "evidence_for_risk": [
+      "Low item count in animal fluency task",
+      "Explicit retrieval failure: 'my mind's a blank'",
+      "Task abandonment and self-doubt",
+      "Moderate but weak F-word output with generic terms"
+    ],
+    "evidence_against_risk": [
+      "Patient completed both tasks",
+      "No overt disengagement or emotional dysregulation",
+      "No evidence of intentional non-compliance or language barrier"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive fatigue or stress during testing",
+      "Mild anxiety affecting retrieval under time pressure",
+      "Normal age-related slowing without dementia-level impairment"
+    ],
+    "risk_factor_findings": [
+      "Self-reported retrieval difficulty: 'my mind's a blank'",
+      "Task failure to sustain fluency: blanking after initial items"
+    ],
+    "subjective_assessment_findings": [
+      "Patient reports inability to recall animals despite prompting",
+      "Patient expresses mild frustration: 'Are you timing me too?'"
+    ],
+    "emotional_assessment_findings": [
+      "Mild frustration and self-doubt expressed during task",
+      "No signs of apathy, disengagement, or emotional flattening",
+      "No overt anxiety or agitation, but task pressure is perceptible"
+    ],
+    "risk_control_suggestions": [
+      "Repeat fluency tasks in a less pressured setting",
+      "Include memory and executive function screening tools",
+      "Observe for consistency across multiple sessions"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening battery",
+    "future_risk_trend_summary": "Single clip insufficient to predict longitudinal trajectory; longitudinal follow-up recommended for trend assessment",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Audio quality is poor",
+      "transcript is noisy and not fully reliable.",
+      "Patient is clearly the target subject, but examiner speech dominates task structure.",
+      "No visual cues available",
+      "assessment based solely on verbal fluency performance and self-report."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "poor_audio",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Dogs, cats, squirrels. Holy cats, I know more than that. Gee, my mind's a blank. I can't think of any now. Rabbit. Squirrel. Family, fight, famous, future, fine, forget, final, finish, fence, flower, father.",
+    "speaker_turn_summary": [
+      "Examiner: Give one-minute animal fluency task, exclude fish/birds.",
+      "Patient: Dogs, cats, squirrels. Says mind is blank.",
+      "Examiner: Ask if timing is necessary.",
+      "Patient: Says can't think of any. Mentions animals seen/played with.",
+      "Examiner: Switches to F-word fluency task.",
+      "Patient: Lists F-words: family, fight, famous, etc."
+    ],
+    "patient_cue_summary": [
+      "Low fluency productivity in animal task: only 3-4 items before blanking.",
+      "Explicit retrieval failure: 'my mind's a blank', 'can't think of any'.",
+      "Task drift: mentions 'animals I've seen and played with' as constraint.",
+      "In F-word task: moderate productivity (11 items), but includes filler/weak terms (fine, forget, final).",
+      "No evidence of semantic elaboration, coherence, or sustained fluency in either task.",
+      "No signs of intentional non-compliance or emotional resistance beyond mild frustration."
+    ]
+  },
+  "latency_ms": 20374,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/563-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/563-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

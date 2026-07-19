@@ -1,0 +1,130 @@
+{
+  "case_id": "english__pitt__control__cookie__295_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "All of the action. Water spilling out of the sink, the mother's drying dishes, the boy is on the stepstool reaching cookie jar, he's about to fall over, his sister is reaching up, she wants a cookie. And I think that's about all that's going on. Her feet are getting wet, that's for sure. That's good. Okay.",
+  "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing. His sister is reaching up, she wants a cookie. Her feet are getting wet, that's for sure.",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes scene with mostly correct elements but no hesitation or disorganization",
+    "Examiner: acknowledges or prompts (implied)"
+  ],
+  "patient_cue_summary": [
+    "Coherent, sequential description of multiple scene elements",
+    "Correct naming of key objects and actions: cookie jar, stool, mother, sink, sister",
+    "No evidence of word-finding pauses, repetition, or abandonment",
+    "No examiner dependence in content delivery",
+    "Low-level filler or hesitation not present",
+    "speech is complete and connected"
+  ],
+  "transcript_request_id": "chatcmpl-16a28b87-e1df-9fbe-a3eb-2d4c231eea53",
+  "classification_request_id": "chatcmpl-447cd8d2-8b88-90a5-80bf-51a0e6bb953a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__295_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__295_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a complete, sequential description of multiple elements in the scene.",
+        "evidence": "Patient describes boy reaching for cookie jar, stool tipping, mother washing dishes, sink overflowing, sister reaching up, and feet getting wet — all in logical order.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval",
+        "summary": "Patient accurately names key objects and actions without hesitation or circumlocution.",
+        "evidence": "Uses specific terms: 'cookie jar', 'stool', 'mother', 'sink', 'sister', 'wet' — all contextually appropriate and correctly applied.",
+        "confidence": null
+      },
+      {
+        "label": "Task Relevance and Completeness",
+        "summary": "Patient fully addresses the picture-description task without needing prompting or correction.",
+        "evidence": "No examiner prompts are needed to elicit the full description; patient self-sustains the narrative.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "The patient provides a coherent, complete, and accurate description of a multi-element scene involving a child reaching for cookies, a tipping stool, a mother washing dishes, and a flooded sink. No signs of retrieval difficulty, disorganization, or examiner dependence are evident in the speech. The description is informative and logically sequenced, consistent with healthy cognitive function for this screening task.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent narrative structure",
+      "Accurate naming of multiple scene elements",
+      "No hesitation, repetition, or abandonment",
+      "No examiner dependence in content delivery"
+    ],
+    "alternative_explanations": [
+      "The patient may be describing a familiar or well-practiced scene",
+      "The task may be easier for the patient due to prior exposure or familiarity",
+      "The audio quality may mask subtle cues, but the available speech is clear and complete"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Continue routine cognitive screening as part of standard care",
+      "No immediate clinical intervention required based on this clip"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline is present in this assessment.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio content.",
+      "Patient speech is intelligible and task-relevant",
+      "no impairment-like cues detected.",
+      "Examiner role is inferred but not directly observed",
+      "patient response stands independently."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing. His sister is reaching up, she wants a cookie. Her feet are getting wet, that's for sure.",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes scene with mostly correct elements but no hesitation or disorganization",
+      "Examiner: acknowledges or prompts (implied)"
+    ],
+    "patient_cue_summary": [
+      "Coherent, sequential description of multiple scene elements",
+      "Correct naming of key objects and actions: cookie jar, stool, mother, sink, sister",
+      "No evidence of word-finding pauses, repetition, or abandonment",
+      "No examiner dependence in content delivery",
+      "Low-level filler or hesitation not present",
+      "speech is complete and connected"
+    ]
+  },
+  "latency_ms": 16585,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/295-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/295-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

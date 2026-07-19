@@ -1,0 +1,130 @@
+{
+  "case_id": "english__pitt__dementia__cookie__221_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.9,
+  "transcript": "Name me any action, anything you see in the picture. All right. Okay. Action. Well, the little girl is reaching, waiting for her brother to give her a cookie. The boy has a cookie from a cookie jar, but he's knocked the lid off and he is tumbling off a stool. And mother is drying dishes, but she has left the spigot on and water's pouring out of the sink. And the little girl has her finger up to her mouth. And boy has one cookie in his hand for the girl in his left hand, and he is just touching another cookie with his right hand. You only want action, you say? That's about it.",
+  "patient_only_transcript": "The little girl is reaching, waiting for her brother to give her a cookie. The boy has a cookie from a cookie jar, but he's knocked the lid off and he is tumbling off a stool. And mother is drying dishes, but she has left the spigot on and water's pouring out of the sink. And the little girl has her finger up to her mouth. And boy has one cookie in his hand for the girl in his left hand, and he is just touching another cookie with his right hand. That's about it.",
+  "speaker_turn_summary": [
+    "Examiner: Name me any action, anything you see in the picture.",
+    "Patient: The little girl is reaching, waiting for her brother to give her a cookie. The boy has a cookie from a cookie jar, but he's knocked the lid off and he is tumbling off a stool. And mother is drying dishes, but she has left the spigot on and water's pouring out of the sink. And the little girl has her finger up to her mouth. And boy has one cookie in his hand for the girl in his left hand, and he is just touching another cookie with his right hand. That's about it.",
+    "Examiner: You only want action, you say?"
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with multiple actors and actions",
+    "Specific content words: cookie, stool, mother, sink, finger, hand",
+    "Logical sequencing of events: girl waiting, boy tumbling, mother leaving spigot on",
+    "Minimal examiner dependence — patient completes full description without prompting",
+    "No word-finding pauses, circumlocution, repetition, or abandonment",
+    "No semantic vagueness or low-information phrasing"
+  ],
+  "transcript_request_id": "chatcmpl-62ff532d-8390-98b9-9b83-ff093d38b10e",
+  "classification_request_id": "chatcmpl-60949e40-891c-9314-8b2d-04c2addfe94b",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__221_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__221_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential, and accurate description of a multi-actor picture scene involving the girl, boy, mother, cookie jar, stool, and sink.",
+        "evidence": "Patient describes multiple spatial and temporal relationships: girl waiting, boy tumbling, mother leaving spigot on, girl’s finger to mouth, boy holding cookie in left hand while touching another with right hand.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific, concrete nouns and verbs relevant to the picture task without substitution or vagueness.",
+        "evidence": "Terms like 'cookie jar', 'tumbling off a stool', 'spigot on', 'finger up to her mouth' indicate precise lexical retrieval.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description with clear subject-action-object structure and maintains focus on the picture’s key events.",
+        "evidence": "Patient describes each character’s action in sequence without confusion or contradiction, and links actions to consequences (e.g., lid knocked off → boy tumbling).",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, detailed, and accurate description of a complex picture scene without signs of word-finding difficulty, disorganization, or examiner dependence. No impairment-like cues are evident in the speech content.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No pauses, repetitions, or circumlocutions",
+      "No semantic vagueness or low-information content",
+      "No disorganization or failure to link events",
+      "No reliance on examiner prompting to complete description"
+    ],
+    "alternative_explanations": [
+      "Patient may be describing a familiar or well-practiced scene",
+      "Task may be within patient’s cognitive capacity despite potential underlying concerns",
+      "Audio quality may mask subtle cues, but available content is strong"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Continue routine cognitive screening as part of standard care",
+      "No immediate clinical intervention required based on this clip",
+      "Consider longitudinal follow-up if other risk factors emerge"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline in this assessment.",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio content.",
+      "Patient speech is self-contained and task-compliant without examiner dependency.",
+      "No signs of dementia-like impairment detected in this single clip."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The little girl is reaching, waiting for her brother to give her a cookie. The boy has a cookie from a cookie jar, but he's knocked the lid off and he is tumbling off a stool. And mother is drying dishes, but she has left the spigot on and water's pouring out of the sink. And the little girl has her finger up to her mouth. And boy has one cookie in his hand for the girl in his left hand, and he is just touching another cookie with his right hand. That's about it.",
+    "speaker_turn_summary": [
+      "Examiner: Name me any action, anything you see in the picture.",
+      "Patient: The little girl is reaching, waiting for her brother to give her a cookie. The boy has a cookie from a cookie jar, but he's knocked the lid off and he is tumbling off a stool. And mother is drying dishes, but she has left the spigot on and water's pouring out of the sink. And the little girl has her finger up to her mouth. And boy has one cookie in his hand for the girl in his left hand, and he is just touching another cookie with his right hand. That's about it.",
+      "Examiner: You only want action, you say?"
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with multiple actors and actions",
+      "Specific content words: cookie, stool, mother, sink, finger, hand",
+      "Logical sequencing of events: girl waiting, boy tumbling, mother leaving spigot on",
+      "Minimal examiner dependence — patient completes full description without prompting",
+      "No word-finding pauses, circumlocution, repetition, or abandonment",
+      "No semantic vagueness or low-information phrasing"
+    ]
+  },
+  "latency_ms": 28614,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/221-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/221-1.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

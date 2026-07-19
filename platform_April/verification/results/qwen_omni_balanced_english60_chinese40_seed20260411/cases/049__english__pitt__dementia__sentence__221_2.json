@@ -1,0 +1,143 @@
+{
+  "case_id": "english__pitt__dementia__sentence__221_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.9,
+  "transcript": "About pencil. The pencil. The pencil is beside another pencil. Tree. Tree grows in my lawn. Now I'm going to give you two words. Don't worry about the order that I give them to you in. Just give me a short simple sentence using those words. Child, hospital. Child is in the hospital. Cold, winter. I get cold in the winter. Now I'm going to give you three words. Again, don't worry about the order that I give them to you in. Just use all three of them in one short simple sentence. Chair, doctor, sit. Doctor sits in the chair. Bureau, open, drawer. The bureau drawer is open. Good.",
+  "patient_only_transcript": "The pencil is beside another pencil. Tree grows in my lawn. Child is in the hospital. I get cold in the winter. Doctor sits in the chair. The bureau drawer is open.",
+  "speaker_turn_summary": [
+    "Examiner: Prompt about pencil.",
+    "Patient: The pencil is beside another pencil.",
+    "Examiner: Prompt about tree.",
+    "Patient: Tree grows in my lawn.",
+    "Examiner: Prompt with 'child, hospital'.",
+    "Patient: Child is in the hospital.",
+    "Examiner: Prompt with 'cold, winter'.",
+    "Patient: I get cold in the winter.",
+    "Examiner: Prompt with 'chair, doctor, sit'.",
+    "Patient: Doctor sits in the chair.",
+    "Examiner: Prompt with 'bureau, open, drawer'.",
+    "Patient: The bureau drawer is open."
+  ],
+  "patient_cue_summary": [
+    "Task-compliant sentence generation for each prompt",
+    "Stable fluency and grammatical structure",
+    "No retrieval failure or hesitation",
+    "No circumlocution or filler usage",
+    "No repetition or self-correction",
+    "No examiner dependence or scaffolding needed"
+  ],
+  "transcript_request_id": "chatcmpl-668bad16-0365-96f6-8316-f4597bf5bf8e",
+  "classification_request_id": "chatcmpl-fde3e6b7-2ab0-95a3-9bb5-b5768948bd63",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__221_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__221_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Sentence Construction Task Performance",
+        "summary": "Patient generated accurate, grammatically correct, and task-relevant sentences for all prompts without hesitation or error.",
+        "evidence": "Patient responded to 'child, hospital' with 'Child is in the hospital.' Responded to 'chair, doctor, sit' with 'Doctor sits in the chair.' Responded to 'bureau, open, drawer' with 'The bureau drawer is open.'",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Compliance and Fluency",
+        "summary": "Patient followed instructions precisely and produced complete, coherent sentences for each prompt without need for clarification or correction.",
+        "evidence": "No filler words, no repetition, no circumlocution. Responses were concise and directly addressed the prompt.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Absence of Impairment Cues",
+        "summary": "No signs of retrieval difficulty, disorganization, or task failure observed in patient speech.",
+        "evidence": "All responses were complete, accurate, and structurally sound. No pauses, restarts, or examiner dependence observed.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient completed all structured sentence-generation tasks with accurate, grammatically correct, and task-relevant responses. No observable signs of retrieval difficulty, hesitation, or disorganization. Speech is fluent and self-contained. No evidence of impairment-like features. Further observation may be warranted if clinical context suggests concern, but current clip does not support cognitive_risk.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Consistent, accurate sentence construction across all prompts",
+      "No pauses, fillers, or restarts",
+      "No semantic vagueness or omission of core task elements",
+      "No examiner scaffolding or dependence required"
+    ],
+    "alternative_explanations": [
+      "Normal language performance in structured task",
+      "Task-specific fluency without broader cognitive impairment",
+      "Possible mild anxiety or formality affecting speech style, not impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Monitor for longitudinal consistency in performance",
+      "Consider formal cognitive screening if clinical concerns persist",
+      "Avoid overinterpretation of brief or formulaic responses in isolation"
+    ],
+    "visit_recommendation": "routine follow-up or formal screening if indicated by clinical context",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline.",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is fully intelligible and task-compliant.",
+      "No visual or body cues available for additional assessment."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The pencil is beside another pencil. Tree grows in my lawn. Child is in the hospital. I get cold in the winter. Doctor sits in the chair. The bureau drawer is open.",
+    "speaker_turn_summary": [
+      "Examiner: Prompt about pencil.",
+      "Patient: The pencil is beside another pencil.",
+      "Examiner: Prompt about tree.",
+      "Patient: Tree grows in my lawn.",
+      "Examiner: Prompt with 'child, hospital'.",
+      "Patient: Child is in the hospital.",
+      "Examiner: Prompt with 'cold, winter'.",
+      "Patient: I get cold in the winter.",
+      "Examiner: Prompt with 'chair, doctor, sit'.",
+      "Patient: Doctor sits in the chair.",
+      "Examiner: Prompt with 'bureau, open, drawer'.",
+      "Patient: The bureau drawer is open."
+    ],
+    "patient_cue_summary": [
+      "Task-compliant sentence generation for each prompt",
+      "Stable fluency and grammatical structure",
+      "No retrieval failure or hesitation",
+      "No circumlocution or filler usage",
+      "No repetition or self-correction",
+      "No examiner dependence or scaffolding needed"
+    ]
+  },
+  "latency_ms": 15182,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/221-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/221-2.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

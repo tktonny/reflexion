@@ -1,0 +1,101 @@
+{
+  "case_id": "english__pitt__dementia__cookie__005_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.7,
+  "classification_request_id": "chatcmpl-a266fbcf-0958-974c-88b1-f173053e8c20",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "speech_content",
+        "summary": "Patient describes a picture scene involving a boy slipping off a stool while trying to steal cookies, a mother at the sink, and a girl shushing her.",
+        "evidence": "Patient's speech is audible and describes a multi-element visual scene with narrative structure, including character actions and spatial relationships.",
+        "confidence": 0.8
+      },
+      {
+        "label": "speech_coherence",
+        "summary": "Patient's description is sequential and contextually connected, though slightly repetitive and self-correcting.",
+        "evidence": "Patient says: 'The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. The little girl is saying shh to the mother so she don't hear.' Then repeats and clarifies: 'I said the sink was running over.'",
+        "confidence": 0.75
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "task_performance",
+        "summary": "Patient successfully describes a complex picture scene with multiple actors and actions, though with minor self-correction and repetition.",
+        "evidence": "Patient accurately identifies characters (boy, mother, girl), actions (slipping, stealing, shushing, drying dishes), and environmental details (running sink, water over).",
+        "confidence": 0.8
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient accurately describes a multi-element picture scene with appropriate narrative structure and detail. Speech is coherent, task-relevant, and shows no signs of lexical retrieval difficulty, disorientation, or impaired sequencing. No observable emotional or behavioral indicators of cognitive impairment are present.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate description of complex visual scene with multiple actors and actions.",
+      "Coherent, sequential speech with minimal self-correction.",
+      "No signs of confusion, repetition, or disorientation in task response."
+    ],
+    "alternative_explanations": [
+      "Patient may be a child or young adult, and the task may be developmentally appropriate.",
+      "The description may reflect a simple narrative recall task without cognitive impairment indicators.",
+      "Limited visual context may reduce confidence in full cognitive assessment, but available speech evidence is reassuring."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "No caregiver or examiner-reported cognitive concerns mentioned in the clip."
+    ],
+    "emotional_assessment_findings": [
+      "Patient displays neutral affect; no signs of anxiety, frustration, or apathy observed in speech tone or content."
+    ],
+    "risk_control_suggestions": [
+      "Continue with standard cognitive screening battery if part of a larger assessment.",
+      "Monitor for consistency across multiple tasks or sessions.",
+      "No immediate clinical intervention indicated based on this clip."
+    ],
+    "visit_recommendation": "routine follow-up or continuation of screening battery as appropriate.",
+    "future_risk_trend_summary": "Longitudinal prediction is not possible from a single clip; further assessment required for risk stratification.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable; assessment relies solely on audio description of a picture task.",
+      "Patient speech is intelligible and task-relevant; examiner prompts are minimal and non-dominant.",
+      "No signs of dementia-like impairment observed in available speech content or tone."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "video_too_short",
+      "face_not_visible",
+      "limited_speaking_time"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 10576,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/005-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/005-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

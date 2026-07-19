@@ -1,0 +1,125 @@
+{
+  "case_id": "english__pitt__control__cookie__229_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.7,
+  "transcript": "Cookie. The chair is children's. The girl is possibly moving her finger towards her mouth, reaching for a cookie. Water is running out of the sink. Mother is drying the dishes.",
+  "patient_only_transcript": "The chair is children's. The girl is possibly moving her finger towards her mouth, reaching for a cookie. Water is running out of the sink. Mother is drying the dishes.",
+  "speaker_turn_summary": [
+    "Examiner: Prompt for scene description.",
+    "Patient: Describes scene elements including chair, girl, cookie, water, mother.",
+    "Examiner: No follow-up or prompting detected in audio."
+  ],
+  "patient_cue_summary": [
+    "Patient provides brief but accurate identification of multiple scene elements.",
+    "Speech is intelligible and task-relevant.",
+    "No evidence of word-finding pauses, circumlocution, repetition, or disorganization.",
+    "No examiner scaffolding or rescue observed.",
+    "Limited elaboration but no breakdown in task comprehension or retrieval."
+  ],
+  "transcript_request_id": "chatcmpl-15957e52-9702-932f-9189-74fa91845bbc",
+  "classification_request_id": "chatcmpl-ae1939ba-3d81-9618-9393-cfcd9c72d6d6",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__229_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__229_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identified key actors and actions in the picture description task.",
+        "evidence": "Patient stated: 'The chair is children's. The girl is possibly moving her finger towards her mouth, reaching for a cookie. Water is running out of the sink. Mother is drying the dishes.'",
+        "confidence": 0.9
+      },
+      {
+        "label": "Speech Coherence",
+        "summary": "Speech was coherent, sequential, and did not show signs of breakdown or disorganization.",
+        "evidence": "No repetitions, restarts, or circumlocutions observed in the patient's response.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Task Relevance",
+        "summary": "Response directly addressed the picture description task without deviation or tangential content.",
+        "evidence": "All elements mentioned were relevant to the described scene; no unrelated or confused content.",
+        "confidence": 0.9
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a concise, accurate description of a picture-based scene involving a child reaching for a cookie, a running sink, and a mother drying dishes. Speech is intelligible and task-relevant. No clear signs of cognitive impairment are observed in this single audio clip. Further observation or additional testing is recommended due to limited modality coverage and lack of visual context.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Task-relevant, coherent speech with accurate scene element identification.",
+      "No signs of retrieval failure, disorganization, or examiner dependence.",
+      "No emotional or affective abnormalities observed in audio."
+    ],
+    "alternative_explanations": [
+      "Limited elaboration may reflect task constraints or patient style, not impairment.",
+      "Absence of visual context may limit full assessment, but audio alone does not suggest cognitive risk."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule follow-up with full multimodal assessment including visual scene description.",
+      "Consider repeating the task with prompting or structured cues if initial response is brief.",
+      "Monitor for consistency across multiple sessions or tasks."
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio clip; further data required for trend assessment.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment relies solely on audio.",
+      "Patient speech is intelligible and task-compliant, but limited in elaboration.",
+      "No signs of cognitive impairment detected in this clip",
+      "classification remains conservative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The chair is children's. The girl is possibly moving her finger towards her mouth, reaching for a cookie. Water is running out of the sink. Mother is drying the dishes.",
+    "speaker_turn_summary": [
+      "Examiner: Prompt for scene description.",
+      "Patient: Describes scene elements including chair, girl, cookie, water, mother.",
+      "Examiner: No follow-up or prompting detected in audio."
+    ],
+    "patient_cue_summary": [
+      "Patient provides brief but accurate identification of multiple scene elements.",
+      "Speech is intelligible and task-relevant.",
+      "No evidence of word-finding pauses, circumlocution, repetition, or disorganization.",
+      "No examiner scaffolding or rescue observed.",
+      "Limited elaboration but no breakdown in task comprehension or retrieval."
+    ]
+  },
+  "latency_ms": 11524,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/229-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/229-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

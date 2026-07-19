@@ -1,0 +1,193 @@
+{
+  "dataset": "talkbank_english_pitt",
+  "manifest_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/talkbank/corpora/english/pitt/manifest.jsonl",
+  "results_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/results/qwen_omni_prompt_probe_pitt_audio_dialogue_extra_2",
+  "metrics": {
+    "evaluated_cases": 2,
+    "successful_cases": 2,
+    "error_cases": 0,
+    "skipped_cases": 0,
+    "accuracy": 0.5,
+    "recall": 0.0,
+    "specificity": 1.0,
+    "confusion_matrix": {
+      "true_positive": 0,
+      "true_negative": 1,
+      "false_positive": 0,
+      "false_negative": 1
+    }
+  },
+  "cases": [
+    {
+      "case_id": "english__pitt__control__cookie__006_2",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "HC",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.3,
+      "reviewer_confidence": 0.6,
+      "classification_request_id": "chatcmpl-f1aab912-1b34-90b2-98a2-0e9995ab6ed3",
+      "transcript_model": "qwen3-omni-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__006_2/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__006_2/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [
+          {
+            "label": "narrative description",
+            "summary": "Patient describes a picture scene involving children, a cookie jar, a mother washing dishes, and environmental details like an open window and wet floor.",
+            "evidence": "Patient verbally recounts a multi-element scene including children's actions, household activity, and environmental conditions, suggesting some narrative capacity.",
+            "confidence": 0.7
+          },
+          {
+            "label": "lexical retrieval",
+            "summary": "Patient uses concrete nouns (cookie, stool, jar, dishes, window) and basic verbs (reaching, standing, falling, washing, drying, blowing).",
+            "evidence": "Vocabulary is functional and contextually appropriate for describing a picture task, with no obvious word-finding failure or semantic paraphasia.",
+            "confidence": 0.8
+          },
+          {
+            "label": "narrative coherence",
+            "summary": "Patient strings together multiple elements of the scene in a loose chronological or spatial order, though with some hesitation and filler words.",
+            "evidence": "Speech includes pauses, 'uh', and 'ah', but maintains a recognizable sequence of events without major disorganization or tangentiality.",
+            "confidence": 0.6
+          }
+        ],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 1.0,
+        "risk_score": 0.3,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient provides a verbally coherent, contextually appropriate description of a picture scene with functional vocabulary and basic narrative structure. No clear signs of cognitive impairment are observed in the available audio. However, visual and multimodal evidence is unavailable, limiting confidence in the assessment.",
+        "evidence_for_risk": [],
+        "evidence_against_risk": [
+          "Functional vocabulary use",
+          "Coherent narrative structure",
+          "Absence of semantic errors or disorganization"
+        ],
+        "alternative_explanations": [
+          "Limited visual data prevents full assessment",
+          "Audio-only format may mask nonverbal cues",
+          "Patient may be performing at baseline or within normal range for age"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [],
+        "risk_control_suggestions": [
+          "Follow up with full multimodal cognitive screening including visual and behavioral observation",
+          "Consider repeating the picture description task with structured prompts or time limits",
+          "Monitor for consistency across multiple sessions"
+        ],
+        "visit_recommendation": "formal screening",
+        "future_risk_trend_summary": "Longitudinal prediction is not possible from a single audio-only clip. Further observation is needed to assess for emerging patterns.",
+        "reviewer_confidence": 0.6,
+        "context_notes": [
+          "Video component is unavailable; assessment is based solely on audio description of a picture task.",
+          "Patient is likely the primary respondent in a structured screening interaction.",
+          "No explicit memory complaints or caregiver concerns reported in the clip."
+        ],
+        "quality_flags": [
+          "face_not_visible",
+          "video_too_short",
+          "transcript_unavailable"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+      },
+      "latency_ms": 8844,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Control",
+        "source_relative_path": "Control/cookie/006-2.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/006-2.mp3?f=save",
+        "expected_group_audio_count": 247
+      }
+    },
+    {
+      "case_id": "english__pitt__dementia__cookie__003_0",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.2,
+      "reviewer_confidence": 0.4,
+      "classification_request_id": "chatcmpl-c76e7a16-6502-929d-b2b6-5de06da4fc70",
+      "transcript_model": "qwen3-omni-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__003_0/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__003_0/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 1.0,
+        "risk_score": 0.2,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "The clip contains conversational audio from a screening task involving scene description (cookie jar, overflowing sink, etc.), but speech is largely unintelligible and transcript unavailable. No clear impairment-like signals are directly observable or audible. The patient’s role is probable but not isolated with high confidence. Further clinical evaluation is recommended due to insufficient data for confident classification.",
+        "evidence_for_risk": [],
+        "evidence_against_risk": [
+          "No clear speech breakdown, lexical retrieval failure, or disorganized narrative observed.",
+          "No visible or audible signs of emotional dysregulation or affective flattening.",
+          "Task context is known (picture description), but patient response is not meaningfully assessable due to audio quality."
+        ],
+        "alternative_explanations": [
+          "Audio quality issues may mask potential impairment signals.",
+          "Patient may be non-native speaker or speaking with articulation difficulty unrelated to dementia.",
+          "Examiner may be dominating or prompting, reducing patient response clarity."
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [],
+        "risk_control_suggestions": [
+          "Repeat screening with clearer audio recording and structured task instructions.",
+          "Use visual cues or written prompts to supplement verbal response if audio remains unreliable.",
+          "Consider formal cognitive screening battery if patient is at known risk for dementia."
+        ],
+        "visit_recommendation": "Formal cognitive screening with clinical evaluation recommended due to insufficient data for confident classification.",
+        "future_risk_trend_summary": "Longitudinal prediction is not possible from this single clip. Further observation or multi-session assessment is needed.",
+        "reviewer_confidence": 0.4,
+        "context_notes": [
+          "Video portion is unavailable; only audio is present.",
+          "Patient speech is largely unintelligible; transcript not available.",
+          "Task context: picture description (cookie jar, sink, etc.) is known but response not assessable.",
+          "Examiner speech is present but not the target of evaluation."
+        ],
+        "quality_flags": [
+          "transcript_unavailable",
+          "speech_unintelligible"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+      },
+      "latency_ms": 7968,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/003-0.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/003-0.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "case_id": "mandarin__chou__mci__032__032_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "在公园里啊，有小孩子在荡秋千啊，啊也有小女生在打羽毛球。结果有个小朋友牵了一只狗，就咬了人家小女生。然后凉亭下有那个两两位老阿伯在下象棋，还在泡茶，就这样。哎哎，那那那这，不是不是，那这样子，我就是这样念出来就好了嘛。我觉得的故事就是这样子嘛，就是这两个这两个老阿伯可能是带了小孙女啦出来打羽毛球啊，然后两个老阿伯就在那边下棋。结果就碰到了一个小小男生牵了一只狗啊，咬了人家小女生的衣服啊，这样子。那这个就不用了，这远远的就是在荡秋千而已嘛，就这样。",
+  "patient_only_transcript": "在公园里啊，有小孩子在荡秋千啊，啊也有小女生在打羽毛球。结果有个小朋友牵了一只狗，就咬了人家小女生。然后凉亭下有那个两位老阿伯在下象棋，还在泡茶，就这样。哎哎，那那那这，不是不是，那这样子，我就是这样念出来就好了嘛。我觉得的故事就是这样子嘛，就是这两个这两个老阿伯可能是带了小孙女啦出来打羽毛球啊，然后两个老阿伯就在那边下棋。结果就碰到了一个小小男生牵了一只狗啊，咬了人家小女生的衣服啊，这样子。那这个就不用了，这远远的就是在荡秋千而已嘛，就这样。",
+  "speaker_turn_summary": [
+    "Examiner: prompts patient to describe park scene",
+    "Patient: describes multiple scene elements including children on swings, girls playing badminton, dog biting girl, elders playing chess and drinking tea, and possible family relationships",
+    "Patient: self-corrects and rephrases multiple times, shows hesitation and repetition",
+    "Patient: ends with self-acknowledgment that the description is sufficient"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple scene elements: children on swings, girls playing badminton, dog biting girl, elders playing chess and drinking tea",
+    "Patient uses repeated self-corrections and fillers (e.g., 哎哎, 那那那这, 不是不是) indicating hesitation but not semantic collapse",
+    "Patient attempts to reconstruct narrative with causal links (e.g., '可能是带了小孙女啦出来打羽毛球') despite disorganization",
+    "Patient does not abandon the task",
+    "ends with self-assessment that the description is sufficient",
+    "No evidence of naming failure, major contradiction, or severe disorganization",
+    "scene remains reconstructable despite colloquial speech patterns"
+  ],
+  "transcript_request_id": "chatcmpl-b19cfac8-c287-9d07-b3fd-a9dda732ed87",
+  "classification_request_id": "chatcmpl-e4912e1b-2764-9b73-929a-0446cf5469a5",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__032__032_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__032__032_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene description coherence",
+        "summary": "Patient describes multiple actors and actions in the park scene, including children on swings, badminton players, a dog biting a girl, and elders playing chess and drinking tea.",
+        "evidence": "Patient lists multiple scene elements with some causal or relational phrasing (e.g., '可能是带了小孙女啦出来打羽毛球'), despite disorganized delivery and self-corrections.",
+        "confidence": 0.5
+      },
+      {
+        "label": "narrative reconstruction effort",
+        "summary": "Patient attempts to reconstruct a coherent narrative despite pauses, repetitions, and self-corrections, and concludes that the description is sufficient.",
+        "evidence": "Patient says '我就是这样念出来就好了嘛' and '就这样' to signal task completion, indicating awareness of task structure.",
+        "confidence": 0.5
+      },
+      {
+        "label": "lexical and syntactic patterns",
+        "summary": "Patient uses colloquial Mandarin with discourse particles (啊, 嗯), repeated phrases (那那那这), and generic referents (这个/那个), which are normal in spontaneous speech and not indicative of impairment.",
+        "evidence": "Use of '啊', '那那那这', '不是不是', '这样子' are typical of natural Mandarin conversation and do not reflect word-finding failure or semantic collapse.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a moderately coherent, multi-element description of a park scene with multiple actors and actions, despite disorganized delivery, self-corrections, and colloquial speech patterns. No evidence of naming failure, semantic collapse, or severe disorganization. Patient appears cooperative and completes the task with self-assessment. Not sufficient for dementia classification, but warrants observation due to speech disorganization and hesitation.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient identifies multiple relevant scene elements",
+      "Patient does not abandon the task or show semantic collapse",
+      "Patient self-assesses completion and does not require prompting",
+      "Colloquial speech patterns are normal in spontaneous Mandarin"
+    ],
+    "alternative_explanations": [
+      "Speech disorganization may reflect task difficulty or mild anxiety rather than cognitive impairment",
+      "Colloquial fillers and repetitions are typical in natural speech and not diagnostic",
+      "Lack of visual data prevents assessment of nonverbal cues that might support impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient self-reports that the description is sufficient and does not require further elaboration"
+    ],
+    "emotional_assessment_findings": [
+      "Patient displays mild hesitation and self-correction, but no signs of frustration, anxiety, or apathy",
+      "Patient tone is neutral and cooperative, with no emotional flattening or reactivity"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with a more structured narrative or memory task to assess consistency and retrieval",
+      "Consider repeating the scene-description task with visual cues or prompts to reduce disorganization",
+      "Monitor for persistent speech disorganization or task abandonment in future sessions"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no strong evidence of cognitive decline, but observation is warranted due to speech disorganization and hesitation.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video data is unavailable",
+      "assessment is based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible and task-compliant despite disorganization and colloquial patterns.",
+      "No evidence of dementia-like impairment in this clip",
+      "classification remains conservative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "在公园里啊，有小孩子在荡秋千啊，啊也有小女生在打羽毛球。结果有个小朋友牵了一只狗，就咬了人家小女生。然后凉亭下有那个两位老阿伯在下象棋，还在泡茶，就这样。哎哎，那那那这，不是不是，那这样子，我就是这样念出来就好了嘛。我觉得的故事就是这样子嘛，就是这两个这两个老阿伯可能是带了小孙女啦出来打羽毛球啊，然后两个老阿伯就在那边下棋。结果就碰到了一个小小男生牵了一只狗啊，咬了人家小女生的衣服啊，这样子。那这个就不用了，这远远的就是在荡秋千而已嘛，就这样。",
+    "speaker_turn_summary": [
+      "Examiner: prompts patient to describe park scene",
+      "Patient: describes multiple scene elements including children on swings, girls playing badminton, dog biting girl, elders playing chess and drinking tea, and possible family relationships",
+      "Patient: self-corrects and rephrases multiple times, shows hesitation and repetition",
+      "Patient: ends with self-acknowledgment that the description is sufficient"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple scene elements: children on swings, girls playing badminton, dog biting girl, elders playing chess and drinking tea",
+      "Patient uses repeated self-corrections and fillers (e.g., 哎哎, 那那那这, 不是不是) indicating hesitation but not semantic collapse",
+      "Patient attempts to reconstruct narrative with causal links (e.g., '可能是带了小孙女啦出来打羽毛球') despite disorganization",
+      "Patient does not abandon the task",
+      "ends with self-assessment that the description is sufficient",
+      "No evidence of naming failure, major contradiction, or severe disorganization",
+      "scene remains reconstructable despite colloquial speech patterns"
+    ]
+  },
+  "latency_ms": 22904,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/032/032_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/032/032_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

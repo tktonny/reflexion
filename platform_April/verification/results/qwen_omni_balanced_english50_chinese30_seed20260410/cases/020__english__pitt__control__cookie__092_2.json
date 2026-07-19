@@ -1,0 +1,131 @@
+{
+  "case_id": "english__pitt__control__cookie__092_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "On in the picture. The boy is tipping stool, reaching for the cookie jar. The girl is reaching for a cookie, putting her hand on her lips. Mother is drying dishes. Water is overflowing the sink. That's all the action that I can see. That's fun.",
+  "patient_only_transcript": "The boy is tipping stool, reaching for the cookie jar. The girl is reaching for a cookie, putting her hand on her lips. Mother is drying dishes. Water is overflowing the sink. That's all the action that I can see. That's fun.",
+  "speaker_turn_summary": [
+    "Examiner: (prompt or setup not audible)",
+    "Patient: Describes scene with correct key elements: boy, stool, cookie jar, girl, cookie, hand on lips, mother, dishes, overflowing sink.",
+    "Examiner: (acknowledgment or follow-up not audible)",
+    "Patient: Adds 'That's fun.' at end."
+  ],
+  "patient_cue_summary": [
+    "Patient names all major scene elements correctly.",
+    "Patient delivers a coherent, linear description of the picture.",
+    "Patient does not show word-finding pauses, circumlocution, or semantic vagueness.",
+    "Patient does not repeat, restart, or abandon utterances.",
+    "Patient does not show examiner dependence or confusion about roles/actions.",
+    "Patient adds a brief evaluative comment ('That's fun.') at end, which is contextually appropriate but not impairing."
+  ],
+  "transcript_request_id": "chatcmpl-2e00570a-71b8-94ef-af64-7316f1e6d638",
+  "classification_request_id": "chatcmpl-1fee89e4-6b7c-972a-a83a-8ca229fc78b1",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__092_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__092_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a complete, logically sequenced description of the picture, naming all major actors and actions.",
+        "evidence": "Patient correctly identifies boy tipping stool, reaching for cookie jar; girl reaching for cookie with hand on lips; mother drying dishes; water overflowing sink.",
+        "confidence": 0.9
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific, accurate vocabulary without circumlocution or filler terms.",
+        "evidence": "Patient uses precise terms: 'tipping stool', 'reaching for the cookie jar', 'putting her hand on her lips', 'overflowing the sink'.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description in a clear, event-based sequence without disorganization or confusion.",
+        "evidence": "Patient describes actions in a logical order: boy’s action, girl’s action, mother’s action, environmental detail (overflowing sink).",
+        "confidence": 0.88
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, accurate, and complete description of the picture without signs of retrieval difficulty, disorganization, or examiner dependence. No impairment-like cues are observed in the audio.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No word-finding pauses or circumlocution",
+      "No semantic vagueness or repetition",
+      "No examiner dependence or abandonment of task",
+      "All key scene elements correctly identified and logically sequenced"
+    ],
+    "alternative_explanations": [
+      "Patient may be young or naturally articulate, not necessarily indicative of cognitive health",
+      "Task may be simple or familiar to patient, reducing cognitive load"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Patient displays neutral to mildly positive affect, ending with 'That's fun.'"
+    ],
+    "risk_control_suggestions": [
+      "No immediate intervention needed",
+      "Continue routine monitoring if part of longitudinal screening"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of cognitive decline in this assessment.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment relies solely on audio description.",
+      "Patient’s description is complete and well-organized, suggesting intact cognitive function for this task.",
+      "Examiner prompts are not audible",
+      "patient appears to respond independently and fully to the task."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is tipping stool, reaching for the cookie jar. The girl is reaching for a cookie, putting her hand on her lips. Mother is drying dishes. Water is overflowing the sink. That's all the action that I can see. That's fun.",
+    "speaker_turn_summary": [
+      "Examiner: (prompt or setup not audible)",
+      "Patient: Describes scene with correct key elements: boy, stool, cookie jar, girl, cookie, hand on lips, mother, dishes, overflowing sink.",
+      "Examiner: (acknowledgment or follow-up not audible)",
+      "Patient: Adds 'That's fun.' at end."
+    ],
+    "patient_cue_summary": [
+      "Patient names all major scene elements correctly.",
+      "Patient delivers a coherent, linear description of the picture.",
+      "Patient does not show word-finding pauses, circumlocution, or semantic vagueness.",
+      "Patient does not repeat, restart, or abandon utterances.",
+      "Patient does not show examiner dependence or confusion about roles/actions.",
+      "Patient adds a brief evaluative comment ('That's fun.') at end, which is contextually appropriate but not impairing."
+    ]
+  },
+  "latency_ms": 22184,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/092-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/092-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

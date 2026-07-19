@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__control__cookie__340_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "Okay, the sink is running over. She's standing in the sink. Mother is, mother is also drying dishes. Little boy is getting pushed out of the cookie jar, handing it to his sister, and falling off the step stool at the same time. Little girl touching her nose. Outside, you can see the outside window. The cookie jar has fallen over to the side. It looks like the curtains are blowing. And it looks like the mother has completed washing at least two cups and one dish. And action would be the door hanging open where the cookie jar is uncovered.",
+  "patient_only_transcript": "The sink is running over. She's standing in the sink. Mother is, mother is also drying dishes. Little boy is getting pushed out of the cookie jar, handing it to his sister, and falling off the step stool at the same time. Little girl touching her nose. Outside, you can see the outside window. The cookie jar has fallen over to the side. It looks like the curtains are blowing. And it looks like the mother has completed washing at least two cups and one dish. And action would be the door hanging open where the cookie jar is uncovered.",
+  "speaker_turn_summary": [
+    "Examiner: prompts or introduces task (implied)",
+    "Patient: describes scene with multiple elements, but with some hesitation and repetition in phrasing, e.g., 'mother is, mother is also drying dishes'.",
+    "Examiner: may prompt or clarify (implied by patient’s structure)"
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with multiple correct elements (sink, cookie jar, mother, boy, girl, stool, curtains)",
+    "Some repetition and hesitation in phrasing ('mother is, mother is also...')",
+    "No clear word-finding pauses or semantic vagueness",
+    "all key objects and actions are named",
+    "Narrative is logically sequenced and task-relevant",
+    "No evidence of disorganization, abandonment, or examiner dependence beyond minor phrasing repetition"
+  ],
+  "transcript_request_id": "chatcmpl-34451b2e-2490-97f1-93f1-89bcdb33b52f",
+  "classification_request_id": "chatcmpl-d19dd693-6904-938c-b8bf-1f9279e1360c",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__340_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__340_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, task-relevant description of a multi-element picture scene, including actions, objects, and spatial relationships.",
+        "evidence": "Patient names sink, cookie jar, mother, boy, girl, step stool, curtains, dishes, door — all relevant to the cookie-theft picture task. Describes sequence of events and spatial layout.",
+        "confidence": null
+      },
+      {
+        "label": "Phrasing Repetition",
+        "summary": "Patient repeats 'mother is' in a slightly hesitant or self-correcting manner, suggesting minor fluency hesitation.",
+        "evidence": "Audio contains 'Mother is, mother is also drying dishes' — slight repetition and pause before continuing.",
+        "confidence": null
+      },
+      {
+        "label": "Task Completion",
+        "summary": "Patient completes the full picture description task with no omissions or confusion about core elements.",
+        "evidence": "All major scene components are addressed: actions (falling, handing, drying), objects (cookie jar, cups, dishes), and environmental cues (curtains, window, door).",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, detailed, and task-relevant description of the picture scene with no evidence of word-finding difficulty, disorganization, or examiner dependence. Minor phrasing repetition is not sufficient to indicate cognitive impairment. No risk factors or impairment-like cues are present.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Full scene description with correct object and action identification",
+      "Logical sequencing of events",
+      "No semantic vagueness or circumlocution",
+      "No abandonment or restarts of utterances",
+      "No signs of confusion or role reversal"
+    ],
+    "alternative_explanations": [
+      "Minor phrasing hesitation may reflect natural speech rhythm or slight nervousness during task performance, not cognitive impairment.",
+      "Repetition of 'mother is' may be a self-correction or emphasis, not a retrieval failure."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed.",
+      "Continue routine monitoring if part of longitudinal screening.",
+      "If future clips show similar patterns with more impairment cues, consider re-evaluation."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Limited predictive value from single clip; longitudinal data preferred for trend assessment.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible and task-compliant",
+      "no strong impairment signals detected.",
+      "Minor phrasing repetition does not override overall coherence and informativeness."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The sink is running over. She's standing in the sink. Mother is, mother is also drying dishes. Little boy is getting pushed out of the cookie jar, handing it to his sister, and falling off the step stool at the same time. Little girl touching her nose. Outside, you can see the outside window. The cookie jar has fallen over to the side. It looks like the curtains are blowing. And it looks like the mother has completed washing at least two cups and one dish. And action would be the door hanging open where the cookie jar is uncovered.",
+    "speaker_turn_summary": [
+      "Examiner: prompts or introduces task (implied)",
+      "Patient: describes scene with multiple elements, but with some hesitation and repetition in phrasing, e.g., 'mother is, mother is also drying dishes'.",
+      "Examiner: may prompt or clarify (implied by patient’s structure)"
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with multiple correct elements (sink, cookie jar, mother, boy, girl, stool, curtains)",
+      "Some repetition and hesitation in phrasing ('mother is, mother is also...')",
+      "No clear word-finding pauses or semantic vagueness",
+      "all key objects and actions are named",
+      "Narrative is logically sequenced and task-relevant",
+      "No evidence of disorganization, abandonment, or examiner dependence beyond minor phrasing repetition"
+    ]
+  },
+  "latency_ms": 18668,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/340-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/340-0.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

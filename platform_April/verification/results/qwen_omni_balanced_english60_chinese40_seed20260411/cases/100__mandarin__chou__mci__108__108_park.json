@@ -1,0 +1,129 @@
+{
+  "case_id": "mandarin__chou__mci__108__108_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.65,
+  "transcript": "两个老人在下棋呀。两个小孩在打网球还是羽毛球，这我就不知道。哦，羽毛球，这里有羽毛球。有一个男生拉着一条小狗，在咬一个女生。这是在荡秋千。这个是溜滑梯。就这样啊。",
+  "patient_only_transcript": "两个老人在下棋呀。两个小孩在打网球还是羽毛球，这我就不知道。哦，羽毛球，这里有羽毛球。有一个男生拉着一条小狗，在咬一个女生。这是在荡秋千。这个是溜滑梯。就这样啊。",
+  "speaker_turn_summary": [
+    "患者描述公园场景中多个角色与动作：老人下棋、小孩打羽毛球、男生牵狗、荡秋千、滑梯。",
+    "患者在描述中出现犹豫（‘这我就不知道’）、自我修正（‘哦，羽毛球’）、补充细节（‘这里有羽毛球’）。",
+    "患者语句结构完整，能识别多个独立事件，但部分语句略显口语化或省略主语。",
+    "examiner likely prompted or guided the task, but no examiner speech is clearly distinguishable from patient speech in audio."
+  ],
+  "patient_cue_summary": [
+    "患者能识别并描述多个场景元素（老人、小孩、羽毛球、狗、秋千、滑梯），表明基本场景理解能力。",
+    "患者使用‘这我就不知道’‘哦，羽毛球’等口语化表达，但未出现命名崩溃、语义断裂或严重逻辑混乱。",
+    "患者语句结构完整，虽有轻微犹豫和修正，但未出现重复重建失败、严重中断或无法完成任务。",
+    "患者未表现出明显认知障碍的典型特征如语义贫乏、语句无意义、角色混淆或动作逻辑错乱。",
+    "患者描述中存在轻微语用模糊（如‘在咬一个女生’），但结合上下文可合理推断为误述或口误，非认知性命名障碍。"
+  ],
+  "transcript_request_id": "chatcmpl-95ff8537-fdf8-925c-8d33-514691ba093b",
+  "classification_request_id": "chatcmpl-4cc6ad6e-7522-9480-80d7-32c890747846",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__108__108_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__108__108_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes multiple visible elements in a park scene with moderate coherence and some hesitation.",
+        "evidence": "Patient identifies老人下棋, 小孩打羽毛球, 男生牵狗, 荡秋千, 滑梯 — multiple correct scene elements with minor pauses and self-corrections.",
+        "confidence": 0.7
+      },
+      {
+        "label": "lexical_retrieval",
+        "summary": "Patient retrieves most relevant nouns and actions, with minor hesitation or filler use.",
+        "evidence": "Patient uses '羽毛球' correctly after uncertainty; '咬一个女生' may be misstatement but contextually interpretable.",
+        "confidence": 0.65
+      },
+      {
+        "label": "discourse_structure",
+        "summary": "Patient maintains topic continuity and sequential description of scene elements, despite informal phrasing.",
+        "evidence": "Patient lists multiple actors and actions in approximate spatial/temporal order without major disorganization.",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates adequate scene description ability with minor hesitations and informal phrasing. No persuasive evidence of cognitive impairment. Further observation or formal screening recommended due to limited modality and potential recording quality issues.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple scene elements and actors.",
+      "Patient maintains topic continuity and sequential description.",
+      "No evidence of naming collapse, semantic poverty, or severe disorganization.",
+      "Minor hesitations and fillers are consistent with normal colloquial Mandarin, not cognitive impairment."
+    ],
+    "alternative_explanations": [
+      "Informal speech patterns and colloquial fillers are normal in spontaneous Mandarin description tasks.",
+      "Minor misstatement ('咬一个女生') may be a slip or mishearing, not a cognitive deficit.",
+      "Limited visual modality and audio quality may reduce confidence in assessment."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery (e.g., MoCA, MMSE) in clinic setting.",
+      "Repeat scene-description task with clearer visual stimuli or structured prompts.",
+      "Consider caregiver report or longitudinal observation if symptoms persist."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction limited from single clip; no evidence of progressive decline or strong impairment.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video modality unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible and task-compliant despite informal phrasing.",
+      "No signs of dementia-like impairment in this single clip",
+      "conservative classification applied."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "两个老人在下棋呀。两个小孩在打网球还是羽毛球，这我就不知道。哦，羽毛球，这里有羽毛球。有一个男生拉着一条小狗，在咬一个女生。这是在荡秋千。这个是溜滑梯。就这样啊。",
+    "speaker_turn_summary": [
+      "患者描述公园场景中多个角色与动作：老人下棋、小孩打羽毛球、男生牵狗、荡秋千、滑梯。",
+      "患者在描述中出现犹豫（‘这我就不知道’）、自我修正（‘哦，羽毛球’）、补充细节（‘这里有羽毛球’）。",
+      "患者语句结构完整，能识别多个独立事件，但部分语句略显口语化或省略主语。",
+      "examiner likely prompted or guided the task, but no examiner speech is clearly distinguishable from patient speech in audio."
+    ],
+    "patient_cue_summary": [
+      "患者能识别并描述多个场景元素（老人、小孩、羽毛球、狗、秋千、滑梯），表明基本场景理解能力。",
+      "患者使用‘这我就不知道’‘哦，羽毛球’等口语化表达，但未出现命名崩溃、语义断裂或严重逻辑混乱。",
+      "患者语句结构完整，虽有轻微犹豫和修正，但未出现重复重建失败、严重中断或无法完成任务。",
+      "患者未表现出明显认知障碍的典型特征如语义贫乏、语句无意义、角色混淆或动作逻辑错乱。",
+      "患者描述中存在轻微语用模糊（如‘在咬一个女生’），但结合上下文可合理推断为误述或口误，非认知性命名障碍。"
+    ]
+  },
+  "latency_ms": 13668,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/108/108_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/108/108_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

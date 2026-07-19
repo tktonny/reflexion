@@ -1,0 +1,157 @@
+{
+  "case_id": "english__pitt__dementia__fluency__702_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Think of and you can start now. Cat, dog, mouse, horse, zebra, elephant. When I get to the zoo. Rhinoceros, snake, lion, tiger, jaguar, snake, deer, rabbit, fox. Good grief. Giraffe, rhinoceros, hippopotamus, monkey. Okay, that's the letter F. All the words you can think of that begin with the letter F and you can start now. Farm, fun, feeling. Good grief. Any word at all. Can't even think of F letters. Funny, fin, flower, fox.",
+  "patient_only_transcript": "Cat, dog, mouse, horse, zebra, elephant. When I get to the zoo. Rhinoceros, snake, lion, tiger, jaguar, snake, deer, rabbit, fox. Good grief. Giraffe, rhinoceros, hippopotamus, monkey. Okay, that's the letter F. Farm, fun, feeling. Good grief. Any word at all. Can't even think of F letters. Funny, fin, flower, fox.",
+  "speaker_turn_summary": [
+    "Examiner: 'Think of and you can start now. Cat, dog, mouse, horse, zebra, elephant.'",
+    "Patient: 'When I get to the zoo.'",
+    "Patient: 'Rhinoceros, snake, lion, tiger, jaguar, snake, deer, rabbit, fox.'",
+    "Patient: 'Good grief.'",
+    "Patient: 'Giraffe, rhinoceros, hippopotamus, monkey.'",
+    "Examiner: 'Okay, that's the letter F. All the words you can think of that begin with the letter F and you can start now.'",
+    "Patient: 'Farm, fun, feeling.'",
+    "Patient: 'Good grief.'",
+    "Patient: 'Any word at all. Can't even think of F letters.'",
+    "Patient: 'Funny, fin, flower, fox.'"
+  ],
+  "patient_cue_summary": [
+    "Repeated pauses and fillers ('Good grief', 'Can't even think of F letters')",
+    "Partial and fragmented fluency responses with repetition ('snake' listed twice)",
+    "Inconsistent task adherence: switches from animal list to F-words with examiner prompt",
+    "Limited lexical retrieval in F-word task: only 5 words produced, with hesitation and self-correction",
+    "Examiner-dependent continuation: patient explicitly states inability to generate F-words without prompting"
+  ],
+  "transcript_request_id": "chatcmpl-2acf1b16-ee45-9871-9b43-a895bb273288",
+  "classification_request_id": "chatcmpl-baa45227-7751-98c1-8ce6-f986d9707fc1",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__702_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__702_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "vocal_frustration",
+        "summary": "Patient vocalized 'Good grief' and 'Can't even think of F letters' with audible exasperation",
+        "evidence": "Patient explicitly stated frustration and cognitive difficulty during F-word task",
+        "confidence": 0.8
+      },
+      {
+        "label": "speech_hesitation",
+        "summary": "Frequent pauses, fillers, and self-corrections during fluency tasks",
+        "evidence": "Multiple pauses, 'uh', 'good grief', and restarting of utterances observed in audio",
+        "confidence": 0.75
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "fluency_task_performance",
+        "summary": "Patient generated animal names with repetition and incomplete sequencing; struggled with F-word task",
+        "evidence": "Listed animals with duplicate 'snake'; produced only 5 F-words with hesitation and self-admission of difficulty",
+        "confidence": 0.8
+      },
+      {
+        "label": "task_adherence",
+        "summary": "Patient completed animal list but showed reduced engagement and dependence on examiner during F-word task",
+        "evidence": "Switched from animal task to F-word task only after examiner prompt; explicitly stated inability to generate F-words",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates mild fluency impairment during verbal fluency tasks, including pauses, repetition, and explicit self-reported difficulty with word retrieval. Task-switching and examiner dependence suggest possible early cognitive decline. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Repeated pauses and fillers during fluency tasks",
+      "Self-reported inability to generate F-words without prompting",
+      "Fragmented and repetitive animal list with incomplete sequencing",
+      "Emotional cues indicating frustration and cognitive effort"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly generated multiple animal names and some F-words",
+      "No overt disorientation or loss of context",
+      "Task completion was attempted despite difficulty"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive load or stress during testing",
+      "Non-clinical fatigue or distraction",
+      "Mild language processing delay without dementia-level impairment"
+    ],
+    "risk_factor_findings": [
+      "Self-reported difficulty with word retrieval under task pressure",
+      "Task-switching with observable hesitation and frustration"
+    ],
+    "subjective_assessment_findings": [
+      "Patient explicitly states 'Can't even think of F letters' and 'Good grief' indicating frustration"
+    ],
+    "emotional_assessment_findings": [
+      "Frustration and mild distress evident in vocal tone and self-reported statements",
+      "Reduced engagement in F-word task with visible cognitive effort and pause markers"
+    ],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency task with different categories or longer time limits",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Assess functional impact and caregiver report in follow-up"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up is recommended to monitor progression or rule out transient factors",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Audio-only assessment with no visual cues available",
+      "Patient speech is partially intelligible but shows impairment-like cues",
+      "Examiner prompts are neutral context",
+      "patient responses are the primary evaluation focus"
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Cat, dog, mouse, horse, zebra, elephant. When I get to the zoo. Rhinoceros, snake, lion, tiger, jaguar, snake, deer, rabbit, fox. Good grief. Giraffe, rhinoceros, hippopotamus, monkey. Okay, that's the letter F. Farm, fun, feeling. Good grief. Any word at all. Can't even think of F letters. Funny, fin, flower, fox.",
+    "speaker_turn_summary": [
+      "Examiner: 'Think of and you can start now. Cat, dog, mouse, horse, zebra, elephant.'",
+      "Patient: 'When I get to the zoo.'",
+      "Patient: 'Rhinoceros, snake, lion, tiger, jaguar, snake, deer, rabbit, fox.'",
+      "Patient: 'Good grief.'",
+      "Patient: 'Giraffe, rhinoceros, hippopotamus, monkey.'",
+      "Examiner: 'Okay, that's the letter F. All the words you can think of that begin with the letter F and you can start now.'",
+      "Patient: 'Farm, fun, feeling.'",
+      "Patient: 'Good grief.'",
+      "Patient: 'Any word at all. Can't even think of F letters.'",
+      "Patient: 'Funny, fin, flower, fox.'"
+    ],
+    "patient_cue_summary": [
+      "Repeated pauses and fillers ('Good grief', 'Can't even think of F letters')",
+      "Partial and fragmented fluency responses with repetition ('snake' listed twice)",
+      "Inconsistent task adherence: switches from animal list to F-words with examiner prompt",
+      "Limited lexical retrieval in F-word task: only 5 words produced, with hesitation and self-correction",
+      "Examiner-dependent continuation: patient explicitly states inability to generate F-words without prompting"
+    ]
+  },
+  "latency_ms": 25815,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/702-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/702-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

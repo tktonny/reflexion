@@ -1,0 +1,145 @@
+{
+  "case_id": "english__pitt__dementia__cookie__350_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.7,
+  "transcript": "What do you see going on in that picture? Girl washing dishes, I see that. Uh-huh. Oh, the boy's putting up the cookie jar, getting some cookies out of the cookie jar, and his little sister is begging him, oh hurry up, come on. And he's got the footstool, and his. . . Her big sister is washing the dishes. That's the big sister or the mama, I don't know which that is. Is drying the dishes, putting them away. She's got the spigot on and the water is running. And there's her cups, she hasn't put them up yet. And he's up on the footstool and he's got the cookie jars. And what else is going on over here? He's getting the cookie jars. Anything else going on? She's begging him for some. Okay. Begging him for some cookies. What about over here? What else is going on over there? She's washing the dishes. She's drying the dishes and she's got the water on in the sink. And there's her cup sitting down there. Okay, and there? No, she has an apron on. And her shoes. And the drapes are pulled back in one of the rooms. See? Okay, okay.",
+  "patient_only_transcript": "Girl washing dishes, I see that. Uh-huh. Oh, the boy's putting up the cookie jar, getting some cookies out of the cookie jar, and his little sister is begging him, oh hurry up, come on. And he's got the footstool, and his... Her big sister is washing the dishes. That's the big sister or the mama, I don't know which that is. Is drying the dishes, putting them away. She's got the spigot on and the water is running. And there's her cups, she hasn't put them up yet. And he's up on the footstool and he's got the cookie jars. And what else is going on over here? He's getting the cookie jars. Anything else going on? She's begging him for some. Okay. Begging him for some cookies. What about over here? What else is going on over there? She's washing the dishes. She's drying the dishes and she's got the water on in the sink. And there's her cup sitting down there. Okay, and there? No, she has an apron on. And her shoes. And the drapes are pulled back in one of the rooms. See? Okay, okay.",
+  "speaker_turn_summary": [
+    "Examiner: What do you see going on in that picture?",
+    "Patient: Girl washing dishes, I see that.",
+    "Examiner: Uh-huh.",
+    "Patient: Oh, the boy's putting up the cookie jar, getting some cookies out of the cookie jar, and his little sister is begging him, oh hurry up, come on. And he's got the footstool, and his... Her big sister is washing the dishes. That's the big sister or the mama, I don't know which that is. Is drying the dishes, putting them away. She's got the spigot on and the water is running. And there's her cups, she hasn't put them up yet. And he's up on the footstool and he's got the cookie jars.",
+    "Examiner: And what else is going on over here?",
+    "Patient: He's getting the cookie jars.",
+    "Examiner: Anything else going on?",
+    "Patient: She's begging him for some. Okay. Begging him for some cookies.",
+    "Examiner: What about over here? What else is going on over there?",
+    "Patient: She's washing the dishes. She's drying the dishes and she's got the water on in the sink. And there's her cup sitting down there. Okay, and there? No, she has an apron on. And her shoes. And the drapes are pulled back in one of the rooms. See? Okay, okay."
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies multiple actors and actions in the scene: girl washing dishes, boy reaching for cookie jar, sister begging, footstool, water running, cups not put away, apron, shoes, drapes.",
+    "Patient exhibits mild uncertainty in role identification: 'That's the big sister or the mama, I don't know which that is.'",
+    "Patient uses examiner prompts to continue description, but does not require scaffolding to generate core content.",
+    "Patient speech is coherent, task-relevant, and includes specific scene details despite some hesitation and filler phrases.",
+    "No evidence of word-finding breakdown, semantic vagueness, repetition, or disorganization beyond mild uncertainty.",
+    "Narrative is sustained and organized around the picture’s key events without tangential drift or task failure."
+  ],
+  "transcript_request_id": "chatcmpl-888cdc71-b8e7-9f64-854d-0dea923df08e",
+  "classification_request_id": "chatcmpl-b28b80c6-9fa8-970b-8ef9-c262515c5521",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__350_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__350_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identifies multiple actors, actions, and objects in the picture description task.",
+        "evidence": "Patient names girl washing dishes, boy reaching for cookie jar, sister begging, footstool, water running, cups not put away, apron, shoes, drapes.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Relevance and Coherence",
+        "summary": "Patient remains focused on the picture description task without tangential drift or task failure.",
+        "evidence": "Narrative is organized around the picture’s key events; no irrelevant or disconnected content.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Mild Uncertainty in Role Identification",
+        "summary": "Patient expresses uncertainty about whether a character is the big sister or the mother, but does not indicate confusion or memory failure.",
+        "evidence": "Patient says: 'That's the big sister or the mama, I don't know which that is.'",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient provides a coherent, task-relevant description of a picture depicting a cookie-theft scene, accurately identifying multiple actors, actions, and objects. Mild uncertainty in role identification is noted but does not indicate cognitive impairment. No breakdowns in fluency, organization, or task control are observed. Further observation or formal screening is recommended due to limited data and lack of visual modality.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of core scene elements",
+      "Coherent, sustained narrative without restarts or pauses",
+      "No semantic vagueness or word-finding failure",
+      "Task completion without examiner rescue"
+    ],
+    "alternative_explanations": [
+      "Mild uncertainty may reflect natural speech variation or task complexity rather than impairment",
+      "Limited visual modality and session structure may constrain full assessment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a full cognitive screening battery",
+      "Include visual observation in next session if possible",
+      "Consider repeating the picture description task with different images"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio clip; no evidence of progressive decline or impairment in this sample.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video modality unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible and task-compliant",
+      "no impairment-like cues detected.",
+      "Examiner prompts are neutral context",
+      "patient response is self-sufficient for basic task completion."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "interviewer_dominant",
+      "limited_speaking_time",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Girl washing dishes, I see that. Uh-huh. Oh, the boy's putting up the cookie jar, getting some cookies out of the cookie jar, and his little sister is begging him, oh hurry up, come on. And he's got the footstool, and his... Her big sister is washing the dishes. That's the big sister or the mama, I don't know which that is. Is drying the dishes, putting them away. She's got the spigot on and the water is running. And there's her cups, she hasn't put them up yet. And he's up on the footstool and he's got the cookie jars. And what else is going on over here? He's getting the cookie jars. Anything else going on? She's begging him for some. Okay. Begging him for some cookies. What about over here? What else is going on over there? She's washing the dishes. She's drying the dishes and she's got the water on in the sink. And there's her cup sitting down there. Okay, and there? No, she has an apron on. And her shoes. And the drapes are pulled back in one of the rooms. See? Okay, okay.",
+    "speaker_turn_summary": [
+      "Examiner: What do you see going on in that picture?",
+      "Patient: Girl washing dishes, I see that.",
+      "Examiner: Uh-huh.",
+      "Patient: Oh, the boy's putting up the cookie jar, getting some cookies out of the cookie jar, and his little sister is begging him, oh hurry up, come on. And he's got the footstool, and his... Her big sister is washing the dishes. That's the big sister or the mama, I don't know which that is. Is drying the dishes, putting them away. She's got the spigot on and the water is running. And there's her cups, she hasn't put them up yet. And he's up on the footstool and he's got the cookie jars.",
+      "Examiner: And what else is going on over here?",
+      "Patient: He's getting the cookie jars.",
+      "Examiner: Anything else going on?",
+      "Patient: She's begging him for some. Okay. Begging him for some cookies.",
+      "Examiner: What about over here? What else is going on over there?",
+      "Patient: She's washing the dishes. She's drying the dishes and she's got the water on in the sink. And there's her cup sitting down there. Okay, and there? No, she has an apron on. And her shoes. And the drapes are pulled back in one of the rooms. See? Okay, okay."
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies multiple actors and actions in the scene: girl washing dishes, boy reaching for cookie jar, sister begging, footstool, water running, cups not put away, apron, shoes, drapes.",
+      "Patient exhibits mild uncertainty in role identification: 'That's the big sister or the mama, I don't know which that is.'",
+      "Patient uses examiner prompts to continue description, but does not require scaffolding to generate core content.",
+      "Patient speech is coherent, task-relevant, and includes specific scene details despite some hesitation and filler phrases.",
+      "No evidence of word-finding breakdown, semantic vagueness, repetition, or disorganization beyond mild uncertainty.",
+      "Narrative is sustained and organized around the picture’s key events without tangential drift or task failure."
+    ]
+  },
+  "latency_ms": 23279,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/350-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/350-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

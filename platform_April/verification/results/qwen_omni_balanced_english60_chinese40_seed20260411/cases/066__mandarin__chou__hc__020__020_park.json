@@ -1,0 +1,123 @@
+{
+  "case_id": "mandarin__chou__hc__020__020_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "一位老先生，一位老太太在下棋。两个小孩，小女孩在打网球。那么后面一个弟弟还是哥哥牵着条狗，这条狗去拉这个女孩子的衣服。然后后面还有一个秋千，秋千上面两个小孩子在玩，秋千旁边还有一个滑梯。这个老太太的后面有一个茶几，上面有茶杯，有茶，而且这个茶还是热的，在这个茶壶里面看到冒出热气的样子。啊，他们打的是羽毛球。",
+  "patient_only_transcript": "一位老先生，一位老太太在下棋。两个小孩，小女孩在打网球。那么后面一个弟弟还是哥哥牵着条狗，这条狗去拉这个女孩子的衣服。然后后面还有一个秋千，秋千上面两个小孩子在玩，秋千旁边还有一个滑梯。这个老太太的后面有一个茶几，上面有茶杯，有茶，而且这个茶还是热的，在这个茶壶里面看到冒出热气的样子。啊，他们打的是羽毛球。",
+  "speaker_turn_summary": [
+    "Examiner: prompts scene description task",
+    "Patient: describes multiple scene elements including elderly couple, children, dog, swing, slide, tea table, hot tea, and羽毛球 (badminton)"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple actors and objects in the scene",
+    "Patient uses topic-comment structure with some discourse particles (啊)",
+    "Patient maintains a coherent, sequential description of spatial layout",
+    "Patient does not show naming collapse, semantic vagueness, or abandonment",
+    "Patient’s speech is intelligible despite some pauses and fillers"
+  ],
+  "transcript_request_id": "chatcmpl-184be418-a005-98d5-9380-085d12afda34",
+  "classification_request_id": "chatcmpl-06738593-3d2a-956e-8ae8-86ffbd5733a6",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__020__020_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__020__020_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes multiple scene elements in a spatially organized way, including people, actions, and objects.",
+        "evidence": "Patient lists elderly couple playing chess, children playing tennis and on swing, dog pulling girl’s dress, tea table with hot tea, and slide — all correctly identified and sequenced.",
+        "confidence": 0.85
+      },
+      {
+        "label": "lexical_retrieval",
+        "summary": "Patient retrieves and names multiple relevant nouns and actions without significant difficulty.",
+        "evidence": "Patient correctly names '老太太', '小女孩', '狗', '秋千', '滑梯', '茶几', '茶壶', '羽毛球' — all core scene elements.",
+        "confidence": 0.8
+      },
+      {
+        "label": "discourse_structure",
+        "summary": "Patient uses simple but functional discourse structure with topic-comment phrasing and minimal fillers.",
+        "evidence": "Patient uses '啊' and '那么' as discourse markers, but does not repeat, restart, or abandon the narrative.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, multi-element description of a park scene with multiple actors and objects. Speech is intelligible and task-relevant. No clear impairment-like cues are present. However, audio quality and transcript availability are limited, warranting cautious observation.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies and sequences multiple scene elements",
+      "Patient does not show naming collapse, semantic vagueness, or abandonment",
+      "Patient’s speech is understandable and task-compliant despite minor fillers"
+    ],
+    "alternative_explanations": [
+      "Audio quality or recording conditions may limit full assessment",
+      "Patient may be naturally colloquial or hesitant, not cognitively impaired",
+      "Scene description task may be inherently complex, requiring multiple elements to be recalled"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a more structured cognitive screening task",
+      "Observe for consistency across multiple sessions",
+      "Consider environmental or recording factors affecting audio clarity"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation recommended.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-compliant, but transcript is not fully reliable due to audio quality.",
+      "Chinese colloquial features (e.g., 嗯, 啊) are not indicative of impairment in this context."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "一位老先生，一位老太太在下棋。两个小孩，小女孩在打网球。那么后面一个弟弟还是哥哥牵着条狗，这条狗去拉这个女孩子的衣服。然后后面还有一个秋千，秋千上面两个小孩子在玩，秋千旁边还有一个滑梯。这个老太太的后面有一个茶几，上面有茶杯，有茶，而且这个茶还是热的，在这个茶壶里面看到冒出热气的样子。啊，他们打的是羽毛球。",
+    "speaker_turn_summary": [
+      "Examiner: prompts scene description task",
+      "Patient: describes multiple scene elements including elderly couple, children, dog, swing, slide, tea table, hot tea, and羽毛球 (badminton)"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple actors and objects in the scene",
+      "Patient uses topic-comment structure with some discourse particles (啊)",
+      "Patient maintains a coherent, sequential description of spatial layout",
+      "Patient does not show naming collapse, semantic vagueness, or abandonment",
+      "Patient’s speech is intelligible despite some pauses and fillers"
+    ]
+  },
+  "latency_ms": 17084,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/020/020_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/020/020_park.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

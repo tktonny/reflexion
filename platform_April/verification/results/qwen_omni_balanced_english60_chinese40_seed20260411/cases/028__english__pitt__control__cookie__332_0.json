@@ -1,0 +1,126 @@
+{
+  "case_id": "english__pitt__control__cookie__332_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "The water's running on the floor. Who's taking cookie out of cookie jar? Stool is falling over. The girl is asking for a cookie. The wife is wiping the dish. Anything else? I guess not.",
+  "patient_only_transcript": "The water's running on the floor. Who's taking cookie out of cookie jar? Stool is falling over. The girl is asking for a cookie. The wife is wiping the dish. Anything else? I guess not.",
+  "speaker_turn_summary": [
+    "Examiner: 'Anything else?'",
+    "Patient: 'The water's running on the floor. Who's taking cookie out of cookie jar? Stool is falling over. The girl is asking for a cookie. The wife is wiping the dish. Anything else? I guess not.'"
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies multiple scene elements: water running, cookie jar, stool falling, girl asking for cookie, wife wiping dish.",
+    "Patient uses direct, task-relevant phrasing without significant hesitation or filler.",
+    "Patient ends with 'Anything else? I guess not.' — indicating task completion or closure, not confusion or breakdown.",
+    "No evidence of word-finding failure, semantic vagueness, or disorganization.",
+    "Patient speech is intelligible and self-contained, though brief and not elaborative."
+  ],
+  "transcript_request_id": "chatcmpl-be79466d-364b-9ab5-bdd8-2ff43ccc54ed",
+  "classification_request_id": "chatcmpl-a370b4c3-40ee-951f-8035-b4b94a636bfb",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__332_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__332_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient correctly identifies key actors and actions in the picture description task.",
+        "evidence": "Patient listed: water running, cookie jar, stool falling, girl asking for cookie, wife wiping dish — all core elements of the scene.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Closure",
+        "summary": "Patient signals task completion with 'Anything else? I guess not.' — indicating awareness of task boundaries.",
+        "evidence": "Patient self-terminates response after covering main elements, without examiner prompting to stop.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Speech Fluency and Coherence",
+        "summary": "Speech is fluent, grammatically intact, and logically sequenced without restarts or pauses.",
+        "evidence": "No fillers, repetitions, or self-corrections observed in patient's response.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient accurately described key elements of the picture scene without signs of retrieval failure, disorganization, or task breakdown. Speech is fluent and task-relevant. No impairment-like cues detected.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Fluent, coherent, self-contained response",
+      "No word-finding pauses, fillers, or restarts",
+      "Task completion signaled without examiner prompting"
+    ],
+    "alternative_explanations": [
+      "Brief response may reflect task efficiency or limited elaboration, not cognitive impairment",
+      "Poor audio quality may mask subtle cues, but patient speech remains intelligible and complete"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed",
+      "routine follow-up is appropriate.",
+      "Consider repeating the task with visual cues or prompting to assess consistency."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Single-clip assessment limits longitudinal prediction; no evidence of cognitive decline in this clip.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio and ASR transcript.",
+      "Patient speech is intelligible and task-relevant",
+      "no impairment-like features detected.",
+      "ASR transcript may contain examiner prompts",
+      "patient-only reconstruction is based on audio and context."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The water's running on the floor. Who's taking cookie out of cookie jar? Stool is falling over. The girl is asking for a cookie. The wife is wiping the dish. Anything else? I guess not.",
+    "speaker_turn_summary": [
+      "Examiner: 'Anything else?'",
+      "Patient: 'The water's running on the floor. Who's taking cookie out of cookie jar? Stool is falling over. The girl is asking for a cookie. The wife is wiping the dish. Anything else? I guess not.'"
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies multiple scene elements: water running, cookie jar, stool falling, girl asking for cookie, wife wiping dish.",
+      "Patient uses direct, task-relevant phrasing without significant hesitation or filler.",
+      "Patient ends with 'Anything else? I guess not.' — indicating task completion or closure, not confusion or breakdown.",
+      "No evidence of word-finding failure, semantic vagueness, or disorganization.",
+      "Patient speech is intelligible and self-contained, though brief and not elaborative."
+    ]
+  },
+  "latency_ms": 15665,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/332-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/332-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

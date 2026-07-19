@@ -1,0 +1,142 @@
+{
+  "case_id": "english__pitt__dementia__cookie__260_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "I'd like for you to take a look at this picture. Take a look at that picture and tell me everything that you see happening in that picture, everything that's going on there. The boy's in the cookie jar, but the stool is lopsided. He couldn't be standing like that on a stool on two legs. And the mother's letting the water run over the sink. I assume she's already washed the plate that she's drying. I don't know whether she, whether that would be necessary. That's about all I can see there. Okay, that's fine.",
+  "patient_only_transcript": "The boy's in the cookie jar, but the stool is lopsided. He couldn't be standing like that on a stool on two legs. And the mother's letting the water run over the sink. I assume she's already washed the plate that she's drying. I don't know whether she, whether that would be necessary. That's about all I can see there.",
+  "speaker_turn_summary": [
+    "Examiner: 'I'd like for you to take a look at this picture... tell me everything that you see happening in that picture...'",
+    "Patient: 'The boy's in the cookie jar, but the stool is lopsided... He couldn't be standing like that on a stool on two legs... And the mother's letting the water run over the sink... I assume she's already washed the plate that she's drying... I don't know whether she... whether that would be necessary... That's about all I can see there.'"
+  ],
+  "patient_cue_summary": [
+    "Mentions key scene elements (boy, cookie jar, stool, mother, sink, plate) but with fragmented phrasing",
+    "Uses speculative language ('I assume', 'I don't know') indicating uncertainty or retrieval difficulty",
+    "Includes self-correction and hesitation ('whether she, whether that would be necessary')",
+    "Lacks causal or narrative cohesion between events (no connection between boy stealing cookies and mother washing dishes)",
+    "Ends with 'That's about all I can see there' — suggests incomplete or truncated description",
+    "No evidence of spontaneous elaboration or organizational structure beyond basic object listing"
+  ],
+  "transcript_request_id": "chatcmpl-405b5e2b-8890-9133-b7f3-1a6d76747b6c",
+  "classification_request_id": "chatcmpl-fbc249a9-fadb-96e4-bc4a-a4c7d02394a2",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__260_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__260_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient identifies key objects but fails to construct a coherent, connected narrative of the picture’s events.",
+        "evidence": "Patient lists elements (boy, cookie jar, stool, mother, sink) but does not link them causally or temporally. Ends with admission of limited observation.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Precision",
+        "summary": "Patient uses vague and speculative language ('I assume', 'I don't know', 'whether that would be necessary') indicating possible word-finding difficulty.",
+        "evidence": "Use of hedging and self-doubt phrases suggests retrieval or confidence deficit, not just uncertainty.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient’s description lacks logical sequencing or causal structure; events are presented as isolated observations without integration.",
+        "evidence": "No transition between boy’s action and mother’s action; no inference or prediction about scene dynamics.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates partial task completion with fragmented, uncertain, and non-narrative description of the picture. While key elements are named, the lack of coherence, causal linkage, and confidence suggests possible early cognitive impairment. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Fragmented narrative structure",
+      "Use of speculative and hesitant language",
+      "Incomplete description despite prompting",
+      "Lack of causal or temporal integration between scene elements"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies major scene components (boy, cookie jar, mother, sink)",
+      "No signs of severe disorientation or incoherence",
+      "No emotional dysregulation or apathy observed"
+    ],
+    "alternative_explanations": [
+      "Task difficulty or unfamiliarity with picture description format",
+      "Temporary cognitive load or fatigue during testing",
+      "Language processing delay without dementia"
+    ],
+    "risk_factor_findings": [
+      "Uncertainty in task completion",
+      "Speculative and hesitant language use",
+      "Fragmented narrative structure"
+    ],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty about scene interpretation ('I don't know whether that would be necessary')",
+      "Patient appears to rely on examiner context to complete description ('That's about all I can see there')"
+    ],
+    "emotional_assessment_findings": [
+      "No clear signs of distress, frustration, or apathy",
+      "Affective tone is neutral to slightly hesitant, not emotionally reactive"
+    ],
+    "risk_control_suggestions": [
+      "Repeat picture description task with structured prompts",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Obtain collateral history from caregiver or family member",
+      "Schedule follow-up visit for longitudinal comparison"
+    ],
+    "visit_recommendation": "Formal cognitive screening and clinical evaluation recommended.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment needed to determine progression or stability.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio transcript and task context.",
+      "Patient speech is intelligible but shows signs of mild retrieval or organizational difficulty.",
+      "Examiner prompt is standard",
+      "patient response is not fully self-sufficient or elaborative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy's in the cookie jar, but the stool is lopsided. He couldn't be standing like that on a stool on two legs. And the mother's letting the water run over the sink. I assume she's already washed the plate that she's drying. I don't know whether she, whether that would be necessary. That's about all I can see there.",
+    "speaker_turn_summary": [
+      "Examiner: 'I'd like for you to take a look at this picture... tell me everything that you see happening in that picture...'",
+      "Patient: 'The boy's in the cookie jar, but the stool is lopsided... He couldn't be standing like that on a stool on two legs... And the mother's letting the water run over the sink... I assume she's already washed the plate that she's drying... I don't know whether she... whether that would be necessary... That's about all I can see there.'"
+    ],
+    "patient_cue_summary": [
+      "Mentions key scene elements (boy, cookie jar, stool, mother, sink, plate) but with fragmented phrasing",
+      "Uses speculative language ('I assume', 'I don't know') indicating uncertainty or retrieval difficulty",
+      "Includes self-correction and hesitation ('whether she, whether that would be necessary')",
+      "Lacks causal or narrative cohesion between events (no connection between boy stealing cookies and mother washing dishes)",
+      "Ends with 'That's about all I can see there' — suggests incomplete or truncated description",
+      "No evidence of spontaneous elaboration or organizational structure beyond basic object listing"
+    ]
+  },
+  "latency_ms": 20346,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/260-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/260-2.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

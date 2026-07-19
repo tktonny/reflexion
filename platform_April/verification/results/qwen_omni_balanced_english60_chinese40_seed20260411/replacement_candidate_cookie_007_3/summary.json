@@ -1,0 +1,152 @@
+{
+  "dataset": "talkbank_english_pitt",
+  "manifest_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/talkbank/corpora/english/pitt/manifest.jsonl",
+  "results_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/results/qwen_omni_balanced_english60_chinese40_seed20260411/replacement_candidate_cookie_007_3",
+  "metrics": {
+    "evaluated_cases": 1,
+    "successful_cases": 1,
+    "error_cases": 0,
+    "skipped_cases": 0,
+    "accuracy": 0.0,
+    "recall": 0.0,
+    "confusion_matrix": {
+      "true_positive": 0,
+      "true_negative": 0,
+      "false_positive": 0,
+      "false_negative": 1
+    }
+  },
+  "cases": [
+    {
+      "case_id": "english__pitt__dementia__cookie__007_3",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.25,
+      "reviewer_confidence": 0.85,
+      "transcript": "Well, the girl is telling the boy to get the cookies down, but don't tell your mother. And the boy is also falling over off the stool. And the mother is letting the water run out of the sink, and she's drying dishes. I don't quite get that, but then she has water on the floor. And basically it's kind of a distressing scene. Everything's gone haywire. She needs to turn off the water. She turned off the water, she'd be 100% better off.",
+      "patient_only_transcript": "The girl is telling the boy to get the cookies down, but don't tell your mother. And the boy is also falling over off the stool. And the mother is letting the water run out of the sink, and she's drying dishes. I don't quite get that, but then she has water on the floor. And basically it's kind of a distressing scene. Everything's gone haywire. She needs to turn off the water. She turned off the water, she'd be 100% better off.",
+      "speaker_turn_summary": [
+        "Patient describes the scene: girl instructs boy, boy falls, mother leaves water running, water on floor, scene is distressing, suggests turning off water.",
+        "Examiner likely prompts or observes",
+        "no clear examiner speech identified in audio."
+      ],
+      "patient_cue_summary": [
+        "Patient accurately identifies multiple actors (girl, boy, mother) and core actions (getting cookies, falling, water running, drying dishes).",
+        "Patient expresses mild confusion ('I don't quite get that') but continues with coherent description.",
+        "Patient concludes with evaluative judgment ('distressing scene', 'everything's gone haywire', 'she'd be 100% better off') indicating interpretive capacity.",
+        "No evidence of word-finding breakdown, semantic vagueness, repetition, or task disengagement.",
+        "Speech is intelligible and task-relevant despite mild uncertainty and evaluative commentary."
+      ],
+      "transcript_request_id": "chatcmpl-cf377247-da4d-95d5-a844-850920c26cf5",
+      "classification_request_id": "chatcmpl-2d47770f-2464-9144-8af8-84c2ca7fc1e8",
+      "transcript_model": "qwen3-asr-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__007_3/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__007_3/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [
+          {
+            "label": "Scene Description Accuracy",
+            "summary": "Patient accurately identifies key actors, actions, and spatial relationships in the picture description task.",
+            "evidence": "Patient names girl, boy, mother; describes cookie retrieval, falling, water running, water on floor, and evaluates scene as distressing.",
+            "confidence": 0.75
+          },
+          {
+            "label": "Task Relevance and Coherence",
+            "summary": "Patient remains focused on the task and provides a structured, sequential description of the scene.",
+            "evidence": "Patient organizes description chronologically and thematically, with minimal tangentiality or disorganization.",
+            "confidence": 0.75
+          },
+          {
+            "label": "Cognitive Load and Retrieval",
+            "summary": "Patient retrieves and articulates multiple scene elements without evidence of retrieval failure or breakdown.",
+            "evidence": "No pauses, restarts, fillers, or circumlocution indicating word-finding difficulty; speech is fluent and complete.",
+            "confidence": 0.5
+          }
+        ],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.25,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient provides a coherent, accurate, and task-relevant description of the pictured scene with mild evaluative commentary. No persuasive evidence of cognitive impairment is present. Mild uncertainty is noted but does not indicate breakdown in retrieval, organization, or task control. Further observation or follow-up may be warranted if context suggests functional concern.",
+        "evidence_for_risk": [],
+        "evidence_against_risk": [
+          "Accurate identification of multiple scene elements and actors",
+          "Coherent, fluent, and sequential description",
+          "No signs of word-finding difficulty, repetition, or task disengagement",
+          "Mild uncertainty does not indicate cognitive breakdown"
+        ],
+        "alternative_explanations": [
+          "Mild confusion may reflect general uncertainty or narrative style rather than cognitive impairment",
+          "Evaluative commentary may reflect emotional response or interpretive judgment, not memory or executive deficit",
+          "Task may be challenging or ambiguous, leading to partial or interpretive response without impairment"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [
+          "Patient expresses mild confusion about scene interpretation but does not indicate memory loss or functional impairment."
+        ],
+        "emotional_assessment_findings": [
+          "Patient displays mild concern or evaluative tone ('distressing scene', 'everything's gone haywire'), not distress, anxiety, or apathy."
+        ],
+        "risk_control_suggestions": [
+          "Follow up with a structured cognitive screening battery if clinical concern persists",
+          "Observe for consistency across multiple sessions or tasks",
+          "Consider caregiver report or functional history if available"
+        ],
+        "visit_recommendation": "routine follow-up or formal screening if clinical concern is present",
+        "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of progressive decline or impairment in this segment.",
+        "reviewer_confidence": 0.85,
+        "context_notes": [
+          "Video is unavailable",
+          "assessment based solely on audio and transcript reconstruction.",
+          "Patient speech is intelligible and task-relevant",
+          "no evidence of dementia-like impairment in this clip.",
+          "Mild uncertainty and evaluative tone are not sufficient for cognitive_risk classification in this context."
+        ],
+        "quality_flags": [
+          "multiple_people",
+          "face_not_visible",
+          "transcript_unavailable",
+          "speech_unintelligible"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+        "patient_only_transcript": "The girl is telling the boy to get the cookies down, but don't tell your mother. And the boy is also falling over off the stool. And the mother is letting the water run out of the sink, and she's drying dishes. I don't quite get that, but then she has water on the floor. And basically it's kind of a distressing scene. Everything's gone haywire. She needs to turn off the water. She turned off the water, she'd be 100% better off.",
+        "speaker_turn_summary": [
+          "Patient describes the scene: girl instructs boy, boy falls, mother leaves water running, water on floor, scene is distressing, suggests turning off water.",
+          "Examiner likely prompts or observes",
+          "no clear examiner speech identified in audio."
+        ],
+        "patient_cue_summary": [
+          "Patient accurately identifies multiple actors (girl, boy, mother) and core actions (getting cookies, falling, water running, drying dishes).",
+          "Patient expresses mild confusion ('I don't quite get that') but continues with coherent description.",
+          "Patient concludes with evaluative judgment ('distressing scene', 'everything's gone haywire', 'she'd be 100% better off') indicating interpretive capacity.",
+          "No evidence of word-finding breakdown, semantic vagueness, repetition, or task disengagement.",
+          "Speech is intelligible and task-relevant despite mild uncertainty and evaluative commentary."
+        ]
+      },
+      "latency_ms": 20145,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/007-3.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/007-3.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    }
+  ]
+}

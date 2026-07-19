@@ -1,0 +1,131 @@
+{
+  "case_id": "english__pitt__dementia__cookie__005_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.85,
+  "transcript": "This is the picture. Just tell me what's happening in the picture. The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. She's. . . The little girl is saying \"Shh\" so the mother don't hear. Did I say the sink was running over? Okay. Uh-huh, you did. Mother's drying the dishes. I don't see anything else. Okay, that's fine.",
+  "patient_only_transcript": "The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. The little girl is saying 'Shh' so the mother don't hear. Mother's drying the dishes. I don't see anything else.",
+  "speaker_turn_summary": [
+    "Examiner: 'This is the picture. Just tell me what's happening in the picture.'",
+    "Patient: 'The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. The little girl is saying 'Shh' so the mother don't hear. Mother's drying the dishes. I don't see anything else.'",
+    "Examiner: 'Did I say the sink was running over?'",
+    "Patient: 'Okay. Uh-huh, you did.'",
+    "Examiner: 'Okay, that's fine.'"
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with correct key elements (boy, stool, cookies, mother, sink, girl, 'Shh')",
+    "Minimal examiner dependence — patient initiates and completes full description without prompting",
+    "No obvious word-finding pauses, circumlocution, or semantic vagueness",
+    "No repetition, self-correction, or abandoned utterances",
+    "Narrative is logically sequenced and causally linked (girl says 'Shh' to prevent mother from hearing)",
+    "Patient ends with 'I don't see anything else' — neutral, not indicative of cognitive deficit"
+  ],
+  "transcript_request_id": "chatcmpl-2d9b47b1-12c3-9833-9fbe-158c85266650",
+  "classification_request_id": "chatcmpl-ac7f7fd5-e4dd-909c-9db0-5cc66655beaf",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient accurately and sequentially describes the entire picture scene, including characters, actions, and causal relationships.",
+        "evidence": "Patient states: 'The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. The little girl is saying 'Shh' so the mother don't hear. Mother's drying the dishes. I don't see anything else.'",
+        "confidence": 0.95
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific, contextually appropriate terms without vagueness or circumlocution.",
+        "evidence": "Patient names specific objects (cookies, sink, stool, dishes) and actions (slipping, stealing, drying, saying 'Shh').",
+        "confidence": 0.9
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description logically, linking events causally (girl says 'Shh' to prevent mother from hearing).",
+        "evidence": "Patient connects the girl’s action to the mother’s unawareness, indicating understanding of narrative causality.",
+        "confidence": 0.85
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "The patient provides a coherent, complete, and logically organized description of the pictured scene, accurately identifying all major actors and actions. There is no evidence of word-finding difficulty, disorganization, or examiner dependence. The patient’s speech is clear, informative, and task-relevant. No impairment-like cues are present.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent narrative structure",
+      "Accurate recall of multiple scene elements",
+      "No hesitation, repetition, or circumlocution",
+      "Self-contained description without reliance on examiner prompts"
+    ],
+    "alternative_explanations": [
+      "The patient may be a child or young adult with good language and memory skills",
+      "The task may be within the patient’s cognitive capacity",
+      "The patient may be describing a familiar or rehearsed scenario"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No further cognitive screening indicated based on this clip",
+      "Continue routine observation if part of a longitudinal assessment"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is not supported by a single clip; no evidence of cognitive decline is present.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-relevant",
+      "no impairment-like features detected.",
+      "Examiner prompts are minimal and do not dominate the interaction."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. The little girl is saying 'Shh' so the mother don't hear. Mother's drying the dishes. I don't see anything else.",
+    "speaker_turn_summary": [
+      "Examiner: 'This is the picture. Just tell me what's happening in the picture.'",
+      "Patient: 'The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. The little girl is saying 'Shh' so the mother don't hear. Mother's drying the dishes. I don't see anything else.'",
+      "Examiner: 'Did I say the sink was running over?'",
+      "Patient: 'Okay. Uh-huh, you did.'",
+      "Examiner: 'Okay, that's fine.'"
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with correct key elements (boy, stool, cookies, mother, sink, girl, 'Shh')",
+      "Minimal examiner dependence — patient initiates and completes full description without prompting",
+      "No obvious word-finding pauses, circumlocution, or semantic vagueness",
+      "No repetition, self-correction, or abandoned utterances",
+      "Narrative is logically sequenced and causally linked (girl says 'Shh' to prevent mother from hearing)",
+      "Patient ends with 'I don't see anything else' — neutral, not indicative of cognitive deficit"
+    ]
+  },
+  "latency_ms": 13696,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/005-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/005-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

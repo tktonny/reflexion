@@ -1,0 +1,131 @@
+{
+  "case_id": "english__pitt__control__cookie__132_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "There we go, that's it. Okay, the boy is in the cookie jar giving them to his sister. Mother is washing the dishes. The water is overflowing the sink. The boy is falling off the stool. The girl is eating the cookie, asking for another. The cover's off the cookie jar. Door of the cabinet is open. The window outside is open. Yard. The mother is impervious of what's going on. She's unconsciously standing in the water, wiping the dishes. That's about it. The wind might be blowing there. Okay.",
+  "patient_only_transcript": "The boy is in the cookie jar giving them to his sister. Mother is washing the dishes. The water is overflowing the sink. The boy is falling off the stool. The girl is eating the cookie, asking for another. The cover's off the cookie jar. Door of the cabinet is open. The window outside is open. Yard. The mother is impervious of what's going on. She's unconsciously standing in the water, wiping the dishes. That's about it. The wind might be blowing there.",
+  "speaker_turn_summary": [
+    "Examiner: 'There we go, that's it.'",
+    "Patient: 'Okay, the boy is in the cookie jar giving them to his sister. Mother is washing the dishes. The water is overflowing the sink. The boy is falling off the stool. The girl is eating the cookie, asking for another. The cover's off the cookie jar. Door of the cabinet is open. The window outside is open. Yard. The mother is impervious of what's going on. She's unconsciously standing in the water, wiping the dishes. That's about it. The wind might be blowing there.'",
+    "Examiner: 'Okay.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides a detailed, sequential description of a multi-element scene.",
+    "Patient uses specific nouns and verbs: 'cookie jar', 'falling off the stool', 'overflowing sink', 'mother is impervious'.",
+    "Patient includes spatial and causal details: 'cover's off', 'door of the cabinet is open', 'wind might be blowing'.",
+    "Patient speech is largely coherent and self-sustained without obvious pauses, restarts, or filler dependence.",
+    "Patient does not show word-finding difficulty, semantic vagueness, or disorganization.",
+    "Patient's description is task-relevant and complete for a picture-description task, despite some minor hesitations or filler phrases like 'That's about it.'"
+  ],
+  "transcript_request_id": "chatcmpl-d54e2533-2847-9401-a2d3-3aed097f6728",
+  "classification_request_id": "chatcmpl-56f1d5b4-e481-9877-b05f-7617d631456c",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__132_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__132_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential, and causally linked description of a multi-element picture scene involving children, mother, cookie jar, sink, and open windows/cabinets.",
+        "evidence": "Patient describes multiple spatial, temporal, and causal elements without examiner prompting or correction: 'The boy is falling off the stool', 'The girl is eating the cookie, asking for another', 'The cover's off the cookie jar', 'The mother is impervious of what's going on'.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific, concrete nouns and verbs relevant to the picture description task, indicating intact lexical access.",
+        "evidence": "Patient names specific objects and actions: 'cookie jar', 'stool', 'overflowing sink', 'mother', 'window outside is open', 'door of the cabinet is open'.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description in a logical, event-based sequence without fragmentation or abandonment.",
+        "evidence": "Patient describes the scene in a continuous, connected narrative: 'The boy is in the cookie jar giving them to his sister... The mother is washing the dishes... The water is overflowing... The boy is falling off the stool... The girl is eating the cookie...'.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, detailed, and task-relevant description of a multi-element picture scene without signs of word-finding difficulty, disorganization, or examiner dependence. No impairment-like cues are evident in speech content or structure.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient's description is complete, specific, and logically organized.",
+      "No evidence of semantic vagueness, repetition, or abandonment.",
+      "Patient does not rely on examiner prompts or show retrieval failure.",
+      "Patient uses concrete nouns and verbs relevant to the task context."
+    ],
+    "alternative_explanations": [
+      "The patient may be describing a familiar or well-known scene rather than a picture.",
+      "The patient may be narrating a story or memory rather than describing a visual stimulus.",
+      "The audio may contain some background noise or slight hesitations that do not impact overall coherence."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No specific interventions needed based on this clip.",
+      "Continue routine cognitive screening if part of a longitudinal protocol.",
+      "Monitor for changes in narrative coherence or detail in future assessments."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline is present in this assessment.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is self-sustained and task-relevant, with no signs of impairment.",
+      "Examiner prompts are minimal and do not dominate the patient response.",
+      "Patient's description is consistent with healthy performance on a picture-description task."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is in the cookie jar giving them to his sister. Mother is washing the dishes. The water is overflowing the sink. The boy is falling off the stool. The girl is eating the cookie, asking for another. The cover's off the cookie jar. Door of the cabinet is open. The window outside is open. Yard. The mother is impervious of what's going on. She's unconsciously standing in the water, wiping the dishes. That's about it. The wind might be blowing there.",
+    "speaker_turn_summary": [
+      "Examiner: 'There we go, that's it.'",
+      "Patient: 'Okay, the boy is in the cookie jar giving them to his sister. Mother is washing the dishes. The water is overflowing the sink. The boy is falling off the stool. The girl is eating the cookie, asking for another. The cover's off the cookie jar. Door of the cabinet is open. The window outside is open. Yard. The mother is impervious of what's going on. She's unconsciously standing in the water, wiping the dishes. That's about it. The wind might be blowing there.'",
+      "Examiner: 'Okay.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides a detailed, sequential description of a multi-element scene.",
+      "Patient uses specific nouns and verbs: 'cookie jar', 'falling off the stool', 'overflowing sink', 'mother is impervious'.",
+      "Patient includes spatial and causal details: 'cover's off', 'door of the cabinet is open', 'wind might be blowing'.",
+      "Patient speech is largely coherent and self-sustained without obvious pauses, restarts, or filler dependence.",
+      "Patient does not show word-finding difficulty, semantic vagueness, or disorganization.",
+      "Patient's description is task-relevant and complete for a picture-description task, despite some minor hesitations or filler phrases like 'That's about it.'"
+    ]
+  },
+  "latency_ms": 25695,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/132-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/132-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

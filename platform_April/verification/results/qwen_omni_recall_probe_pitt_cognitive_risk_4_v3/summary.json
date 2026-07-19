@@ -1,0 +1,356 @@
+{
+  "dataset": "talkbank_english_pitt",
+  "manifest_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/talkbank/corpora/english/pitt/manifest.jsonl",
+  "results_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/results/qwen_omni_recall_probe_pitt_cognitive_risk_4_v3",
+  "metrics": {
+    "evaluated_cases": 4,
+    "successful_cases": 3,
+    "error_cases": 1,
+    "skipped_cases": 0,
+    "accuracy": 0.6666666666666666,
+    "precision": 1.0,
+    "recall": 0.6666666666666666,
+    "f1": 0.8,
+    "confusion_matrix": {
+      "true_positive": 2,
+      "true_negative": 0,
+      "false_positive": 0,
+      "false_negative": 1
+    }
+  },
+  "cases": [
+    {
+      "case_id": "english__pitt__dementia__cookie__001_2",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "predicted_label": "cognitive_risk",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.35,
+      "reviewer_confidence": 0.65,
+      "patient_only_transcript": "The boy is going in the cookie jar... the stool is falling... water is overflowing... the mother is near the girl... she's trying to wipe dishes... I can't think of the word... I don't know if that's more than one... I'm saying he's a boy because it's hard to tell anymore...",
+      "patient_cue_summary": [
+        "word-finding pauses and circumlocution ('I can't think of the word')",
+        "vague and fragmented descriptions ('the water is running... and the mother... uh...')",
+        "repetition and self-correction ('I'm saying he's a boy because it's hard to tell anymore')",
+        "examiner-dependent continuation ('I don't know if that's more than one')",
+        "partial scene description with missing causal links and weak organization"
+      ],
+      "classification_request_id": "chatcmpl-713e9808-8d6a-9b0a-9f02-f292be6a21c2",
+      "transcript_model": "qwen3-omni-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [
+          {
+            "label": "Word-Finding Difficulty",
+            "summary": "Patient repeatedly struggles to retrieve specific nouns or descriptors, using circumlocutions and filler phrases.",
+            "evidence": "Patient says 'I can't think of the word' and 'I don't know if that's more than one'.",
+            "confidence": 0.7
+          },
+          {
+            "label": "Fragmented Scene Description",
+            "summary": "Patient describes elements of the scene but fails to link them coherently or maintain narrative flow.",
+            "evidence": "Patient mentions 'boy', 'cookie jar', 'stool', 'water overflowing', 'mother', but lacks causal or sequential structure.",
+            "confidence": 0.65
+          },
+          {
+            "label": "Examiner Dependence",
+            "summary": "Patient relies on examiner prompts and appears to need repeated clarification or direction.",
+            "evidence": "Patient says 'I don't know if that's more than one' and 'I'm saying he's a boy because it's hard to tell anymore', suggesting reliance on external cues.",
+            "confidence": 0.6
+          }
+        ],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "uncertain",
+        "target_patient_basis": "externally_provided",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.35,
+        "risk_label": "cognitive_risk",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient demonstrates mild impairment-like cues including word-finding difficulty, fragmented scene description, and examiner dependence. These suggest possible cognitive decline but are not conclusive. Further clinical evaluation is recommended.",
+        "evidence_for_risk": [
+          "Repeated word-finding pauses and circumlocutions",
+          "Lack of coherent narrative structure despite task relevance",
+          "Reliance on examiner prompts to continue description"
+        ],
+        "evidence_against_risk": [
+          "Patient correctly identifies key scene elements (boy, cookie jar, mother, water, stool)",
+          "No overt confusion or disorientation in task context",
+          "Speech is not unintelligible, though low-information"
+        ],
+        "alternative_explanations": [
+          "Temporary cognitive load or fatigue during task",
+          "Language processing delay unrelated to dementia",
+          "Task-specific difficulty or unfamiliarity with picture description format"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [
+          "Patient expresses uncertainty about identifying gender and scene elements",
+          "Patient reports difficulty retrieving specific words or concepts"
+        ],
+        "emotional_assessment_findings": [
+          "Frustration or cognitive effort audible in pauses and filler phrases",
+          "Low affective engagement or hesitation in describing scene"
+        ],
+        "risk_control_suggestions": [
+          "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+          "Repeat picture description task with structured prompts",
+          "Assess functional daily activities and caregiver reports"
+        ],
+        "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment.",
+        "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up assessments recommended to track progression.",
+        "reviewer_confidence": 0.65,
+        "context_notes": [
+          "Video component unavailable; assessment based solely on audio.",
+          "Patient speech is partially intelligible but shows impairment-like features.",
+          "Examiner prompts dominate speech; patient response is fragmented and hesitant."
+        ],
+        "quality_flags": [
+          "multiple_people",
+          "target_patient_uncertain",
+          "interviewer_dominant",
+          "transcript_unavailable",
+          "speech_unintelligible"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+        "patient_only_transcript": "The boy is going in the cookie jar... the stool is falling... water is overflowing... the mother is near the girl... she's trying to wipe dishes... I can't think of the word... I don't know if that's more than one... I'm saying he's a boy because it's hard to tell anymore...",
+        "patient_cue_summary": [
+          "word-finding pauses and circumlocution ('I can't think of the word')",
+          "vague and fragmented descriptions ('the water is running... and the mother... uh...')",
+          "repetition and self-correction ('I'm saying he's a boy because it's hard to tell anymore')",
+          "examiner-dependent continuation ('I don't know if that's more than one')",
+          "partial scene description with missing causal links and weak organization"
+        ]
+      },
+      "latency_ms": 14090,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/001-2.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/001-2.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    },
+    {
+      "case_id": "english__pitt__dementia__cookie__005_0",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "predicted_label": "cognitive_risk",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.35,
+      "reviewer_confidence": 0.7,
+      "patient_only_transcript": "The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. The little girl is saying 'shh' so the mother won't hear. The sink was running over. The mother is drying the dishes. I don't see anything else.",
+      "patient_cue_summary": [
+        "Patient names key scene elements (boy, cookies, mother, sink, girl, stool) but with minimal elaboration.",
+        "Patient repeats 'the sink was running over' — suggests possible retrieval or sequencing difficulty.",
+        "Patient ends with 'I don't see anything else' — indicates possible task completion or lack of further observation.",
+        "Speech is coherent but lacks narrative depth, causal links, or detailed description of interactions.",
+        "No clear signs of word-finding pauses, circumlocution, or abandonment, but also no evidence of rich, organized description."
+      ],
+      "classification_request_id": "chatcmpl-adc11fdd-4903-9058-88db-15951439fe51",
+      "transcript_model": "qwen3-omni-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "externally_provided",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.35,
+        "risk_label": "cognitive_risk",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient accurately identifies major scene elements but provides minimal elaboration, lacks narrative coherence, and ends with a vague statement. No strong impairment cues, but insufficient detail for healthy classification. Further clinical review recommended.",
+        "evidence_for_risk": [
+          "Minimal elaboration despite rich visual context",
+          "Repetition of sink detail without expansion",
+          "Lack of causal or sequential linking between events"
+        ],
+        "evidence_against_risk": [
+          "No word-finding pauses or semantic vagueness",
+          "Correct naming of key objects and roles",
+          "No signs of disorganization or abandonment"
+        ],
+        "alternative_explanations": [
+          "Patient may be young or shy, limiting verbal elaboration",
+          "Task may be unfamiliar or poorly explained",
+          "Examiner may have prompted or guided response"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [],
+        "risk_control_suggestions": [
+          "Repeat picture description task with structured prompts",
+          "Assess memory and narrative coherence with follow-up tasks",
+          "Consider caregiver report for functional context"
+        ],
+        "visit_recommendation": "Formal cognitive screening recommended",
+        "future_risk_trend_summary": "Longitudinal prediction limited; single clip insufficient for trend assessment",
+        "reviewer_confidence": 0.7,
+        "context_notes": [
+          "Video unavailable; assessment based solely on audio transcript",
+          "Patient speech is intelligible but lacks depth for healthy classification",
+          "Task context: picture description of cookie-theft scene"
+        ],
+        "quality_flags": [
+          "multiple_people",
+          "transcript_unavailable",
+          "face_not_visible"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+        "patient_only_transcript": "The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. The little girl is saying 'shh' so the mother won't hear. The sink was running over. The mother is drying the dishes. I don't see anything else.",
+        "patient_cue_summary": [
+          "Patient names key scene elements (boy, cookies, mother, sink, girl, stool) but with minimal elaboration.",
+          "Patient repeats 'the sink was running over' — suggests possible retrieval or sequencing difficulty.",
+          "Patient ends with 'I don't see anything else' — indicates possible task completion or lack of further observation.",
+          "Speech is coherent but lacks narrative depth, causal links, or detailed description of interactions.",
+          "No clear signs of word-finding pauses, circumlocution, or abandonment, but also no evidence of rich, organized description."
+        ]
+      },
+      "latency_ms": 13045,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/005-0.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/005-0.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    },
+    {
+      "case_id": "english__pitt__dementia__cookie__007_1",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "patient_cue_summary": [],
+      "transcript_model": "qwen3-omni-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__007_1/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__007_1/audio.mp3",
+      "latency_ms": 18461,
+      "error": "invalid_provider_output: qwen_omni returned an invalid assessment payload",
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/007-1.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/007-1.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    },
+    {
+      "case_id": "english__pitt__dementia__cookie__010_0",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.2,
+      "reviewer_confidence": 0.7,
+      "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing.",
+      "patient_cue_summary": [
+        "coherent scene description",
+        "specific content words",
+        "main events linked logically",
+        "little examiner dependence"
+      ],
+      "classification_request_id": "chatcmpl-4fc542e5-1055-9e0f-8eee-fb63874e5a05",
+      "transcript_model": "qwen3-omni-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.2,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient provides a coherent, detailed description of the pictured scene, including key elements such as the boy reaching into the cookie jar, the stool tipping, the mother washing dishes, and the sink overflowing. Speech is intelligible and organized, with minimal examiner dependence. No clear signs of cognitive impairment are evident in the audio. However, due to lack of visual data and potential limitations in audio clarity, further observation is recommended.",
+        "evidence_for_risk": [
+          "Patient accurately describes multiple elements of the scene",
+          "Speech is organized and logically sequenced",
+          "No signs of word-finding difficulty or disorganization"
+        ],
+        "evidence_against_risk": [
+          "No self-reported concerns or caregiver statements",
+          "No emotional dysregulation or affective flattening observed",
+          "No examiner prompts required to elicit basic scene description"
+        ],
+        "alternative_explanations": [
+          "Audio quality may limit full assessment of speech nuances",
+          "Lack of visual data prevents confirmation of nonverbal cues",
+          "Single clip limits longitudinal inference"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [],
+        "risk_control_suggestions": [
+          "Follow up with a full neuropsychological screening if clinical concern persists",
+          "Repeat the picture description task with clearer audio or visual recording",
+          "Monitor for functional changes in daily activities or memory complaints"
+        ],
+        "visit_recommendation": "routine follow-up with formal cognitive screening if symptoms emerge or caregiver concerns are raised",
+        "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further data required for trend assessment",
+        "reviewer_confidence": 0.7,
+        "context_notes": [
+          "Video data unavailable; assessment based solely on audio",
+          "Patient speech is intelligible and task-relevant",
+          "No strong impairment signals detected in available audio"
+        ],
+        "quality_flags": [
+          "transcript_unavailable",
+          "speech_unintelligible"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+        "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing.",
+        "patient_cue_summary": [
+          "coherent scene description",
+          "specific content words",
+          "main events linked logically",
+          "little examiner dependence"
+        ]
+      },
+      "latency_ms": 11664,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/010-0.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/010-0.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    }
+  ]
+}

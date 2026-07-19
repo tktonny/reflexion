@@ -1,0 +1,121 @@
+{
+  "case_id": "mandarin__chou__hc__026__026_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "我跟你说，水倒了嘛哈。然后这个人在，爸爸在在烫东西啊，然后然后小孩想要去弄那个插头。哎，有电出来，小狗狗就在叫。嗯。那我就说。猫咪在，哎。就是爸爸在烫衣服啊，小朋友跑去插头的地方要去弄插头，那只狗很聪明，看到了，发电就就汪汪叫，猫咪一一看叫，然后就去打破水。二二零一九啦。嗯。六月二十七。就是烫衣服开始。",
+  "patient_only_transcript": "我跟你说，水倒了嘛哈。然后这个人在，爸爸在在烫东西啊，然后然后小孩想要去弄那个插头。哎，有电出来，小狗狗就在叫。嗯。那我就说。猫咪在，哎。就是爸爸在烫衣服啊，小朋友跑去插头的地方要去弄插头，那只狗很聪明，看到了，发电就就汪汪叫，猫咪一一看叫，然后就去打破水。二二零一九啦。嗯。六月二十七。就是烫衣服开始。",
+  "speaker_turn_summary": [
+    "患者描述家庭场景：水倒了、爸爸烫衣服、小孩去碰插头、狗叫、猫打破水。",
+    "患者语句中包含重复、语气词（如‘嘛哈’‘嗯’‘哎’）、语序松散，但核心事件可识别。",
+    "患者未被明显打断或引导，主动叙述多个角色与动作，未出现明显语义断裂或命名失败。"
+  ],
+  "patient_cue_summary": [
+    "患者能识别并描述多个角色（爸爸、小孩、狗、猫）和动作（烫衣服、碰插头、狗叫、猫打破水）。",
+    "语句中存在语义重复、语气词、语序松散，但未导致核心信息丢失或无法重建。",
+    "患者未表现出命名困难、语义断裂、逻辑中断或严重自我修正，整体叙述可被理解为场景描述而非失语或混乱。",
+    "未出现明显认知障碍信号如持续重复、语义坍塌、角色混淆、时间线错乱或任务失败。"
+  ],
+  "transcript_request_id": "chatcmpl-62dfee3e-132b-90fe-85bc-64674fb241e7",
+  "classification_request_id": "chatcmpl-caef475c-8c80-96b1-9f86-9e6510b569ef",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__026__026_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__026__026_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "患者能描述多个家庭成员与动作，虽语句松散但核心事件可识别。",
+        "evidence": "患者提及爸爸烫衣服、小孩碰插头、狗叫、猫打破水，多个角色与动作被正确命名。",
+        "confidence": 0.5
+      },
+      {
+        "label": "discourse_particles_and_repetition",
+        "summary": "语句中含语气词和重复，但未影响信息传递。",
+        "evidence": "使用‘嘛哈’‘嗯’‘哎’‘然后然后’等，属正常口语表达，未导致语义中断或命名失败。",
+        "confidence": 0.25
+      },
+      {
+        "label": "task_completion_attempt",
+        "summary": "患者尝试完成场景描述任务，未明显放弃或中断。",
+        "evidence": "患者主动叙述多个事件，虽非连贯叙事，但未出现语义坍塌或任务失败。",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "externally_provided",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "患者能描述多个家庭场景元素，语句虽口语化、松散、含语气词，但未出现命名失败、语义断裂或任务放弃。符合轻度非典型表达，但无明确认知障碍证据。建议观察或补充评估。",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "能识别并命名多个角色与动作",
+      "未出现语义坍塌或命名失败",
+      "叙述虽松散但未中断或放弃任务"
+    ],
+    "alternative_explanations": [
+      "口语化表达、语气词、语序松散属正常语言特征，非认知障碍证据",
+      "场景描述任务本身允许非结构化叙述，非要求逻辑连贯",
+      "录音质量或语速可能影响清晰度，但未影响核心信息传递"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "建议补充结构化认知筛查工具（如MMSE、MoCA）",
+      "观察患者在后续任务中是否持续出现语义模糊或任务中断",
+      "若患者在其他任务中表现类似，可考虑轻度认知风险再评估"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "单次评估无法预测长期认知趋势，建议纵向观察或重复评估。",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "患者语言表达符合非正式口语特征，未达认知障碍诊断标准。",
+      "场景描述任务中，识别多个元素即为有效完成，非要求逻辑连贯。",
+      "语句松散不等于认知障碍，需结合多模态或重复评估确认。"
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable",
+      "limited_speaking_time"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "我跟你说，水倒了嘛哈。然后这个人在，爸爸在在烫东西啊，然后然后小孩想要去弄那个插头。哎，有电出来，小狗狗就在叫。嗯。那我就说。猫咪在，哎。就是爸爸在烫衣服啊，小朋友跑去插头的地方要去弄插头，那只狗很聪明，看到了，发电就就汪汪叫，猫咪一一看叫，然后就去打破水。二二零一九啦。嗯。六月二十七。就是烫衣服开始。",
+    "speaker_turn_summary": [
+      "患者描述家庭场景：水倒了、爸爸烫衣服、小孩去碰插头、狗叫、猫打破水。",
+      "患者语句中包含重复、语气词（如‘嘛哈’‘嗯’‘哎’）、语序松散，但核心事件可识别。",
+      "患者未被明显打断或引导，主动叙述多个角色与动作，未出现明显语义断裂或命名失败。"
+    ],
+    "patient_cue_summary": [
+      "患者能识别并描述多个角色（爸爸、小孩、狗、猫）和动作（烫衣服、碰插头、狗叫、猫打破水）。",
+      "语句中存在语义重复、语气词、语序松散，但未导致核心信息丢失或无法重建。",
+      "患者未表现出命名困难、语义断裂、逻辑中断或严重自我修正，整体叙述可被理解为场景描述而非失语或混乱。",
+      "未出现明显认知障碍信号如持续重复、语义坍塌、角色混淆、时间线错乱或任务失败。"
+    ]
+  },
+  "latency_ms": 16308,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/026/026_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/026/026_Daddy.mp3?f=save",
+    "expected_group_audio_count": 120
+  }
+}

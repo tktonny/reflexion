@@ -1,0 +1,134 @@
+{
+  "case_id": "mandarin__chou__hc__006__006_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "烫衣服的时候发现一个这个小小朋友去摸这个电线，触那个电触电，他哇叫起来。那这个上面那个花，这个是应该是花瓶吧？水，一个猫，它又吓到了，一吓到它，猫把这个水瓶打翻，漏水。那它也是，那个那个狗也也跟抓过来，它要干什么我就不知道了。那就是叫，开始是，应该是它这么开始，生了，触了电，触了线，它叫起来，它狗就，对啊，这狗就过来，啊，看什么事，猫就把这个水瓶打破，留下。",
+  "patient_only_transcript": "烫衣服的时候发现一个小朋友去摸电线，触电叫起来。花瓶里的水被猫打翻漏水。狗也过来，不知道它要干什么。开始是触电叫起来，狗过来看，猫打翻水瓶。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes a multi-event scene involving child, electricity, cat, dog, water bottle, and reactions"
+  ],
+  "patient_cue_summary": [
+    "Describes multiple events but with fragmented sequencing",
+    "Uses vague terms like '小朋友' (little child) without specific identification or role",
+    "Repeats '触电' (electric shock) and '叫起来' (shouted) without elaborating on cause-effect",
+    "Mentions '狗也过来' (dog also came over) without clarifying intent or action",
+    "Uses '不知道' (don't know) to express uncertainty about dog's behavior",
+    "Narrative lacks causal coherence: events are listed but not logically connected",
+    "Lexical retrieval appears adequate for basic objects (water bottle, cat, dog, electricity) but not for actions or relationships"
+  ],
+  "transcript_request_id": "chatcmpl-1b449544-9491-9b1b-898d-4fac7cb934fc",
+  "classification_request_id": "chatcmpl-2156457c-4b86-9a4b-afea-85e488c4c60f",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__006__006_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__006__006_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "narrative disorganization",
+        "summary": "Patient describes a multi-event scene but with weak causal links and fragmented sequencing.",
+        "evidence": "Patient lists events (child touching wire, cat knocking over bottle, dog approaching) without clearly connecting them causally or temporally.",
+        "confidence": 0.7
+      },
+      {
+        "label": "lexical vagueness",
+        "summary": "Patient uses generic terms and expresses uncertainty about roles or intentions.",
+        "evidence": "Uses '小朋友' instead of specifying child's identity; says '不知道它要干什么' (don't know what it wants to do) about dog's behavior.",
+        "confidence": 0.65
+      },
+      {
+        "label": "repetition and lack of elaboration",
+        "summary": "Patient repeats '触电' and '叫起来' without expanding on sensory or emotional details.",
+        "evidence": "Repeats '触电' and '叫起来' as key events without adding descriptive or emotional context.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a basic description of a multi-event scene but with fragmented sequencing, lexical vagueness, and lack of causal coherence. While key objects are named, the narrative lacks depth, organization, and emotional or action-based elaboration. These features suggest mild cognitive concern warranting further observation.",
+    "evidence_for_risk": [
+      "Fragmented event sequencing",
+      "Use of vague terms and uncertainty expressions",
+      "Repetition without elaboration",
+      "Lack of causal or temporal linking between events"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies common objects (water bottle, cat, dog, electricity)",
+      "Patient maintains basic narrative continuity despite disorganization"
+    ],
+    "alternative_explanations": [
+      "Language processing delay or fatigue during task",
+      "Task complexity or examiner prompting may have influenced response structure",
+      "Normal variation in narrative style during spontaneous description"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with structured narrative or memory tasks",
+      "Assess for word-finding difficulty or semantic retrieval in other domains",
+      "Consider caregiver report for functional or behavioral changes"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended; routine follow-up if no further concerns arise.",
+    "future_risk_trend_summary": "Longitudinal prediction limited based on single clip; further observation needed to assess progression or stability.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio content.",
+      "Patient speech is intelligible but organizationally weak.",
+      "Examiner role is inferred from context",
+      "patient is primary respondent.",
+      "No visual cues available for emotional or behavioral assessment."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "烫衣服的时候发现一个小朋友去摸电线，触电叫起来。花瓶里的水被猫打翻漏水。狗也过来，不知道它要干什么。开始是触电叫起来，狗过来看，猫打翻水瓶。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes a multi-event scene involving child, electricity, cat, dog, water bottle, and reactions"
+    ],
+    "patient_cue_summary": [
+      "Describes multiple events but with fragmented sequencing",
+      "Uses vague terms like '小朋友' (little child) without specific identification or role",
+      "Repeats '触电' (electric shock) and '叫起来' (shouted) without elaborating on cause-effect",
+      "Mentions '狗也过来' (dog also came over) without clarifying intent or action",
+      "Uses '不知道' (don't know) to express uncertainty about dog's behavior",
+      "Narrative lacks causal coherence: events are listed but not logically connected",
+      "Lexical retrieval appears adequate for basic objects (water bottle, cat, dog, electricity) but not for actions or relationships"
+    ]
+  },
+  "latency_ms": 16948,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/006/006_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/006/006_Daddy.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

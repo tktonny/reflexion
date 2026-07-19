@@ -1,0 +1,143 @@
+{
+  "case_id": "english__pitt__control__cookie__137_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "She's drying dishes. The water is pouring out of the sink. This kid's about to break a nail because this is moving, the thing's moving. And she's talking and moving her hands and he's moving, getting a cookie out of the jar. Um, she isn't moving her feet out of that water. She's going to be shortly. Oh, the, no, I don't see the wind blowing. That's about it.",
+  "patient_only_transcript": "She's drying dishes. The water is pouring out of the sink. This kid's about to break a nail because this is moving, the thing's moving. And she's talking and moving her hands and he's moving, getting a cookie out of the jar. Um, she isn't moving her feet out of that water. She's going to be shortly. Oh, the, no, I don't see the wind blowing. That's about it.",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes scene with fragmented, hesitant, and incomplete sequencing",
+    "Patient: uses vague terms like 'this', 'the thing', 'that one' (implied)",
+    "Patient: repeats 'she's going to be shortly' without clear causal link",
+    "Patient: ends with 'That's about it.' — abrupt, incomplete closure"
+  ],
+  "patient_cue_summary": [
+    "Uses vague referents ('this', 'the thing') instead of specific nouns",
+    "Fragmented sentence structure with pauses and restarts ('Um, she isn't... She's going to be shortly.')",
+    "Incomplete narrative closure ('That's about it.') — lacks summary or coherence",
+    "Repetitive or redundant phrasing ('this is moving, the thing's moving')",
+    "Low-information content despite task context (cookie theft, sink, mother, stool implied)",
+    "Examiner-dependent continuation implied by lack of self-sustained narrative"
+  ],
+  "transcript_request_id": "chatcmpl-b3733c09-312d-99b5-8bb9-67a5ae7b388b",
+  "classification_request_id": "chatcmpl-904304d3-4016-96af-8907-e279bfcf93de",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__137_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__137_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Narrative Coherence",
+        "summary": "Fragmented, incomplete description with weak causal links and vague referents.",
+        "evidence": "Patient says 'this is moving, the thing's moving' and 'That's about it.' — lacks logical flow or summary.",
+        "confidence": 0.7
+      },
+      {
+        "label": "Lexical Retrieval",
+        "summary": "Uses vague terms ('this', 'the thing') and lacks specific nouns despite task context.",
+        "evidence": "Patient avoids naming specific objects or actions clearly; relies on pronouns and filler terms.",
+        "confidence": 0.65
+      },
+      {
+        "label": "Task Completion",
+        "summary": "Response ends abruptly without closure or summary, suggesting incomplete task engagement.",
+        "evidence": "Patient concludes with 'That's about it.' — no elaboration or wrap-up of scene description.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a partially coherent but fragmented description of a picture-based scene. Speech contains vague referents, incomplete sequencing, and weak narrative closure. While some scene elements are named, the response lacks organization, lexical precision, and self-sustained structure. Examiner dependence is implied. Not sufficient for healthy classification, but not strong enough for dementia. Further clinical review recommended.",
+    "evidence_for_risk": [
+      "Vague referents ('this', 'the thing') indicating possible word-finding difficulty",
+      "Fragmented, hesitant phrasing with pauses and restarts",
+      "Incomplete narrative closure ('That's about it.') — suggests lack of cognitive control or task completion",
+      "Repetition of 'moving' without clear causal or spatial linkage",
+      "Examiner-dependent continuation implied by lack of self-sustained description"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key scene elements: cookie, sink, mother, water, stool (implied)",
+      "Speech is mostly intelligible and not unintelligible",
+      "No overt signs of confusion, disorientation, or severe memory loss",
+      "No emotional dysregulation or affective flattening observed"
+    ],
+    "alternative_explanations": [
+      "Examiner prompting may have influenced response structure",
+      "Possible fatigue or distraction during task",
+      "Non-native speaker or speech disfluency not due to cognitive impairment",
+      "Task may be misinterpreted or poorly elicited"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat task with clearer instructions or visual cues",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Observe patient in structured, repeated tasks to assess consistency",
+      "Include caregiver report for functional context"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment",
+    "future_risk_trend_summary": "Longitudinal prediction not possible from single clip; risk remains low but warrants monitoring",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio with examiner-patient interaction",
+      "Patient speech is partially intelligible but lacks coherence and lexical precision",
+      "Task context: cookie-theft picture description",
+      "patient response is incomplete and vague",
+      "No visual cues available for emotional or behavioral assessment"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "She's drying dishes. The water is pouring out of the sink. This kid's about to break a nail because this is moving, the thing's moving. And she's talking and moving her hands and he's moving, getting a cookie out of the jar. Um, she isn't moving her feet out of that water. She's going to be shortly. Oh, the, no, I don't see the wind blowing. That's about it.",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes scene with fragmented, hesitant, and incomplete sequencing",
+      "Patient: uses vague terms like 'this', 'the thing', 'that one' (implied)",
+      "Patient: repeats 'she's going to be shortly' without clear causal link",
+      "Patient: ends with 'That's about it.' — abrupt, incomplete closure"
+    ],
+    "patient_cue_summary": [
+      "Uses vague referents ('this', 'the thing') instead of specific nouns",
+      "Fragmented sentence structure with pauses and restarts ('Um, she isn't... She's going to be shortly.')",
+      "Incomplete narrative closure ('That's about it.') — lacks summary or coherence",
+      "Repetitive or redundant phrasing ('this is moving, the thing's moving')",
+      "Low-information content despite task context (cookie theft, sink, mother, stool implied)",
+      "Examiner-dependent continuation implied by lack of self-sustained narrative"
+    ]
+  },
+  "latency_ms": 15054,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/137-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/137-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

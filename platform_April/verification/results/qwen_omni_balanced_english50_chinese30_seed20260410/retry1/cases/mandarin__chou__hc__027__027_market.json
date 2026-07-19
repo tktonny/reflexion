@@ -1,0 +1,133 @@
+{
+  "case_id": "mandarin__chou__hc__027__027_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "阿妈带着小朋友在捞鱼，这个想捞到了鱼他很高兴，而这个没捞到就不太高兴。这个看的看的不晓得怎么捞着妈妈的发呆了，冰淇淋都融掉掉了他头上。这边小朋友玩水是很高兴，这个爬手就是爬他的包包。",
+  "patient_only_transcript": "阿妈带着小朋友在捞鱼，这个想捞到了鱼他很高兴，而这个没捞到就不太高兴。这个看的看的不晓得怎么捞着妈妈的发呆了，冰淇淋都融掉掉了他头上。这边小朋友玩水是很高兴，这个爬手就是爬他的包包。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes scene with fragmented, vague, and disorganized narrative, showing word-finding difficulty and weak causal links."
+  ],
+  "patient_cue_summary": [
+    "Fragmented sentence structure with repeated phrases ('看的看的')",
+    "Vague terminology ('不晓得怎么捞着妈妈的发呆了') indicating semantic uncertainty",
+    "Weak causal organization: events are listed but not logically connected",
+    "Lexical retrieval difficulty: '爬手就是爬他的包包' lacks clarity or specificity",
+    "Examiner-dependent narrative flow: relies on scene context rather than self-sustained description"
+  ],
+  "transcript_request_id": "chatcmpl-20546d0d-1443-9247-b3cf-8b192dd783bd",
+  "classification_request_id": "chatcmpl-7061f02b-b964-9844-99ce-92994cb9a118",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__027__027_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__027__027_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Narrative Disorganization",
+        "summary": "Patient's description lacks logical sequencing and causal coherence, despite mentioning multiple scene elements.",
+        "evidence": "Phrases like '看的看的不晓得怎么捞着妈妈的发呆了' indicate semantic uncertainty and weak event linkage.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval Difficulty",
+        "summary": "Patient uses vague or imprecise terms and repeats phrases, suggesting word-finding challenges.",
+        "evidence": "Use of '不晓得怎么捞着妈妈的发呆了' and '爬手就是爬他的包包' shows imprecise or circumlocutory language.",
+        "confidence": null
+      },
+      {
+        "label": "Examiner-Dependent Narrative",
+        "summary": "Patient's response appears to rely on scene context rather than self-sustained, structured description.",
+        "evidence": "Narrative structure is fragmented and does not independently reconstruct the scene without external cues.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented, disorganized description of a scene with vague terminology and weak causal links. While some scene elements are correctly named, the narrative lacks coherence, lexical precision, and self-sustained structure. These features suggest mild cognitive impairment-like cues warranting further clinical observation.",
+    "evidence_for_risk": [
+      "Repetitive phrasing ('看的看的')",
+      "Unclear or vague phrasing ('不晓得怎么捞着妈妈的发呆了')",
+      "Weak narrative organization and causal links",
+      "Lexical retrieval difficulty in final clause ('爬手就是爬他的包包')"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key scene elements (mother, children, fishing, ice cream, water)",
+      "No explicit memory complaints or caregiver concerns reported",
+      "Speech is intelligible and not unintelligible or silent"
+    ],
+    "alternative_explanations": [
+      "Narrative style may reflect childlike or non-native Mandarin fluency rather than cognitive impairment",
+      "Scene description task may be unfamiliar or challenging for patient, leading to disorganized response",
+      "Examiner prompting may have influenced structure, reducing patient autonomy in response"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Emotional reactivity observed in description of高兴 and不太高兴, but not reliably attributed to patient's own affect",
+      "No clear evidence of apathy, anxiety, or frustration from patient speech"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with structured picture-description or story-reconstruction tasks",
+      "Administer brief cognitive screening tools (e.g., MoCA, MMSE) in clinic setting",
+      "Observe for consistency across multiple sessions and contexts"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation needed to assess progression or stability",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment relies solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible but shows mild impairment-like features in organization and lexical retrieval.",
+      "Examiner role is inferred from context",
+      "patient is the primary subject of evaluation."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "video_too_short",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "阿妈带着小朋友在捞鱼，这个想捞到了鱼他很高兴，而这个没捞到就不太高兴。这个看的看的不晓得怎么捞着妈妈的发呆了，冰淇淋都融掉掉了他头上。这边小朋友玩水是很高兴，这个爬手就是爬他的包包。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes scene with fragmented, vague, and disorganized narrative, showing word-finding difficulty and weak causal links."
+    ],
+    "patient_cue_summary": [
+      "Fragmented sentence structure with repeated phrases ('看的看的')",
+      "Vague terminology ('不晓得怎么捞着妈妈的发呆了') indicating semantic uncertainty",
+      "Weak causal organization: events are listed but not logically connected",
+      "Lexical retrieval difficulty: '爬手就是爬他的包包' lacks clarity or specificity",
+      "Examiner-dependent narrative flow: relies on scene context rather than self-sustained description"
+    ]
+  },
+  "latency_ms": 15195,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/027/027_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/027/027_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

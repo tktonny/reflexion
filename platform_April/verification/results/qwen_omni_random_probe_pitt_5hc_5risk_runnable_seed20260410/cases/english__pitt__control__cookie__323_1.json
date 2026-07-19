@@ -1,0 +1,121 @@
+{
+  "case_id": "english__pitt__control__cookie__323_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "Hmm, what I want you to do is take a look at this picture and tell me everything that you see happening in this picture. I want you to tell me everything that's going on here. Everything, not things that are just bad, right? Right. Just everything that's going on. Okay. There are two little kids, a boy and a girl. The boy's on a stool which is falling over, getting cookies out of a jar. The cookies are in the cabinet with the lid off, and it's in the kitchen. The mother is washing dishes at the window with a curtain on the window. Walk outside with trees and grass. Water is running over in the sink onto the floor. The mother is drying a dish and stepping in the water. There's a plate and two cups sitting on the cabinet. The mother has an apron on. Okay? Okay.",
+  "patient_only_transcript": "There are two little kids, a boy and a girl. The boy's on a stool which is falling over, getting cookies out of a jar. The cookies are in the cabinet with the lid off, and it's in the kitchen. The mother is washing dishes at the window with a curtain on the window. Walk outside with trees and grass. Water is running over in the sink onto the floor. The mother is drying a dish and stepping in the water. There's a plate and two cups sitting on the cabinet. The mother has an apron on.",
+  "speaker_turn_summary": [
+    "Examiner: Prompt to describe picture.",
+    "Patient: Describes scene with multiple elements including kids, stool, cookies, mother, sink, apron, cabinet, window, trees, grass.",
+    "Examiner: Acknowledges patient response."
+  ],
+  "patient_cue_summary": [
+    "Patient provides a detailed, multi-element description of the picture.",
+    "Patient names specific objects and actions: boy on stool, cookies in cabinet, mother washing dishes, water running, apron, plate and cups.",
+    "Patient’s description is largely coherent and sequentially organized, though includes minor redundancy (e.g., 'walk outside with trees and grass' as standalone phrase).",
+    "No clear word-finding pauses, repetitions, or abandonment of utterances.",
+    "Patient does not appear examiner-dependent",
+    "responds fully to open-ended prompt without prompting for structure."
+  ],
+  "transcript_request_id": "chatcmpl-c2d95a0c-1f8f-9de6-a9f4-0a8531affed8",
+  "classification_request_id": "chatcmpl-5cd34595-0776-913d-a49a-163169e7eaf4",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__323_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__323_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient describes multiple key elements of the picture including characters, objects, actions, and spatial context.",
+        "evidence": "Patient mentions boy, girl, stool, cookies, cabinet, mother, sink, water, apron, plate, cups, window, curtain, trees, grass — covering most major components of the picture.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Coherence",
+        "summary": "Patient organizes the description in a mostly logical sequence, linking actions and locations.",
+        "evidence": "Patient describes the boy’s action, then the cookies, then the mother’s activity, then environmental details — showing basic narrative flow.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific, concrete nouns and verbs appropriate to the scene, without vague or generic terms.",
+        "evidence": "Terms like 'stool falling over', 'drying a dish', 'lid off', 'apron on' indicate precise lexical retrieval.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a detailed, coherent, and specific description of the picture, naming most key elements and actions without hesitation, repetition, or examiner dependence. No impairment-like cues are evident in speech or content.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient’s description is complete and organized.",
+      "No signs of word-finding difficulty, disorganization, or vagueness.",
+      "No emotional dysregulation or affective flattening observed.",
+      "Patient does not appear reliant on examiner prompting or correction."
+    ],
+    "alternative_explanations": [
+      "Patient may be a child or young adult, though age is not inferable from audio alone.",
+      "Patient may be well-practiced or familiar with the task, reducing apparent cognitive load."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed.",
+      "Routine follow-up may be appropriate if other clinical indicators emerge."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no persuasive evidence of cognitive decline is present.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment is based solely on audio.",
+      "Patient’s speech is fully intelligible and task-relevant.",
+      "No signs of cognitive impairment detected in this single clip."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "There are two little kids, a boy and a girl. The boy's on a stool which is falling over, getting cookies out of a jar. The cookies are in the cabinet with the lid off, and it's in the kitchen. The mother is washing dishes at the window with a curtain on the window. Walk outside with trees and grass. Water is running over in the sink onto the floor. The mother is drying a dish and stepping in the water. There's a plate and two cups sitting on the cabinet. The mother has an apron on.",
+    "speaker_turn_summary": [
+      "Examiner: Prompt to describe picture.",
+      "Patient: Describes scene with multiple elements including kids, stool, cookies, mother, sink, apron, cabinet, window, trees, grass.",
+      "Examiner: Acknowledges patient response."
+    ],
+    "patient_cue_summary": [
+      "Patient provides a detailed, multi-element description of the picture.",
+      "Patient names specific objects and actions: boy on stool, cookies in cabinet, mother washing dishes, water running, apron, plate and cups.",
+      "Patient’s description is largely coherent and sequentially organized, though includes minor redundancy (e.g., 'walk outside with trees and grass' as standalone phrase).",
+      "No clear word-finding pauses, repetitions, or abandonment of utterances.",
+      "Patient does not appear examiner-dependent",
+      "responds fully to open-ended prompt without prompting for structure."
+    ]
+  },
+  "latency_ms": 20370,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/323-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/323-1.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

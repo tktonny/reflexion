@@ -1,0 +1,125 @@
+{
+  "case_id": "mandarin__chou__hc__018__018_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "二零一九六月二十七，有一个父亲，他正在烫床单。呃，他的小 baby。呃，因为发现呃去玩那个插头。所以那个父亲大叫哇一声，后来汪汪，他的小狗汪汪听呃那个听到了大叫以后就。就汪汪叫警告小孩，以后猫也被吓到了，喵喵就就把那个花瓶的水打翻了，那个水倒在床单上面。",
+  "patient_only_transcript": "二零一九六月二十七，有一个父亲，他正在烫床单。呃，他的小baby。呃，因为发现呃去玩那个插头。所以那个父亲大叫哇一声，后来汪汪，他的小狗汪汪听呃那个听到了大叫以后就。就汪汪叫警告小孩，以后猫也被吓到了，喵喵就就把那个花瓶的水打翻了，那个水倒在床单上面。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes a home hazard scene with multiple actors (father, baby, dog, cat) and actions (ironing, playing with plug, barking, knocking over vase, water spilling)"
+  ],
+  "patient_cue_summary": [
+    "Patient describes multiple scene elements: father, baby, dog, cat, plug, vase, water, bedsheet",
+    "Narrative is topic-chained with some discourse particles (呃) and pauses, but remains largely coherent",
+    "No clear naming collapse, semantic vagueness, or abandonment of core task elements",
+    "Patient reconstructs a multi-actor, multi-action scenario without major contradictions or disorganization",
+    "Patient speech is intelligible enough to identify key actors and events despite some hesitation and filler use"
+  ],
+  "transcript_request_id": "chatcmpl-e763f1e2-416c-9277-bfab-e485fba31d19",
+  "classification_request_id": "chatcmpl-67cb2987-0334-91aa-9448-ef3bb3f3df6f",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__018__018_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__018__018_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes a multi-actor, multi-action home hazard scenario with identifiable characters and events.",
+        "evidence": "Patient names father, baby, dog, cat, plug, vase, water, bedsheet, and describes their actions in sequence.",
+        "confidence": 0.85
+      },
+      {
+        "label": "discourse_particles_and_hesitations",
+        "summary": "Patient uses fillers (呃) and pauses, but does not impair overall comprehension or task completion.",
+        "evidence": "Speech contains repeated '呃' and pauses, but narrative remains intact and task-relevant.",
+        "confidence": 0.8
+      },
+      {
+        "label": "lexical_retrieval_and_reference_clarity",
+        "summary": "Patient uses generic referents (这个/那个) and pronouns, but core scene elements are clearly identified.",
+        "evidence": "Patient refers to '那个插头', '那个花瓶的水', '床单上面' — all referents are contextually clear and task-relevant.",
+        "confidence": 0.85
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, multi-element description of a home hazard scenario with multiple actors and actions. Speech contains typical colloquial fillers and pauses but no signs of naming collapse, semantic vagueness, or narrative abandonment. Insufficient visual data to confirm behavioral cues. Moderate confidence in patient isolation and task completion. Recommend follow-up observation or formal screening if further concerns arise.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies multiple scene elements and actors",
+      "Narrative remains largely coherent despite fillers and pauses",
+      "No evidence of semantic or lexical retrieval failure",
+      "No abandonment or disorganization of task"
+    ],
+    "alternative_explanations": [
+      "Colloquial speech patterns in Mandarin are normal and do not indicate impairment",
+      "Fillers and pauses may reflect natural speech rhythm rather than cognitive deficit",
+      "Task completion suggests intact scene-description ability"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule follow-up observation or formal cognitive screening if caregiver or clinician reports concern",
+      "Avoid overinterpreting fillers or pauses as impairment indicators",
+      "Consider repeating the task with visual cues or prompting if needed"
+    ],
+    "visit_recommendation": "routine follow-up or formal screening if additional concerns emerge",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio clip; no evidence of progressive decline or strong impairment indicators.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video data is unavailable",
+      "assessment is based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible and task-compliant despite colloquial features.",
+      "No signs of cognitive impairment detected in this clip",
+      "classification remains conservative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "二零一九六月二十七，有一个父亲，他正在烫床单。呃，他的小baby。呃，因为发现呃去玩那个插头。所以那个父亲大叫哇一声，后来汪汪，他的小狗汪汪听呃那个听到了大叫以后就。就汪汪叫警告小孩，以后猫也被吓到了，喵喵就就把那个花瓶的水打翻了，那个水倒在床单上面。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes a home hazard scene with multiple actors (father, baby, dog, cat) and actions (ironing, playing with plug, barking, knocking over vase, water spilling)"
+    ],
+    "patient_cue_summary": [
+      "Patient describes multiple scene elements: father, baby, dog, cat, plug, vase, water, bedsheet",
+      "Narrative is topic-chained with some discourse particles (呃) and pauses, but remains largely coherent",
+      "No clear naming collapse, semantic vagueness, or abandonment of core task elements",
+      "Patient reconstructs a multi-actor, multi-action scenario without major contradictions or disorganization",
+      "Patient speech is intelligible enough to identify key actors and events despite some hesitation and filler use"
+    ]
+  },
+  "latency_ms": 14659,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/018/018_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/018/018_Daddy.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

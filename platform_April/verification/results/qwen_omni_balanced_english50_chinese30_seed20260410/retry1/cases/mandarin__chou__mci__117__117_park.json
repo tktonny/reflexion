@@ -1,0 +1,131 @@
+{
+  "case_id": "mandarin__chou__mci__117__117_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.65,
+  "transcript": "公园啊，公园那个老人家在下棋，泡泡茶下棋，小朋友在打羽毛球，这个小男生在遛狗，还有的小朋友在荡秋千。这是公园嘛，很好玩呐。然后这个这个这个狗就跑去咬这个小朋友。应该就是这样子了吧。",
+  "patient_only_transcript": "公园啊，公园那个老人家在下棋，泡泡茶下棋，小朋友在打羽毛球，这个小男生在遛狗，还有的小朋友在荡秋千。这是公园嘛，很好玩呐。然后这个这个这个狗就跑去咬这个小朋友。应该就是这样子了吧。",
+  "speaker_turn_summary": [
+    "Patient describes a park scene with multiple activities: elders playing chess, children playing badminton, a boy walking a dog, children swinging on a swing.",
+    "Patient mentions a dog biting a child, then concludes with '应该就是这样子了吧' (should be like this)."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with multiple elements, but lacks specific detail or causal linkage between events.",
+    "Repetition of '这个' (this) indicating possible word-finding hesitation or filler use.",
+    "Concluding phrase '应该就是这样子了吧' suggests uncertainty or lack of confidence in narrative completion.",
+    "No clear signs of disorganization or abandonment, but speech is minimally elaborative and lacks depth or precision.",
+    "No evidence of semantic vagueness or circumlocution beyond filler repetition."
+  ],
+  "transcript_request_id": "chatcmpl-f4cf9da4-49f5-9e58-b658-82d3e9ea9728",
+  "classification_request_id": "chatcmpl-14dbb571-4583-9669-bd6c-e428db12c482",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__117__117_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__117__117_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Narrative Coherence",
+        "summary": "Patient describes multiple park activities in a logical sequence, but lacks depth or causal linkage between events.",
+        "evidence": "Patient lists elders playing chess, children playing badminton, a boy walking a dog, and children swinging, then mentions a dog biting a child. The narrative is complete but superficial.",
+        "confidence": 0.8
+      },
+      {
+        "label": "Lexical Retrieval",
+        "summary": "Patient uses repetition of '这个' and concludes with '应该就是这样子了吧', suggesting possible mild hesitation or uncertainty.",
+        "evidence": "Repetition of '这个' appears three times in quick succession. Final phrase indicates uncertainty or lack of confidence in narrative completion.",
+        "confidence": 0.7
+      },
+      {
+        "label": "Informativeness",
+        "summary": "Speech is informative at a basic level but lacks specific detail, sensory description, or emotional tone.",
+        "evidence": "Patient names activities and actors but does not describe actions, emotions, or spatial relationships in detail.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a general, coherent description of a park scene with multiple activities, including a dog biting a child. Speech is intelligible but minimally elaborative, with slight repetition and a concluding phrase indicating uncertainty. No strong impairment-like cues are present. Further observation or formal screening is recommended due to limited depth and potential for underreporting or retrieval difficulty.",
+    "evidence_for_risk": [
+      "Repetition of '这个' may indicate mild word-finding hesitation.",
+      "Concluding phrase '应该就是这样子了吧' suggests lack of confidence or incomplete narrative.",
+      "Speech is brief and lacks specific detail or causal structure despite rich visual context."
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple scene elements and activities.",
+      "Speech is coherent and logically sequenced without disorganization or abandonment.",
+      "No signs of semantic confusion, disorientation, or emotional flattness.",
+      "No evidence of examiner dependence or need for prompting beyond natural dialogue."
+    ],
+    "alternative_explanations": [
+      "The patient may be describing a familiar scene from memory or imagination, which is common in non-clinical settings.",
+      "The repetition and concluding phrase may reflect natural conversational style rather than cognitive impairment.",
+      "Limited speaking time and lack of visual context may reduce diagnostic confidence."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a structured picture-description task or narrative recall task to assess depth and coherence.",
+      "Administer a brief cognitive screening tool such as MoCA or MMSE if clinical context permits.",
+      "Monitor for consistency across multiple sessions or tasks to detect emerging patterns."
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip. Further observation or multi-session assessment is needed to determine if patterns are consistent or transient.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible but minimally elaborative",
+      "no strong impairment cues detected.",
+      "Classification is conservative",
+      "'needs_observation' reflects limited evidence for or against impairment."
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable",
+      "limited_speaking_time"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "公园啊，公园那个老人家在下棋，泡泡茶下棋，小朋友在打羽毛球，这个小男生在遛狗，还有的小朋友在荡秋千。这是公园嘛，很好玩呐。然后这个这个这个狗就跑去咬这个小朋友。应该就是这样子了吧。",
+    "speaker_turn_summary": [
+      "Patient describes a park scene with multiple activities: elders playing chess, children playing badminton, a boy walking a dog, children swinging on a swing.",
+      "Patient mentions a dog biting a child, then concludes with '应该就是这样子了吧' (should be like this)."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with multiple elements, but lacks specific detail or causal linkage between events.",
+      "Repetition of '这个' (this) indicating possible word-finding hesitation or filler use.",
+      "Concluding phrase '应该就是这样子了吧' suggests uncertainty or lack of confidence in narrative completion.",
+      "No clear signs of disorganization or abandonment, but speech is minimally elaborative and lacks depth or precision.",
+      "No evidence of semantic vagueness or circumlocution beyond filler repetition."
+    ]
+  },
+  "latency_ms": 20590,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/117/117_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/117/117_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

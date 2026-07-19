@@ -1,0 +1,96 @@
+{
+  "case_id": "english__pitt__dementia__cookie__005_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "patient_only_transcript": "The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. The little girl is saying 'shh' so the mother won't hear. The sink was running over. The mother is drying the dishes. I don't see anything else.",
+  "patient_cue_summary": [
+    "Patient names key scene elements (boy, cookies, mother, sink, girl, stool) but with minimal elaboration.",
+    "Patient repeats 'the sink was running over' — suggests possible retrieval or sequencing difficulty.",
+    "Patient ends with 'I don't see anything else' — indicates possible task completion or lack of further observation.",
+    "Speech is coherent but lacks narrative depth, causal links, or detailed description of interactions.",
+    "No clear signs of word-finding pauses, circumlocution, or abandonment, but also no evidence of rich, organized description."
+  ],
+  "classification_request_id": "chatcmpl-adc11fdd-4903-9058-88db-15951439fe51",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "externally_provided",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient accurately identifies major scene elements but provides minimal elaboration, lacks narrative coherence, and ends with a vague statement. No strong impairment cues, but insufficient detail for healthy classification. Further clinical review recommended.",
+    "evidence_for_risk": [
+      "Minimal elaboration despite rich visual context",
+      "Repetition of sink detail without expansion",
+      "Lack of causal or sequential linking between events"
+    ],
+    "evidence_against_risk": [
+      "No word-finding pauses or semantic vagueness",
+      "Correct naming of key objects and roles",
+      "No signs of disorganization or abandonment"
+    ],
+    "alternative_explanations": [
+      "Patient may be young or shy, limiting verbal elaboration",
+      "Task may be unfamiliar or poorly explained",
+      "Examiner may have prompted or guided response"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat picture description task with structured prompts",
+      "Assess memory and narrative coherence with follow-up tasks",
+      "Consider caregiver report for functional context"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended",
+    "future_risk_trend_summary": "Longitudinal prediction limited; single clip insufficient for trend assessment",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable; assessment based solely on audio transcript",
+      "Patient speech is intelligible but lacks depth for healthy classification",
+      "Task context: picture description of cookie-theft scene"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "face_not_visible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is slipping off the stool. He's trying to steal cookies. The mother is working at the sink with the water running over. The little girl is saying 'shh' so the mother won't hear. The sink was running over. The mother is drying the dishes. I don't see anything else.",
+    "patient_cue_summary": [
+      "Patient names key scene elements (boy, cookies, mother, sink, girl, stool) but with minimal elaboration.",
+      "Patient repeats 'the sink was running over' — suggests possible retrieval or sequencing difficulty.",
+      "Patient ends with 'I don't see anything else' — indicates possible task completion or lack of further observation.",
+      "Speech is coherent but lacks narrative depth, causal links, or detailed description of interactions.",
+      "No clear signs of word-finding pauses, circumlocution, or abandonment, but also no evidence of rich, organized description."
+    ]
+  },
+  "latency_ms": 13045,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/005-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/005-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

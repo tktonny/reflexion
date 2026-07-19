@@ -1,0 +1,106 @@
+{
+  "case_id": "mandarin__chou__hc__020__020_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "这是一个钓虾场或者是钓鱼场啊。一个奶奶带了一个孙子在这个，另外一个妈妈带了一个女儿。妈妈手上拿着雪雪糕，这个冰激凌化了。这个冰激凌滴在小女孩头上。这个小男孩网到一条鱼。这小女孩没有网到。然后后面另外有一个卖卖小吃的摊子。卖的是什么东西我看不出来。啊，一个背背包的小孩子在掷骰子，跟另外一个，可是他的后面另外一个小孩子在掏他的背包，从他背包里面拿东西出来。给旁边一个小孩子看到了。说啊，你这个，你的背包开了。对，这个摊子是卖烤香肠的。嗯，差不多了。",
+  "patient_only_transcript": "这是一个钓虾场或者是钓鱼场啊。一个奶奶带了一个孙子在这个，另外一个妈妈带了一个女儿。妈妈手上拿着雪雪糕，这个冰激凌化了。这个冰激凌滴在小女孩头上。这个小男孩网到一条鱼。这小女孩没有网到。然后后面另外有一个卖卖小吃的摊子。卖的是什么东西我看不出来。啊，一个背背包的小孩子在掷骰子，跟另外一个，可是他的后面另外一个小孩子在掏他的背包，从他背包里面拿东西出来。给旁边一个小孩子看到了。说啊，你这个，你的背包开了。对，这个摊子是卖烤香肠的。嗯，差不多了。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context for scene description task.",
+    "Patient: describes multiple scene elements including characters, actions, objects, and spatial relationships in a coherent, sequential manner.",
+    "Examiner: may prompt or acknowledge, but patient speech dominates the content."
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple actors (grandma, grandson, mother, daughter, children with backpack, dice player, thief).",
+    "Patient describes multiple actions (fishing, ice cream dripping, backpack theft, dice game, sausage stand).",
+    "Patient uses colloquial Mandarin with fillers (啊, 嗯) and generic referents (这个, 那个), but maintains referential clarity.",
+    "Patient’s description is sequential and task-relevant, with no major contradictions or abandonment.",
+    "Patient’s speech is intelligible enough to reconstruct scene elements, despite minor audio noise or ASR inaccuracy."
+  ],
+  "transcript_request_id": "chatcmpl-a558383a-4dd2-9a9e-8bb0-4cb78e4c451d",
+  "classification_request_id": "chatcmpl-8b64b5f3-365a-9257-8c55-28fefdc879a4",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__020__020_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__020__020_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, multi-element description of a market scene with multiple characters and actions. Speech is intelligible, task-relevant, and contains normal colloquial features (fillers, generic pronouns) without impairment-like breakdowns. No persuasive evidence of cognitive decline. Further observation or formal screening recommended due to limited modality coverage and audio quality.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies and describes multiple scene elements including actors, objects, and actions.",
+      "Narrative is sequential and task-compliant, with no major disorganization or abandonment.",
+      "Patient’s speech is intelligible and does not exhibit word-finding failure, naming collapse, or semantic vagueness beyond normal colloquial variation."
+    ],
+    "alternative_explanations": [
+      "Audio quality or ASR inaccuracy may mask subtle cues.",
+      "Patient may be young or non-native, but no impairment indicators are present in the content.",
+      "Scene-description task may be inherently complex, but patient performs adequately."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a formal cognitive screening battery if clinical concern persists.",
+      "Repeat the task with clearer audio or visual support if available.",
+      "Monitor for consistency across multiple sessions or tasks."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if clinical concern arises.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of progressive decline or strong risk indicators.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-compliant despite minor audio noise or ASR inaccuracy.",
+      "Colloquial Mandarin features (fillers, generic pronouns) are normal and not indicative of impairment."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这是一个钓虾场或者是钓鱼场啊。一个奶奶带了一个孙子在这个，另外一个妈妈带了一个女儿。妈妈手上拿着雪雪糕，这个冰激凌化了。这个冰激凌滴在小女孩头上。这个小男孩网到一条鱼。这小女孩没有网到。然后后面另外有一个卖卖小吃的摊子。卖的是什么东西我看不出来。啊，一个背背包的小孩子在掷骰子，跟另外一个，可是他的后面另外一个小孩子在掏他的背包，从他背包里面拿东西出来。给旁边一个小孩子看到了。说啊，你这个，你的背包开了。对，这个摊子是卖烤香肠的。嗯，差不多了。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context for scene description task.",
+      "Patient: describes multiple scene elements including characters, actions, objects, and spatial relationships in a coherent, sequential manner.",
+      "Examiner: may prompt or acknowledge, but patient speech dominates the content."
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple actors (grandma, grandson, mother, daughter, children with backpack, dice player, thief).",
+      "Patient describes multiple actions (fishing, ice cream dripping, backpack theft, dice game, sausage stand).",
+      "Patient uses colloquial Mandarin with fillers (啊, 嗯) and generic referents (这个, 那个), but maintains referential clarity.",
+      "Patient’s description is sequential and task-relevant, with no major contradictions or abandonment.",
+      "Patient’s speech is intelligible enough to reconstruct scene elements, despite minor audio noise or ASR inaccuracy."
+    ]
+  },
+  "latency_ms": 15034,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/020/020_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/020/020_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "case_id": "english__pitt__dementia__cookie__497_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "You see going on in the picture. Well, the little boy went up to get some cookies. The little girl's reaching up to give the jar to her brother. The mother is washing dishes, and the sink is full of water, and the mother is wiping the dishes. And let's see what else. And the boy is almost falling off this long thing here. What do you want to call this? A chair, a chair. And the water's falling over on the floor by the mother. And the little girl's handing her something to her brother. Cookies is probably cookies, or he's handing her cookies, whatever. Right? Okay, sure.",
+  "patient_only_transcript": "The little boy went up to get some cookies. The little girl's reaching up to give the jar to her brother. The mother is washing dishes, and the sink is full of water, and the mother is wiping the dishes. And let's see what else. And the boy is almost falling off this long thing here. What do you want to call this? A chair, a chair. And the water's falling over on the floor by the mother. And the little girl's handing her something to her brother. Cookies is probably cookies, or he's handing her cookies, whatever. Right?",
+  "speaker_turn_summary": [
+    "Examiner: You see going on in the picture.",
+    "Patient: Well, the little boy went up to get some cookies. The little girl's reaching up to give the jar to her brother. The mother is washing dishes, and the sink is full of water, and the mother is wiping the dishes. And let's see what else. And the boy is almost falling off this long thing here. What do you want to call this? A chair, a chair. And the water's falling over on the floor by the mother. And the little girl's handing her something to her brother. Cookies is probably cookies, or he's handing her cookies, whatever. Right?",
+    "Examiner: Okay, sure."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with multiple actors and spatial details",
+    "Use of filler words and self-correction ('What do you want to call this? A chair, a chair.')",
+    "Minor hesitation and repetition in naming object ('long thing here')",
+    "Slight uncertainty in object attribution ('Cookies is probably cookies, or he's handing her cookies, whatever.')",
+    "No clear evidence of word-finding failure, disorganization, or abandonment of task"
+  ],
+  "transcript_request_id": "chatcmpl-da5decf4-2994-9772-b814-25b7f0811a6c",
+  "classification_request_id": "chatcmpl-f5875a72-c1cf-99ba-9044-2b98815f7e51",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__497_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__497_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential description of a picture involving multiple actors and actions, including the boy, girl, mother, cookies, sink, and chair.",
+        "evidence": "Patient describes the boy reaching for cookies, the girl handing the jar, the mother washing dishes, the sink overflowing, and the boy nearly falling off a chair — all in a logical order with minimal pauses.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Naming",
+        "summary": "Patient occasionally hesitates or self-corrects when naming objects, such as 'this long thing here' before identifying it as 'a chair'.",
+        "evidence": "Patient says 'What do you want to call this? A chair, a chair.' — indicating mild naming difficulty or uncertainty, but resolves it quickly.",
+        "confidence": null
+      },
+      {
+        "label": "Task Completion and Informativeness",
+        "summary": "Patient completes the picture description task with sufficient detail and relevance, though with minor hesitation and uncertainty in phrasing.",
+        "evidence": "Patient covers all major elements of the scene and attempts to describe relationships and actions, despite slight vagueness in one phrase ('Cookies is probably cookies, or he's handing her cookies, whatever.').",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient provides a generally coherent and detailed description of a picture-based task, demonstrating adequate scene comprehension and narrative ability. Minor hesitations and self-corrections suggest mild retrieval or naming uncertainty, but not sufficient to indicate cognitive impairment. Further observation or follow-up is recommended.",
+    "evidence_for_risk": [
+      "Minor naming hesitation ('this long thing here' → 'a chair')",
+      "Slight uncertainty in object attribution ('Cookies is probably cookies...')"
+    ],
+    "evidence_against_risk": [
+      "No evidence of disorganization, word-finding failure, or task abandonment",
+      "Coherent, sequential, and complete description of the scene",
+      "No signs of emotional dysregulation or affective flattening"
+    ],
+    "alternative_explanations": [
+      "Mild hesitation may reflect natural speech disfluency rather than cognitive impairment",
+      "Uncertainty in phrasing may reflect examiner prompting or task ambiguity",
+      "Patient may be young or not fully comfortable with the task, leading to minor hesitation"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule follow-up to observe consistency in picture description tasks",
+      "Consider repeating the task with different images to assess generalization",
+      "Monitor for increased disfluency or incoherence in future sessions"
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening in 6–12 months, or sooner if additional concerns arise.",
+    "future_risk_trend_summary": "Limited predictive value from a single clip; longitudinal assessment is needed to determine clinical significance.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio and task context.",
+      "Patient appears to be engaged and responsive to examiner prompts.",
+      "Task is a picture description task (cookie-theft scene)",
+      "patient completed it with minor disfluencies."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The little boy went up to get some cookies. The little girl's reaching up to give the jar to her brother. The mother is washing dishes, and the sink is full of water, and the mother is wiping the dishes. And let's see what else. And the boy is almost falling off this long thing here. What do you want to call this? A chair, a chair. And the water's falling over on the floor by the mother. And the little girl's handing her something to her brother. Cookies is probably cookies, or he's handing her cookies, whatever. Right?",
+    "speaker_turn_summary": [
+      "Examiner: You see going on in the picture.",
+      "Patient: Well, the little boy went up to get some cookies. The little girl's reaching up to give the jar to her brother. The mother is washing dishes, and the sink is full of water, and the mother is wiping the dishes. And let's see what else. And the boy is almost falling off this long thing here. What do you want to call this? A chair, a chair. And the water's falling over on the floor by the mother. And the little girl's handing her something to her brother. Cookies is probably cookies, or he's handing her cookies, whatever. Right?",
+      "Examiner: Okay, sure."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with multiple actors and spatial details",
+      "Use of filler words and self-correction ('What do you want to call this? A chair, a chair.')",
+      "Minor hesitation and repetition in naming object ('long thing here')",
+      "Slight uncertainty in object attribution ('Cookies is probably cookies, or he's handing her cookies, whatever.')",
+      "No clear evidence of word-finding failure, disorganization, or abandonment of task"
+    ]
+  },
+  "latency_ms": 27320,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/497-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/497-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "case_id": "english__pitt__dementia__cookie__007_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.4,
+  "classification_request_id": "chatcmpl-ea5c0bd4-91a3-963e-83d6-7ec056723958",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__007_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__007_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Audio-only clip with limited speech content and no visual cues. Patient appears to describe a picture scene but speech is unintelligible and transcript unavailable. No clear impairment-like signals observed. Further observation or multimodal assessment recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No observable speech errors, repetitions, or disorganization in available audio",
+      "No visible signs of distress, apathy, or emotional dysregulation",
+      "Task context (cookie theft picture description) is intact but unverifiable due to audio quality"
+    ],
+    "alternative_explanations": [
+      "Audio quality issues may mask subtle cognitive signals",
+      "Patient may be non-native speaker or experiencing temporary speech difficulty unrelated to dementia",
+      "Lack of visual data prevents assessment of gaze, facial expression, or motor behavior"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat screening with improved audio capture or visual recording",
+      "Use structured cognitive screening tools (e.g., MoCA, MMSE) in follow-up",
+      "Include caregiver report or functional history to supplement audio-only assessment"
+    ],
+    "visit_recommendation": "Formal cognitive screening in next visit with multimodal assessment",
+    "future_risk_trend_summary": "Limited predictive value from single audio-only clip. Longitudinal assessment required for meaningful risk stratification.",
+    "reviewer_confidence": 0.4,
+    "context_notes": [
+      "Video portion unavailable; assessment based solely on audio with low intelligibility",
+      "Patient role inferred from interaction context; examiner speech not evaluated",
+      "Task: cookie theft picture description; no verifiable performance due to audio quality"
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "video_too_short",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 10058,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/007-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/007-1.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "case_id": "mandarin__chou__mci__162__162_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.65,
+  "transcript": "妈妈带着奶奶奶也带着各带一个小朋友去逛夜市，他们在捞鱼，玩这个捞鱼的游戏。旁边有一摊在玩赌博的游戏。这时候有一个扒手伸进正在玩玩的那个激烈的那个那个失败了的游戏的时候，有一个扒手把手伸进小华的口袋。惊坏了旁边的妈带小华的妈妈的。这一间他的冰淇淋融化就把诶也没有注意到就滴到小小华的的嘴的的脸上，让小华也甜到了那个冰淇淋的甜味。这个扒手的动作就惊坏了这个妈妈，没有注意到她的冰淇淋融化滴到了她的小孩的头上。",
+  "patient_only_transcript": "妈妈带着奶奶也带着各带一个小朋友去逛夜市，他们在捞鱼，玩这个捞鱼的游戏。旁边有一摊在玩赌博的游戏。这时候有一个扒手伸进正在玩玩的那个激烈的那个那个失败了的游戏的时候，有一个扒手把手伸进小华的口袋。惊坏了旁边的妈带小华的妈妈的。这一间他的冰淇淋融化就把诶也没有注意到就滴到小小华的的嘴的的脸上，让小华也甜到了那个冰淇淋的甜味。这个扒手的动作就惊坏了这个妈妈，没有注意到她的冰淇淋融化滴到了她的小孩的头上。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets up the scene description task.",
+    "Patient: describes a market scene with multiple actors (mother, grandmother, children), activities (fishing game, gambling game), and an incident (pickpocket, melting ice cream)."
+  ],
+  "patient_cue_summary": [
+    "Patient describes multiple scene elements: actors, games, incident, emotional reaction, and physical consequence (ice cream dripping).",
+    "Speech contains colloquial fillers and repetitions (e.g., '玩玩的', '那个那个', '的的'), but overall structure is coherent and task-relevant.",
+    "Patient maintains referential clarity for key entities (mother, child, thief, ice cream) despite some syntactic looseness.",
+    "No evidence of naming collapse, semantic vagueness, or abandonment of core task elements.",
+    "Narrative is not elegant but remains reconstructable and informative for a scene-description task."
+  ],
+  "transcript_request_id": "chatcmpl-13c1f996-739a-9744-a995-7a847f76fb6c",
+  "classification_request_id": "chatcmpl-88992a6d-3b8a-93f0-83b3-8df95bc4c276",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__162__162_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__162__162_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes a multi-actor, multi-action market scene with identifiable events and emotional reactions.",
+        "evidence": "Patient names mother, grandmother, children, games (fishing, gambling), thief, ice cream incident, and emotional response (startled mother).",
+        "confidence": 0.7
+      },
+      {
+        "label": "lexical_retrieval_and_repetition",
+        "summary": "Patient uses colloquial fillers and repetitions common in spontaneous Mandarin speech, but does not show naming failure or semantic collapse.",
+        "evidence": "Phrases like '玩玩的', '那个那个', '的的' are present but do not impede reconstruction of scene elements.",
+        "confidence": 0.65
+      },
+      {
+        "label": "task_completion_and_relevance",
+        "summary": "Patient completes the scene-description task with multiple relevant details, indicating task engagement and comprehension.",
+        "evidence": "Patient describes sequence of events, spatial relations, and consequences (ice cream dripping on child's face).",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, multi-element description of a market scene with multiple actors and events. Speech contains colloquial features common in spontaneous Mandarin but does not show impairment-like cues such as naming collapse, semantic vagueness, or task abandonment. Further observation or formal screening is recommended due to limited modality and potential recording quality issues.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies and sequences multiple scene elements.",
+      "Patient maintains referential clarity for key characters and objects.",
+      "Narrative is reconstructable despite colloquial speech patterns.",
+      "No signs of disorganization, contradiction, or abandonment."
+    ],
+    "alternative_explanations": [
+      "Colloquial speech patterns and repetitions are normal in spontaneous Mandarin.",
+      "Limited audio quality may mask subtle cues, but current evidence does not support cognitive impairment.",
+      "Task may be challenging for some patients, but patient completed it with sufficient detail."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a formal cognitive screening tool (e.g., MoCA, MMSE) in a controlled setting.",
+      "Observe patient’s performance in structured scene-description tasks with visual support.",
+      "Consider repeating the task with clearer audio or visual cues if available."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening recommended.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further assessment needed for trend evaluation.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-relevant despite colloquial features.",
+      "No evidence of dementia-like impairment in this clip",
+      "classification is conservative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "妈妈带着奶奶也带着各带一个小朋友去逛夜市，他们在捞鱼，玩这个捞鱼的游戏。旁边有一摊在玩赌博的游戏。这时候有一个扒手伸进正在玩玩的那个激烈的那个那个失败了的游戏的时候，有一个扒手把手伸进小华的口袋。惊坏了旁边的妈带小华的妈妈的。这一间他的冰淇淋融化就把诶也没有注意到就滴到小小华的的嘴的的脸上，让小华也甜到了那个冰淇淋的甜味。这个扒手的动作就惊坏了这个妈妈，没有注意到她的冰淇淋融化滴到了她的小孩的头上。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets up the scene description task.",
+      "Patient: describes a market scene with multiple actors (mother, grandmother, children), activities (fishing game, gambling game), and an incident (pickpocket, melting ice cream)."
+    ],
+    "patient_cue_summary": [
+      "Patient describes multiple scene elements: actors, games, incident, emotional reaction, and physical consequence (ice cream dripping).",
+      "Speech contains colloquial fillers and repetitions (e.g., '玩玩的', '那个那个', '的的'), but overall structure is coherent and task-relevant.",
+      "Patient maintains referential clarity for key entities (mother, child, thief, ice cream) despite some syntactic looseness.",
+      "No evidence of naming collapse, semantic vagueness, or abandonment of core task elements.",
+      "Narrative is not elegant but remains reconstructable and informative for a scene-description task."
+    ]
+  },
+  "latency_ms": 16544,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/162/162_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/162/162_market.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

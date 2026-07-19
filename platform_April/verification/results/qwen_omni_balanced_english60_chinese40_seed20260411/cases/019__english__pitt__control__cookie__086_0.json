@@ -1,0 +1,123 @@
+{
+  "case_id": "english__pitt__control__cookie__086_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.6,
+  "transcript": "Now you just look at the picture and just tell me everything that's going on, okay? This is going to be my looking at those artistic things and fiddling when we get there. We have a dishwasher, but the sink is overflowing on the floor. This faucet is running, and he's standing there. Yeah, the kiddos are robbing the cookie jar, and the little boy is falling off the stool. He's getting the cookie jar off the shelf, and that doesn't happen just yet. I think it was painted on this wet side of the room. Do you want to know anything? He's got a cup and a plate on his shoulders, and he's drying up the plate. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this. He's doing this",
+  "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+  "speaker_turn_summary": [
+    "Examiner: 'Now you just look at the picture and just tell me everything that's going on, okay?'",
+    "Patient: 'The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.'"
+  ],
+  "patient_cue_summary": [
+    "brief but accurate scene description",
+    "intelligible speech",
+    "core events identified",
+    "limited elaboration alone is not enough for cognitive_risk"
+  ],
+  "transcript_request_id": "chatcmpl-53905ac4-4f47-94df-8dda-836fdcd19a69",
+  "classification_request_id": "chatcmpl-34d84eb8-5a42-918b-b5f8-657dda3dbcd7",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__086_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__086_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identified key actors and actions in the picture.",
+        "evidence": "Patient stated: 'The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Relevance",
+        "summary": "Patient responded directly to the examiner's prompt to describe the picture.",
+        "evidence": "Patient provided a focused description without tangential or irrelevant content.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Speech Intelligibility",
+        "summary": "Patient speech was understandable and coherent despite poor audio quality.",
+        "evidence": "Reconstructed transcript is clear and complete, with no signs of breakdown or filler-heavy speech.",
+        "confidence": 0.25
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provided a concise but accurate description of the pictured scene, identifying key actors and actions without evident breakdown in retrieval, organization, or task control. Audio quality is poor and visual data is unavailable, limiting confidence. No persuasive impairment-like signals detected.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient accurately identified core elements of the scene: boy reaching for cookies, stool tipping, mother at sink, water running.",
+      "Speech was intelligible and task-relevant.",
+      "No signs of word-finding pauses, circumlocution, repetition, or examiner dependence were clearly present in the reconstructed transcript."
+    ],
+    "alternative_explanations": [
+      "Poor audio quality may mask subtle impairment cues.",
+      "Limited visual sampling prevents full assessment of nonverbal behavior.",
+      "Patient may have been brief due to task constraints or personal style, not cognitive deficit."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the picture-description task with clearer audio or visual recording.",
+      "Consider formal cognitive screening if patient is at known risk for dementia or has caregiver concerns.",
+      "Monitor for consistency across multiple sessions or tasks."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if risk factors or caregiver concerns persist.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip with poor audio and no visual data.",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Video data is unavailable",
+      "assessment is based solely on audio and reconstructed patient transcript.",
+      "Patient speech was intelligible and task-relevant, but audio quality limits confidence in fine-grained analysis.",
+      "No clear impairment-like cues were detected in the patient's response to the picture-description task."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+    "speaker_turn_summary": [
+      "Examiner: 'Now you just look at the picture and just tell me everything that's going on, okay?'",
+      "Patient: 'The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.'"
+    ],
+    "patient_cue_summary": [
+      "brief but accurate scene description",
+      "intelligible speech",
+      "core events identified",
+      "limited elaboration alone is not enough for cognitive_risk"
+    ]
+  },
+  "latency_ms": 17527,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/086-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/086-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

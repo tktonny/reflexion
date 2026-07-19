@@ -1,0 +1,129 @@
+{
+  "case_id": "mandarin__chou__mci__011__011_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "啊，眼睛没有看。他在打羽毛球。他在玩象棋，然后小孩子玩秋千，他在玩，他牵着狗，把小孩子的衣服咬住了。就这样子啊，他在玩象棋，后面那泡茶喝，然后他打那个羽毛球，哦，打到这里。他正要打过去，这个人牵这个狗。就咬住他的那个衣服，没有。是，还是有打着。",
+  "patient_only_transcript": "啊，眼睛没有看。他在打羽毛球。他在玩象棋，然后小孩子玩秋千，他在玩，他牵着狗，把小孩子的衣服咬住了。就这样子啊，他在玩象棋，后面那泡茶喝，然后他打那个羽毛球，哦，打到这里。他正要打过去，这个人牵这个狗。就咬住他的那个衣服，没有。是，还是有打着。",
+  "speaker_turn_summary": [
+    "患者描述公园场景中多个同时发生的动作：打羽毛球、下象棋、小孩玩秋千、牵狗咬衣。",
+    "患者语句结构松散，有重复、自我修正（如‘没有。是，还是有打着’）。",
+    "患者未明确区分角色主语，使用‘他’‘这个人’等泛指，但能识别多个行为主体。",
+    "患者语句中包含语气词‘啊’‘哦’‘就这样子’，语义连贯但非完整叙事。"
+  ],
+  "patient_cue_summary": [
+    "患者能识别并描述多个场景元素（打羽毛球、下象棋、小孩玩秋千、狗咬衣），显示基本场景理解能力。",
+    "语句中存在自我修正、重复、语气词和语义模糊（如‘没有。是，还是有打着’），但未导致叙事完全断裂。",
+    "患者未明显遗忘或混淆核心事件，未出现命名障碍或语义塌缩。",
+    "语句结构松散但未完全脱离任务，未表现出严重认知中断或任务放弃。"
+  ],
+  "transcript_request_id": "chatcmpl-03c41b88-e9e3-9667-8063-f21d883eab80",
+  "classification_request_id": "chatcmpl-520e7546-31fd-983a-9ebe-0e3f610fa4c6",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__011__011_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__011__011_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "患者能识别并描述多个公园场景中的同时动作，语义基本连贯，但结构松散。",
+        "evidence": "患者提及打羽毛球、下象棋、小孩玩秋千、狗咬衣等多元素，虽语句松散但未遗漏核心事件。",
+        "confidence": 0.5
+      },
+      {
+        "label": "self_correction_and_vagueness",
+        "summary": "患者语句中存在自我修正（如‘没有。是，还是有打着’）和泛指代词（如‘他’‘这个人’），语义略模糊。",
+        "evidence": "语句中出现‘没有。是，还是有打着’等自我修正，以及未明确主语的泛指表达。",
+        "confidence": 0.25
+      },
+      {
+        "label": "task_completion_and_relevance",
+        "summary": "患者持续回应场景描述任务，未中断或放弃，但未提供完整因果或逻辑结构。",
+        "evidence": "患者持续描述多个动作，未出现任务放弃或明显遗忘，但未构建完整叙事。",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "患者能描述公园场景中多个同时发生的动作，语句结构松散但未完全断裂，存在轻微语义模糊和自我修正，但未出现严重认知中断或命名障碍。建议进一步观察或补充任务评估。",
+    "evidence_for_risk": [
+      "语句中存在自我修正和重复（如‘没有。是，还是有打着’）",
+      "语义模糊，未明确区分角色主语（如‘他’‘这个人’）",
+      "语句结构松散，非完整叙事，但未完全脱离任务"
+    ],
+    "evidence_against_risk": [
+      "能识别并描述多个场景元素（打羽毛球、下象棋、小孩玩秋千、狗咬衣）",
+      "未出现命名障碍、语义塌缩或严重遗忘",
+      "语义连贯，未完全中断或放弃任务"
+    ],
+    "alternative_explanations": [
+      "语句松散和语气词使用可能反映口语化表达或非正式语境，非认知障碍特有表现",
+      "轻微自我修正可能源于录音质量或表达犹豫，非认知功能受损",
+      "场景描述完整性支持基本认知功能尚可"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "建议补充标准化认知筛查工具（如MMSE、MoCA）以确认认知状态",
+      "可增加任务复杂度或要求更结构化描述以观察认知组织能力",
+      "建议后续随访观察语言表达稳定性与任务完成度"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "单次评估无法确定认知衰退趋势，建议纵向观察语言表达稳定性与任务完成度变化",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "视频不可用，仅依据音频内容评估，存在质量限制",
+      "患者语句虽松散但未完全脱离任务，未达认知风险阈值",
+      "轻微语义模糊和自我修正不构成强认知风险信号，需结合其他评估"
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "啊，眼睛没有看。他在打羽毛球。他在玩象棋，然后小孩子玩秋千，他在玩，他牵着狗，把小孩子的衣服咬住了。就这样子啊，他在玩象棋，后面那泡茶喝，然后他打那个羽毛球，哦，打到这里。他正要打过去，这个人牵这个狗。就咬住他的那个衣服，没有。是，还是有打着。",
+    "speaker_turn_summary": [
+      "患者描述公园场景中多个同时发生的动作：打羽毛球、下象棋、小孩玩秋千、牵狗咬衣。",
+      "患者语句结构松散，有重复、自我修正（如‘没有。是，还是有打着’）。",
+      "患者未明确区分角色主语，使用‘他’‘这个人’等泛指，但能识别多个行为主体。",
+      "患者语句中包含语气词‘啊’‘哦’‘就这样子’，语义连贯但非完整叙事。"
+    ],
+    "patient_cue_summary": [
+      "患者能识别并描述多个场景元素（打羽毛球、下象棋、小孩玩秋千、狗咬衣），显示基本场景理解能力。",
+      "语句中存在自我修正、重复、语气词和语义模糊（如‘没有。是，还是有打着’），但未导致叙事完全断裂。",
+      "患者未明显遗忘或混淆核心事件，未出现命名障碍或语义塌缩。",
+      "语句结构松散但未完全脱离任务，未表现出严重认知中断或任务放弃。"
+    ]
+  },
+  "latency_ms": 16268,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/011/011_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/011/011_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

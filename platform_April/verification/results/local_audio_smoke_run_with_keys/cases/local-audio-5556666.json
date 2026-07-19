@@ -1,0 +1,14 @@
+{
+  "case_id": "local-audio-5556666",
+  "dataset": "local_audio_smoke",
+  "split": "smoke",
+  "ground_truth_label": "HC",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3.5-plus",
+  "latency_ms": 62724,
+  "error": "invalid_provider_output: audio_only returned an invalid assessment payload",
+  "metadata": {
+    "source": "local_repo_audio",
+    "note": "single-case local audio smoke test"
+  }
+}

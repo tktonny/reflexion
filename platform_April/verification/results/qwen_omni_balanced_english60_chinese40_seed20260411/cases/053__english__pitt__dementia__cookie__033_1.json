@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__dementia__cookie__033_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "Tell me everything that you see going on in the picture. What's happening in that picture? Man, the boy's gone into the cookie jar. And the mother is standing here, over here. Cookie jar. The guy's going into the cookie jar. Mother's doing the dishes. What is it? Curtains. What's happening over here? Yeah. What's going on? Like water. What's it doing? Cleaning dishes. Okay. Thank you.",
+  "patient_only_transcript": "The boy's gone into the cookie jar. The mother is standing here, over here. Cookie jar. The guy's going into the cookie jar. Mother's doing the dishes. What is it? Curtains. What's happening over here? Yeah. Like water. What's it doing? Cleaning dishes.",
+  "speaker_turn_summary": [
+    "Examiner: Tell me everything that you see going on in the picture. What's happening in that picture?",
+    "Patient: Man, the boy's gone into the cookie jar. And the mother is standing here, over here. Cookie jar. The guy's going into the cookie jar. Mother's doing the dishes.",
+    "Examiner: What is it? Curtains. What's happening over here? Yeah. What's going on? Like water. What's it doing? Cleaning dishes. Okay. Thank you."
+  ],
+  "patient_cue_summary": [
+    "Patient identifies core actors (boy, mother) and actions (going into cookie jar, doing dishes) accurately.",
+    "Patient uses repetitive phrasing ('cookie jar', 'the guy's going into') but does not show clear word-finding breakdown or semantic vagueness.",
+    "Patient response is task-relevant and completes the prompt without examiner scaffolding beyond initial prompt.",
+    "Patient speech is intelligible but brief and lacks elaboration or narrative structure",
+    "no clear signs of disorganization, tangentiality, or retrieval failure.",
+    "No evidence of hesitation, restarts, or filler words indicating cognitive impairment in this clip."
+  ],
+  "transcript_request_id": "chatcmpl-57d42349-dab2-96db-95c1-81d7f9f826bb",
+  "classification_request_id": "chatcmpl-1fca6a91-49f5-9df1-89dc-0e5e73fd92be",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__033_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__033_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient correctly identifies key actors (boy, mother) and actions (going into cookie jar, doing dishes).",
+        "evidence": "Patient says: 'The boy's gone into the cookie jar. The mother is standing here... Mother's doing the dishes.'",
+        "confidence": 0.9
+      },
+      {
+        "label": "Speech Coherence and Fluency",
+        "summary": "Speech is fluent, task-relevant, and lacks signs of word-finding breakdown or disorganization.",
+        "evidence": "Patient delivers a continuous, intelligible response without pauses, restarts, or filler words.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Task Completion and Elaboration",
+        "summary": "Patient completes the prompt but provides minimal elaboration; no evidence of examiner dependence beyond initial instruction.",
+        "evidence": "Patient responds to prompt without prompting beyond initial question; response is concise but complete.",
+        "confidence": 0.8
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a brief but accurate description of the pictured scene, identifying key actors and actions without clear signs of cognitive impairment. Speech is intelligible and task-relevant, though limited in elaboration. No evidence of word-finding failure, disorganization, or examiner dependence beyond initial prompt. Further observation or additional testing is recommended due to limited data and lack of visual modality.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Task-relevant, accurate identification of scene elements (boy, mother, cookie jar, dishes)",
+      "Intelligible speech without pauses, restarts, or filler words indicating retrieval difficulty",
+      "No semantic vagueness or tangential drift from the prompt"
+    ],
+    "alternative_explanations": [
+      "Limited elaboration may reflect task design, fatigue, or lack of motivation rather than cognitive impairment",
+      "Briefness may reflect efficient communication style rather than cognitive deficit",
+      "Absence of visual modality limits full assessment of nonverbal cues"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with additional cognitive screening tasks to assess sustained performance",
+      "Consider repeating the picture description task with different stimuli or in a more structured format",
+      "Observe for consistency across multiple sessions or tasks before escalating concern"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline in this segment.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video modality is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-compliant, but brief and lacks elaboration.",
+      "No clear impairment-like cues detected in this clip",
+      "classification remains conservative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy's gone into the cookie jar. The mother is standing here, over here. Cookie jar. The guy's going into the cookie jar. Mother's doing the dishes. What is it? Curtains. What's happening over here? Yeah. Like water. What's it doing? Cleaning dishes.",
+    "speaker_turn_summary": [
+      "Examiner: Tell me everything that you see going on in the picture. What's happening in that picture?",
+      "Patient: Man, the boy's gone into the cookie jar. And the mother is standing here, over here. Cookie jar. The guy's going into the cookie jar. Mother's doing the dishes.",
+      "Examiner: What is it? Curtains. What's happening over here? Yeah. What's going on? Like water. What's it doing? Cleaning dishes. Okay. Thank you."
+    ],
+    "patient_cue_summary": [
+      "Patient identifies core actors (boy, mother) and actions (going into cookie jar, doing dishes) accurately.",
+      "Patient uses repetitive phrasing ('cookie jar', 'the guy's going into') but does not show clear word-finding breakdown or semantic vagueness.",
+      "Patient response is task-relevant and completes the prompt without examiner scaffolding beyond initial prompt.",
+      "Patient speech is intelligible but brief and lacks elaboration or narrative structure",
+      "no clear signs of disorganization, tangentiality, or retrieval failure.",
+      "No evidence of hesitation, restarts, or filler words indicating cognitive impairment in this clip."
+    ]
+  },
+  "latency_ms": 18673,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/033-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/033-1.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

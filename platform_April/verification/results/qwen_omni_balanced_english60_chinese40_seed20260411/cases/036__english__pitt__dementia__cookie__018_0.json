@@ -1,0 +1,152 @@
+{
+  "case_id": "english__pitt__dementia__cookie__018_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.5,
+  "transcript": "Tell me everything that's going on. Well, we're grading. I think we are going to, yeah. Cookies from the cookie jar. And mother does not see it because she's inside drying the clothes. And the kids then just, I guess, in the picture that mother is working hard and the kids were playing. And all of a sudden, one of these just turned over a dish. All over the floor, except it did not break. It didn't splash from the, it splashed from the sink, not from. That's okay. Is there anything else? One of the kids got a crack on the head. And he has a. You know, it's sometimes I see a very clear and other times I see a weak image, so to speak. And sometimes I just don't know. What is it? Well, is there anything else that you can think of? Mostly, I have not had so much trouble in looking at things as an image, but not getting any nuanced behind this. Was there anything else in that picture you want to tell me, or do you think you've told me everything? Okay, thank you. All right.",
+  "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see. One of the kids got a crack on the head. Sometimes I see a very clear image, other times a weak one. I just don’t know what it is. Mostly, I have not had trouble looking at things as an image, but not getting any nuanced behind this.",
+  "speaker_turn_summary": [
+    "Examiner: Tell me everything that's going on.",
+    "Patient: Well, we're grading. I think we are going to, yeah. Cookies from the cookie jar. And mother does not see it because she's inside drying the clothes. And the kids then just, I guess, in the picture that mother is working hard and the kids were playing. And all of a sudden, one of these just turned over a dish. All over the floor, except it did not break. It didn't splash from the, it splashed from the sink, not from. That's okay.",
+    "Examiner: Is there anything else?",
+    "Patient: One of the kids got a crack on the head. And he has a. You know, it's sometimes I see a very clear and other times I see a weak image, so to speak. And sometimes I just don't know. What is it?",
+    "Examiner: Well, is there anything else that you can think of?",
+    "Patient: Mostly, I have not had so much trouble in looking at things as an image, but not getting any nuanced behind this.",
+    "Examiner: Was there anything else in that picture you want to tell me, or do you think you've told me everything?",
+    "Patient: Okay, thank you. All right."
+  ],
+  "patient_cue_summary": [
+    "Patient provides core scene elements: cookies, mother, kids, dish tipping, water splashing, crack on head.",
+    "Patient exhibits self-awareness of visual perception variability: 'sometimes I see a very clear image, other times a weak one.'",
+    "Patient shows mild uncertainty and lack of confidence in interpretation: 'I just don’t know what it is.'",
+    "Patient uses examiner prompts to complete descriptions, indicating some scaffolding dependence.",
+    "Patient does not demonstrate word-finding pauses, circumlocution, or semantic vagueness beyond mild uncertainty.",
+    "Patient does not show disorganized sequencing or failure to cover core task elements.",
+    "Patient’s speech is intelligible and task-relevant, though not elaborative or fluent in a structured narrative sense."
+  ],
+  "transcript_request_id": "chatcmpl-5bd4ef03-7075-943f-b10e-296204857e87",
+  "classification_request_id": "chatcmpl-fae5d524-a775-9180-a80e-236e9676701a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__018_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__018_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient identifies core actors (mother, kids), actions (reaching, tipping, splashing), and objects (cookies, dish, sink) relevant to the picture task.",
+        "evidence": "Patient states: 'Cookies from the cookie jar... mother is at the sink... one of these just turned over a dish... water is running over... one of the kids got a crack on the head.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Perceptual Variability Self-Report",
+        "summary": "Patient reports inconsistent visual clarity, suggesting possible perceptual or attentional variability, not necessarily cognitive impairment.",
+        "evidence": "Patient states: 'Sometimes I see a very clear image, other times a weak image, so to speak.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Engagement and Scaffolding",
+        "summary": "Patient relies on examiner prompts to complete descriptions, indicating some task dependence but not inability to engage.",
+        "evidence": "Patient responds to prompts: 'Is there anything else?' and 'Well, is there anything else that you can think of?' with partial or incomplete responses.",
+        "confidence": 0.25
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides intelligible, task-relevant descriptions of the picture with core elements identified. Reports perceptual variability and mild uncertainty, but no clear signs of word-finding failure, disorganization, or task breakdown. Examiner scaffolding is present but not excessive. No evidence of dementia-like impairment in this single clip.",
+    "evidence_for_risk": [
+      "Patient reports visual variability and uncertainty, which may reflect perceptual or attentional factors rather than cognitive decline.",
+      "Patient relies on examiner prompts to complete descriptions, indicating some scaffolding dependence but not inability to engage with the task."
+    ],
+    "evidence_against_risk": [
+      "Patient identifies all key actors, actions, and objects in the scene without omission or semantic vagueness.",
+      "Patient speech is coherent, grammatically intact, and task-focused despite limited elaboration.",
+      "No signs of word-finding pauses, circumlocution, repetition, or disorganized sequencing that would suggest retrieval or processing impairment."
+    ],
+    "alternative_explanations": [
+      "Perceptual variability may reflect normal visual processing fluctuations or fatigue rather than cognitive impairment.",
+      "Task dependence may reflect mild uncertainty or lack of confidence rather than cognitive deficit.",
+      "The patient may be describing the scene accurately but with limited elaboration due to task constraints or personality."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient reports variability in visual clarity: 'sometimes I see a very clear image, other times a weak one.'",
+      "Patient expresses uncertainty about interpretation: 'I just don’t know what it is.'",
+      "Patient indicates difficulty extracting nuanced meaning from the image: 'not getting any nuanced behind this.'"
+    ],
+    "emotional_assessment_findings": [
+      "Patient exhibits mild uncertainty and hesitation, but no signs of distress, frustration, or apathy.",
+      "Patient remains engaged with the task and responds to prompts without withdrawal or emotional reactivity.",
+      "Patient’s tone is calm and cooperative, with no signs of agitation or affective flattening."
+    ],
+    "risk_control_suggestions": [
+      "Monitor for consistency in visual description tasks across multiple sessions.",
+      "Consider perceptual or attentional factors if variability persists across assessments.",
+      "Avoid overinterpreting mild uncertainty or scaffolding dependence as cognitive impairment."
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening if symptoms persist or worsen.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip. No strong evidence of cognitive decline; further observation is appropriate.",
+    "reviewer_confidence": 0.5,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-relevant, though not elaborative.",
+      "Examiner prompts are neutral context",
+      "patient’s own responses are the primary basis for evaluation.",
+      "Perceptual variability reported by patient is not sufficient by itself to indicate cognitive impairment."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see. One of the kids got a crack on the head. Sometimes I see a very clear image, other times a weak one. I just don’t know what it is. Mostly, I have not had trouble looking at things as an image, but not getting any nuanced behind this.",
+    "speaker_turn_summary": [
+      "Examiner: Tell me everything that's going on.",
+      "Patient: Well, we're grading. I think we are going to, yeah. Cookies from the cookie jar. And mother does not see it because she's inside drying the clothes. And the kids then just, I guess, in the picture that mother is working hard and the kids were playing. And all of a sudden, one of these just turned over a dish. All over the floor, except it did not break. It didn't splash from the, it splashed from the sink, not from. That's okay.",
+      "Examiner: Is there anything else?",
+      "Patient: One of the kids got a crack on the head. And he has a. You know, it's sometimes I see a very clear and other times I see a weak image, so to speak. And sometimes I just don't know. What is it?",
+      "Examiner: Well, is there anything else that you can think of?",
+      "Patient: Mostly, I have not had so much trouble in looking at things as an image, but not getting any nuanced behind this.",
+      "Examiner: Was there anything else in that picture you want to tell me, or do you think you've told me everything?",
+      "Patient: Okay, thank you. All right."
+    ],
+    "patient_cue_summary": [
+      "Patient provides core scene elements: cookies, mother, kids, dish tipping, water splashing, crack on head.",
+      "Patient exhibits self-awareness of visual perception variability: 'sometimes I see a very clear image, other times a weak one.'",
+      "Patient shows mild uncertainty and lack of confidence in interpretation: 'I just don’t know what it is.'",
+      "Patient uses examiner prompts to complete descriptions, indicating some scaffolding dependence.",
+      "Patient does not demonstrate word-finding pauses, circumlocution, or semantic vagueness beyond mild uncertainty.",
+      "Patient does not show disorganized sequencing or failure to cover core task elements.",
+      "Patient’s speech is intelligible and task-relevant, though not elaborative or fluent in a structured narrative sense."
+    ]
+  },
+  "latency_ms": 23556,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/018-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/018-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

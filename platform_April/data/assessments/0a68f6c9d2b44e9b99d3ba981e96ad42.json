@@ -1,0 +1,117 @@
+{
+  "assessment_id": "0a68f6c9d2b44e9b99d3ba981e96ad42",
+  "patient_id": "patient-001",
+  "language": "en",
+  "created_at": "2026-04-12T16:37:47.966651Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Neutral to slightly engaged expression; no overt signs of distress, confusion, or emotional flattening.",
+      "evidence": "Patient maintains steady eye contact with camera; facial muscles show minimal movement beyond speech-related changes; no visible signs of agitation or apathy.",
+      "confidence": 0.85
+    },
+    {
+      "label": "Gaze and Attention",
+      "summary": "Consistent visual attention directed toward camera; no signs of disengagement or wandering gaze.",
+      "evidence": "Patient’s eyes remain focused on the camera throughout the clip; no frequent shifts in gaze or fixation on external objects.",
+      "confidence": 0.9
+    }
+  ],
+  "body_findings": [
+    {
+      "label": "Posture and Movement",
+      "summary": "Stable posture; minimal body movement observed.",
+      "evidence": "Patient remains seated and relatively still; no signs of fidgeting, restlessness, or motor coordination issues.",
+      "confidence": 0.88
+    }
+  ],
+  "voice_findings": [
+    {
+      "label": "Speech Fluency",
+      "summary": "Speech is fluent with occasional pauses and self-corrections; no evidence of word-finding difficulty or anomia.",
+      "evidence": "Patient speaks in complete sentences with natural rhythm; minor hesitations occur but do not disrupt communication.",
+      "confidence": 0.8
+    },
+    {
+      "label": "Speech Clarity",
+      "summary": "Speech is clear and intelligible; no slurring or articulation errors observed.",
+      "evidence": "All phonemes are clearly articulated; no distortion or reduced intelligibility noted.",
+      "confidence": 0.92
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Self-Reported Routine",
+      "summary": "Patient describes daily routine including waking time, driving, and eating breakfast while driving.",
+      "evidence": "Patient states: 'I wake up at six and drive to the marathon. I take the breakfast during my driving.'",
+      "confidence": 0.95
+    },
+    {
+      "label": "Cognitive Self-Awareness",
+      "summary": "Patient demonstrates awareness of daily activities and self-reports routine without signs of confusion or disorientation.",
+      "evidence": "Patient speaks coherently about personal schedule and actions without repetition, contradiction, or loss of context.",
+      "confidence": 0.87
+    }
+  ],
+  "speaker_structure": "single_speaker",
+  "target_patient_presence": "clear",
+  "target_patient_basis": "visual_focus",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 0.95,
+  "risk_score": 0.15,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "The patient demonstrates coherent speech, stable attention, and appropriate self-report of daily activities without signs of cognitive impairment. No observable risk factors or impairment-like signals are present in this single clip.",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [
+    "No speech disfluencies or word-finding difficulties",
+    "No signs of disorientation or memory loss in self-reported content",
+    "Stable gaze and posture suggest intact attention and motor control"
+  ],
+  "alternative_explanations": [
+    "The patient may be describing a routine without cognitive difficulty",
+    "The clip may not capture a full range of cognitive functions",
+    "The patient may be well-compensated for any underlying condition"
+  ],
+  "risk_factor_findings": [],
+  "subjective_assessment_findings": [],
+  "emotional_assessment_findings": [
+    "Neutral affect",
+    "No observable signs of distress or anxiety"
+  ],
+  "risk_control_suggestions": [
+    "No immediate intervention required",
+    "Consider routine follow-up if new symptoms emerge"
+  ],
+  "visit_recommendation": "routine follow-up",
+  "future_risk_trend_summary": "Limited predictive value from a single clip; longitudinal assessment recommended if concerns arise.",
+  "reviewer_confidence": 0.85,
+  "context_notes": [
+    "This is a single-clinic screening-grade observation, not diagnostic.",
+    "No caregiver or interviewer input is available for comparison.",
+    "Patient self-reports routine without apparent cognitive strain."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "e28d7058-5793-9f57-895c-f60b94eb41f5",
+    "latency_ms": 16636,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 16636
+    }
+  ],
+  "fallback_message": null
+}

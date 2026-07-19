@@ -1,0 +1,14 @@
+{
+  "case_id": "iJJerSu8DxE",
+  "dataset": "yt_demtalk_smoke",
+  "split": "test",
+  "ground_truth_label": "cognitive_risk",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3.5-plus",
+  "latency_ms": 624,
+  "error": "provider_unavailable: audio_only request failed: [Errno 8] nodename nor servname provided, or not known",
+  "metadata": {
+    "source_url": "https://youtu.be/iJJerSu8DxE",
+    "clip_window": "0:00-1:30"
+  }
+}

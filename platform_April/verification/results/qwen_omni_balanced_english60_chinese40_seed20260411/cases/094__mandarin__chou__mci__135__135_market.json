@@ -1,0 +1,142 @@
+{
+  "case_id": "mandarin__chou__mci__135__135_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.7,
+  "transcript": "这边小孩是在抓抓鱼一样，在在捞鱼一样，捞鱼，这个不是阿妈还是什么不知道。小啊这边是你你还是哎哎在做做抓鱼上来这边，啊这个这个。啊这这个小孩是好好像他是在他他妈妈拿一个好像冰淇淋给他递递在手手上了，这样，我的意思是就是这样。",
+  "patient_only_transcript": "这边小孩是在抓鱼一样，在捞鱼，这个不是阿嬷还是什么不知道。小啊这边是你还是在做抓鱼上来这边，这个这个。小孩好像是他妈妈拿一个冰淇淋给他递在手上了，这样，我的意思是就是这样。",
+  "speaker_turn_summary": [
+    "Examiner: prompts scene description task",
+    "Patient: describes children fishing, mentions '阿嬷' and '冰淇淋', uses vague terms like '这个' and '好像', repeats phrases, ends with '这样，我的意思是就是这样'",
+    "Examiner: likely prompts or acknowledges patient response"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple scene elements: children fishing, '阿嬷', '冰淇淋', mother giving ice cream",
+    "Uses vague referents: '这个', '好像', '不知道', '这样'",
+    "Repeats phrases: '这个这个', '在做抓鱼上来这边'",
+    "Narrative is fragmented but not abandoned",
+    "patient attempts to describe multiple actors and actions",
+    "No major contradictions or naming collapse",
+    "scene elements are mostly coherent despite colloquial vagueness"
+  ],
+  "transcript_request_id": "chatcmpl-f7ecf7ed-a088-9703-b8d3-3aaf809905e0",
+  "classification_request_id": "chatcmpl-f271f1a3-a4ae-9fd4-947d-77ade65c93ba",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__135__135_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__135__135_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient identifies multiple relevant scene elements (children fishing, '阿嬷', mother giving ice cream) but uses vague referents and repetitions, indicating possible lexical retrieval difficulty or colloquial speech patterns.",
+        "evidence": "Patient says: '这边小孩是在抓鱼一样...这个不是阿嬷还是什么不知道...小孩好像是他妈妈拿一个冰淇淋给他递在手上了...这样，我的意思是就是这样'.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Lexical Retrieval and Referential Clarity",
+        "summary": "Patient uses generic terms ('这个', '好像') and repeats phrases, suggesting possible difficulty retrieving specific nouns or actions, but does not show complete naming collapse or semantic disorganization.",
+        "evidence": "Patient says: '这个这个', '好像他是在他他妈妈拿一个好像冰淇淋', '不知道' — indicates partial retrieval difficulty but not total breakdown.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient attempts to describe multiple actors and actions but lacks causal or sequential structure; narrative is fragmented but not abandoned, consistent with colloquial Mandarin or mild cognitive hesitation.",
+        "evidence": "Patient describes: children fishing, '阿嬷', mother giving ice cream — multiple elements identified, but no clear sequence or causal links.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a partially coherent description of a market scene with multiple actors and actions, using vague referents and repetitions. While lexical retrieval and narrative organization show mild hesitation, the patient does not exhibit severe impairment or abandonment. The speech is intelligible enough to reconstruct key scene elements, which is counterevidence against cognitive_risk. Further observation or formal screening is recommended.",
+    "evidence_for_risk": [
+      "Use of vague referents ('这个', '好像', '不知道')",
+      "Repetition of phrases ('这个这个', '在做抓鱼上来这边')",
+      "Fragmented narrative without causal structure"
+    ],
+    "evidence_against_risk": [
+      "Patient identifies multiple relevant scene elements (children fishing, '阿嬷', mother giving ice cream)",
+      "No major contradictions or naming collapse",
+      "Narrative is not abandoned",
+      "patient attempts to complete the description despite hesitation",
+      "Speech is intelligible and reconstructable despite colloquial patterns"
+    ],
+    "alternative_explanations": [
+      "Colloquial Mandarin speech patterns including discourse particles, vague referents, and repetitions are common in spontaneous speech and do not necessarily indicate cognitive impairment.",
+      "Patient may be describing a familiar scene but struggling to articulate details due to task demands or mild hesitation, not due to cognitive decline.",
+      "Recording quality or audio noise may contribute to perceived unintelligibility, though patient speech remains reconstructable."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty: '不知道', '好像', '这个'",
+      "Patient appears to be describing a familiar scene but struggles to specify roles or exact actions"
+    ],
+    "emotional_assessment_findings": [
+      "No clear signs of distress, frustration, or apathy",
+      "Affective tone is neutral to slightly hesitant, consistent with effort to describe a complex scene"
+    ],
+    "risk_control_suggestions": [
+      "Schedule follow-up for formal cognitive screening (e.g., MoCA, MMSE)",
+      "Observe patient in structured scene-description tasks with prompting",
+      "Consider caregiver report for functional or memory concerns"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended; routine follow-up if no further concerns arise.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation or multi-visit assessment is needed for trend evaluation.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible enough to reconstruct key scene elements despite colloquial vagueness.",
+      "In Mandarin, vague referents and repetitions are not sufficient alone to indicate cognitive_risk unless combined with severe disorganization or naming failure."
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable",
+      "limited_speaking_time"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这边小孩是在抓鱼一样，在捞鱼，这个不是阿嬷还是什么不知道。小啊这边是你还是在做抓鱼上来这边，这个这个。小孩好像是他妈妈拿一个冰淇淋给他递在手上了，这样，我的意思是就是这样。",
+    "speaker_turn_summary": [
+      "Examiner: prompts scene description task",
+      "Patient: describes children fishing, mentions '阿嬷' and '冰淇淋', uses vague terms like '这个' and '好像', repeats phrases, ends with '这样，我的意思是就是这样'",
+      "Examiner: likely prompts or acknowledges patient response"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple scene elements: children fishing, '阿嬷', '冰淇淋', mother giving ice cream",
+      "Uses vague referents: '这个', '好像', '不知道', '这样'",
+      "Repeats phrases: '这个这个', '在做抓鱼上来这边'",
+      "Narrative is fragmented but not abandoned",
+      "patient attempts to describe multiple actors and actions",
+      "No major contradictions or naming collapse",
+      "scene elements are mostly coherent despite colloquial vagueness"
+    ]
+  },
+  "latency_ms": 18674,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/135/135_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/135/135_market.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

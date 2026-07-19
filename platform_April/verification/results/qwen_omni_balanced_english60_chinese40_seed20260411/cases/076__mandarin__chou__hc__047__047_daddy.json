@@ -1,0 +1,127 @@
+{
+  "case_id": "mandarin__chou__hc__047__047_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "哦，这个爸爸在烫衣服，那小朋友就他，小朋友应该是他在看着吧，没有注意小朋友就要拉那个插头。嗯，啊他就吓一大跳，然后小狗过来好像是要阻止他，阻止小朋友拉那个插头。那连猫咪都吓一大跳，把桌上的小柜上的那个花瓶水弄倒了。那这一边呢？这边就是小狗可能就是看到小，这小朋友要插插头，它很紧张赶快跑过来叫了一声，大人看到了，他在烫衣服本来没有注意到，就是狗在提醒他，呃，小朋友要拉插头了，连猫也紧张了，所以把小柜上的那个花瓶的水弄倒了。嘿。",
+  "patient_only_transcript": "这个爸爸在烫衣服，小朋友在看着，没注意小朋友要拉插头，吓一大跳。小狗过来阻止，猫咪也吓到，把花瓶水弄倒了。小狗看到小朋友要插插头，紧张跑过来叫，大人没注意，狗提醒了。猫也紧张，所以打翻花瓶水。",
+  "speaker_turn_summary": [
+    "Examiner prompts or sets context (implied)",
+    "Patient describes scene: dad ironing, kid watching, kid reaching for plug, dog intervenes, cat startled, vase knocked over",
+    "Patient narrates sequence of events with causal links and multiple actors"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple actors: dad, kid, dog, cat",
+    "Patient describes sequence of actions with temporal and causal markers: '吓一大跳', '跑过来叫', '所以打翻'",
+    "Patient uses colloquial particles: '啊', '嗯', '那个' — but maintains overall scene coherence",
+    "Patient reconstructs a multi-element hazard scenario without abandonment or naming collapse",
+    "Narrative is complete enough to infer spatial and emotional reactions (fear, surprise, intervention) without examiner rescue"
+  ],
+  "transcript_request_id": "chatcmpl-d15eed99-42b4-9020-b9d8-d53feaf90190",
+  "classification_request_id": "chatcmpl-2c0fad0f-0643-9527-82d7-fb705ae1b319",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__047__047_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__047__047_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes a multi-actor, multi-event home hazard scenario with temporal and causal markers.",
+        "evidence": "Patient identifies dad, kid, dog, cat; describes actions (ironing, reaching for plug, dog intervention, cat startled, vase knocked over) with emotional reactions and sequence markers.",
+        "confidence": 0.9
+      },
+      {
+        "label": "lexical_retrieval_and_grammar",
+        "summary": "Patient uses colloquial Mandarin with fillers and pronouns but maintains grammatical completeness and referential clarity.",
+        "evidence": "Use of '那个', '啊', '所以' does not impair comprehension; core nouns and verbs are specific and correctly used.",
+        "confidence": 0.85
+      },
+      {
+        "label": "task_completion_and_relevance",
+        "summary": "Patient completes the scene-description task with relevant details and minimal examiner dependence.",
+        "evidence": "Patient independently reconstructs the full sequence without prompting or correction; task is contextually appropriate for screening.",
+        "confidence": 0.8
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, multi-element description of a home hazard scenario involving multiple actors and emotional reactions. Speech is intelligible, grammatically complete, and contextually relevant. No persuasive impairment-like cues detected. Video is unavailable, so visual and body findings are empty. Audio-only assessment remains conservative.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies and sequences multiple actors and events",
+      "Narrative includes causal and emotional markers without collapse or vagueness",
+      "Colloquial fillers and pronouns are normal in spontaneous Mandarin speech",
+      "No evidence of word-finding failure, disorganization, or task abandonment"
+    ],
+    "alternative_explanations": [
+      "Audio quality or recording context may limit full assessment",
+      "Patient may be describing a familiar scenario rather than performing a cognitive task",
+      "Examiner may have prompted or scaffolded the response"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a full cognitive screening battery if clinical concern persists",
+      "Observe for consistency across multiple sessions or tasks",
+      "Consider environmental or developmental factors if patient is young or non-clinical"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if clinical suspicion remains",
+    "future_risk_trend_summary": "Longitudinal prediction not possible from single audio clip; further assessment needed for trend evaluation",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio description of scene",
+      "Patient speech is intelligible and contextually complete despite colloquial markers",
+      "No evidence of dementia-like impairment in this single clip"
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "video_too_short",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这个爸爸在烫衣服，小朋友在看着，没注意小朋友要拉插头，吓一大跳。小狗过来阻止，猫咪也吓到，把花瓶水弄倒了。小狗看到小朋友要插插头，紧张跑过来叫，大人没注意，狗提醒了。猫也紧张，所以打翻花瓶水。",
+    "speaker_turn_summary": [
+      "Examiner prompts or sets context (implied)",
+      "Patient describes scene: dad ironing, kid watching, kid reaching for plug, dog intervenes, cat startled, vase knocked over",
+      "Patient narrates sequence of events with causal links and multiple actors"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple actors: dad, kid, dog, cat",
+      "Patient describes sequence of actions with temporal and causal markers: '吓一大跳', '跑过来叫', '所以打翻'",
+      "Patient uses colloquial particles: '啊', '嗯', '那个' — but maintains overall scene coherence",
+      "Patient reconstructs a multi-element hazard scenario without abandonment or naming collapse",
+      "Narrative is complete enough to infer spatial and emotional reactions (fear, surprise, intervention) without examiner rescue"
+    ]
+  },
+  "latency_ms": 14792,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/047/047_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/047/047_Daddy.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

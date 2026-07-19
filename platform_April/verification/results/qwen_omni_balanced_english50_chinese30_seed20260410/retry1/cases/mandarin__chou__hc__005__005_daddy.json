@@ -1,0 +1,132 @@
+{
+  "case_id": "mandarin__chou__hc__005__005_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "哦，这个这个爸爸在家带小孩，在烫衣服，这个小孩子就在玩插座，那个猫，那个猫就把那个桌上那一瓶水花瓶的水碰洒了，弄倒了，就是等于说狗嘛也在叫，爸爸很也在叫，狗也叫。爸爸一叫就把这狗跟猫都吓到了，所以说猫就不小心把这柜子弄倒了，这瓶水也倒了，倒下来了。这是爸爸在家，哦，还要讲日期嘛。礼拜天，爸爸在家带小孩，烫衣服，小孩没注意小孩去玩电插头，爸爸看到很吓一跳，然后大声一叫，就把这狗也吓到，猫也吓到了，猫不小心把那个柜子碰倒了，上面的那个花花瓶也洒了。",
+  "patient_only_transcript": "爸爸在家带小孩，烫衣服，小孩玩插座，猫碰倒花瓶，狗和猫被吓到，柜子倒了，水洒了。礼拜天，爸爸在家，小孩没注意，玩电插头，爸爸吓一跳，大声叫，狗和猫都吓到，猫碰倒柜子，花瓶倒了。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes scene with multiple events, objects, and causal links",
+    "Patient: repeats key elements (e.g., '爸爸', '小孩', '猫', '花瓶', '柜子')",
+    "Patient: uses sequential but slightly fragmented narrative structure"
+  ],
+  "patient_cue_summary": [
+    "Patient names multiple objects and actors correctly (爸爸, 小孩, 猫, 狗, 花瓶, 柜子)",
+    "Patient links events causally (爸爸叫 → 狗猫吓到 → 猫碰倒柜子)",
+    "Patient uses repetitive phrasing ('爸爸...爸爸', '狗也叫, 猫也叫')",
+    "Patient shows slight disorganization in event sequencing (e.g., '弄倒了' repeated, '洒了' and '倒下来了' overlapping)",
+    "Patient does not initiate or sustain narrative independently — relies on examiner context (implied by '还要讲日期嘛')",
+    "Patient speech is intelligible but lacks elaboration, detail, or emotional nuance — content is functional but minimal"
+  ],
+  "transcript_request_id": "chatcmpl-d80a6b68-c4df-91f6-9966-5d40719a4158",
+  "classification_request_id": "chatcmpl-d9feec78-d703-95ff-8edb-d7a33f1fe619",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__005__005_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__005__005_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "narrative coherence",
+        "summary": "Patient describes a multi-agent scene with causal links but shows slight fragmentation and repetition, suggesting possible retrieval or organizational difficulty.",
+        "evidence": "Patient links events (爸爸叫 → 狗猫吓到 → 猫碰倒柜子) but uses repetitive phrasing and lacks elaboration or emotional tone. Narrative is functional but not fluent or detailed.",
+        "confidence": 0.7
+      },
+      {
+        "label": "lexical retrieval",
+        "summary": "Patient retrieves correct object and actor names but uses minimal elaboration and repeats key terms, suggesting possible mild word-finding difficulty.",
+        "evidence": "Patient correctly names '爸爸', '小孩', '猫', '狗', '花瓶', '柜子' but does not expand on roles, actions, or context beyond basic event listing.",
+        "confidence": 0.65
+      },
+      {
+        "label": "task independence",
+        "summary": "Patient appears to respond to examiner context or prompts, as indicated by '还要讲日期嘛', suggesting possible dependence on external cues.",
+        "evidence": "Patient pauses or adds '还要讲日期嘛' — implies examiner prompt or task structure — and does not initiate or sustain narrative independently.",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a basic, causally linked description of a domestic scene with multiple agents and objects. Speech is intelligible but shows mild signs of retrieval difficulty, repetition, and task dependence. Not sufficient for healthy classification, but not strong enough for dementia. Further clinical review is recommended.",
+    "evidence_for_risk": [
+      "Repetitive phrasing and slight disorganization in narrative",
+      "Minimal elaboration despite rich scene context",
+      "Possible dependence on examiner prompts or task structure"
+    ],
+    "evidence_against_risk": [
+      "Correct naming of key objects and actors",
+      "Functional causal linking of events",
+      "Intelligible speech without severe breakdown"
+    ],
+    "alternative_explanations": [
+      "Task-dependent response style",
+      "Examiner prompting or scaffolding",
+      "Normal variation in narrative elaboration for non-clinical setting"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery",
+      "Observe patient’s spontaneous narrative and task independence in next session",
+      "Assess for memory, executive function, and language fluency in structured tasks"
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation and repeated assessments are needed to track cognitive trajectory.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video unavailable — assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible but shows mild impairment-like cues in organization and elaboration.",
+      "Examiner role is implied but not directly audible — patient response is evaluated independently."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "爸爸在家带小孩，烫衣服，小孩玩插座，猫碰倒花瓶，狗和猫被吓到，柜子倒了，水洒了。礼拜天，爸爸在家，小孩没注意，玩电插头，爸爸吓一跳，大声叫，狗和猫都吓到，猫碰倒柜子，花瓶倒了。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes scene with multiple events, objects, and causal links",
+      "Patient: repeats key elements (e.g., '爸爸', '小孩', '猫', '花瓶', '柜子')",
+      "Patient: uses sequential but slightly fragmented narrative structure"
+    ],
+    "patient_cue_summary": [
+      "Patient names multiple objects and actors correctly (爸爸, 小孩, 猫, 狗, 花瓶, 柜子)",
+      "Patient links events causally (爸爸叫 → 狗猫吓到 → 猫碰倒柜子)",
+      "Patient uses repetitive phrasing ('爸爸...爸爸', '狗也叫, 猫也叫')",
+      "Patient shows slight disorganization in event sequencing (e.g., '弄倒了' repeated, '洒了' and '倒下来了' overlapping)",
+      "Patient does not initiate or sustain narrative independently — relies on examiner context (implied by '还要讲日期嘛')",
+      "Patient speech is intelligible but lacks elaboration, detail, or emotional nuance — content is functional but minimal"
+    ]
+  },
+  "latency_ms": 15561,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/005/005_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/005/005_Daddy.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "case_id": "mandarin__chou__hc__022__022_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "这奶奶带着她孙子去捞捞金鱼。有另外一个妈妈也带她的女儿去捞。哦，这有两个小孩子在在玩玩骰子。这个背背着背包，另外一个小孩子做扒手，扒，偷偷窃他包包里的东西，嗯。",
+  "patient_only_transcript": "阿嬷带孙子捞鱼，另一个妈妈带女儿捞鱼，两个小孩在玩骰子，一个背着背包，另一个小孩偷拿背包里的东西。",
+  "speaker_turn_summary": [
+    "Examiner prompts or sets context (implied)",
+    "Patient describes scene with multiple actors and actions: grandmother with grandson, another mother with daughter, two children playing dice, one stealing from a backpack."
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple scene elements: actors (grandmother, mother, children), actions (fishing, playing dice, stealing), objects (backpack, dice).",
+    "Use of colloquial Mandarin with discourse particles (e.g., '嗯', '哦') and generic referents ('这个', '那个') is consistent with normal spontaneous speech.",
+    "Narrative is coherent and task-relevant",
+    "no evidence of naming collapse, abandonment, or semantic vagueness beyond normal colloquial variation.",
+    "No signs of disorganization, contradiction, or severe lexical retrieval failure",
+    "patient maintains referential clarity across multiple scene components."
+  ],
+  "transcript_request_id": "chatcmpl-fa37d7df-2a24-9149-8cda-cc939b008c80",
+  "classification_request_id": "chatcmpl-6ae531d0-e1be-9538-a4c6-112a9b4ca85b",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__022__022_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__022__022_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient provides a multi-element, coherent description of a market scene with multiple actors, actions, and objects.",
+        "evidence": "Patient identifies grandmother with grandson, another mother with daughter, two children playing dice, and one child stealing from a backpack. All elements are clearly referenced and sequenced.",
+        "confidence": 0.85
+      },
+      {
+        "label": "lexical_retrieval_and_vocabulary",
+        "summary": "Lexical retrieval is adequate; no evidence of naming failure or semantic collapse.",
+        "evidence": "Patient uses specific nouns (金鱼, 骰子, 背包) and verbs (捞, 玩, 偷) appropriately. No circumlocution or filler-based substitution for core terms.",
+        "confidence": 0.8
+      },
+      {
+        "label": "discourse_structure",
+        "summary": "Discourse structure is topic-comment style with normal colloquial markers; not indicative of impairment.",
+        "evidence": "Use of particles like '哦' and '嗯' and generic referents like '这个' are consistent with natural Mandarin speech patterns, not cognitive impairment.",
+        "confidence": 0.9
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, multi-element description of a market scene with multiple actors and actions. Speech is intelligible and task-relevant. No persuasive impairment-like cues detected. However, due to lack of visual channel and potential examiner influence, further observation is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent scene description with multiple correct elements",
+      "No lexical retrieval failure or semantic vagueness",
+      "Normal colloquial speech patterns without impairment markers"
+    ],
+    "alternative_explanations": [
+      "Colloquial Mandarin speech with discourse particles is normal and not indicative of cognitive decline",
+      "Lack of visual channel limits full assessment",
+      "may mask subtle cues",
+      "Examiner may have prompted or guided the description"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a full cognitive screening battery in clinic",
+      "Observe patient in structured narrative or memory tasks",
+      "Consider repeating the scene-description task with visual cues"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio clip; no evidence of progressive decline or strong impairment.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-relevant",
+      "no signs of cognitive impairment detected.",
+      "Colloquial Mandarin features are normal and not diagnostic of dementia."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "阿嬷带孙子捞鱼，另一个妈妈带女儿捞鱼，两个小孩在玩骰子，一个背着背包，另一个小孩偷拿背包里的东西。",
+    "speaker_turn_summary": [
+      "Examiner prompts or sets context (implied)",
+      "Patient describes scene with multiple actors and actions: grandmother with grandson, another mother with daughter, two children playing dice, one stealing from a backpack."
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple scene elements: actors (grandmother, mother, children), actions (fishing, playing dice, stealing), objects (backpack, dice).",
+      "Use of colloquial Mandarin with discourse particles (e.g., '嗯', '哦') and generic referents ('这个', '那个') is consistent with normal spontaneous speech.",
+      "Narrative is coherent and task-relevant",
+      "no evidence of naming collapse, abandonment, or semantic vagueness beyond normal colloquial variation.",
+      "No signs of disorganization, contradiction, or severe lexical retrieval failure",
+      "patient maintains referential clarity across multiple scene components."
+    ]
+  },
+  "latency_ms": 16997,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/022/022_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/022/022_market.mp3?f=save",
+    "expected_group_audio_count": 120
+  }
+}

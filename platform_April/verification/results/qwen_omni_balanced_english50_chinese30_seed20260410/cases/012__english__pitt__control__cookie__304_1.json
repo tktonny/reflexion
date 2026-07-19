@@ -1,0 +1,133 @@
+{
+  "case_id": "english__pitt__control__cookie__304_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.6,
+  "transcript": "The boy is about to fall off a stool while he's grabbing for the cookie jar. The water's running over the sink and mother's drying dishes. Little girl is reaching up for a cookie. That's all that I see. Okay.",
+  "patient_only_transcript": "The boy is about to fall off a stool while he's grabbing for the cookie jar. The water's running over the sink and mother's drying dishes. Little girl is reaching up for a cookie. That's all that I see.",
+  "speaker_turn_summary": [
+    "Examiner: (prompt or setup not audible)",
+    "Patient: Describes scene with correct key elements but minimal elaboration or organization.",
+    "Examiner: (acknowledgment or follow-up not audible)",
+    "Patient: Ends with 'That's all that I see.' — suggests possible completion, lack of elaboration, or uncertainty."
+  ],
+  "patient_cue_summary": [
+    "Patient names key scene elements (boy, cookie jar, stool, sink, mother, little girl) — correct but minimal.",
+    "Patient’s description is linear but lacks causal or spatial linking between events.",
+    "Patient ends with 'That's all that I see.' — may indicate completion, uncertainty, or lack of further recall.",
+    "No evidence of word-finding pauses, circumlocution, or repetition — but also no evidence of rich, coherent narrative.",
+    "Patient’s speech is intelligible but low in informational density and organizational depth for a picture-description task."
+  ],
+  "transcript_request_id": "chatcmpl-99b3366e-6080-9c83-a29b-84fd36622bf5",
+  "classification_request_id": "chatcmpl-0e90e60f-6dbd-96fe-8c63-1e738601f523",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__304_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__304_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient names key objects and actors in the scene but provides no elaboration, causal links, or spatial/temporal sequencing.",
+        "evidence": "Patient says: 'The boy is about to fall off a stool while he's grabbing for the cookie jar. The water's running over the sink and mother's drying dishes. Little girl is reaching up for a cookie. That's all that I see.'",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient’s description is list-like and lacks narrative cohesion or logical progression between events.",
+        "evidence": "Patient lists events sequentially without connecting them causally or spatially (e.g., no mention of why the boy is falling, or how the girl’s action relates to the mother’s activity).",
+        "confidence": null
+      },
+      {
+        "label": "Informational Density",
+        "summary": "Patient’s response is minimally informative for a picture-description task, ending with a phrase suggesting possible incompleteness or lack of recall.",
+        "evidence": "Patient ends with 'That's all that I see.' — may indicate limited retrieval or lack of further observation, not necessarily impairment but not robustly informative.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides correct but minimal scene description with no elaboration, organization, or causal linking. Speech is intelligible but low in informational depth and narrative cohesion. No overt impairment cues, but insufficient richness for healthy classification. Further clinical review is justified.",
+    "evidence_for_risk": [
+      "Minimal informational content despite task",
+      "Lack of narrative organization or causal linking",
+      "Ending phrase 'That's all that I see.' suggests possible incompleteness or limited recall"
+    ],
+    "evidence_against_risk": [
+      "Correct identification of key scene elements",
+      "No word-finding pauses, circumlocution, or repetition",
+      "Speech is intelligible and task-relevant"
+    ],
+    "alternative_explanations": [
+      "Patient may be young, shy, or not fully engaged with the task",
+      "Patient may be responding to a prompt with minimal elaboration due to context or instruction",
+      "Audio may be limited in capturing full response depth"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a more structured picture-description task with prompting",
+      "Include a brief memory or orientation screen to contextualize performance",
+      "Consider repeating the task with a different image or scenario to assess consistency"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment needed to determine trend.",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient’s speech is intelligible but lacks depth and organization for a picture-description task.",
+      "No overt signs of dementia, but insufficient performance to classify as healthy."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is about to fall off a stool while he's grabbing for the cookie jar. The water's running over the sink and mother's drying dishes. Little girl is reaching up for a cookie. That's all that I see.",
+    "speaker_turn_summary": [
+      "Examiner: (prompt or setup not audible)",
+      "Patient: Describes scene with correct key elements but minimal elaboration or organization.",
+      "Examiner: (acknowledgment or follow-up not audible)",
+      "Patient: Ends with 'That's all that I see.' — suggests possible completion, lack of elaboration, or uncertainty."
+    ],
+    "patient_cue_summary": [
+      "Patient names key scene elements (boy, cookie jar, stool, sink, mother, little girl) — correct but minimal.",
+      "Patient’s description is linear but lacks causal or spatial linking between events.",
+      "Patient ends with 'That's all that I see.' — may indicate completion, uncertainty, or lack of further recall.",
+      "No evidence of word-finding pauses, circumlocution, or repetition — but also no evidence of rich, coherent narrative.",
+      "Patient’s speech is intelligible but low in informational density and organizational depth for a picture-description task."
+    ]
+  },
+  "latency_ms": 23678,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/304-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/304-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

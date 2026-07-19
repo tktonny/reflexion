@@ -1,0 +1,151 @@
+{
+  "case_id": "mandarin__chou__mci__046__046_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "这里面是在卖东西吗？哦，卖香肠。这是同一个东西啊。不是，呃，应该是啊。一个妈妈拿个冰激，在带着孩子们，还有一个婆婆带着孩子们到这个到这个钓鱼池来啊，捉鱼。就是在这块廊走廊正中间呢，就他们这个有一个摆的这个鱼，钓鱼可以。哦，钓鱼的池嘛。然后这个妈妈拿着冰激凌在吃冰激凌呢，掉了她那个孩子的手上。都在地上，冰冰都化掉了。对，就是说他们正在捞这个捞鱼啊。每天都在捞鱼吗？妈妈，那婆婆陪着她，她带着女儿，就在专心的在弄。就妈妈那个太阳，那个妈妈那个就一一直看他们，就是冰，这冰激凌就掉了，掉掉到掉到地上，冰激凌化掉。然后这边的人呢，他一个是在这个这个是他在烤这个香肠，烤香肠，然后一边跟那个旁边的孩子，两个孩子玩那个骰子，哦。那骰子怎么会到上面呢？然后趁着大家就在忙这边在抓鱼，这个地方在在摆弄玩骰骰骰子吧。然后这个小弟弟呢就偷他的东西，从那个手放进他包包拿东西。他一叫一叫，可能就把这个有人拿的东西，他就他就碗就掉这边来了。他本来这个碗里面有放香肠的。一紧张就是是不是丢就丢下去了，是不是这样子？也可以说这个这个卖的人一边在玩这个教人家玩这个骰子，一边在煎这个鱼，这个香肠嘛。因为他们都在玩的很开心的时候，他就是啊，就是。他可能有人，他就他后面他发现是不是发现他的，发现他就叫，然后他就这个这个把他吊上去。",
+  "patient_only_transcript": "这里面是在卖东西吗？哦，卖香肠。这是同一个东西啊。不是，呃，应该是啊。一个妈妈拿个冰激，在带着孩子们，还有一个婆婆带着孩子们到这个到这个钓鱼池来啊，捉鱼。就是在这块廊走廊正中间呢，就他们这个有一个摆的这个鱼，钓鱼可以。哦，钓鱼的池嘛。然后这个妈妈拿着冰激凌在吃冰激凌呢，掉了她那个孩子的手上。都在地上，冰冰都化掉了。对，就是说他们正在捞这个捞鱼啊。每天都在捞鱼吗？妈妈，那婆婆陪着她，她带着女儿，就在专心的在弄。就妈妈那个太阳，那个妈妈那个就一一直看他们，就是冰，这冰激凌就掉了，掉掉到掉到地上，冰激凌化掉。然后这边的人呢，他一个是在这个这个是他在烤这个香肠，烤香肠，然后一边跟那个旁边的孩子，两个孩子玩那个骰子，哦。那骰子怎么会到上面呢？然后趁着大家就在忙这边在抓鱼，这个地方在在摆弄玩骰骰骰子吧。然后这个小弟弟呢就偷他的东西，从那个手放进他包包拿东西。他一叫一叫，可能就把这个有人拿的东西，他就他就碗就掉这边来了。他本来这个碗里面有放香肠的。一紧张就是是不是丢就丢下去了，是不是这样子？也可以说这个这个卖的人一边在玩这个教人家玩这个骰子，一边在煎这个鱼，这个香肠嘛。因为他们都在玩的很开心的时候，他就是啊，就是。他可能有人，他就他后面他发现是不是发现他的，发现他就叫，然后他就这个这个把他吊上去。",
+  "speaker_turn_summary": [
+    "Examiner: Asks if this is a place selling things.",
+    "Patient: Responds with 'selling sausages', then hesitates and corrects.",
+    "Patient: Describes a scene with a mother, children, and a fishing pond, but with fragmented sequencing and repetition.",
+    "Patient: Mentions ice cream falling, but repeats 'ice cream' and 'melted' multiple times, with unclear causal links.",
+    "Patient: Describes a man grilling sausages while playing dice with children, but confuses object placement and sequence.",
+    "Patient: Describes a child stealing, then a bowl falling, but with unclear causality and repeated phrases like 'he called' and 'he dropped'.",
+    "Patient: Ends with a vague summary of the man being distracted while managing multiple tasks, but with weak narrative cohesion."
+  ],
+  "patient_cue_summary": [
+    "Frequent hesitation and self-correction ('不是，呃，应该是啊')",
+    "Repetition of key terms ('冰激凌', '掉', '化掉', '骰子') without clear progression",
+    "Fragmented scene description with weak causal links ('他一叫一叫...碗就掉这边来了')",
+    "Vague object references ('这个东西', '这个碗', '这个卖的人') without consistent identification",
+    "Inconsistent sequencing: jumps between characters, actions, and locations without clear transitions",
+    "Examiner-dependent elaboration: relies on examiner's prompts to continue describing the scene",
+    "Weak narrative control: fails to maintain a coherent storyline despite multiple scene elements"
+  ],
+  "transcript_request_id": "chatcmpl-69e55e12-dab9-9ed7-93eb-5beb3c54133d",
+  "classification_request_id": "chatcmpl-8acf9117-df0a-9f4b-9421-89814bfaf316",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__046__046_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__046__046_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Narrative Disorganization",
+        "summary": "Patient describes a complex scene with multiple characters and actions but fails to maintain coherent sequencing or causal links.",
+        "evidence": "Patient describes mother, children, fishing pond, ice cream falling, man grilling sausages, dice game, child stealing, bowl falling — but these events are presented in a disjointed, repetitive, and circular manner without clear transitions or logical progression.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Repetition",
+        "summary": "Patient frequently repeats key terms and uses vague fillers, suggesting possible word-finding difficulty.",
+        "evidence": "Repeats '冰激凌', '掉', '化掉', '骰子', and uses filler '呃' and '这个' to fill gaps in description. Uses circumlocutions like '这个东西' instead of specific nouns.",
+        "confidence": null
+      },
+      {
+        "label": "Examiner Dependence",
+        "summary": "Patient relies on examiner prompts to continue describing the scene and often restarts or corrects themselves mid-sentence.",
+        "evidence": "Patient begins with '这里面是在卖东西吗？' and then responds with '哦，卖香肠。' — then hesitates and corrects. Later, patient says '然后这边的人呢...' — indicating reliance on examiner's framing to continue.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates mild impairment-like cues including narrative disorganization, lexical repetition, and examiner dependence during a picture-description task. While patient correctly identifies some scene elements, the overall response lacks coherence, causal structure, and lexical precision. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Disjointed scene description with weak causal links",
+      "Frequent repetition and filler usage",
+      "Reliance on examiner prompts to continue narrative"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key objects (ice cream, sausages, dice, fishing pond)",
+      "No signs of severe confusion or incoherence",
+      "Patient completes the task with some effort and detail"
+    ],
+    "alternative_explanations": [
+      "Possible fatigue or distraction during the task",
+      "Language processing delay or mild cognitive load",
+      "Task-specific difficulty with narrative sequencing"
+    ],
+    "risk_factor_findings": [
+      "Possible word-finding difficulty",
+      "Narrative disorganization",
+      "Examiner dependence in task completion"
+    ],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "No clear emotional reactivity or affective flattening observed in audio",
+      "No signs of frustration, anxiety, or apathy detected"
+    ],
+    "risk_control_suggestions": [
+      "Schedule formal cognitive screening with validated tools (e.g., MoCA, MMSE)",
+      "Consider repeating the picture-description task with structured prompts",
+      "Monitor for functional changes in daily activities or memory complaints"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with neuropsychological assessment",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up with repeated assessments recommended to track progression.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is partially intelligible but shows multiple mild impairment-like cues.",
+      "Task appears to be a picture-description elicitation",
+      "patient response is examiner-dependent and disorganized."
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "limited_speaking_time",
+      "overlapping_speech",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这里面是在卖东西吗？哦，卖香肠。这是同一个东西啊。不是，呃，应该是啊。一个妈妈拿个冰激，在带着孩子们，还有一个婆婆带着孩子们到这个到这个钓鱼池来啊，捉鱼。就是在这块廊走廊正中间呢，就他们这个有一个摆的这个鱼，钓鱼可以。哦，钓鱼的池嘛。然后这个妈妈拿着冰激凌在吃冰激凌呢，掉了她那个孩子的手上。都在地上，冰冰都化掉了。对，就是说他们正在捞这个捞鱼啊。每天都在捞鱼吗？妈妈，那婆婆陪着她，她带着女儿，就在专心的在弄。就妈妈那个太阳，那个妈妈那个就一一直看他们，就是冰，这冰激凌就掉了，掉掉到掉到地上，冰激凌化掉。然后这边的人呢，他一个是在这个这个是他在烤这个香肠，烤香肠，然后一边跟那个旁边的孩子，两个孩子玩那个骰子，哦。那骰子怎么会到上面呢？然后趁着大家就在忙这边在抓鱼，这个地方在在摆弄玩骰骰骰子吧。然后这个小弟弟呢就偷他的东西，从那个手放进他包包拿东西。他一叫一叫，可能就把这个有人拿的东西，他就他就碗就掉这边来了。他本来这个碗里面有放香肠的。一紧张就是是不是丢就丢下去了，是不是这样子？也可以说这个这个卖的人一边在玩这个教人家玩这个骰子，一边在煎这个鱼，这个香肠嘛。因为他们都在玩的很开心的时候，他就是啊，就是。他可能有人，他就他后面他发现是不是发现他的，发现他就叫，然后他就这个这个把他吊上去。",
+    "speaker_turn_summary": [
+      "Examiner: Asks if this is a place selling things.",
+      "Patient: Responds with 'selling sausages', then hesitates and corrects.",
+      "Patient: Describes a scene with a mother, children, and a fishing pond, but with fragmented sequencing and repetition.",
+      "Patient: Mentions ice cream falling, but repeats 'ice cream' and 'melted' multiple times, with unclear causal links.",
+      "Patient: Describes a man grilling sausages while playing dice with children, but confuses object placement and sequence.",
+      "Patient: Describes a child stealing, then a bowl falling, but with unclear causality and repeated phrases like 'he called' and 'he dropped'.",
+      "Patient: Ends with a vague summary of the man being distracted while managing multiple tasks, but with weak narrative cohesion."
+    ],
+    "patient_cue_summary": [
+      "Frequent hesitation and self-correction ('不是，呃，应该是啊')",
+      "Repetition of key terms ('冰激凌', '掉', '化掉', '骰子') without clear progression",
+      "Fragmented scene description with weak causal links ('他一叫一叫...碗就掉这边来了')",
+      "Vague object references ('这个东西', '这个碗', '这个卖的人') without consistent identification",
+      "Inconsistent sequencing: jumps between characters, actions, and locations without clear transitions",
+      "Examiner-dependent elaboration: relies on examiner's prompts to continue describing the scene",
+      "Weak narrative control: fails to maintain a coherent storyline despite multiple scene elements"
+    ]
+  },
+  "latency_ms": 40336,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/046/046_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/046/046_market.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

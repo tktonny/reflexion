@@ -1,0 +1,132 @@
+{
+  "case_id": "english__pitt__dementia__fluency__033_3",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Lima bean, green bean, soy bean, corn, apples, peaches, grapes, cherries, blueberries, raspberries, asparagus, zucchini, sugar cane, molasses, taffy, peaches, plums, pears, fish, meat, oats, wheat, barley, rice, sugar. Sat, set, safety, satisfy, suggest, share, seize, stop, sink, sunk, scrap, steal, safety, shot, scream, scramble. He drank.",
+  "patient_only_transcript": "Lima bean, green bean, soy bean, corn, apples, peaches, grapes, cherries, blueberries, raspberries, asparagus, zucchini, sugar cane, molasses, taffy, peaches, plums, pears, fish, meat, oats, wheat, barley, rice, sugar. Sat, set, safety, satisfy, suggest, share, seize, stop, sink, sunk, scrap, steal, safety, shot, scream, scramble. He drank.",
+  "speaker_turn_summary": [
+    "Examiner prompts or cues (implied by task context)",
+    "Patient recites list of food items and then words starting with 's'",
+    "Patient ends with 'He drank.' — possibly incomplete or off-topic"
+  ],
+  "patient_cue_summary": [
+    "Patient recites category items (food, then 's' words) with some repetition (e.g., peaches listed twice)",
+    "Lexical retrieval appears intact for common nouns, but no elaboration or narrative",
+    "No evidence of semantic organization, causal linkage, or scene construction",
+    "Final utterance 'He drank.' is disconnected and lacks context or task relevance",
+    "No signs of word-finding pauses, circumlocution, or self-correction — but also no meaningful elaboration or coherence",
+    "Task appears to be verbal fluency, but patient response is minimal and lacks depth or structure"
+  ],
+  "transcript_request_id": "chatcmpl-0821d888-55e4-9f57-a66d-3c227be6aa54",
+  "classification_request_id": "chatcmpl-e9215e28-62f5-9fbc-9554-15405262a4d4",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__033_3/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__033_3/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Verbal Fluency Task Response",
+        "summary": "Patient recites a list of food items and then words beginning with 's', but response lacks narrative, organization, or elaboration.",
+        "evidence": "Patient recites items in a list format without connecting them into a coherent scene or story. Final utterance 'He drank.' is disconnected and does not relate to the task.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Task Completion and Relevance",
+        "summary": "Patient appears to follow task instructions but provides minimal, disconnected content without meaningful elaboration or contextualization.",
+        "evidence": "Response is limited to word lists without semantic or syntactic development. No evidence of task misunderstanding, but also no evidence of strong cognitive fluency or narrative ability.",
+        "confidence": 0.8
+      },
+      {
+        "label": "Lack of Coherence or Narrative Structure",
+        "summary": "Patient does not construct a meaningful or connected response, suggesting possible difficulty with organizing or sustaining verbal output in a task context.",
+        "evidence": "Response is a series of isolated nouns without syntactic or semantic linkage. Final phrase 'He drank.' is semantically unrelated to prior content.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient recites category items in a verbal fluency task but provides minimal, disconnected content without narrative structure or elaboration. No overt signs of dementia, but response lacks depth and coherence, suggesting possible mild cognitive impairment requiring further observation.",
+    "evidence_for_risk": [
+      "Minimal, disconnected verbal output in a fluency task",
+      "Lack of narrative or semantic organization",
+      "Final utterance 'He drank.' is off-topic and unconnected"
+    ],
+    "evidence_against_risk": [
+      "Patient retrieved and named common nouns correctly",
+      "No evidence of word-finding pauses, circumlocution, or self-correction",
+      "Response was complete in terms of task structure (list of items)"
+    ],
+    "alternative_explanations": [
+      "Task may have been misunderstood or incomplete",
+      "Patient may be fatigued, distracted, or not fully engaged",
+      "Response may reflect limited verbal fluency without cognitive impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency task with different categories or prompts",
+      "Observe patient’s ability to generate narratives or describe scenes",
+      "Include caregiver or clinician report on daily functioning and memory complaints"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up evaluation recommended to assess for mild cognitive impairment or early-stage decline.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment needed to determine progression or stability.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient response is task-compliant but lacks depth, coherence, and narrative structure.",
+      "No overt signs of dementia, but mild impairment-like features warrant observation."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Lima bean, green bean, soy bean, corn, apples, peaches, grapes, cherries, blueberries, raspberries, asparagus, zucchini, sugar cane, molasses, taffy, peaches, plums, pears, fish, meat, oats, wheat, barley, rice, sugar. Sat, set, safety, satisfy, suggest, share, seize, stop, sink, sunk, scrap, steal, safety, shot, scream, scramble. He drank.",
+    "speaker_turn_summary": [
+      "Examiner prompts or cues (implied by task context)",
+      "Patient recites list of food items and then words starting with 's'",
+      "Patient ends with 'He drank.' — possibly incomplete or off-topic"
+    ],
+    "patient_cue_summary": [
+      "Patient recites category items (food, then 's' words) with some repetition (e.g., peaches listed twice)",
+      "Lexical retrieval appears intact for common nouns, but no elaboration or narrative",
+      "No evidence of semantic organization, causal linkage, or scene construction",
+      "Final utterance 'He drank.' is disconnected and lacks context or task relevance",
+      "No signs of word-finding pauses, circumlocution, or self-correction — but also no meaningful elaboration or coherence",
+      "Task appears to be verbal fluency, but patient response is minimal and lacks depth or structure"
+    ]
+  },
+  "latency_ms": 34940,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/033-3.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/033-3.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

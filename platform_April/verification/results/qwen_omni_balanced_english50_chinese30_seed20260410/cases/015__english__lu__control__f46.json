@@ -1,0 +1,151 @@
+{
+  "case_id": "english__lu__control__f46",
+  "dataset": "talkbank_english_lu",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "So in this picture, I was just wondering if you could describe everything that you see going on, and when you're done, just say that you're done. But yeah, just see if you could. Oh, okay, and then tell you what's going on. Yeah, tell me everything you see and tell me what, yeah, just everything you see in the picture. Okay. I'm gonna see if I put the light on if it makes it clearer. I don't know. Oh yeah, sure. The battery compartment fell out. Are you recording this? You should be. Yeah, yeah, yeah. Oh, good. Oh, the light does not. Oh yeah, the light's okay. The chair is falling. Boy, girl, mother is washing. I can't see too clearly. I know the mother is washing dishes, but I can't see too clearly what she's doing. Other than that, oh, she's standing in a puddle of water. And oh, the sink is overflowing. Okay. So now you want me to tell you what I saw? Yeah, yeah, that's perfect. Okay, it's a kitchen scene. We'll start with mother. Mother is standing in a puddle of water. She doesn't seem very organized, I have to say that. Washing dishes. And behind her back, the boy who seems to be the older of the two is standing on a chair which is falling, and he's reaching up to put things away, at which the younger, the daughter, is handy to him. With my limited vision, that was. That's perfect. Yeah, thank you so much. Is that it? Yeah, yeah, you're all set.",
+  "patient_only_transcript": "The chair is falling. Boy, girl, mother is washing. I can't see too clearly. I know the mother is washing dishes, but I can't see too clearly what she's doing. Other than that, oh, she's standing in a puddle of water. And oh, the sink is overflowing. Okay. So now you want me to tell you what I saw? Yeah, yeah, that's perfect. Okay, it's a kitchen scene. We'll start with mother. Mother is standing in a puddle of water. She doesn't seem very organized, I have to say that. Washing dishes. And behind her back, the boy who seems to be the older of the two is standing on a chair which is falling, and he's reaching up to put things away, at which the younger, the daughter, is handy to him. With my limited vision, that was.",
+  "speaker_turn_summary": [
+    "Examiner: Ask patient to describe the picture.",
+    "Patient: Says can't see clearly, mentions mother washing dishes, puddle, overflowing sink.",
+    "Examiner: Asks if patient wants to describe what they saw.",
+    "Patient: Describes kitchen scene, mentions mother, boy on falling chair, daughter handing things, notes limited vision."
+  ],
+  "patient_cue_summary": [
+    "Reports limited visual clarity despite task.",
+    "Uses self-qualification 'with my limited vision' to explain incomplete description.",
+    "Describes scene in fragmented, non-sequential order with pauses and repetitions.",
+    "Mentions key elements (mother, sink, chair, boy, girl) but lacks detailed causal or spatial linking.",
+    "Relies on examiner prompting to continue description",
+    "does not initiate or sustain narrative independently.",
+    "Uses vague phrasing ('the boy who seems to be the older of the two') instead of clear identification or role assignment.",
+    "Includes self-commentary ('she doesn't seem very organized, I have to say that') indicating possible disorganization or lack of confidence."
+  ],
+  "transcript_request_id": "chatcmpl-3f51dba9-4dc7-9a4c-a674-835e9fb735d1",
+  "classification_request_id": "chatcmpl-fcd22535-d5b7-9ef4-acbd-495c77add9bd",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__control__f46/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__control__f46/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Task Completion",
+        "summary": "Patient completes the picture description task but with fragmented, self-limited, and examiner-dependent delivery.",
+        "evidence": "Patient describes key elements (mother, sink, falling chair, boy, girl) but with pauses, self-qualification, and reliance on examiner prompts to continue.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Detail",
+        "summary": "Patient uses general terms and vague descriptors; lacks specific, detailed, or causal linking of scene elements.",
+        "evidence": "Uses phrases like 'I can't see too clearly', 'the boy who seems to be the older of the two', 'handy to him' — indicating imprecise or circumlocutory language.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient’s description is not logically sequenced or causally connected; begins with visual limitations, then attempts scene description with weak structure.",
+        "evidence": "Starts with 'I can't see too clearly', then shifts to 'Okay, it's a kitchen scene' — lacks smooth narrative flow or spatial-temporal coherence.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a partially coherent, examiner-dependent description of a picture with limited visual clarity and vague, fragmented detail. While key elements are named, the description lacks organization, precision, and self-sustained narrative. No overt dementia-level signs, but mild impairment-like cues suggest need for further clinical observation.",
+    "evidence_for_risk": [
+      "Self-reported visual limitation affecting description completeness.",
+      "Fragmented, non-sequential narrative with pauses and circumlocution.",
+      "Reliance on examiner prompts to continue description.",
+      "Use of vague descriptors and imprecise role identification."
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies major scene elements (mother, sink, falling chair, boy, girl).",
+      "No signs of severe disorientation, incoherence, or abandonment of task.",
+      "Cooperative tone and willingness to continue despite limitations."
+    ],
+    "alternative_explanations": [
+      "Visual impairment or sensory limitation may explain reduced detail and clarity.",
+      "Fatigue, anxiety, or unfamiliarity with the task may contribute to fragmented delivery.",
+      "Age-related slowing or mild cognitive variability may be present without dementia."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient reports limited visual clarity and self-identifies as having 'limited vision'.",
+      "Patient acknowledges difficulty perceiving details despite being asked to describe the full scene."
+    ],
+    "emotional_assessment_findings": [
+      "Patient displays mild uncertainty and self-awareness about visual limitations.",
+      "No signs of frustration, anxiety, or apathy",
+      "tone is cooperative and responsive to examiner prompts."
+    ],
+    "risk_control_suggestions": [
+      "Repeat picture description task with clearer visual stimuli or larger print.",
+      "Administer formal cognitive screening tools (e.g., MoCA, MMSE) in follow-up.",
+      "Assess visual acuity and sensory function if not already done.",
+      "Consider caregiver report for functional impact or memory complaints."
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and sensory assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation and multi-session assessment recommended.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but shows mild impairment-like features in organization and detail.",
+      "Examiner prompts are neutral context",
+      "patient response is the primary evaluation focus.",
+      "No evidence of dementia-level impairment",
+      "classification is conservative and precautionary."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "poor_audio",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The chair is falling. Boy, girl, mother is washing. I can't see too clearly. I know the mother is washing dishes, but I can't see too clearly what she's doing. Other than that, oh, she's standing in a puddle of water. And oh, the sink is overflowing. Okay. So now you want me to tell you what I saw? Yeah, yeah, that's perfect. Okay, it's a kitchen scene. We'll start with mother. Mother is standing in a puddle of water. She doesn't seem very organized, I have to say that. Washing dishes. And behind her back, the boy who seems to be the older of the two is standing on a chair which is falling, and he's reaching up to put things away, at which the younger, the daughter, is handy to him. With my limited vision, that was.",
+    "speaker_turn_summary": [
+      "Examiner: Ask patient to describe the picture.",
+      "Patient: Says can't see clearly, mentions mother washing dishes, puddle, overflowing sink.",
+      "Examiner: Asks if patient wants to describe what they saw.",
+      "Patient: Describes kitchen scene, mentions mother, boy on falling chair, daughter handing things, notes limited vision."
+    ],
+    "patient_cue_summary": [
+      "Reports limited visual clarity despite task.",
+      "Uses self-qualification 'with my limited vision' to explain incomplete description.",
+      "Describes scene in fragmented, non-sequential order with pauses and repetitions.",
+      "Mentions key elements (mother, sink, chair, boy, girl) but lacks detailed causal or spatial linking.",
+      "Relies on examiner prompting to continue description",
+      "does not initiate or sustain narrative independently.",
+      "Uses vague phrasing ('the boy who seems to be the older of the two') instead of clear identification or role assignment.",
+      "Includes self-commentary ('she doesn't seem very organized, I have to say that') indicating possible disorganization or lack of confidence."
+    ]
+  },
+  "latency_ms": 45458,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Lu",
+    "source_group": "Control",
+    "source_relative_path": "Control/F46.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Lu/Control//F46.mp3?f=save",
+    "expected_group_audio_count": 26,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

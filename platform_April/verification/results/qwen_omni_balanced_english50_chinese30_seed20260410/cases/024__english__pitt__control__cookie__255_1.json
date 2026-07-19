@@ -1,0 +1,129 @@
+{
+  "case_id": "english__pitt__control__cookie__255_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "This woman is standing by the sink washing dishes and the water's falling out over the sink. I see this little boy standing on a stool reaching for cookies and he looks like he's ready to fall.",
+  "patient_only_transcript": "The woman is standing by the sink washing dishes and the water's falling out over the sink. I see this little boy standing on a stool reaching for cookies and he looks like he's ready to fall.",
+  "speaker_turn_summary": [
+    "Examiner: 'This woman is standing by the sink washing dishes and the water's falling out over the sink.'",
+    "Patient: 'I see this little boy standing on a stool reaching for cookies and he looks like he's ready to fall.'"
+  ],
+  "patient_cue_summary": [
+    "Patient repeats examiner's opening phrase structure",
+    "Patient provides minimal additional detail beyond repeating key nouns",
+    "Patient does not expand or elaborate on scene elements",
+    "Patient's utterance is syntactically simple and lacks causal or temporal linking",
+    "Patient's response is examiner-dependent in structure and content"
+  ],
+  "transcript_request_id": "chatcmpl-963f0c7d-145d-949e-acb6-a90f053fcb41",
+  "classification_request_id": "chatcmpl-e6e967df-3c0a-94ea-99e4-8cc75433a9a3",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__255_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__255_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Task Response Coherence",
+        "summary": "Patient repeats examiner's phrasing and provides minimal elaboration, suggesting limited spontaneous description or retrieval effort.",
+        "evidence": "Patient's utterance mirrors examiner's structure and lacks expansion, detail, or narrative organization beyond basic object naming.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Informativeness",
+        "summary": "Patient uses basic, concrete nouns but does not demonstrate rich or specific scene description, indicating possible retrieval or elaboration difficulty.",
+        "evidence": "Patient names 'boy', 'stool', 'cookies', 'sink' but does not describe actions, relationships, or consequences beyond surface-level observation.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient's response is linear but lacks causal or temporal sequencing, suggesting weak narrative control or cognitive effort in structuring the scene.",
+        "evidence": "Patient's utterance is a simple concatenation of observed elements without connecting them into a coherent event or story.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a basic, examiner-dependent description of the scene with minimal elaboration or narrative structure. While key elements are named, the response lacks depth, organization, and spontaneous detail, suggesting possible mild cognitive impairment or retrieval difficulty. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Examiner-dependent phrasing",
+      "Minimal elaboration beyond basic object naming",
+      "Lack of causal or temporal linking in description"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key scene elements (boy, cookies, sink, stool)",
+      "Speech is intelligible and grammatically simple but not disorganized or fragmented"
+    ],
+    "alternative_explanations": [
+      "Patient may be following examiner prompts closely due to task structure or anxiety",
+      "Patient may have limited verbal fluency or expressive language without cognitive impairment",
+      "Task may be unfamiliar or require more elaboration than provided"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Repeat the picture description task with prompting for elaboration",
+      "Assess for functional or memory complaints in clinical interview"
+    ],
+    "visit_recommendation": "Formal cognitive screening and clinical evaluation recommended",
+    "future_risk_trend_summary": "Longitudinal prediction limited based on single clip; further observation or multi-visit assessment needed",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and transcript reconstruction",
+      "Patient response is examiner-dependent and lacks spontaneous elaboration",
+      "Task context: cookie-theft picture description",
+      "patient should describe scene in detail"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The woman is standing by the sink washing dishes and the water's falling out over the sink. I see this little boy standing on a stool reaching for cookies and he looks like he's ready to fall.",
+    "speaker_turn_summary": [
+      "Examiner: 'This woman is standing by the sink washing dishes and the water's falling out over the sink.'",
+      "Patient: 'I see this little boy standing on a stool reaching for cookies and he looks like he's ready to fall.'"
+    ],
+    "patient_cue_summary": [
+      "Patient repeats examiner's opening phrase structure",
+      "Patient provides minimal additional detail beyond repeating key nouns",
+      "Patient does not expand or elaborate on scene elements",
+      "Patient's utterance is syntactically simple and lacks causal or temporal linking",
+      "Patient's response is examiner-dependent in structure and content"
+    ]
+  },
+  "latency_ms": 18480,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/255-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/255-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

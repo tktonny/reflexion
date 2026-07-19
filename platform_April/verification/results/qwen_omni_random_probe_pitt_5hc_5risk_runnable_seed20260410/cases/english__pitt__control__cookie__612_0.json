@@ -1,0 +1,125 @@
+{
+  "case_id": "english__pitt__control__cookie__612_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "I want you to tell me everything that you see going on in this picture, everything that you see happening here. Go ahead. Well, for one thing, the boy is stealing cookies, and the girl is asking for cookie, and the boy is standing on a stool which is tipping over, and the lady's drying a plate, and the water is running in the sink and overflowing on the floor and getting her feet wet. And the window is open. And I don't know that there's anything special going on outside the window. It seems to me that that's essentially the things that are going on in this picture. And the girl is picking her nose. The boy is handing her a cookie. Really those are the only activities I see. Okay.",
+  "patient_only_transcript": "Well, for one thing, the boy is stealing cookies, and the girl is asking for cookie, and the boy is standing on a stool which is tipping over, and the lady's drying a plate, and the water is running in the sink and overflowing on the floor and getting her feet wet. And the window is open. And I don't know that there's anything special going on outside the window. It seems to me that that's essentially the things that are going on in this picture. And the girl is picking her nose. The boy is handing her a cookie. Really those are the only activities I see.",
+  "speaker_turn_summary": [
+    "Examiner: I want you to tell me everything that you see going on in this picture, everything that you see happening here. Go ahead.",
+    "Patient: Well, for one thing, the boy is stealing cookies, and the girl is asking for cookie, and the boy is standing on a stool which is tipping over, and the lady's drying a plate, and the water is running in the sink and overflowing on the floor and getting her feet wet. And the window is open. And I don't know that there's anything special going on outside the window. It seems to me that that's essentially the things that are going on in this picture. And the girl is picking her nose. The boy is handing her a cookie. Really those are the only activities I see.",
+    "Examiner: Okay."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with multiple specific elements (boy, girl, stool, sink, window, cookie, nose-picking)",
+    "Use of filler phrases like 'for one thing', 'it seems to me', 'I don't know'",
+    "Minor semantic vagueness in 'anything special going on outside the window'",
+    "No evidence of word-finding pauses, repetition, or abandonment",
+    "Narrative is logically sequenced and task-relevant despite some hesitations"
+  ],
+  "transcript_request_id": "chatcmpl-48e83bdb-a7f0-92a9-9b84-8e6fe8f8ec82",
+  "classification_request_id": "chatcmpl-3be125f2-7ae6-99e4-969b-797a5e673606",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__612_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__612_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential description of multiple elements in the picture, including actions, spatial relationships, and consequences (e.g., stool tipping, water overflowing).",
+        "evidence": "Patient lists multiple actors (boy, girl, lady), objects (stool, sink, cookie, window), and events (stealing, drying, overflowing, picking nose) in a connected narrative.",
+        "confidence": 0.8
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific nouns and verbs (e.g., 'stealing cookies', 'drying a plate', 'overflowing on the floor') without significant circumlocution or semantic vagueness.",
+        "evidence": "Patient names concrete actions and objects accurately, including minor details like 'picking her nose' and 'handing her a cookie'.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description with introductory phrases and logical sequencing, though includes some hedging ('I don't know', 'it seems to me').",
+        "evidence": "Patient structures the response with 'for one thing', then lists events, then adds a concluding summary ('Really those are the only activities I see').",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, detailed, and task-relevant description of the pictured scene with specific content and logical sequencing. Minor hedging and filler phrases are present but do not indicate significant impairment. No evidence of word-finding difficulty, disorganization, or examiner dependence. Further observation or follow-up may be warranted due to limited modality coverage and lack of visual cues.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent narrative structure",
+      "Specific and accurate vocabulary use",
+      "No signs of retrieval failure or disorganization",
+      "Task completion without prompting or abandonment"
+    ],
+    "alternative_explanations": [
+      "The patient may be cautious or hesitant in speech, leading to hedging phrases without cognitive impairment.",
+      "The absence of visual cues limits the ability to detect subtle nonverbal signs of impairment.",
+      "The task may be challenging for some individuals, leading to moderate hesitation without pathology."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a second session to assess consistency.",
+      "Include visual observation in future assessments to cross-validate verbal performance.",
+      "Consider repeating the picture description task with a different image to evaluate generalization."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single audio-only clip. No persuasive evidence of cognitive decline is present in this clip.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-relevant, with no signs of impairment.",
+      "Examiner prompts are neutral context",
+      "patient response is self-contained and informative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, for one thing, the boy is stealing cookies, and the girl is asking for cookie, and the boy is standing on a stool which is tipping over, and the lady's drying a plate, and the water is running in the sink and overflowing on the floor and getting her feet wet. And the window is open. And I don't know that there's anything special going on outside the window. It seems to me that that's essentially the things that are going on in this picture. And the girl is picking her nose. The boy is handing her a cookie. Really those are the only activities I see.",
+    "speaker_turn_summary": [
+      "Examiner: I want you to tell me everything that you see going on in this picture, everything that you see happening here. Go ahead.",
+      "Patient: Well, for one thing, the boy is stealing cookies, and the girl is asking for cookie, and the boy is standing on a stool which is tipping over, and the lady's drying a plate, and the water is running in the sink and overflowing on the floor and getting her feet wet. And the window is open. And I don't know that there's anything special going on outside the window. It seems to me that that's essentially the things that are going on in this picture. And the girl is picking her nose. The boy is handing her a cookie. Really those are the only activities I see.",
+      "Examiner: Okay."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with multiple specific elements (boy, girl, stool, sink, window, cookie, nose-picking)",
+      "Use of filler phrases like 'for one thing', 'it seems to me', 'I don't know'",
+      "Minor semantic vagueness in 'anything special going on outside the window'",
+      "No evidence of word-finding pauses, repetition, or abandonment",
+      "Narrative is logically sequenced and task-relevant despite some hesitations"
+    ]
+  },
+  "latency_ms": 26021,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/612-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/612-0.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

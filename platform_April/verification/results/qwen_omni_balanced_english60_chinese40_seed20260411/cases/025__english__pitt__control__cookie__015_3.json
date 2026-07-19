@@ -1,0 +1,134 @@
+{
+  "case_id": "english__pitt__control__cookie__015_3",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.75,
+  "transcript": "Okay, there is a little boy and he's getting, he's standing on a stool that's upsetting, and he's getting a cookie and he's sharing a cookie with the little girl who is shushing her mother with her finger and reaching for the cookie at the same time. Uh, the, what are the instructions? Just give as many details. Tell me all the things you see going on. Action or anything you see going on. Oh, okay. The cupboard door is open, the stool is crooked, the water is splashing on the floor. The mother is, I'm assuming it's a mother, is stepping in it. She's drying her dishes. The sink is overflowing. The cups and the saucers are there. The window is open and you see the lawn outside. And it must be summertime. They all have on short sleeves and she's wearing an apron. Okay.",
+  "patient_only_transcript": "Okay, there is a little boy and he's getting, he's standing on a stool that's upsetting, and he's getting a cookie and he's sharing a cookie with the little girl who is shushing her mother with her finger and reaching for the cookie at the same time. Uh, the, what are the instructions? Just give as many details. Tell me all the things you see going on. Action or anything you see going on. Oh, okay. The cupboard door is open, the stool is crooked, the water is splashing on the floor. The mother is, I'm assuming it's a mother, is stepping in it. She's drying her dishes. The sink is overflowing. The cups and the saucers are there. The window is open and you see the lawn outside. And it must be summertime. They all have on short sleeves and she's wearing an apron. Okay.",
+  "speaker_turn_summary": [
+    "Examiner: 'Tell me all the things you see going on.'",
+    "Patient: Describes boy on stool, cookie sharing, girl shushing mother, open cupboard, crooked stool, splashing water, mother stepping in water, drying dishes, overflowing sink, cups/saucers, open window, lawn visible, summertime, short sleeves, apron.",
+    "Examiner: 'What are the instructions?'",
+    "Patient: Responds with detailed scene description, includes assumptions (e.g., 'I'm assuming it's a mother')."
+  ],
+  "patient_cue_summary": [
+    "Patient provides detailed, coherent scene description of a picture task.",
+    "Patient includes multiple correct scene elements: actors, actions, objects, environmental context.",
+    "Patient uses mild uncertainty ('I'm assuming it's a mother') but does not show word-finding failure or semantic vagueness.",
+    "Patient does not restart, repeat, or abandon the task",
+    "speech is sustained and task-relevant.",
+    "Patient does not show signs of disorganization, tangentiality, or examiner dependence beyond mild prompting."
+  ],
+  "transcript_request_id": "chatcmpl-d6b6829a-ce9e-98ac-9d63-e264d117d6f4",
+  "classification_request_id": "chatcmpl-4859b0c6-c96e-9374-bed6-ba4650977629",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__015_3/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__015_3/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_comprehension",
+        "summary": "Patient accurately identifies multiple actors, objects, and actions in the picture description task.",
+        "evidence": "Patient describes boy on stool, cookie sharing, girl shushing mother, open cupboard, crooked stool, splashing water, mother drying dishes, overflowing sink, window open, lawn visible, summertime, short sleeves, apron.",
+        "confidence": 0.85
+      },
+      {
+        "label": "task_adherence",
+        "summary": "Patient follows task instructions to describe all visible elements in the scene.",
+        "evidence": "Patient responds to prompt 'Tell me all the things you see going on' with comprehensive, structured description covering spatial, temporal, and social elements.",
+        "confidence": 0.8
+      },
+      {
+        "label": "lexical_retrieval",
+        "summary": "Patient retrieves and uses appropriate vocabulary for scene elements without significant breakdown.",
+        "evidence": "Patient uses terms like 'stool', 'cookie', 'mother', 'sink', 'apron', 'summertime', 'lawn' — all contextually accurate and task-relevant.",
+        "confidence": 0.85
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a detailed, coherent, and accurate description of a picture scene, demonstrating intact scene comprehension, task adherence, and lexical retrieval. No signs of cognitive impairment are evident in the audio-only transcript. The session is usable with caveats due to lack of visual data and some speech ambiguity, but patient performance supports healthy cognition.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Comprehensive scene description with multiple correct elements",
+      "No word-finding pauses, circumlocution, or semantic vagueness",
+      "No disorganization, tangentiality, or examiner dependence",
+      "Task-relevant and sustained speech without breakdown"
+    ],
+    "alternative_explanations": [
+      "Mild uncertainty ('I'm assuming it's a mother') may reflect social inference rather than cognitive deficit.",
+      "Audio quality or background noise may limit full confidence, but core content remains intact.",
+      "Patient may be describing a familiar or rehearsed scene, but no evidence of rehearsal or scripted response was detected."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed.",
+      "Consider follow-up if clinical context suggests concern for subtle cognitive changes.",
+      "If visual data becomes available, re-evaluate for consistency with verbal performance."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio clip. No evidence of cognitive decline in this assessment.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video data is unavailable",
+      "assessment is based solely on audio transcript.",
+      "Patient is likely the primary respondent in a structured picture-description task.",
+      "No signs of dementia-like impairment detected in patient speech.",
+      "Examiner prompts are neutral context",
+      "patient performance is task-relevant and coherent."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Okay, there is a little boy and he's getting, he's standing on a stool that's upsetting, and he's getting a cookie and he's sharing a cookie with the little girl who is shushing her mother with her finger and reaching for the cookie at the same time. Uh, the, what are the instructions? Just give as many details. Tell me all the things you see going on. Action or anything you see going on. Oh, okay. The cupboard door is open, the stool is crooked, the water is splashing on the floor. The mother is, I'm assuming it's a mother, is stepping in it. She's drying her dishes. The sink is overflowing. The cups and the saucers are there. The window is open and you see the lawn outside. And it must be summertime. They all have on short sleeves and she's wearing an apron. Okay.",
+    "speaker_turn_summary": [
+      "Examiner: 'Tell me all the things you see going on.'",
+      "Patient: Describes boy on stool, cookie sharing, girl shushing mother, open cupboard, crooked stool, splashing water, mother stepping in water, drying dishes, overflowing sink, cups/saucers, open window, lawn visible, summertime, short sleeves, apron.",
+      "Examiner: 'What are the instructions?'",
+      "Patient: Responds with detailed scene description, includes assumptions (e.g., 'I'm assuming it's a mother')."
+    ],
+    "patient_cue_summary": [
+      "Patient provides detailed, coherent scene description of a picture task.",
+      "Patient includes multiple correct scene elements: actors, actions, objects, environmental context.",
+      "Patient uses mild uncertainty ('I'm assuming it's a mother') but does not show word-finding failure or semantic vagueness.",
+      "Patient does not restart, repeat, or abandon the task",
+      "speech is sustained and task-relevant.",
+      "Patient does not show signs of disorganization, tangentiality, or examiner dependence beyond mild prompting."
+    ]
+  },
+  "latency_ms": 21950,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/015-3.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/015-3.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "case_id": "english__pitt__control__cookie__210_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "Tell me everything that you see going on in this picture. Tell me everything that's happening there. Young boy is up at the cookie jar. He has a cookie jar open. He's reaching for one for himself. He's handing one down to his sister. The three-legged stool is coming down with him. They're nicely dressed kids, but the boy needs his socks pulled up. That's all I see there. Mother, I presume it's mother, is at the sink. The water is running over out of the sink. She's drying a dish. She's looking out the window. There are two cups and a dish. I presume that's a dish that are already dried, I guess, and sitting on the side of the sink. Nicely groomed. Nice curtains pulled back. It's apparently summer outside because the window's open and it looks like shrubs are growing. You can see a window in the other part of the house. I presume that's still their house. And there's a driveway bordered with grass. And there's a tree out there somewhere that you can see part of the trunk and part of the foliage. And I see cabinets around the kitchen, other cabinets. And that's about it. Okay.",
+  "patient_only_transcript": "Young boy is up at the cookie jar. He has a cookie jar open. He's reaching for one for himself. He's handing one down to his sister. The three-legged stool is coming down with him. They're nicely dressed kids, but the boy needs his socks pulled up. That's all I see there. Mother, I presume it's mother, is at the sink. The water is running over out of the sink. She's drying a dish. She's looking out the window. There are two cups and a dish. I presume that's a dish that are already dried, I guess, and sitting on the side of the sink. Nicely groomed. Nice curtains pulled back. It's apparently summer outside because the window's open and it looks like shrubs are growing. You can see a window in the other part of the house. I presume that's still their house. And there's a driveway bordered with grass. And there's a tree out there somewhere that you can see part of the trunk and part of the foliage. And I see cabinets around the kitchen, other cabinets. And that's about it.",
+  "speaker_turn_summary": [
+    "Examiner: Tell me everything that you see going on in this picture.",
+    "Patient: Young boy is up at the cookie jar... [describes scene in detail with some hesitation and self-correction].",
+    "Examiner: Okay."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with specific content words",
+    "Some self-corrections and hedging phrases (e.g., 'I presume', 'I guess')",
+    "Logical sequencing of events with minor pauses and fillers",
+    "No evidence of word-finding failure, disorganization, or abandonment",
+    "Examiner prompt was followed with full response, though slightly verbose"
+  ],
+  "transcript_request_id": "chatcmpl-e31386a4-09ff-96b1-917e-a2c32c296fe4",
+  "classification_request_id": "chatcmpl-3b7ddb3a-7591-9615-8343-1f762a8973ca",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__210_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__210_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential description of a picture depicting a child stealing cookies, including actions, objects, and environmental context.",
+        "evidence": "Patient names key elements: cookie jar, stool, mother, sink, water, dishes, windows, tree, cabinets. Describes causal relationships (e.g., stool tipping with boy). Uses specific nouns and verbs.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Precision",
+        "summary": "Patient retrieves and uses appropriate vocabulary for a complex visual scene, though occasionally uses hedging or vague modifiers.",
+        "evidence": "Uses terms like 'three-legged stool', 'dried dish', 'summer outside', 'driveway bordered with grass'. Occasionally says 'I presume' or 'I guess', suggesting mild uncertainty but not failure.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description chronologically and spatially, linking actions to characters and objects without significant disorganization.",
+        "evidence": "Starts with boy at cookie jar, moves to sister, then stool, then mother at sink, then environmental details. Maintains focus on the picture’s content throughout.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, detailed, and logically organized description of a picture depicting a cookie-theft scene. Although minor hedging phrases are used, there is no evidence of word-finding difficulty, disorganization, or examiner dependence. The response is informative and task-appropriate.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No signs of retrieval failure or semantic vagueness",
+      "No disorganized or fragmented narrative",
+      "No emotional flattness, frustration, or apathy",
+      "Response is self-contained and task-compliant"
+    ],
+    "alternative_explanations": [
+      "Patient may be describing a familiar scene or memory rather than a picture, but this does not affect the assessment of cognitive performance in the task context.",
+      "Hedging phrases may reflect cautiousness or natural speech patterns, not cognitive impairment."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed.",
+      "Continue routine monitoring if part of a longitudinal study.",
+      "Consider repeating the task with a different picture to assess consistency."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip. No evidence of cognitive decline in this task.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-compliant despite minor hedging.",
+      "No signs of dementia-like impairment in this single clip."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Young boy is up at the cookie jar. He has a cookie jar open. He's reaching for one for himself. He's handing one down to his sister. The three-legged stool is coming down with him. They're nicely dressed kids, but the boy needs his socks pulled up. That's all I see there. Mother, I presume it's mother, is at the sink. The water is running over out of the sink. She's drying a dish. She's looking out the window. There are two cups and a dish. I presume that's a dish that are already dried, I guess, and sitting on the side of the sink. Nicely groomed. Nice curtains pulled back. It's apparently summer outside because the window's open and it looks like shrubs are growing. You can see a window in the other part of the house. I presume that's still their house. And there's a driveway bordered with grass. And there's a tree out there somewhere that you can see part of the trunk and part of the foliage. And I see cabinets around the kitchen, other cabinets. And that's about it.",
+    "speaker_turn_summary": [
+      "Examiner: Tell me everything that you see going on in this picture.",
+      "Patient: Young boy is up at the cookie jar... [describes scene in detail with some hesitation and self-correction].",
+      "Examiner: Okay."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with specific content words",
+      "Some self-corrections and hedging phrases (e.g., 'I presume', 'I guess')",
+      "Logical sequencing of events with minor pauses and fillers",
+      "No evidence of word-finding failure, disorganization, or abandonment",
+      "Examiner prompt was followed with full response, though slightly verbose"
+    ]
+  },
+  "latency_ms": 23733,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/210-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/210-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

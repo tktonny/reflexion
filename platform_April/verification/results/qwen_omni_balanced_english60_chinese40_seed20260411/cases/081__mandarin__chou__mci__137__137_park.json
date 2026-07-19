@@ -1,0 +1,133 @@
+{
+  "case_id": "mandarin__chou__mci__137__137_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "老人玩象棋，儿童荡秋千，啊，溜溜狗，还有呃，打网打网打网球。啊，还有一个聊话题。泡茶，嗯，一个泡茶，哎呀，景啊景观很很不错，就这样的，嗯。",
+  "patient_only_transcript": "老人玩象棋，儿童荡秋千，啊，溜溜狗，还有呃，打网打网打网球。啊，还有一个聊话题。泡茶，嗯，一个泡茶，哎呀，景啊景观很很不错，就这样的，嗯。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context for park scene description.",
+    "Patient: describes multiple visible elements in the park: elderly playing chess, children swinging, dog walking, tennis, conversation, tea brewing, scenery.",
+    "Patient speech contains fillers (啊, 嗯, 哎呀), repetitions (打网打网打网球), and colloquial phrasing, but remains largely intelligible and task-relevant."
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple distinct actors and actions in the park scene without major omission.",
+    "Speech contains colloquial fillers and repetitions but does not show semantic collapse or naming failure.",
+    "Patient maintains topic continuity and describes scenery with positive evaluation ('景观很很不错').",
+    "No evidence of abandonment, contradiction, or severe disorganization in the description.",
+    "Task completion is partial but coherent",
+    "patient does not require examiner rescue or show persistent word-finding failure."
+  ],
+  "transcript_request_id": "chatcmpl-07b34024-56f0-9161-9f24-222173368318",
+  "classification_request_id": "chatcmpl-1f77dc9e-7193-93e3-abcb-8c642381dd59",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__137__137_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__137__137_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient lists multiple visible elements in a park scene with minimal semantic breakdown.",
+        "evidence": "Patient identifies elderly playing chess, children swinging, dog walking, tennis, conversation, tea brewing, and scenery evaluation without major omission or contradiction.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Lexical Retrieval and Phrasing",
+        "summary": "Patient uses colloquial fillers and repetitions but does not show persistent naming failure or semantic collapse.",
+        "evidence": "Phrases like '打网打网打网球' and '景啊景观很很不错' are contextually understandable and do not indicate word-finding impairment.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Narrative Flow",
+        "summary": "Patient completes a partial but coherent description of the scene without abandonment or disorganization.",
+        "evidence": "Patient maintains topic continuity and provides evaluative feedback ('很不错'), indicating sustained attention and task engagement.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a partially coherent, contextually relevant description of a park scene with multiple actors and actions. Speech contains colloquial fillers and repetitions but no signs of semantic collapse, naming failure, or abandonment. No persuasive impairment-like cues are present. Further observation or formal screening is recommended due to limited modality and potential for underperformance in a full assessment.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient identifies multiple scene elements without omission or contradiction.",
+      "Speech remains intelligible and task-relevant despite colloquial phrasing.",
+      "No signs of disorganization, abandonment, or affective flattening.",
+      "Positive evaluative tone ('很不错') indicates sustained engagement."
+    ],
+    "alternative_explanations": [
+      "Colloquial speech patterns and fillers are normal in spontaneous Mandarin speech, especially in informal or observational tasks.",
+      "Limited audio quality or recording context may reduce signal clarity without indicating impairment.",
+      "Patient may be describing a familiar or routine scene, which may reduce cognitive load and result in less structured speech."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Affective tone is neutral to mildly positive, with no signs of frustration, anxiety, or apathy.",
+      "Engagement appears consistent with casual observation",
+      "no signs of disengagement or emotional flattening."
+    ],
+    "risk_control_suggestions": [
+      "Schedule follow-up observation or formal cognitive screening in a controlled setting.",
+      "Use structured scene-description tasks with visual aids to reduce ambiguity.",
+      "Consider repeating the task with clearer prompts or visual cues to improve reliability."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single audio-only clip. Further assessment is needed to determine if observed speech patterns are consistent or transient.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment is based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible enough to reconstruct multiple scene elements, which is substantial counterevidence against cognitive_risk in Chinese screening contexts.",
+      "Colloquial fillers and repetitions are not sufficient alone to indicate impairment in Mandarin spontaneous speech."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "老人玩象棋，儿童荡秋千，啊，溜溜狗，还有呃，打网打网打网球。啊，还有一个聊话题。泡茶，嗯，一个泡茶，哎呀，景啊景观很很不错，就这样的，嗯。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context for park scene description.",
+      "Patient: describes multiple visible elements in the park: elderly playing chess, children swinging, dog walking, tennis, conversation, tea brewing, scenery.",
+      "Patient speech contains fillers (啊, 嗯, 哎呀), repetitions (打网打网打网球), and colloquial phrasing, but remains largely intelligible and task-relevant."
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple distinct actors and actions in the park scene without major omission.",
+      "Speech contains colloquial fillers and repetitions but does not show semantic collapse or naming failure.",
+      "Patient maintains topic continuity and describes scenery with positive evaluation ('景观很很不错').",
+      "No evidence of abandonment, contradiction, or severe disorganization in the description.",
+      "Task completion is partial but coherent",
+      "patient does not require examiner rescue or show persistent word-finding failure."
+    ]
+  },
+  "latency_ms": 15985,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/137/137_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/137/137_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

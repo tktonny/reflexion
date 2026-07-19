@@ -1,0 +1,142 @@
+{
+  "case_id": "english__pitt__dementia__cookie__276_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "Right here's the picture. All of the action. And what am I supposed to do? Tell me all of the action you see going on in the picture. Oh, but I don't have to watch this. No, no. Can you tell me the action? What's going on in the picture? Gee, they're busy, aren't they? Yeah. Well, they're busy up there after the cookie jar. Okay. And they're reaching something up to it, I think they're. What else? What else do I go over here? Tell me all the action in the whole picture. Oh. Looks to me like she might be washing dishes here. Looks like she's drying a plate. And here it looks like she had a wreck here with a spill. Here's some dishes waiting to be washed. Here's a cupboard. Oh, over here too. Anything you see going on. Oh, did I mention the one set back for the cookie jar? Here to put some things up in the cookie jar. Oh, there's one, one after it, and then another one. That one looks like it might take a spill. Okay. Okay, good. Good. Really? Really? Here it looks like it's covered up with something in down here. Uh huh. Okay.",
+  "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing.",
+  "speaker_turn_summary": [
+    "Examiner: 'Tell me all of the action you see going on in the picture.'",
+    "Patient: 'Gee, they're busy, aren't they? Yeah. Well, they're busy up there after the cookie jar. And they're reaching something up to it, I think they're. What else? What else do I go over here? ... Looks to me like she might be washing dishes here. Looks like she's drying a plate. And here it looks like she had a wreck here with a spill. Here's some dishes waiting to be washed. Here's a cupboard. Oh, over here too. Anything you see going on. Oh, did I mention the one set back for the cookie jar? Here to put some things up in the cookie jar. Oh, there's one, one after it, and then another one. That one looks like it might take a spill. Okay. Okay, good. Good. Really? Really? Here it looks like it's covered up with something in down here. Uh huh. Okay.'",
+    "Examiner: 'Tell me all the action in the whole picture.'"
+  ],
+  "patient_cue_summary": [
+    "Vague and fragmented descriptions ('they're reaching something up to it, I think they're')",
+    "Repetitive phrasing ('What else? What else do I go over here?')",
+    "Unclear referents ('that one looks like it might take a spill')",
+    "Examiner-dependent continuation ('Oh, did I mention...')",
+    "Inconsistent sequencing and lack of causal linkage between events",
+    "Use of filler terms and hesitation markers ('uh huh', 'okay', 'really?')",
+    "Partial scene coverage with missing key elements despite prompting"
+  ],
+  "transcript_request_id": "chatcmpl-ceb19933-244a-9204-a1f7-2acd90266438",
+  "classification_request_id": "chatcmpl-256452d0-cefc-95e4-b530-722148c8438e",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__276_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__276_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient response is fragmented, disorganized, and lacks causal or spatial linkage between events.",
+        "evidence": "Patient says 'they're reaching something up to it, I think they're' and 'that one looks like it might take a spill' — vague, incomplete, and non-sequential.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses vague terms and filler phrases, with limited specific scene details despite prompting.",
+        "evidence": "Patient says 'what else do I go over here?' and 'here it looks like it's covered up with something' — indicates word-finding difficulty or circumlocution.",
+        "confidence": null
+      },
+      {
+        "label": "Task Engagement and Organization",
+        "summary": "Patient requires examiner prompting and shows weak narrative structure, suggesting reduced task engagement or cognitive control.",
+        "evidence": "Patient restarts phrases ('Oh, did I mention...'), repeats 'okay', and ends with 'Uh huh. Okay.' — indicates fragmented task execution.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient demonstrates mild impairment-like cues in a picture-description task, including fragmented phrasing, examiner dependence, vague referents, and disorganized sequencing. While some scene elements are correctly identified, the overall response lacks coherence, informativeness, and narrative control. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Fragmented and incomplete scene description",
+      "Frequent pauses, fillers, and repetitions",
+      "Examiner-dependent continuation and prompting",
+      "Weak causal and spatial linking between events"
+    ],
+    "evidence_against_risk": [
+      "Some correct identification of key objects (cookie jar, dishes, spill)",
+      "Patient is able to follow task instructions",
+      "No overt confusion or disorientation"
+    ],
+    "alternative_explanations": [
+      "Task fatigue or anxiety may contribute to disorganized speech",
+      "Low confidence in describing complex scenes may lead to fragmented output",
+      "Normal variability in verbal fluency during structured tasks"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Mild uncertainty and hesitation in speech",
+      "Occasional repetition and self-correction",
+      "Low affective engagement, minimal emotional inflection"
+    ],
+    "risk_control_suggestions": [
+      "Repeat the picture-description task with structured prompts",
+      "Administer formal cognitive screening tools (e.g., MoCA, MMSE)",
+      "Observe for functional impact in daily activities",
+      "Consider caregiver report for consistency"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; follow-up assessments are needed to track progression or stability",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio and transcript reconstruction",
+      "Patient speech is partially intelligible but shows multiple mild impairment-like cues",
+      "Task context: cookie-theft picture description",
+      "patient should describe scene coherently",
+      "Examiner prompts are neutral",
+      "patient response is the primary evaluation metric"
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing.",
+    "speaker_turn_summary": [
+      "Examiner: 'Tell me all of the action you see going on in the picture.'",
+      "Patient: 'Gee, they're busy, aren't they? Yeah. Well, they're busy up there after the cookie jar. And they're reaching something up to it, I think they're. What else? What else do I go over here? ... Looks to me like she might be washing dishes here. Looks like she's drying a plate. And here it looks like she had a wreck here with a spill. Here's some dishes waiting to be washed. Here's a cupboard. Oh, over here too. Anything you see going on. Oh, did I mention the one set back for the cookie jar? Here to put some things up in the cookie jar. Oh, there's one, one after it, and then another one. That one looks like it might take a spill. Okay. Okay, good. Good. Really? Really? Here it looks like it's covered up with something in down here. Uh huh. Okay.'",
+      "Examiner: 'Tell me all the action in the whole picture.'"
+    ],
+    "patient_cue_summary": [
+      "Vague and fragmented descriptions ('they're reaching something up to it, I think they're')",
+      "Repetitive phrasing ('What else? What else do I go over here?')",
+      "Unclear referents ('that one looks like it might take a spill')",
+      "Examiner-dependent continuation ('Oh, did I mention...')",
+      "Inconsistent sequencing and lack of causal linkage between events",
+      "Use of filler terms and hesitation markers ('uh huh', 'okay', 'really?')",
+      "Partial scene coverage with missing key elements despite prompting"
+    ]
+  },
+  "latency_ms": 19156,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/276-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/276-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

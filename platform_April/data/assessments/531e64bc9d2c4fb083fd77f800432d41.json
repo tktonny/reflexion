@@ -1,0 +1,103 @@
+{
+  "assessment_id": "531e64bc9d2c4fb083fd77f800432d41",
+  "patient_id": "patient-001",
+  "language": "en",
+  "created_at": "2026-04-07T08:54:50.136569Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Neutral to slightly pensive expression; minimal emotional display.",
+      "evidence": "Patient maintains steady eye contact with camera; facial muscles show no overt signs of distress, confusion, or emotional lability.",
+      "confidence": 0.85
+    },
+    {
+      "label": "Gaze and Attention",
+      "summary": "Consistent visual attention toward camera; brief glances away during speech.",
+      "evidence": "Patient looks directly at camera for most of the clip; briefly shifts gaze to side during speech, possibly indicating internal processing or recall.",
+      "confidence": 0.8
+    }
+  ],
+  "body_findings": [
+    {
+      "label": "Posture and Movement",
+      "summary": "Stable posture; minimal fidgeting or restlessness.",
+      "evidence": "Patient remains seated and upright throughout; hand briefly rests near mouth, then returns to lap; no signs of agitation or motor discoordination.",
+      "confidence": 0.9
+    }
+  ],
+  "voice_findings": [
+    {
+      "label": "Speech Clarity",
+      "summary": "Speech is clear and intelligible; no slurring or disfluency observed.",
+      "evidence": "Patient says 'Hello' twice with normal prosody and articulation; no pauses, repetitions, or phonetic errors.",
+      "confidence": 0.95
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Verbal Content",
+      "summary": "Minimal verbal output; only two instances of 'Hello' spoken.",
+      "evidence": "Patient speaks only two short, clear utterances: 'Hello' at 0:20 and again at 0:24. No extended responses or conversational content provided.",
+      "confidence": 0.9
+    }
+  ],
+  "speaker_structure": "single_speaker",
+  "target_patient_presence": "clear",
+  "target_patient_basis": "visual_focus",
+  "detected_languages": [
+    "English"
+  ],
+  "language_confidence": 0.95,
+  "risk_score": 0.15,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "The patient demonstrates stable visual attention, clear speech, and neutral affect. No observable signs of cognitive impairment or emotional dysregulation are present in the clip. The limited verbal output does not indicate impairment, as it may reflect context (e.g., initial greeting).",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [
+    "Clear articulation and speech fluency.",
+    "Stable posture and consistent eye contact.",
+    "Absence of facial or vocal indicators of confusion, distress, or disengagement."
+  ],
+  "alternative_explanations": [
+    "Limited verbal output may reflect context (e.g., greeting, technical setup, or interview protocol).",
+    "Neutral affect may reflect formality or situational restraint rather than emotional flattening."
+  ],
+  "risk_factor_findings": [],
+  "subjective_assessment_findings": [],
+  "emotional_assessment_findings": [
+    "Neutral affect; no visible signs of anxiety, frustration, or apathy.",
+    "Engaged posture and eye contact suggest attentiveness to interaction."
+  ],
+  "risk_control_suggestions": [
+    "No immediate intervention required.",
+    "Consider follow-up if additional behavioral or cognitive concerns emerge in subsequent interactions."
+  ],
+  "visit_recommendation": "routine follow-up or no further action at this time.",
+  "future_risk_trend_summary": "Insufficient data to predict future cognitive decline from a single clip; longitudinal assessment is recommended if clinical concerns arise.",
+  "reviewer_confidence": 0.85,
+  "context_notes": [
+    "Clip duration is short and limited in verbal content; findings are conservative and based on available cues.",
+    "No caregiver or interviewer speech is present to provide additional context or concern."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "523d6009-47e9-9ab1-ad79-25672e268e8f",
+    "latency_ms": 14954,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 14954
+    }
+  ],
+  "fallback_message": null
+}

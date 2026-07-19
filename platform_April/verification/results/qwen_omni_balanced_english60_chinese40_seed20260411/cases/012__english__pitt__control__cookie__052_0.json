@@ -1,0 +1,141 @@
+{
+  "case_id": "english__pitt__control__cookie__052_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "That's the picture. Boy is taking cookies from the cookie jar, giving one to his sister, also falling off the stool he is on. The mother is washing dishes, is letting the sink overflow, getting all over the floor. I see nothing. Girl is saying, \"Be quiet.\" Does that count? That's all I see. Okay, thank you. What have I missed?",
+  "patient_only_transcript": "Boy is taking cookies from the cookie jar, giving one to his sister, also falling off the stool he is on. The mother is washing dishes, is letting the sink overflow, getting all over the floor. I see nothing. Girl is saying, 'Be quiet.' Does that count? That's all I see.",
+  "speaker_turn_summary": [
+    "Examiner: 'That's the picture.'",
+    "Patient: 'Boy is taking cookies from the cookie jar, giving one to his sister, also falling off the stool he is on.'",
+    "Patient: 'The mother is washing dishes, is letting the sink overflow, getting all over the floor.'",
+    "Patient: 'I see nothing.'",
+    "Patient: 'Girl is saying, \"Be quiet.\" Does that count?'",
+    "Patient: 'That's all I see.'",
+    "Examiner: 'Okay, thank you. What have I missed?'"
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies multiple core actors and actions in the scene: boy, sister, mother, cookies, stool, sink overflow.",
+    "Patient uses minimal elaboration and ends with 'That's all I see,' indicating possible task completion or limited engagement.",
+    "Patient includes a minor self-question: 'Does that count?' suggesting mild uncertainty or examiner-dependency.",
+    "No evidence of word-finding pauses, circumlocution, repetition, or disorganization in the patient's speech.",
+    "Patient's speech is intelligible and task-relevant, though brief and not elaborative."
+  ],
+  "transcript_request_id": "chatcmpl-e1bb457d-c7ac-99bf-80c8-b1f2be736484",
+  "classification_request_id": "chatcmpl-1fe96a2e-ed03-9de1-90ec-9b9fcf4ce94e",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__052_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__052_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identifies key actors and actions in the picture description task.",
+        "evidence": "Patient correctly names the boy, sister, mother, cookies, stool, and sink overflow.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Elaboration",
+        "summary": "Patient provides a concise but complete description and ends with 'That's all I see,' suggesting task completion or limited elaboration.",
+        "evidence": "Patient does not expand beyond core elements; no evidence of task failure or confusion.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Examiner Dependency and Uncertainty",
+        "summary": "Patient asks 'Does that count?' indicating possible uncertainty or reliance on examiner feedback.",
+        "evidence": "Patient explicitly questions whether their response is sufficient, suggesting mild dependency on external validation.",
+        "confidence": 0.25
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "externally_provided",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a brief but accurate description of the picture, identifying all major actors and actions. Speech is intelligible and task-relevant. No clear impairment-like cues are present. Mild uncertainty and limited elaboration suggest the need for further observation rather than immediate concern for cognitive decline.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Intelligible, coherent speech without pauses or restarts",
+      "No signs of word-finding difficulty, disorganization, or examiner dependence beyond mild uncertainty"
+    ],
+    "alternative_explanations": [
+      "Limited elaboration may reflect task completion or lack of motivation rather than cognitive impairment",
+      "Mild uncertainty may reflect self-awareness or examiner interaction style rather than cognitive deficit",
+      "Briefness may reflect natural speaking style or task constraints"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient reports 'I see nothing' and 'That's all I see,' which may reflect limited elaboration or task completion rather than cognitive impairment."
+    ],
+    "emotional_assessment_findings": [
+      "No observable emotional reactivity, frustration, anxiety, or apathy in the patient's tone or delivery.",
+      "Patient's tone is neutral and matter-of-fact, with no signs of distress or affective flattening."
+    ],
+    "risk_control_suggestions": [
+      "Follow up with a more structured or open-ended picture description task to assess elaboration and narrative fluency.",
+      "Consider repeating the task with a different image to assess consistency.",
+      "Monitor for changes in task completion, elaboration, or self-reported uncertainty over time."
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening in 6–12 months, or prompt clinical evaluation if additional concerns arise.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip. No persuasive evidence of cognitive decline is present, but mild uncertainty warrants monitoring.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-relevant, but brief and minimally elaborative.",
+      "No impairment-like cues are present beyond mild uncertainty and limited elaboration.",
+      "Examiner prompts are neutral and do not dominate the patient's response."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible",
+      "limited_speaking_time",
+      "multi_speaker"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Boy is taking cookies from the cookie jar, giving one to his sister, also falling off the stool he is on. The mother is washing dishes, is letting the sink overflow, getting all over the floor. I see nothing. Girl is saying, 'Be quiet.' Does that count? That's all I see.",
+    "speaker_turn_summary": [
+      "Examiner: 'That's the picture.'",
+      "Patient: 'Boy is taking cookies from the cookie jar, giving one to his sister, also falling off the stool he is on.'",
+      "Patient: 'The mother is washing dishes, is letting the sink overflow, getting all over the floor.'",
+      "Patient: 'I see nothing.'",
+      "Patient: 'Girl is saying, \"Be quiet.\" Does that count?'",
+      "Patient: 'That's all I see.'",
+      "Examiner: 'Okay, thank you. What have I missed?'"
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies multiple core actors and actions in the scene: boy, sister, mother, cookies, stool, sink overflow.",
+      "Patient uses minimal elaboration and ends with 'That's all I see,' indicating possible task completion or limited engagement.",
+      "Patient includes a minor self-question: 'Does that count?' suggesting mild uncertainty or examiner-dependency.",
+      "No evidence of word-finding pauses, circumlocution, repetition, or disorganization in the patient's speech.",
+      "Patient's speech is intelligible and task-relevant, though brief and not elaborative."
+    ]
+  },
+  "latency_ms": 20855,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/052-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/052-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

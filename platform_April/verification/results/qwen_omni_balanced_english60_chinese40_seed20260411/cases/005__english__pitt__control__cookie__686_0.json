@@ -1,0 +1,127 @@
+{
+  "case_id": "english__pitt__control__cookie__686_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.85,
+  "transcript": "Take a look at that and tell me everything that you see happening in that picture, everything that's going on. Well, the little girl's reaching for a cookie and the boy is on a stool which is falling over to get in the cookie jar up on the second shelf of the cupboard with the door open. The faucet is running and it's overflowing onto the floor because it's overflowing into the sink. The woman is drying a plate. She's also looking out the window. There's a couple of bowls and a plate on the counter. Curtains at the windows. There's a driveway or it looks like a driveway outside and you can see another window and some bushes out there and a tree. And I guess that looks like part of the garage, window of the garage out there. And the cookie jar has a lid off. The little boy has one hand in the cookie jar and one with a cookie and is handing it to the little girl who's got her hand up for it and she looks like got her finger in her mouth telling him to be careful. Okay, good.",
+  "patient_only_transcript": "The little girl's reaching for a cookie and the boy is on a stool which is falling over to get in the cookie jar up on the second shelf of the cupboard with the door open. The faucet is running and it's overflowing onto the floor because it's overflowing into the sink. The woman is drying a plate. She's also looking out the window. There's a couple of bowls and a plate on the counter. Curtains at the windows. There's a driveway or it looks like a driveway outside and you can see another window and some bushes out there and a tree. And I guess that looks like part of the garage, window of the garage out there. And the cookie jar has a lid off. The little boy has one hand in the cookie jar and one with a cookie and is handing it to the little girl who's got her hand up for it and she looks like got her finger in her mouth telling him to be careful.",
+  "speaker_turn_summary": [
+    "Examiner: Take a look at that and tell me everything that you see happening in that picture, everything that's going on.",
+    "Patient: The little girl's reaching for a cookie and the boy is on a stool which is falling over to get in the cookie jar up on the second shelf of the cupboard with the door open. The faucet is running and it's overflowing onto the floor because it's overflowing into the sink. The woman is drying a plate. She's also looking out the window. There's a couple of bowls and a plate on the counter. Curtains at the windows. There's a driveway or it looks like a driveway outside and you can see another window and some bushes out there and a tree. And I guess that looks like part of the garage, window of the garage out there. And the cookie jar has a lid off. The little boy has one hand in the cookie jar and one with a cookie and is handing it to the little girl who's got her hand up for it and she looks like got her finger in her mouth telling him to be careful."
+  ],
+  "patient_cue_summary": [
+    "Patient provides a detailed, coherent, and largely accurate description of the picture scene.",
+    "Patient names multiple actors (girl, boy, woman), objects (cookie jar, stool, faucet, plate, bowls, counter, window, bushes, tree, garage), and actions (reaching, falling, running, drying, looking, handing, finger in mouth).",
+    "Patient includes minor uncertainty ('I guess that looks like part of the garage') but does not show word-finding breakdown, repetition, restart, or task abandonment.",
+    "Patient completes the full task without examiner scaffolding or interruption.",
+    "No evidence of semantic vagueness, circumlocution, or disorganization in the narrative structure."
+  ],
+  "transcript_request_id": "chatcmpl-3a934f21-5342-967f-8866-6262b6e35e7a",
+  "classification_request_id": "chatcmpl-a54986ee-d306-930d-970f-cb8f014b0bf9",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__686_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__686_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient accurately describes multiple actors, objects, actions, and spatial relationships in the picture.",
+        "evidence": "Patient names the girl, boy, woman, cookie jar, stool, faucet, counter, windows, driveway, bushes, tree, and garage, and describes their actions and interactions.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Narrative Coherence",
+        "summary": "Patient delivers a logically sequenced and grammatically complete description without disorganization or tangential drift.",
+        "evidence": "Patient structures the description chronologically and causally (e.g., 'the boy is on a stool which is falling over to get in the cookie jar...'), with minimal hesitation or correction.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Completion",
+        "summary": "Patient fulfills the task prompt by describing 'everything that's going on' in the picture without needing examiner prompting or scaffolding.",
+        "evidence": "Patient begins and completes the full description independently, covering all major elements of the scene.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "The patient provides a comprehensive, accurate, and fluent description of the pictured scene without signs of retrieval difficulty, disorganization, or task failure. No impairment-like cues are observed in speech or content. The session is usable with caveats due to lack of visual channel and transcript unavailability, but audio content is sufficient for conservative HC classification.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient accurately identifies multiple scene elements and relationships.",
+      "Narrative is coherent, sequential, and task-compliant.",
+      "No word-finding pauses, restarts, or examiner dependence observed.",
+      "Patient completes the full description without hesitation or omission of core task demands."
+    ],
+    "alternative_explanations": [
+      "The patient may be describing a familiar or well-structured scene, which does not require complex retrieval or executive control.",
+      "The patient may be a fluent speaker with no cognitive impairment, and the task was successfully completed.",
+      "The lack of visual channel does not affect the audio-based assessment, which is sufficient for this screening context."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention required.",
+      "Routine follow-up is appropriate if no other clinical concerns are present.",
+      "Consider formal cognitive screening if additional symptoms or caregiver concerns emerge."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip. No persuasive evidence of cognitive decline is present in this assessment.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video channel is unavailable",
+      "assessment is audio-only.",
+      "Patient speech is intelligible and task-compliant.",
+      "No signs of cognitive impairment detected in this clip.",
+      "Session usability is rated as usable_with_caveats due to missing visual data and transcript unavailability."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The little girl's reaching for a cookie and the boy is on a stool which is falling over to get in the cookie jar up on the second shelf of the cupboard with the door open. The faucet is running and it's overflowing onto the floor because it's overflowing into the sink. The woman is drying a plate. She's also looking out the window. There's a couple of bowls and a plate on the counter. Curtains at the windows. There's a driveway or it looks like a driveway outside and you can see another window and some bushes out there and a tree. And I guess that looks like part of the garage, window of the garage out there. And the cookie jar has a lid off. The little boy has one hand in the cookie jar and one with a cookie and is handing it to the little girl who's got her hand up for it and she looks like got her finger in her mouth telling him to be careful.",
+    "speaker_turn_summary": [
+      "Examiner: Take a look at that and tell me everything that you see happening in that picture, everything that's going on.",
+      "Patient: The little girl's reaching for a cookie and the boy is on a stool which is falling over to get in the cookie jar up on the second shelf of the cupboard with the door open. The faucet is running and it's overflowing onto the floor because it's overflowing into the sink. The woman is drying a plate. She's also looking out the window. There's a couple of bowls and a plate on the counter. Curtains at the windows. There's a driveway or it looks like a driveway outside and you can see another window and some bushes out there and a tree. And I guess that looks like part of the garage, window of the garage out there. And the cookie jar has a lid off. The little boy has one hand in the cookie jar and one with a cookie and is handing it to the little girl who's got her hand up for it and she looks like got her finger in her mouth telling him to be careful."
+    ],
+    "patient_cue_summary": [
+      "Patient provides a detailed, coherent, and largely accurate description of the picture scene.",
+      "Patient names multiple actors (girl, boy, woman), objects (cookie jar, stool, faucet, plate, bowls, counter, window, bushes, tree, garage), and actions (reaching, falling, running, drying, looking, handing, finger in mouth).",
+      "Patient includes minor uncertainty ('I guess that looks like part of the garage') but does not show word-finding breakdown, repetition, restart, or task abandonment.",
+      "Patient completes the full task without examiner scaffolding or interruption.",
+      "No evidence of semantic vagueness, circumlocution, or disorganization in the narrative structure."
+    ]
+  },
+  "latency_ms": 26420,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/686-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/686-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "case_id": "mandarin__chou__mci__040__040_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "一个大人拿熨斗，好像烫衣服，小孩子在玩插头哦，嗯，这个猫狗啊在在玩，好像在玩好了，这个花瓶的水倒了。",
+  "patient_only_transcript": "一个大人拿熨斗，好像烫衣服，小孩子在玩插头哦，嗯，这个猫狗啊在在玩，好像在玩好了，这个花瓶的水倒了。",
+  "speaker_turn_summary": [
+    "患者描述场景：大人烫衣服，小孩玩插头，猫狗在玩，花瓶水倒了。",
+    "examiner likely prompted or guided, but no explicit examiner speech is clearly separable from patient speech in audio."
+  ],
+  "patient_cue_summary": [
+    "Patient describes multiple scene elements: adult with iron, child playing with plug, cat/dog playing, vase water spilled.",
+    "Use of discourse particles: '哦', '嗯', '这个...那个' — normal colloquial Mandarin, not necessarily impairment.",
+    "No clear semantic collapse, naming failure, or abandonment of task.",
+    "Narrative is fragmented but coherent enough to reconstruct multiple relevant actions and objects.",
+    "No evidence of severe disorganization, contradiction, or inability to complete scene description task."
+  ],
+  "transcript_request_id": "chatcmpl-29c674b7-6921-9e9a-8c96-7a5aae37695f",
+  "classification_request_id": "chatcmpl-c4cbe240-4507-99e2-a19b-b00d544b0f62",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__040__040_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__040__040_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes multiple actors and actions in a home hazard scene, though with fragmented syntax and colloquial fillers.",
+        "evidence": "Patient mentions adult with iron, child playing with plug, cat/dog playing, vase water spilled — all relevant scene elements.",
+        "confidence": 0.8
+      },
+      {
+        "label": "discourse_particles",
+        "summary": "Use of '哦', '嗯', '这个' is consistent with normal colloquial Mandarin, not necessarily impairment.",
+        "evidence": "Patient uses '哦' and '嗯' as discourse markers; '这个' used as generic referent — common in spontaneous speech.",
+        "confidence": 0.9
+      },
+      {
+        "label": "task_completion",
+        "summary": "Patient completes the scene-description task with partial coherence, identifying multiple relevant elements despite fragmentation.",
+        "evidence": "Patient does not abandon task; multiple scene elements are correctly identified and described.",
+        "confidence": 0.85
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented but comprehensible description of a multi-actor home scene with multiple actions. Discourse particles and short clauses are consistent with normal colloquial Mandarin. No strong impairment cues detected. Further observation or formal screening recommended due to audio quality and lack of visual modality.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient identifies multiple relevant scene elements: adult, child, cat/dog, vase, water spilled.",
+      "Narrative is reconstructable despite fragmentation and colloquial fillers.",
+      "No evidence of word-finding failure, semantic collapse, or task abandonment."
+    ],
+    "alternative_explanations": [
+      "Poor audio quality may mask subtle impairment cues.",
+      "Colloquial speech patterns (e.g., '嗯', '这个') are normal in Mandarin and not diagnostic of impairment.",
+      "Scene description task may be inherently fragmented",
+      "patient completed the task with partial coherence."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat task with clearer audio or visual support.",
+      "Use structured scene-description checklist to reduce ambiguity.",
+      "Consider formal cognitive screening if patient is at known risk or has caregiver concerns."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if no prior evaluation or if caregiver reports functional concerns.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment needed for risk stratification.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video modality unavailable",
+      "assessment based solely on audio with low quality.",
+      "Patient speech is intelligible enough to reconstruct scene elements, supporting HC classification.",
+      "Colloquial Mandarin features do not indicate cognitive impairment in this context."
+    ],
+    "quality_flags": [
+      "poor_audio",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "一个大人拿熨斗，好像烫衣服，小孩子在玩插头哦，嗯，这个猫狗啊在在玩，好像在玩好了，这个花瓶的水倒了。",
+    "speaker_turn_summary": [
+      "患者描述场景：大人烫衣服，小孩玩插头，猫狗在玩，花瓶水倒了。",
+      "examiner likely prompted or guided, but no explicit examiner speech is clearly separable from patient speech in audio."
+    ],
+    "patient_cue_summary": [
+      "Patient describes multiple scene elements: adult with iron, child playing with plug, cat/dog playing, vase water spilled.",
+      "Use of discourse particles: '哦', '嗯', '这个...那个' — normal colloquial Mandarin, not necessarily impairment.",
+      "No clear semantic collapse, naming failure, or abandonment of task.",
+      "Narrative is fragmented but coherent enough to reconstruct multiple relevant actions and objects.",
+      "No evidence of severe disorganization, contradiction, or inability to complete scene description task."
+    ]
+  },
+  "latency_ms": 16371,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/040/040_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/040/040_Daddy.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

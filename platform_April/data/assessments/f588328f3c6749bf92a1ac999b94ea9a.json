@@ -1,0 +1,99 @@
+{
+  "assessment_id": "f588328f3c6749bf92a1ac999b94ea9a",
+  "patient_id": "smoke-001",
+  "language": "en",
+  "created_at": "2026-04-07T05:19:52.688212Z",
+  "visual_findings": [
+    {
+      "label": "mock_visual_screen",
+      "summary": "fusion mock analysis produced a placeholder visual review.",
+      "evidence": "Enable a real API key to replace mock findings.",
+      "confidence": 0.35
+    }
+  ],
+  "body_findings": [
+    {
+      "label": "mock_body_screen",
+      "summary": "Body movement findings are placeholder values in mock mode.",
+      "evidence": null,
+      "confidence": 0.3
+    }
+  ],
+  "voice_findings": [
+    {
+      "label": "mock_voice_screen",
+      "summary": "Voice findings are placeholder values in mock mode.",
+      "evidence": null,
+      "confidence": 0.3
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "mock_content_screen",
+      "summary": "Content findings are placeholder values in mock mode.",
+      "evidence": null,
+      "confidence": 0.3
+    }
+  ],
+  "speaker_structure": null,
+  "target_patient_presence": null,
+  "target_patient_basis": null,
+  "detected_languages": [],
+  "language_confidence": null,
+  "risk_score": 0.5,
+  "risk_label": "HC",
+  "risk_tier": "medium",
+  "screening_classification": "needs_observation",
+  "screening_summary": "Medium screening risk in this clip; mixed or limited cues suggest further review.",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [],
+  "alternative_explanations": [],
+  "risk_factor_findings": [],
+  "subjective_assessment_findings": [],
+  "emotional_assessment_findings": [],
+  "risk_control_suggestions": [
+    "Repeat screening with clearer audio/video or a structured task.",
+    "Monitor changes over time rather than relying on one clip.",
+    "Consider formal cognitive screening if symptoms persist."
+  ],
+  "visit_recommendation": "Consider formal cognitive screening or clinician review if concerns persist.",
+  "future_risk_trend_summary": "Insufficient longitudinal data to predict future cognitive risk trend from a single clip.",
+  "reviewer_confidence": null,
+  "context_notes": [],
+  "quality_flags": [
+    "mock_provider"
+  ],
+  "session_usability": "usable_with_caveats",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "fusion",
+    "model_name": "gpt-5.4",
+    "request_id": "mock-cbbe956cf047",
+    "latency_ms": 255,
+    "raw_status": "mock"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "failed",
+      "failure_reason": "provider_unavailable",
+      "latency_ms": 93
+    },
+    {
+      "provider": "gemini",
+      "attempt_order": 2,
+      "status": "failed",
+      "failure_reason": "upload_failed",
+      "latency_ms": 5
+    },
+    {
+      "provider": "fusion",
+      "attempt_order": 3,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 255
+    }
+  ],
+  "fallback_message": "Processed by fusion after gemini upload_failed."
+}

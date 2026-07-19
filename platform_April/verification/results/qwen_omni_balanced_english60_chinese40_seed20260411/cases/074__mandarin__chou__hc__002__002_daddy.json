@@ -1,0 +1,134 @@
+{
+  "case_id": "mandarin__chou__hc__002__002_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "那个二零一九年的时候，一零八年的时候，六月二十七号那一天，呃，看到了那个一只狗在在叫，一面跑一面叫。那么同时有有有一个婴儿，他很好奇，他去玩那个墙壁上的插座，插座跟插头啊，用用手去很危险。嗯。那么有只有一只猫咪，小狗。啊，猫咪了，这是看什么东西啊？有有在桌，在那个柜子上面有一个花瓶掉下来了，掉下来水呃洒到满地，那那个地上毯子上面有有有被子，水水水沾到被子，那个猫咪也吓一跳吓一跳。嗯。那么有有一个有一个人，呃，这个人觉得好奇怪啊，听到这些声音，或者是看到看到这些，所以他哇哇叫一声。嗯。哦，不是，原来他在烫烫衣服，烫熨斗烫衣服，烫衣服以后，是不是他碰了他手还怎么样？他怎么会哇哇叫？他怎么叫哇？哦，他可能听到声音了，或者是看到什么东西了。哦，原来他哇一声叫是因为那个猫把那个把把那个花瓶打翻了，所以把他烫好的衣服啊，折叠好的衣服啊弄潮潮湿掉了。",
+  "patient_only_transcript": "患者描述了2019年6月27日的场景：狗在跑叫，婴儿去玩墙上的插座，猫咪和小狗在场，花瓶从柜子掉下，水洒满地弄湿了毯子和被子，猫咪被吓到，有人听到声音或看到场景后哇哇叫，后来发现是因为猫打翻花瓶导致熨好的衣服被弄湿。",
+  "speaker_turn_summary": [
+    "患者描述场景：狗叫跑动、婴儿玩插座、花瓶掉落、水洒地、猫咪受惊、有人哇哇叫、衣服被弄湿。",
+    "患者在描述中多次自我修正、补充细节，如‘哦，不是，原来他在烫衣服’，‘他怎么会哇哇叫？’，‘哦，原来他哇一声叫是因为那个猫把花瓶打翻了’。",
+    "患者语句结构完整，能识别多个角色（狗、婴儿、猫咪、人）和多个动作（跑、叫、玩、掉、洒、烫、弄湿），但语流中存在较多停顿、重复、自我纠正和语气词（如‘呃’‘嗯’‘哦’）。",
+    "患者未表现出明显语义断裂、命名障碍或逻辑混乱，但语句组织松散，缺乏连贯因果链，依赖语境推断事件关联。"
+  ],
+  "patient_cue_summary": [
+    "患者能识别并描述多个场景元素（狗、婴儿、插座、花瓶、水、猫咪、人、熨衣服、衣服被弄湿），表明基本场景理解能力尚存。",
+    "语句中存在大量语气词、自我修正、重复和停顿（如‘呃’‘哦’‘不是，原来’‘他怎么会哇哇叫？’），但未导致语义崩解或核心信息丢失。",
+    "患者未出现命名障碍、语义空洞、严重逻辑断裂或任务完全失败，但叙事缺乏结构化组织，因果链依赖外部推断。",
+    "患者未表现出明显认知崩溃或语言退化，但语流中存在较多非必要填充和语义松散，可能反映注意力分散或表达效率降低，非典型认知障碍特征。"
+  ],
+  "transcript_request_id": "chatcmpl-5d62c468-eca2-9b06-a35b-d0fe092ee633",
+  "classification_request_id": "chatcmpl-743bdc13-187e-9881-84d5-ac14a6fced04",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__002__002_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__002__002_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "语义完整性",
+        "summary": "患者能识别并描述多个场景元素，包括动物、人物、动作和结果，语义基本完整。",
+        "evidence": "患者提及狗、婴儿、猫咪、人、花瓶、水、毯子、被子、熨衣服、衣服被弄湿等，覆盖主要事件。",
+        "confidence": 0.5
+      },
+      {
+        "label": "语流组织性",
+        "summary": "语句松散，缺乏连贯因果链，依赖语境推断事件关联。",
+        "evidence": "患者描述事件时未明确因果关系，如‘原来他哇一声叫是因为那个猫打翻花瓶’，需外部推断。",
+        "confidence": 0.5
+      },
+      {
+        "label": "表达效率",
+        "summary": "语句中存在大量语气词、自我修正和停顿，表达效率较低。",
+        "evidence": "语句中出现‘呃’‘哦’‘不是，原来’‘他怎么会哇哇叫？’等填充和修正，影响流畅性。",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "患者能识别并描述多个场景元素，语义基本完整，但语流松散、填充词多、结构松散，缺乏连贯因果链。未见典型认知障碍语言特征，但表达效率较低，建议进一步观察或补充评估。",
+    "evidence_for_risk": [
+      "语句结构松散，缺乏连贯性，依赖语境推断事件关联。",
+      "存在较多语气词、自我修正和停顿，表达效率较低。",
+      "未形成清晰因果链，事件描述依赖外部推断。"
+    ],
+    "evidence_against_risk": [
+      "能识别多个角色和动作，语义基本完整。",
+      "未出现命名障碍、语义空洞、逻辑断裂或任务失败。",
+      "情绪表达正常，无明显认知退化迹象。"
+    ],
+    "alternative_explanations": [
+      "语流松散可能源于表达习惯、紧张、非正式语境或录音质量影响，非认知障碍特有。",
+      "填充词和自我修正在非正式口语中常见，尤其在描述复杂场景时，不必然指向认知损害。",
+      "表达效率低可能与任务复杂度、注意力分配或语言组织能力有关，非典型认知障碍表现。"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "患者语调平静，无明显焦虑、恐惧、愤怒或情绪波动，未表现出情绪反应异常。",
+      "患者在描述中偶有惊讶语气（如‘哇哇叫’‘哦，原来’），但属自然反应，非情绪失控或情感淡漠。",
+      "患者未表现出明显情绪淡漠、冷漠或过度兴奋，情绪表达与描述内容基本匹配。"
+    ],
+    "risk_control_suggestions": [
+      "建议补充标准化认知筛查工具（如MMSE、MoCA）进行客观评估。",
+      "建议在更结构化任务中观察患者语言组织能力与任务完成度。",
+      "建议观察患者在重复任务或复杂指令下的表现，以区分表达效率低与认知障碍。"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "单次评估无法预测长期认知趋势，建议纵向观察或结合其他临床指标。",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "音频质量较差，部分语句模糊，影响判断精度。",
+      "患者语句中存在较多非必要填充词和自我修正，但未导致语义崩解。",
+      "场景描述任务中，患者能识别多个元素，但缺乏结构化组织，属表达效率问题，非典型认知障碍。",
+      "未见明显情绪或行为异常，情绪评估为正常。"
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable",
+      "limited_speaking_time"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "患者描述了2019年6月27日的场景：狗在跑叫，婴儿去玩墙上的插座，猫咪和小狗在场，花瓶从柜子掉下，水洒满地弄湿了毯子和被子，猫咪被吓到，有人听到声音或看到场景后哇哇叫，后来发现是因为猫打翻花瓶导致熨好的衣服被弄湿。",
+    "speaker_turn_summary": [
+      "患者描述场景：狗叫跑动、婴儿玩插座、花瓶掉落、水洒地、猫咪受惊、有人哇哇叫、衣服被弄湿。",
+      "患者在描述中多次自我修正、补充细节，如‘哦，不是，原来他在烫衣服’，‘他怎么会哇哇叫？’，‘哦，原来他哇一声叫是因为那个猫把花瓶打翻了’。",
+      "患者语句结构完整，能识别多个角色（狗、婴儿、猫咪、人）和多个动作（跑、叫、玩、掉、洒、烫、弄湿），但语流中存在较多停顿、重复、自我纠正和语气词（如‘呃’‘嗯’‘哦’）。",
+      "患者未表现出明显语义断裂、命名障碍或逻辑混乱，但语句组织松散，缺乏连贯因果链，依赖语境推断事件关联。"
+    ],
+    "patient_cue_summary": [
+      "患者能识别并描述多个场景元素（狗、婴儿、插座、花瓶、水、猫咪、人、熨衣服、衣服被弄湿），表明基本场景理解能力尚存。",
+      "语句中存在大量语气词、自我修正、重复和停顿（如‘呃’‘哦’‘不是，原来’‘他怎么会哇哇叫？’），但未导致语义崩解或核心信息丢失。",
+      "患者未出现命名障碍、语义空洞、严重逻辑断裂或任务完全失败，但叙事缺乏结构化组织，因果链依赖外部推断。",
+      "患者未表现出明显认知崩溃或语言退化，但语流中存在较多非必要填充和语义松散，可能反映注意力分散或表达效率降低，非典型认知障碍特征。"
+    ]
+  },
+  "latency_ms": 28263,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/002/002_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/002/002_Daddy.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

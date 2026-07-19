@@ -1,0 +1,14 @@
+{
+  "case_id": "iJJerSu8DxE",
+  "dataset": "yt_demtalk_smoke",
+  "split": "test",
+  "ground_truth_label": "cognitive_risk",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3.5-plus",
+  "latency_ms": 3972,
+  "error": "provider_unavailable: audio_only returned 401: {\"error\":{\"message\":\"Incorrect API key provided. For details, see: https://help.aliyun.com/zh/model-studio/error-code#apikey-error\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_api_key\"},\"request_id\":\"c16b4b8e-b24b-95ca-98ad-b7c61dfdf3fb\"}",
+  "metadata": {
+    "source_url": "https://youtu.be/iJJerSu8DxE",
+    "clip_window": "0:00-1:30"
+  }
+}

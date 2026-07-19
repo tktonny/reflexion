@@ -1,0 +1,131 @@
+{
+  "case_id": "english__pitt__control__cookie__059_4",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.85,
+  "transcript": "Oh, there is a little boy on a step stool about to fall. He's reaching in the cookie jar, and the little girl reaching for a cookie, and the mother washing dishes and the sink is overflowing. The water's coming in. It looks like there might be a breeze blowing the curtains. There's water shining on the floor. In the door of the cupboard is a jar where he has a cookie jar. Hmm. Okay, that's fine.",
+  "patient_only_transcript": "Oh, there is a little boy on a step stool about to fall. He's reaching in the cookie jar, and the little girl reaching for a cookie, and the mother washing dishes and the sink is overflowing. The water's coming in. It looks like there might be a breeze blowing the curtains. There's water shining on the floor. In the door of the cupboard is a jar where he has a cookie jar. Hmm. Okay, that's fine.",
+  "speaker_turn_summary": [
+    "Examiner: prompts or introduces task (implied)",
+    "Patient: describes scene with multiple elements (boy, cookie jar, mother, sink, breeze, water, cupboard)",
+    "Examiner: acknowledges or ends (\"Okay, that's fine\")"
+  ],
+  "patient_cue_summary": [
+    "Patient provides a detailed, multi-element description of the scene",
+    "Patient uses specific nouns and actions (cookie jar, sink overflowing, breeze, water on floor)",
+    "Patient includes minor hesitations or filler (\"Hmm\") and ends with examiner-directed closure",
+    "Patient does not show word-finding pauses, repetition, or disorganization",
+    "Patient's description is coherent, sequential, and task-relevant",
+    "Patient does not appear examiner-dependent or vague in core elements"
+  ],
+  "transcript_request_id": "chatcmpl-01001661-cefd-9b8a-80f8-f3d67753140d",
+  "classification_request_id": "chatcmpl-73cde82d-1ffc-9be3-a9f2-5e98cbd7392c",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__059_4/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__059_4/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential description of the picture scene including multiple characters and environmental elements.",
+        "evidence": "Patient mentions boy on stool, cookie jar, girl reaching, mother washing dishes, overflowing sink, breeze, water on floor, cupboard jar — all relevant to the task.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific nouns and verbs without circumlocution or vagueness.",
+        "evidence": "Terms like 'step stool', 'cookie jar', 'overflowing sink', 'breeze blowing curtains', 'water shining on the floor' are precise and task-appropriate.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description logically without disorganization or repetition.",
+        "evidence": "Description flows from character actions to environmental details without backtracking or abandonment.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "The patient provides a coherent, detailed, and task-relevant description of the pictured scene, including multiple characters, actions, and environmental details. No signs of word-finding difficulty, disorganization, vagueness, or examiner dependence are evident. The minor hesitation (\"Hmm\") and concluding phrase (\"Okay, that's fine\") do not indicate impairment. The absence of visual data limits full assessment, but the spoken content alone supports a healthy profile.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent, sequential, and informative scene description",
+      "Use of specific, relevant vocabulary and spatial/temporal details",
+      "No signs of retrieval failure, repetition, or abandonment",
+      "Task completion without examiner prompting or correction"
+    ],
+    "alternative_explanations": [
+      "The patient may be describing the scene accurately due to familiarity or strong visual memory",
+      "The minor hesitation may reflect natural speech rhythm rather than cognitive impairment",
+      "The lack of visual data prevents confirmation of non-verbal cues, but spoken content is sufficient for conservative HC classification"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Continue routine cognitive screening as part of standard care",
+      "No immediate clinical intervention required based on this clip",
+      "Consider follow-up if other domains show decline or if patient reports subjective concerns"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline in this sample.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video data is unavailable",
+      "assessment relies solely on audio content.",
+      "Patient's speech is intelligible, task-relevant, and coherent, supporting HC classification.",
+      "Examiner prompts are minimal and do not dominate the interaction.",
+      "No signs of dementia-like impairment are present in the spoken content."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "video_too_short",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Oh, there is a little boy on a step stool about to fall. He's reaching in the cookie jar, and the little girl reaching for a cookie, and the mother washing dishes and the sink is overflowing. The water's coming in. It looks like there might be a breeze blowing the curtains. There's water shining on the floor. In the door of the cupboard is a jar where he has a cookie jar. Hmm. Okay, that's fine.",
+    "speaker_turn_summary": [
+      "Examiner: prompts or introduces task (implied)",
+      "Patient: describes scene with multiple elements (boy, cookie jar, mother, sink, breeze, water, cupboard)",
+      "Examiner: acknowledges or ends (\"Okay, that's fine\")"
+    ],
+    "patient_cue_summary": [
+      "Patient provides a detailed, multi-element description of the scene",
+      "Patient uses specific nouns and actions (cookie jar, sink overflowing, breeze, water on floor)",
+      "Patient includes minor hesitations or filler (\"Hmm\") and ends with examiner-directed closure",
+      "Patient does not show word-finding pauses, repetition, or disorganization",
+      "Patient's description is coherent, sequential, and task-relevant",
+      "Patient does not appear examiner-dependent or vague in core elements"
+    ]
+  },
+  "latency_ms": 25165,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/059-4.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/059-4.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

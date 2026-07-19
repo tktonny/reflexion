@@ -1,0 +1,88 @@
+{
+  "case_id": "english__pitt__dementia__cookie__001_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.75,
+  "classification_request_id": "chatcmpl-3ca688a8-990f-9461-b9e5-6f86335adc77",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "Speech clarity",
+        "summary": "Patient speech is intelligible and coherent, describing a picture with multiple elements.",
+        "evidence": "Patient describes a kitchen scene involving a fallen cookie jar, a mother washing dishes, overflowing sink, and window curtains — indicating narrative ability and contextual comprehension.",
+        "confidence": 0.85
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "Picture description accuracy",
+        "summary": "Patient accurately describes multiple elements of the picture: cookie jar fall, mother unaware, water overflow, window curtains.",
+        "evidence": "Patient mentions all key components of the picture task without omission or distortion, suggesting intact visual memory and sequencing ability.",
+        "confidence": 0.8
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, accurate description of a complex picture task, with no observable signs of cognitive impairment. Video is unavailable, but audio content is sufficient for basic screening.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent, detailed picture description without errors or omissions",
+      "No signs of disorientation, confusion, or memory failure in speech",
+      "Intelligible and fluent speech with appropriate narrative structure"
+    ],
+    "alternative_explanations": [
+      "Patient may be describing the picture accurately due to familiarity with the task or strong visual memory",
+      "Lack of video does not preclude accurate verbal description; audio-only screening may be sufficient for basic assessment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Continue routine cognitive monitoring if part of longitudinal screening",
+      "Consider follow-up if other domains (e.g., executive function, memory) are clinically suspected"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of cognitive decline in this assessment.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video portion is unavailable; assessment relies solely on audio content.",
+      "Patient is likely the primary respondent in a picture description task.",
+      "No signs of dementia-like impairment observed in available speech content."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "video_too_short",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 8263,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/001-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/001-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

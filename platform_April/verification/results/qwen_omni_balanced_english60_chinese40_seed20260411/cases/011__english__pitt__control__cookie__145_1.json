@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__control__cookie__145_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "Touching lip, raising arm. Is that what you mean? Reaching for cookie, handing cookie down, slipping from stool, stool falling over, and wiping dishes, water running, water overflowing, breathe, I don't know if that's one, stepping out from water. I guess that too. Good. Good.",
+  "patient_only_transcript": "Touching lip, raising arm. Reaching for cookie, handing cookie down, slipping from stool, stool falling over, and wiping dishes, water running, water overflowing, breathe, I don't know if that's one, stepping out from water. I guess that too. Good.",
+  "speaker_turn_summary": [
+    "Examiner: 'Touching lip, raising arm. Is that what you mean?'",
+    "Patient: 'Reaching for cookie, handing cookie down, slipping from stool, stool falling over, and wiping dishes, water running, water overflowing, breathe, I don't know if that's one, stepping out from water. I guess that too. Good.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides a list of observed actions without clear narrative structure or causal linkage.",
+    "Patient includes self-uncertainty markers: 'I don't know if that's one', 'I guess that too'.",
+    "Patient ends with 'Good' — possibly acknowledging examiner prompt, not self-generated elaboration.",
+    "Patient speech is intelligible but lacks elaboration, sequencing, or task-specific detail beyond basic action listing.",
+    "No evidence of word-finding breakdown, repetition, or restarts — but also no evidence of fluent, coherent, or task-compliant description."
+  ],
+  "transcript_request_id": "chatcmpl-d6fe47ef-d508-95ed-97f3-eaa45f794de8",
+  "classification_request_id": "chatcmpl-1758d41f-be32-932b-b015-edb1242d34e9",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__145_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__145_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Task Description",
+        "summary": "Patient lists observed actions from picture without narrative or causal structure.",
+        "evidence": "Patient: 'Reaching for cookie, handing cookie down, slipping from stool, stool falling over, and wiping dishes, water running, water overflowing... I don't know if that's one, stepping out from water. I guess that too. Good.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Self-uncertainty",
+        "summary": "Patient includes phrases indicating doubt or lack of confidence in completeness.",
+        "evidence": "Patient: 'I don't know if that's one, I guess that too.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Examiner Interaction",
+        "summary": "Patient appears to respond to examiner prompts rather than generate independent description.",
+        "evidence": "Patient ends with 'Good' — possibly acknowledging examiner prompt.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented, minimally elaborated list of observed actions without clear narrative or task completion. Speech is intelligible but lacks depth, sequencing, or evidence of sustained cognitive control. No overt impairment cues, but insufficient task performance to classify as healthy. Further observation or structured assessment recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Speech is intelligible and task-relevant",
+      "No word-finding pauses, circumlocution, or restarts",
+      "No emotional dysregulation or affective flattening",
+      "No explicit memory complaint or caregiver concern reported"
+    ],
+    "alternative_explanations": [
+      "Task may be misinterpreted or incomplete",
+      "Patient may be responding to examiner prompts rather than generating independent description",
+      "Limited elaboration may reflect task design or patient style, not cognitive impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat structured picture-description task with clearer instructions",
+      "Observe patient’s ability to sequence events or explain cause-effect relationships",
+      "Include caregiver report or prior cognitive history if available"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio and provided metadata.",
+      "Patient speech is intelligible but minimally elaborative",
+      "not sufficient to support cognitive_risk.",
+      "Task context: cookie-theft picture description",
+      "patient did not demonstrate full task completion or narrative structure."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "video_too_short",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Touching lip, raising arm. Reaching for cookie, handing cookie down, slipping from stool, stool falling over, and wiping dishes, water running, water overflowing, breathe, I don't know if that's one, stepping out from water. I guess that too. Good.",
+    "speaker_turn_summary": [
+      "Examiner: 'Touching lip, raising arm. Is that what you mean?'",
+      "Patient: 'Reaching for cookie, handing cookie down, slipping from stool, stool falling over, and wiping dishes, water running, water overflowing, breathe, I don't know if that's one, stepping out from water. I guess that too. Good.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides a list of observed actions without clear narrative structure or causal linkage.",
+      "Patient includes self-uncertainty markers: 'I don't know if that's one', 'I guess that too'.",
+      "Patient ends with 'Good' — possibly acknowledging examiner prompt, not self-generated elaboration.",
+      "Patient speech is intelligible but lacks elaboration, sequencing, or task-specific detail beyond basic action listing.",
+      "No evidence of word-finding breakdown, repetition, or restarts — but also no evidence of fluent, coherent, or task-compliant description."
+    ]
+  },
+  "latency_ms": 14641,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/145-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/145-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

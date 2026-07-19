@@ -1,0 +1,112 @@
+{
+  "case_id": "english__pitt__dementia__fluency__212_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.6,
+  "transcript": "A trellis. Trellis, okay. And you can begin now. Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes. Okay, good. I'm going to change directions, but you can begin now. Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound. Okay, good. Very good.",
+  "patient_only_transcript": "Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes. Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound.",
+  "speaker_turn_summary": [
+    "Examiner: 'A trellis. Trellis, okay. And you can begin now.'",
+    "Patient: 'Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes.'",
+    "Examiner: 'Okay, good. I'm going to change directions, but you can begin now.'",
+    "Patient: 'Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound.'",
+    "Examiner: 'Okay, good. Very good.'"
+  ],
+  "patient_cue_summary": [
+    "Patient delivers a long, uninterrupted list of items in two fluency tasks without hesitation or correction.",
+    "Patient repeats 'celery, turnips' in the first list, indicating mild repetition but not significant retrieval failure.",
+    "Patient transitions smoothly to a second fluency task with 'saw, see, say...' without prompting or pause.",
+    "Patient maintains task relevance and lexical productivity in both tasks, with no evidence of semantic drift, tangentiality, or breakdown.",
+    "Patient does not exhibit pauses, fillers, self-corrections, or signs of retrieval difficulty in either fluency task.",
+    "Examiner provides minimal scaffolding and does not need to correct or prompt the patient during either task."
+  ],
+  "transcript_request_id": "chatcmpl-d31b3e17-5228-9b62-835f-4da939b1924d",
+  "classification_request_id": "chatcmpl-6a6beeac-f4ea-90d9-8312-2e9add007c9f",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__212_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__212_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates adequate verbal fluency in two structured tasks, with no observable signs of retrieval difficulty, semantic disorganization, or task breakdown. Mild repetition of items occurs but does not indicate impairment. Examiner provides minimal scaffolding, suggesting patient is largely self-sufficient. No emotional or behavioral cues suggest distress or apathy. Audio quality is low, and visual data is unavailable, limiting confidence in full assessment.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient completes both fluency tasks without pauses, fillers, or corrections.",
+      "Patient maintains task relevance and lexical productivity in both categories.",
+      "No evidence of semantic drift, tangentiality, or retrieval failure.",
+      "Examiner does not need to prompt or correct the patient during either task."
+    ],
+    "alternative_explanations": [
+      "Low audio quality may mask subtle impairments not detectable in this clip.",
+      "Patient may be fatigued or distracted, but this is not evident from the speech content.",
+      "The tasks may be too easy for the patient to demonstrate impairment, even if present."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Consider repeating the fluency tasks with more challenging categories or time constraints.",
+      "Add a memory or executive function task to complement fluency assessment.",
+      "If available, obtain a visual or behavioral observation to supplement this audio-only assessment."
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening if symptoms persist or progress.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single audio-only clip with no visual or behavioral data. Further assessment is recommended if clinical concerns arise.",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Audio-only assessment with low quality and no visual data.",
+      "Patient appears to complete both fluency tasks without difficulty.",
+      "Examiner provides minimal scaffolding, suggesting patient independence.",
+      "No signs of dementia-like impairment are evident in this clip."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes. Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound.",
+    "speaker_turn_summary": [
+      "Examiner: 'A trellis. Trellis, okay. And you can begin now.'",
+      "Patient: 'Apples, pears, peaches, celery, turnips, meat, bread, candy, pickles, tomatoes, potatoes, celery, turnips, bananas, oranges, plums, buns, peas, beans, cantaloupes.'",
+      "Examiner: 'Okay, good. I'm going to change directions, but you can begin now.'",
+      "Patient: 'Saw, see, say, soothe, suck, sample, sort, see, sympathize, summer, sail, sail, snub, snort, snicker, slop, slang, slide, slow, sleuth, sustain, sample, seething, slug, sound.'",
+      "Examiner: 'Okay, good. Very good.'"
+    ],
+    "patient_cue_summary": [
+      "Patient delivers a long, uninterrupted list of items in two fluency tasks without hesitation or correction.",
+      "Patient repeats 'celery, turnips' in the first list, indicating mild repetition but not significant retrieval failure.",
+      "Patient transitions smoothly to a second fluency task with 'saw, see, say...' without prompting or pause.",
+      "Patient maintains task relevance and lexical productivity in both tasks, with no evidence of semantic drift, tangentiality, or breakdown.",
+      "Patient does not exhibit pauses, fillers, self-corrections, or signs of retrieval difficulty in either fluency task.",
+      "Examiner provides minimal scaffolding and does not need to correct or prompt the patient during either task."
+    ]
+  },
+  "latency_ms": 22834,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/212-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/212-1.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "case_id": "english__lu__control__f39",
+  "dataset": "talkbank_english_lu",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.9,
+  "transcript": "It's a warm summer day. The kids were hungry and wanted a cookie. Mom was distracted because she had just received some bad news. The water is overflowing in the sink because her mind is focused elsewhere. Meanwhile, the kids decided to climb up to the cookie jar. The little boy went up first and handed down a cookie to his sister. Then he went up again to get a cookie for himself, and he's about to fall. Mom is not noticing because her mind is elsewhere. She will probably wind up taking one of them to the emergency room in a little while and make her day even worse than what she's thinking about right now.",
+  "patient_only_transcript": "It's a warm summer day. The kids were hungry and wanted a cookie. Mom was distracted because she had just received some bad news. The water is overflowing in the sink because her mind is focused elsewhere. Meanwhile, the kids decided to climb up to the cookie jar. The little boy went up first and handed down a cookie to his sister. Then he went up again to get a cookie for himself, and he's about to fall. Mom is not noticing because her mind is elsewhere. She will probably wind up taking one of them to the emergency room in a little while and make her day even worse than what she's thinking about right now.",
+  "speaker_turn_summary": [
+    "Examiner: Presents scenario prompt.",
+    "Patient: Recites full scenario verbatim without pauses, fillers, or disorganization."
+  ],
+  "patient_cue_summary": [
+    "Patient recites entire scenario with high lexical fidelity and coherent event sequencing.",
+    "No word-finding pauses, circumlocutions, or semantic vagueness observed.",
+    "Patient demonstrates strong episodic recall and narrative control, matching examiner-provided structure.",
+    "No evidence of disorganization, repetition, or examiner dependence in speech output."
+  ],
+  "transcript_request_id": "chatcmpl-1af93af9-79db-9c9c-a8db-b3f093af95cb",
+  "classification_request_id": "chatcmpl-2f094a0b-310e-977d-a665-ac247a794b22",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__control__f39/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__control__f39/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "narrative coherence",
+        "summary": "Patient delivers a complete, logically sequenced, and semantically rich description of a multi-agent scenario without hesitation or error.",
+        "evidence": "Patient recites full scenario verbatim with correct causal links, character roles, and temporal progression.",
+        "confidence": null
+      },
+      {
+        "label": "lexical retrieval",
+        "summary": "Patient retrieves and uses specific, contextually appropriate vocabulary (e.g., 'cookie jar', 'overflowing', 'emergency room').",
+        "evidence": "All key nouns, verbs, and modifiers are accurately recalled and deployed without substitution or vagueness.",
+        "confidence": null
+      },
+      {
+        "label": "task compliance",
+        "summary": "Patient fully complies with the open-ended description task without prompting or deviation.",
+        "evidence": "Patient delivers full narrative without pauses, restarts, or examiner intervention required.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient demonstrates intact episodic memory, narrative organization, and lexical retrieval during an open-ended scenario description task. No impairment-like cues detected in speech content or structure.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Full, coherent, and accurate recall of multi-agent scenario.",
+      "No signs of word-finding difficulty, disorganization, or semantic vagueness.",
+      "No examiner dependence or need for prompting observed."
+    ],
+    "alternative_explanations": [
+      "Patient may be a highly verbal, well-educated individual with strong memory performance.",
+      "Scenario may have been rehearsed or familiar to patient prior to recording.",
+      "Audio quality may be sufficient for accurate transcription despite lack of visual channel."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No further cognitive screening indicated based on this clip.",
+      "Routine follow-up is appropriate if other clinical concerns arise."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of cognitive decline observed.",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "Video channel is unavailable",
+      "assessment relies solely on audio content.",
+      "Patient speech is fully intelligible and task-compliant.",
+      "No signs of cognitive impairment detected in this single clip."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "It's a warm summer day. The kids were hungry and wanted a cookie. Mom was distracted because she had just received some bad news. The water is overflowing in the sink because her mind is focused elsewhere. Meanwhile, the kids decided to climb up to the cookie jar. The little boy went up first and handed down a cookie to his sister. Then he went up again to get a cookie for himself, and he's about to fall. Mom is not noticing because her mind is elsewhere. She will probably wind up taking one of them to the emergency room in a little while and make her day even worse than what she's thinking about right now.",
+    "speaker_turn_summary": [
+      "Examiner: Presents scenario prompt.",
+      "Patient: Recites full scenario verbatim without pauses, fillers, or disorganization."
+    ],
+    "patient_cue_summary": [
+      "Patient recites entire scenario with high lexical fidelity and coherent event sequencing.",
+      "No word-finding pauses, circumlocutions, or semantic vagueness observed.",
+      "Patient demonstrates strong episodic recall and narrative control, matching examiner-provided structure.",
+      "No evidence of disorganization, repetition, or examiner dependence in speech output."
+    ]
+  },
+  "latency_ms": 20960,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Lu",
+    "source_group": "Control",
+    "source_relative_path": "Control/F39.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Lu/Control//F39.mp3?f=save",
+    "expected_group_audio_count": 26,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

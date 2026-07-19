@@ -1,0 +1,21 @@
+{
+  "case_id": "english__pitt__dementia__sentence__705_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "speaker_turn_summary": [],
+  "patient_cue_summary": [],
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/talkbank/corpora/english/pitt/Dementia/sentence/705-0.mp3",
+  "latency_ms": 50,
+  "error": "ffmpeg version 6.1 Copyright (c) 2000-2023 the FFmpeg developers\n  built with clang version 16.0.6\n  configuration: --prefix=/opt/anaconda3 --cc=arm64-apple-darwin20.0.0-clang --cxx=arm64-apple-darwin20.0.0-clang++ --nm=arm64-apple-darwin20.0.0-nm --ar=arm64-apple-darwin20.0.0-ar --disable-doc --disable-openssl --enable-demuxer=dash --enable-hardcoded-tables --enable-libfreetype --enable-libfontconfig --enable-libopenh264 --enable-libdav1d --enable-cross-compile --arch=arm64 --target-os=darwin --cross-prefix=arm64-apple-darwin20.0.0- --host-cc=/Users/runner/miniforge3/conda-bld/ffmpeg_1699729534217/_build_env/bin/x86_64-apple-darwin13.4.0-clang --enable-neon --enable-gnutls --enable-libmp3lame --enable-libvpx --enable-libass --enable-pthreads --enable-gpl --enable-libx264 --enable-libx265 --enable-libaom --enable-libsvtav1 --enable-libxml2 --enable-pic --enable-shared --disable-static --enable-version3 --enable-zlib --enable-libopus --pkg-config=/Users/runner/miniforge3/conda-bld/ffmpeg_1699729534217/_build_env/bin/pkg-config\n  libavutil      58. 29.100 / 58. 29.100\n  libavcodec     60. 31.102 / 60. 31.102\n  libavformat    60. 16.100 / 60. 16.100\n  libavdevice    60.  3.100 / 60.  3.100\n  libavfilter     9. 12.100 /  9. 12.100\n  libswscale      7.  5.100 /  7.  5.100\n  libswresample   4. 12.100 /  4. 12.100\n  libpostproc    57.  3.100 / 57.  3.100\n[in#0 @ 0x1227041b0] Error opening input: Invalid data found when processing input\nError opening input file /Users/macbookair/Documents/Cloud/REFLEXION/verification/data/talkbank/corpora/english/pitt/Dementia/sentence/705-0.mp3.\nError opening input files: Invalid data found when processing input",
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/705-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/705-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

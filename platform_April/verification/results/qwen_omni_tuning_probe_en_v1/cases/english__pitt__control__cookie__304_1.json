@@ -1,0 +1,126 @@
+{
+  "case_id": "english__pitt__control__cookie__304_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "The boy is about to fall off a stool while he's grabbing for the cookie jar. The water's running over the sink and mother's drying dishes. Little girl is reaching up for a cookie. That's all that I see. Okay.",
+  "patient_only_transcript": "The boy is about to fall off a stool while he's grabbing for the cookie jar. The water's running over the sink and mother's drying dishes. Little girl is reaching up for a cookie. That's all that I see.",
+  "speaker_turn_summary": [
+    "Examiner: prompts or introduces task (implied)",
+    "Patient: describes scene with core elements (boy, stool, cookie jar, water, mother, girl, cookie)",
+    "Examiner: acknowledges with 'Okay.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides accurate identification of multiple scene actors and actions",
+    "Speech is intelligible and task-relevant",
+    "Response is concise but complete for the task context",
+    "No evidence of word-finding breakdown, disorganization, or examiner dependence",
+    "Ends with 'That's all that I see' — mild uncertainty but not impairment-level"
+  ],
+  "transcript_request_id": "chatcmpl-1e4a63d8-a852-9975-b75a-e8021d654291",
+  "classification_request_id": "chatcmpl-d73af3a2-37b8-9621-9bea-17c4d0adc590",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__304_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__304_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient accurately identifies key actors (boy, mother, little girl), actions (grabbing cookie jar, drying dishes, reaching for cookie), and environmental detail (water running over sink, stool tipping).",
+        "evidence": "Patient’s transcript: 'The boy is about to fall off a stool while he's grabbing for the cookie jar. The water's running over the sink and mother's drying dishes. Little girl is reaching up for a cookie.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Relevance and Coherence",
+        "summary": "Response is directly relevant to the cookie-theft picture description task and maintains coherent structure without tangents or confusion.",
+        "evidence": "Patient describes a sequence of related events without disorganization or semantic drift.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Lexical Retrieval and Fluency",
+        "summary": "No signs of word-finding difficulty, circumlocution, or hesitation; speech is fluent and uses appropriate vocabulary for the context.",
+        "evidence": "No fillers, restarts, or self-corrections observed in transcript or audio.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a concise, accurate, and coherent description of a multi-element scene task. No impairment-like cues are evident in speech, content, or structure. The response is task-appropriate and complete for the context.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "No signs of retrieval failure or disorganization",
+      "Fluent, task-relevant speech without examiner dependence",
+      "Response ends with mild uncertainty but does not indicate cognitive breakdown"
+    ],
+    "alternative_explanations": [
+      "Response may be brief due to task constraints or patient style, not cognitive impairment",
+      "Mild uncertainty ('That's all that I see') may reflect modest confidence, not memory or language deficit"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed",
+      "Consider follow-up if other domains show concern",
+      "Reassess if patient shows decline in future evaluations"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline observed.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment relies solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible and task-compliant",
+      "no impairment-like features detected.",
+      "Examiner prompts are minimal and do not dominate the interaction."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is about to fall off a stool while he's grabbing for the cookie jar. The water's running over the sink and mother's drying dishes. Little girl is reaching up for a cookie. That's all that I see.",
+    "speaker_turn_summary": [
+      "Examiner: prompts or introduces task (implied)",
+      "Patient: describes scene with core elements (boy, stool, cookie jar, water, mother, girl, cookie)",
+      "Examiner: acknowledges with 'Okay.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides accurate identification of multiple scene actors and actions",
+      "Speech is intelligible and task-relevant",
+      "Response is concise but complete for the task context",
+      "No evidence of word-finding breakdown, disorganization, or examiner dependence",
+      "Ends with 'That's all that I see' — mild uncertainty but not impairment-level"
+    ]
+  },
+  "latency_ms": 13785,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/304-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/304-1.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

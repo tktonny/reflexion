@@ -1,0 +1,136 @@
+{
+  "case_id": "english__pitt__dementia__sentence__283_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "The first word is pencil. You can write a note. Tree. The tree has leaves. They're about to fall down. Okay, now I'm going to give you two words and I want you to use both words together in one sentence. You don't need to worry about the order. First two words are child, hospital. The child was rushed to the hospital. Cold, winter. During a cold winter, you stay at home and don't go out unless you're needed. Now I'm going to give you three words and I want you to use all three words in one brief simple sentence. You don't need to worry about the order. Chair, chair, doctor, sit. We had to sit in the chair before the doctor came. Bureau, open, drawer. Somebody opened the bureau drawer.",
+  "patient_only_transcript": "The child was rushed to the hospital. We had to sit in the chair before the doctor came. Somebody opened the bureau drawer.",
+  "speaker_turn_summary": [
+    "Examiner: 'The first word is pencil. You can write a note.'",
+    "Examiner: 'Tree. The tree has leaves. They're about to fall down.'",
+    "Examiner: 'Now I'm going to give you two words... child, hospital.'",
+    "Patient: 'The child was rushed to the hospital.'",
+    "Examiner: 'Cold, winter. During a cold winter, you stay at home...'",
+    "Examiner: 'Now I'm going to give you three words... chair, doctor, sit.'",
+    "Patient: 'We had to sit in the chair before the doctor came.'",
+    "Examiner: 'Bureau, open, drawer.'",
+    "Patient: 'Somebody opened the bureau drawer.'"
+  ],
+  "patient_cue_summary": [
+    "Correctly uses all target words in grammatically complete sentences",
+    "No hesitation, filler, or circumlocution in responses",
+    "Responses are brief and task-focused without elaboration or personal context",
+    "No signs of disorganization, confusion, or retrieval failure",
+    "Task adherence is complete and accurate"
+  ],
+  "transcript_request_id": "chatcmpl-53ee5a86-cc4e-9097-8eb2-ac4b4fcbf639",
+  "classification_request_id": "chatcmpl-24d825ae-f4e7-9df9-95f8-86d01612d893",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__283_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__283_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "sentence_retrieval_task_response",
+        "summary": "Patient correctly uses provided words in sentences, but responses are brief, lack elaboration, and show minimal narrative or organizational complexity.",
+        "evidence": "Patient responds to 'child, hospital' with 'The child was rushed to the hospital.' Responds to 'chair, doctor, sit' with 'We had to sit in the chair before the doctor came.' Responds to 'bureau, open, drawer' with 'Somebody opened the bureau drawer.' All responses are grammatically correct but lack detail, context, or personal elaboration.",
+        "confidence": 0.9
+      },
+      {
+        "label": "lexical_retrieval_and_coherence",
+        "summary": "Patient retrieves and uses target vocabulary accurately but does not expand or elaborate beyond minimal sentence structure.",
+        "evidence": "Patient consistently retrieves and correctly uses target words without hesitation or substitution. No evidence of word-finding pauses, circumlocution, or semantic vagueness. However, responses are formulaic and lack narrative depth or personal context.",
+        "confidence": 0.85
+      },
+      {
+        "label": "task_adherence_and_informativeness",
+        "summary": "Patient adheres to task instructions but provides minimal content beyond required word usage, suggesting limited spontaneous elaboration or cognitive load management.",
+        "evidence": "Patient follows instructions to use all words in one sentence without order concern. Responses are concise and task-compliant but lack additional descriptive or contextual information. No signs of confusion or failure to understand task.",
+        "confidence": 0.8
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient successfully completes structured sentence-level language tasks using provided vocabulary. Responses are accurate, grammatically correct, and task-compliant. No evidence of word-finding difficulty, disorganization, or semantic vagueness. Patient demonstrates adequate lexical retrieval and task adherence. No impairment-like signals detected.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Correct and complete sentence construction with target words",
+      "No hesitation, filler words, or circumlocution",
+      "No disorganization or narrative breakdown",
+      "Task adherence without prompting or correction"
+    ],
+    "alternative_explanations": [
+      "Patient may be performing at baseline cognitive level without impairment",
+      "Task may be within patient's functional capacity despite potential subclinical concerns",
+      "Lack of elaboration may reflect task design or patient style rather than cognitive deficit"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Continue routine cognitive monitoring",
+      "Consider follow-up if functional decline is reported by caregiver or patient",
+      "No immediate clinical intervention indicated based on this clip"
+    ],
+    "visit_recommendation": "routine follow-up or no further action",
+    "future_risk_trend_summary": "Limited predictive value from single clip; longitudinal assessment recommended if functional concerns emerge",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio and task performance.",
+      "Patient speech is clear, coherent, and task-compliant with no impairment-like cues.",
+      "Examiner prompts are neutral context",
+      "patient responses are self-contained and adequate."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The child was rushed to the hospital. We had to sit in the chair before the doctor came. Somebody opened the bureau drawer.",
+    "speaker_turn_summary": [
+      "Examiner: 'The first word is pencil. You can write a note.'",
+      "Examiner: 'Tree. The tree has leaves. They're about to fall down.'",
+      "Examiner: 'Now I'm going to give you two words... child, hospital.'",
+      "Patient: 'The child was rushed to the hospital.'",
+      "Examiner: 'Cold, winter. During a cold winter, you stay at home...'",
+      "Examiner: 'Now I'm going to give you three words... chair, doctor, sit.'",
+      "Patient: 'We had to sit in the chair before the doctor came.'",
+      "Examiner: 'Bureau, open, drawer.'",
+      "Patient: 'Somebody opened the bureau drawer.'"
+    ],
+    "patient_cue_summary": [
+      "Correctly uses all target words in grammatically complete sentences",
+      "No hesitation, filler, or circumlocution in responses",
+      "Responses are brief and task-focused without elaboration or personal context",
+      "No signs of disorganization, confusion, or retrieval failure",
+      "Task adherence is complete and accurate"
+    ]
+  },
+  "latency_ms": 19260,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/283-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/283-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

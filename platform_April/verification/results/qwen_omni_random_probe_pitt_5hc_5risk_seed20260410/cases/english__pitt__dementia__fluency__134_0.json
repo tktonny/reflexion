@@ -1,0 +1,108 @@
+{
+  "case_id": "english__pitt__dementia__fluency__134_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.6,
+  "transcript": "Cat. Dog. Horse. Pig. Hen. Turkey. Say horse. Bear. Okay, all the words that you can think of. Fox. Okay, thanks.",
+  "patient_only_transcript": "Cat. Dog. Horse. Pig. Hen. Turkey. [pause] Say horse. Bear. [pause] Okay, all the words that you can think of. Fox. Okay, thanks.",
+  "speaker_turn_summary": [
+    "Examiner: 'Say horse.'",
+    "Patient: 'Cat. Dog. Horse. Pig. Hen. Turkey.'",
+    "Examiner: 'Okay, all the words that you can think of.'",
+    "Patient: 'Fox. Okay, thanks.'"
+  ],
+  "patient_cue_summary": [
+    "Minimal lexical output with repeated animal names",
+    "Short, fragmented utterances with no elaboration or narrative",
+    "No evidence of semantic organization or scene description",
+    "Examiner-dependent continuation required to complete task",
+    "No spontaneous elaboration or contextual linking beyond basic naming"
+  ],
+  "transcript_request_id": "chatcmpl-8b1833ad-41a0-98c9-adfe-b5fdddfe6c5a",
+  "classification_request_id": "chatcmpl-41ec7eb1-81f5-92eb-b7ae-202fd7a1358c",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__134_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__134_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.3,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates limited verbal fluency output with minimal elaboration, fragmented responses, and reliance on examiner prompting. No evidence of coherent narrative or scene description. Task completion is incomplete and lacks depth. Suggests possible early cognitive concern warranting further clinical review.",
+    "evidence_for_risk": [
+      "Sparse, repetitive animal naming without elaboration",
+      "Examiner-dependent task completion",
+      "Absence of contextual or narrative content",
+      "Short, disconnected utterances"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly names several common animals",
+      "No signs of agitation, confusion, or emotional dysregulation",
+      "Task is completed with minimal prompting"
+    ],
+    "alternative_explanations": [
+      "Task may be misinterpreted or poorly explained to patient",
+      "Patient may be fatigued, distracted, or unfamiliar with verbal fluency task",
+      "Language or cultural background may affect response style"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency task with clearer instructions or visual cues",
+      "Assess for attention, motivation, and task comprehension",
+      "Consider brief cognitive screening battery if clinical context permits"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended",
+    "future_risk_trend_summary": "Longitudinal prediction not possible from single clip; follow-up assessment advised",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio",
+      "Patient speech is minimal and task-dependent",
+      "No visual cues available to assess engagement or affect"
+    ],
+    "quality_flags": [],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Cat. Dog. Horse. Pig. Hen. Turkey. [pause] Say horse. Bear. [pause] Okay, all the words that you can think of. Fox. Okay, thanks.",
+    "speaker_turn_summary": [
+      "Examiner: 'Say horse.'",
+      "Patient: 'Cat. Dog. Horse. Pig. Hen. Turkey.'",
+      "Examiner: 'Okay, all the words that you can think of.'",
+      "Patient: 'Fox. Okay, thanks.'"
+    ],
+    "patient_cue_summary": [
+      "Minimal lexical output with repeated animal names",
+      "Short, fragmented utterances with no elaboration or narrative",
+      "No evidence of semantic organization or scene description",
+      "Examiner-dependent continuation required to complete task",
+      "No spontaneous elaboration or contextual linking beyond basic naming"
+    ]
+  },
+  "latency_ms": 11490,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/134-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/134-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

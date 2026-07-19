@@ -1,0 +1,132 @@
+{
+  "case_id": "english__pitt__dementia__sentence__070_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.6,
+  "transcript": "Okay. Good. Pencil. I write with a pencil. Tree. The tree lost its leaves. Pardon me? The tree lost its leaves. Okay, now this time there's two words. I want you to put both of the words in one sentence. And you don't have to worry about what order you put them in. Okay? Child, hospital. The child is in the hospital. Cold, winter. The winter is cold. Okay, so this time three words. And you don't have to worry about what order they come in. Chair, doctor, sit. I'm in the doctor's office in the chair. Sit in the chair. Bureau, open, drawer. The bureau or drawer was open. Okay, good.",
+  "patient_only_transcript": "I write with a pencil. The tree lost its leaves. The child is in the hospital. The winter is cold. I'm in the doctor's office in the chair. Sit in the chair. The bureau or drawer was open.",
+  "speaker_turn_summary": [
+    "Examiner: Okay. Good. Pencil. I write with a pencil. Tree. The tree lost its leaves. Okay, now this time there's two words. I want you to put both of the words in one sentence. And you don't have to worry about what order you put them in. Okay? Child, hospital. Cold, winter. Okay, so this time three words. And you don't have to worry about what order they come in. Chair, doctor, sit. Bureau, open, drawer. Okay, good.",
+    "Patient: I write with a pencil. The tree lost its leaves. The child is in the hospital. The winter is cold. I'm in the doctor's office in the chair. Sit in the chair. The bureau or drawer was open."
+  ],
+  "patient_cue_summary": [
+    "Patient repeats examiner prompts verbatim in some cases (e.g., 'I write with a pencil')",
+    "Patient uses minimal elaboration or narrative structure beyond keyword recall",
+    "Patient response to three-word task is fragmented ('I'm in the doctor's office in the chair. Sit in the chair.')",
+    "Patient response to 'bureau, open, drawer' is vague ('The bureau or drawer was open.')",
+    "Patient does not spontaneously generate coherent scene descriptions beyond basic object naming",
+    "Patient shows no evidence of disorganized speech, but also no evidence of rich, self-initiated narrative"
+  ],
+  "transcript_request_id": "chatcmpl-0954152c-f5a7-92e6-bb11-8b52bc37866f",
+  "classification_request_id": "chatcmpl-849dca54-223c-9696-b40f-7df125fa7701",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__070_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__070_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Task Compliance",
+        "summary": "Patient completes all task prompts but provides minimal elaboration and relies on examiner phrasing.",
+        "evidence": "Patient responds to 'child, hospital' with 'The child is in the hospital' — correct but brief. Responds to 'chair, doctor, sit' with 'I'm in the doctor's office in the chair. Sit in the chair.' — repetitive and fragmented.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval",
+        "summary": "Patient retrieves common nouns and basic verbs but avoids complex or descriptive vocabulary.",
+        "evidence": "Patient says 'tree lost its leaves', 'winter is cold', 'bureau or drawer was open' — all correct but generic and lacking detail.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Coherence",
+        "summary": "Patient does not construct or sustain a coherent narrative; responses are isolated phrases.",
+        "evidence": "No causal or temporal linking between events; responses are task-bound and lack spontaneous structure.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.3,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides basic, examiner-dependent responses to structured sentence-level language tasks. Responses are minimally elaborated, lack narrative coherence, and show limited spontaneous content generation despite task prompts. No overt signs of severe impairment, but cues suggest possible mild cognitive concern warranting further clinical review.",
+    "evidence_for_risk": [
+      "Patient relies on examiner prompts for task structure",
+      "Responses are brief and lack elaboration or narrative",
+      "Patient uses vague or repetitive phrasing (e.g., 'The bureau or drawer was open')",
+      "No evidence of spontaneous scene construction or causal linking"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies common objects and basic relationships",
+      "No signs of disorientation, confusion, or severe word-finding failure",
+      "Responses are intelligible and task-compliant"
+    ],
+    "alternative_explanations": [
+      "Language task may be challenging for non-native speaker or due to fatigue",
+      "Patient may be unfamiliar with structured language tasks or overly cautious",
+      "Examiner may have provided excessive scaffolding, reducing patient autonomy"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Obtain collateral history from caregiver or family member",
+      "Repeat language task with open-ended prompts to assess spontaneous narrative ability",
+      "Consider follow-up in 3–6 months if no other symptoms are present"
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation or multi-session assessment is recommended.",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but minimally elaborative and examiner-dependent.",
+      "No visual cues available to assess affect, gaze, or engagement."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "I write with a pencil. The tree lost its leaves. The child is in the hospital. The winter is cold. I'm in the doctor's office in the chair. Sit in the chair. The bureau or drawer was open.",
+    "speaker_turn_summary": [
+      "Examiner: Okay. Good. Pencil. I write with a pencil. Tree. The tree lost its leaves. Okay, now this time there's two words. I want you to put both of the words in one sentence. And you don't have to worry about what order you put them in. Okay? Child, hospital. Cold, winter. Okay, so this time three words. And you don't have to worry about what order they come in. Chair, doctor, sit. Bureau, open, drawer. Okay, good.",
+      "Patient: I write with a pencil. The tree lost its leaves. The child is in the hospital. The winter is cold. I'm in the doctor's office in the chair. Sit in the chair. The bureau or drawer was open."
+    ],
+    "patient_cue_summary": [
+      "Patient repeats examiner prompts verbatim in some cases (e.g., 'I write with a pencil')",
+      "Patient uses minimal elaboration or narrative structure beyond keyword recall",
+      "Patient response to three-word task is fragmented ('I'm in the doctor's office in the chair. Sit in the chair.')",
+      "Patient response to 'bureau, open, drawer' is vague ('The bureau or drawer was open.')",
+      "Patient does not spontaneously generate coherent scene descriptions beyond basic object naming",
+      "Patient shows no evidence of disorganized speech, but also no evidence of rich, self-initiated narrative"
+    ]
+  },
+  "latency_ms": 27676,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/070-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/070-2.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

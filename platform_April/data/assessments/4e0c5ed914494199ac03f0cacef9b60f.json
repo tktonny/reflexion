@@ -1,0 +1,116 @@
+{
+  "assessment_id": "4e0c5ed914494199ac03f0cacef9b60f",
+  "patient_id": "n8l4rd5ifg4",
+  "language": "en",
+  "created_at": "2026-04-06T05:21:35.903373Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Consistent, engaged facial expressions with smiling and animated gestures observed across segments.",
+      "evidence": "The patient displays varied facial expressions including smiling, raised eyebrows, and direct eye contact with the camera during speech segments.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Gaze and Attention",
+      "summary": "Sustained visual attention toward the camera during speaking segments.",
+      "evidence": "The patient maintains consistent eye contact with the camera, indicating focused attention during verbal delivery.",
+      "confidence": 0.85
+    }
+  ],
+  "body_findings": [
+    {
+      "label": "Posture and Movement",
+      "summary": "Stable posture and controlled hand gestures observed during speech.",
+      "evidence": "The patient uses deliberate hand gestures while speaking and maintains upright posture throughout the video.",
+      "confidence": 0.8
+    }
+  ],
+  "voice_findings": [
+    {
+      "label": "Speech Fluency",
+      "summary": "Speech is fluent, with clear articulation and natural pacing.",
+      "evidence": "The patient speaks at a natural pace with no observable pauses, repetitions, or disfluencies.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Vocal Tone and Intonation",
+      "summary": "Vocal tone is expressive and modulated, consistent with conversational delivery.",
+      "evidence": "The speaker modulates pitch and volume appropriately, with intonation changes matching emotional emphasis.",
+      "confidence": 0.85
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Topic Coherence",
+      "summary": "The patient discusses seasonal affective disorder with structured, coherent points.",
+      "evidence": "The speaker introduces topics with numbered tips and transitions logically between them, indicating organized thought.",
+      "confidence": 0.85
+    },
+    {
+      "label": "Self-Referential Content",
+      "summary": "The patient references personal strategies for coping with seasonal mood changes, indicating self-awareness.",
+      "evidence": "The speaker mentions creating playlists, baking, and using Pinterest boards as personal coping mechanisms.",
+      "confidence": 0.8
+    }
+  ],
+  "speaker_structure": "single_speaker",
+  "target_patient_presence": "clear",
+  "target_patient_basis": "visual_focus",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 1.0,
+  "risk_score": 0.1,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "The patient demonstrates fluent speech, coherent content delivery, consistent eye contact, and positive affect. No observable signs of cognitive impairment or emotional dysregulation are present in the clip.",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [
+    "No speech disfluencies, memory lapses, or confusion observed.",
+    "Content is organized and self-referential, indicating intact executive and memory functions.",
+    "Facial expressions and gestures are congruent with speech and emotionally appropriate."
+  ],
+  "alternative_explanations": [
+    "The video may be a pre-recorded educational or vlog-style segment, not a clinical interview.",
+    "The patient may be performing for an audience, which could influence presentation style."
+  ],
+  "risk_factor_findings": [],
+  "subjective_assessment_findings": [],
+  "emotional_assessment_findings": [
+    "Consistent positive affect with smiling and animated expressions.",
+    "Engaged and enthusiastic tone during delivery, suggesting emotional investment in topic."
+  ],
+  "risk_control_suggestions": [
+    "No specific interventions indicated based on this clip.",
+    "Continue routine monitoring if part of a longitudinal study."
+  ],
+  "visit_recommendation": "No further clinical evaluation indicated based on this single clip.",
+  "future_risk_trend_summary": "Insufficient data to predict future cognitive decline from a single, non-clinical video segment.",
+  "reviewer_confidence": 0.9,
+  "context_notes": [
+    "This clip appears to be a self-recorded educational or vlog-style video, not a formal clinical assessment.",
+    "No clinical metadata or diagnostic context is provided.",
+    "The patient is the sole speaker and appears to be fully engaged and articulate."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "bad36822-2b25-92b4-aa79-a4482084ee0c",
+    "latency_ms": 120227,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 120227
+    }
+  ],
+  "fallback_message": null
+}

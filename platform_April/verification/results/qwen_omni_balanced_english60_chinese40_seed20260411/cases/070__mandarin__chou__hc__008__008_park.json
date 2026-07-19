@@ -1,0 +1,108 @@
+{
+  "case_id": "mandarin__chou__hc__008__008_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.75,
+  "transcript": "在公园里哦，有小朋友荡秋千哦，啊也有老人下午下象棋，也有小朋友呢那个打羽毛球。忽然间呢，那个有一个人呢带着狗啊，那狗呢冲向一个小女生，哦，拉她的衣服，让那么那个这个小女生哇一下之后呢，啊另外一个伙伴呢跟她打一球，伙伴一准备要打说啊，怎么这样，然后那个下象棋的人呢，哇，一看到她叫也都往这边看，哦，往这边看，哦。啊，那那个下象棋的人呢，他们呢就一边泡茶，啊那个茶壶呢，那个那个水壶开了，哦，冒烟了，冒烟，啊，那这个 picture 这个图呢，就是显示出在公园里面的，突然间这狗冲上去拉拉那个衣服的那一个刹那的情境。这羽毛球啊，这羽毛球啊，这个这呃这个就是呃在那荡，那个你看在荡秋千的那个那些小女生呢，也都眼睛都瞪着她这个这一个情境。嗯，就是这个就是她的那个那个那个发现啊，怎么这样，这只手拉着一些，她大概也紧张，手一握在这个那个石桌上，啊另外一只手这样。哎，惊讶的景景色了，啊，这个球也打出去了，就是球打出去的那一刹那狗咬她。",
+  "patient_only_transcript": "在公园里，有小朋友荡秋千，也有老人下象棋，还有小朋友打羽毛球。忽然间，有个人带着狗冲向一个小女生，拉她的衣服，小女生哇一下。另一个伙伴准备打球，说‘怎么这样’。下象棋的人也看到，叫着往这边看。他们一边泡茶，水壶开了冒烟。狗冲向女生那一刹那的情境被显示出来。打羽毛球的球也打出去了。荡秋千的小女生眼睛都瞪着这个情境。她紧张，手握在石桌上，另一只手这样，惊讶的景色。狗咬她。",
+  "speaker_turn_summary": [
+    "Patient describes park scene with multiple simultaneous actions: children on swings,老人 playing chess, children playing badminton, dog rushing toward girl, girl screaming, other child reacting, chess players looking over, tea kettle boiling, ball being hit, girls watching, girl’s startled reaction, dog biting."
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple actors and actions in the scene without major abandonment.",
+    "Use of discourse particles (哦、啊、那个) and generic referents (这个、那个) is present but does not block reconstruction of scene elements.",
+    "Narrative is coherent and sequentially organized despite some repetition and hesitation.",
+    "No evidence of naming collapse, semantic vagueness, or major disorganization.",
+    "Patient reconstructs key event (dog rushing, girl’s reaction, others’ reactions) with sufficient detail for scene description task."
+  ],
+  "transcript_request_id": "chatcmpl-b29f49fe-e769-968a-b089-ef995b055e07",
+  "classification_request_id": "chatcmpl-7fb5cec0-d522-96f6-a301-9e94472f4f7f",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__008__008_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__008__008_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, multi-element description of a complex park scene with multiple simultaneous actions and emotional reactions. Discourse particles and colloquial phrasing are present but do not impair comprehension or task completion. No clear signs of cognitive impairment are observed. Further observation or formal screening may be warranted if clinical context suggests concern.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies multiple actors, actions, and objects in the scene.",
+      "Narrative is sequentially organized and emotionally grounded.",
+      "No evidence of word-finding failure, semantic collapse, or disorganization.",
+      "Patient reconstructs the key event (dog rushing, girl’s reaction) with sufficient detail."
+    ],
+    "alternative_explanations": [
+      "Colloquial speech patterns and discourse particles are normal in spontaneous Mandarin description tasks.",
+      "Audio quality or recording conditions may limit full clarity but do not invalidate the patient’s ability to describe the scene.",
+      "The task may be challenging due to its multi-actor nature, but patient performance is adequate for screening purposes."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Patient describes the girl’s reaction as '哇一下' and '惊讶的景色', indicating emotional awareness of the event.",
+      "Patient describes their own physical reaction as '紧张' and '手一握在石桌上', indicating emotional and physical response to the event.",
+      "No signs of affective flattening, apathy, or disengagement."
+    ],
+    "risk_control_suggestions": [
+      "Monitor for consistency in future scene-description tasks.",
+      "Consider formal cognitive screening if clinical history or caregiver concern suggests risk.",
+      "Avoid overinterpreting colloquial speech patterns as impairment."
+    ],
+    "visit_recommendation": "routine follow-up or formal screening if indicated by clinical context.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further observation or multi-visit assessment is needed for trend evaluation.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-compliant despite colloquial style.",
+      "No evidence of cognitive impairment in this clip",
+      "classification is conservative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "在公园里，有小朋友荡秋千，也有老人下象棋，还有小朋友打羽毛球。忽然间，有个人带着狗冲向一个小女生，拉她的衣服，小女生哇一下。另一个伙伴准备打球，说‘怎么这样’。下象棋的人也看到，叫着往这边看。他们一边泡茶，水壶开了冒烟。狗冲向女生那一刹那的情境被显示出来。打羽毛球的球也打出去了。荡秋千的小女生眼睛都瞪着这个情境。她紧张，手握在石桌上，另一只手这样，惊讶的景色。狗咬她。",
+    "speaker_turn_summary": [
+      "Patient describes park scene with multiple simultaneous actions: children on swings,老人 playing chess, children playing badminton, dog rushing toward girl, girl screaming, other child reacting, chess players looking over, tea kettle boiling, ball being hit, girls watching, girl’s startled reaction, dog biting."
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple actors and actions in the scene without major abandonment.",
+      "Use of discourse particles (哦、啊、那个) and generic referents (这个、那个) is present but does not block reconstruction of scene elements.",
+      "Narrative is coherent and sequentially organized despite some repetition and hesitation.",
+      "No evidence of naming collapse, semantic vagueness, or major disorganization.",
+      "Patient reconstructs key event (dog rushing, girl’s reaction, others’ reactions) with sufficient detail for scene description task."
+    ]
+  },
+  "latency_ms": 22027,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/008/008_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/008/008_park.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

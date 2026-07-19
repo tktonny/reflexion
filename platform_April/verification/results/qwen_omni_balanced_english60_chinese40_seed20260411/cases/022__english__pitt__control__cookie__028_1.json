@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__control__cookie__028_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "Okay, here's the picture. Drying the dishes. Water is flying out of the sink onto the floor. Children are getting into the cookie jar. The boys out there on the pool. The little girl is getting out of the pool. Water is splashing on the floor.",
+  "patient_only_transcript": "Okay, here's the picture. Drying the dishes. Water is flying out of the sink onto the floor. Children are getting into the cookie jar. The boys out there on the pool. The little girl is getting out of the pool. Water is splashing on the floor.",
+  "speaker_turn_summary": [
+    "Examiner: 'Okay, here's the picture.'",
+    "Patient: 'Drying the dishes. Water is flying out of the sink onto the floor. Children are getting into the cookie jar. The boys out there on the pool. The little girl is getting out of the pool. Water is splashing on the floor.'",
+    "Examiner: (silent or not clearly audible)"
+  ],
+  "patient_cue_summary": [
+    "Patient provides a brief but task-relevant description of the picture.",
+    "Speech is intelligible but contains some semantic inconsistencies (e.g., 'boys out there on the pool' vs. 'little girl getting out of the pool' in a kitchen scene).",
+    "No clear word-finding pauses, restarts, or examiner-dependent scaffolding observed.",
+    "Patient names multiple actors and actions, though some spatial/logical relations are unclear or mismatched with the scene context.",
+    "No evidence of disorganization, tangential drift, or failure to complete the task."
+  ],
+  "transcript_request_id": "chatcmpl-39b9c6f5-0809-9153-836f-6c7226cfe02b",
+  "classification_request_id": "chatcmpl-6273fe4a-54ec-99d6-9890-d7c6a637ce2a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__028_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__028_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Task Completion",
+        "summary": "Patient provided a short but relevant description of the picture, naming key actors and actions.",
+        "evidence": "Patient described dishes, water, children, cookie jar, boys, girl, and splashing — core elements of the scene.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Semantic Consistency",
+        "summary": "Some spatial/logical inconsistencies in the description (e.g., 'on the pool' in a kitchen context).",
+        "evidence": "Patient said 'boys out there on the pool' and 'little girl getting out of the pool' — inconsistent with a kitchen setting.",
+        "confidence": 0.25
+      },
+      {
+        "label": "Fluency and Coherence",
+        "summary": "Speech is fluent, coherent, and task-focused without pauses, restarts, or examiner dependence.",
+        "evidence": "Patient delivered a continuous, self-contained description without hesitation or correction.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provided a brief but task-relevant description of the picture, naming multiple actors and actions. Minor semantic inconsistencies (e.g., 'on the pool') may reflect contextual confusion or misstatement, but no clear signs of cognitive impairment such as word-finding failure, disorganization, or task breakdown. Further observation or follow-up is recommended due to limited data and audio quality.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Task completion with relevant content",
+      "No word-finding pauses or restarts",
+      "No examiner dependence or scaffolding",
+      "Fluent, coherent speech"
+    ],
+    "alternative_explanations": [
+      "Semantic inconsistency may reflect misstatement or misremembering of scene details rather than cognitive impairment.",
+      "Audio quality and lack of visual context limit diagnostic confidence.",
+      "Patient may be describing a different scene or misinterpreting the picture."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a second picture description task to assess consistency.",
+      "Include a brief memory or orientation probe to contextualize performance.",
+      "Consider repeating the task with clearer visual cues or verbal prompts if available."
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening in 3–6 months, or prompt clinical evaluation if additional concerns arise.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip with audio-only and incomplete visual context. No strong evidence of cognitive decline is present, but observation is warranted.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio and ASR transcript.",
+      "Patient speech is intelligible and task-relevant, but semantic inconsistencies require cautious interpretation.",
+      "No clear impairment-like cues observed",
+      "classification leans toward needs_observation due to data limitations, not clinical evidence."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Okay, here's the picture. Drying the dishes. Water is flying out of the sink onto the floor. Children are getting into the cookie jar. The boys out there on the pool. The little girl is getting out of the pool. Water is splashing on the floor.",
+    "speaker_turn_summary": [
+      "Examiner: 'Okay, here's the picture.'",
+      "Patient: 'Drying the dishes. Water is flying out of the sink onto the floor. Children are getting into the cookie jar. The boys out there on the pool. The little girl is getting out of the pool. Water is splashing on the floor.'",
+      "Examiner: (silent or not clearly audible)"
+    ],
+    "patient_cue_summary": [
+      "Patient provides a brief but task-relevant description of the picture.",
+      "Speech is intelligible but contains some semantic inconsistencies (e.g., 'boys out there on the pool' vs. 'little girl getting out of the pool' in a kitchen scene).",
+      "No clear word-finding pauses, restarts, or examiner-dependent scaffolding observed.",
+      "Patient names multiple actors and actions, though some spatial/logical relations are unclear or mismatched with the scene context.",
+      "No evidence of disorganization, tangential drift, or failure to complete the task."
+    ]
+  },
+  "latency_ms": 13922,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/028-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/028-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

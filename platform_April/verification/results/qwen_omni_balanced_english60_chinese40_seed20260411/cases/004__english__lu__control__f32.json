@@ -1,0 +1,126 @@
+{
+  "case_id": "english__lu__control__f32",
+  "dataset": "talkbank_english_lu",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "Doing dangerous things, falling off a stool while trying to get cookies. I see the lady washing dishes with the water overflowing on the floor. I see, oh, something out the window? Hmm. Are these bushes? Not really clear. It looks like there's a fire out the window, but there's probably not. Um, is there something else I'm supposed to be seeing? She has ugly curtains on her window. She's trying to wash, dry the dishes while the water's running on the floor. Is that it?",
+  "patient_only_transcript": "Doing dangerous things, falling off a stool while trying to get cookies. I see the lady washing dishes with the water overflowing on the floor. I see, oh, something out the window? Hmm. Are these bushes? Not really clear. It looks like there's a fire out the window, but there's probably not. Um, is there something else I'm supposed to be seeing? She has ugly curtains on her window. She's trying to wash, dry the dishes while the water's running on the floor. Is that it?",
+  "speaker_turn_summary": [
+    "Patient describes a scene: boy falling for cookies, lady washing dishes with water overflowing, window view with bushes and possible fire, ugly curtains, water running on floor."
+  ],
+  "patient_cue_summary": [
+    "Patient provides a coherent but fragmented description of a multi-element scene.",
+    "Patient exhibits mild uncertainty and hesitation (e.g., 'Hmm', 'Not really clear', 'Is that it?').",
+    "Patient names core actors and actions accurately (e.g., 'lady washing dishes', 'water overflowing', 'cookies', 'stool').",
+    "Patient does not show word-finding pauses, circumlocution, or task abandonment beyond natural hesitation.",
+    "Patient does not require examiner scaffolding or restarts to complete the task.",
+    "Patient does not exhibit tangential drift, contradiction, or semantic vagueness beyond mild uncertainty."
+  ],
+  "transcript_request_id": "chatcmpl-b619767f-cf4b-9aef-8966-2fa460fb5e2c",
+  "classification_request_id": "chatcmpl-867ac563-3c45-9105-b6d4-70e320ec54ba",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__control__f32/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__control__f32/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient accurately identifies multiple scene elements including actors, actions, and spatial relationships.",
+        "evidence": "Patient mentions boy falling for cookies, lady washing dishes with water overflowing, window view with bushes and possible fire, ugly curtains, water on floor.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Sustained Attention",
+        "summary": "Patient completes the task without examiner prompting or restarting, despite mild uncertainty.",
+        "evidence": "Patient provides a continuous, self-contained description without needing prompts or corrections.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Lexical Retrieval and Vocabulary Use",
+        "summary": "Patient uses appropriate, specific vocabulary for scene elements without circumlocution or semantic vagueness.",
+        "evidence": "Patient uses terms like 'overflowing', 'ugly curtains', 'falling off a stool', 'cookies' without substitution or filler.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, task-relevant description of a multi-element scene with accurate naming of actors and actions. Mild uncertainty and hesitation are present but do not indicate retrieval failure or task breakdown. No persuasive impairment-like cues are observed. Further observation or formal screening is recommended due to limited modality coverage and lack of visual evidence.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate scene description with multiple correct elements.",
+      "No word-finding pauses, circumlocution, or task abandonment.",
+      "No examiner scaffolding or restarts required.",
+      "No tangential drift or contradiction in narrative."
+    ],
+    "alternative_explanations": [
+      "Mild uncertainty may reflect natural hesitation in a structured task rather than cognitive impairment.",
+      "Lack of visual evidence limits confidence in full assessment",
+      "audio-only context may mask non-verbal cues.",
+      "Patient may be describing a familiar or rehearsed scenario, reducing cognitive load."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule follow-up to assess consistency across multiple sessions.",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE) for objective assessment.",
+      "Include caregiver report to contextualize patient’s functional performance outside the clip."
+    ],
+    "visit_recommendation": "Formal screening with clinical cognitive assessment is appropriate.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single audio-only clip. Further observation is needed to determine if symptoms are persistent or situational.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-relevant",
+      "no strong impairment cues detected.",
+      "Mild uncertainty and hesitation are not sufficient for cognitive_risk classification in this context."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Doing dangerous things, falling off a stool while trying to get cookies. I see the lady washing dishes with the water overflowing on the floor. I see, oh, something out the window? Hmm. Are these bushes? Not really clear. It looks like there's a fire out the window, but there's probably not. Um, is there something else I'm supposed to be seeing? She has ugly curtains on her window. She's trying to wash, dry the dishes while the water's running on the floor. Is that it?",
+    "speaker_turn_summary": [
+      "Patient describes a scene: boy falling for cookies, lady washing dishes with water overflowing, window view with bushes and possible fire, ugly curtains, water running on floor."
+    ],
+    "patient_cue_summary": [
+      "Patient provides a coherent but fragmented description of a multi-element scene.",
+      "Patient exhibits mild uncertainty and hesitation (e.g., 'Hmm', 'Not really clear', 'Is that it?').",
+      "Patient names core actors and actions accurately (e.g., 'lady washing dishes', 'water overflowing', 'cookies', 'stool').",
+      "Patient does not show word-finding pauses, circumlocution, or task abandonment beyond natural hesitation.",
+      "Patient does not require examiner scaffolding or restarts to complete the task.",
+      "Patient does not exhibit tangential drift, contradiction, or semantic vagueness beyond mild uncertainty."
+    ]
+  },
+  "latency_ms": 16543,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Lu",
+    "source_group": "Control",
+    "source_relative_path": "Control/F32.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Lu/Control//F32.mp3?f=save",
+    "expected_group_audio_count": 26,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

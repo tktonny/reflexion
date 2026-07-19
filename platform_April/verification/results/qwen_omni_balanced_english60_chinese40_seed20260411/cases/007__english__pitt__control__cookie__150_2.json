@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__control__cookie__150_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "What you see going on in the picture? Okay, the kid on the bench, who's got his hand in the cookie jar and he's falling off. His sister wants one. His mother is standing in a puddle of water because she didn't turn off the faucet and she's trying to dry a dish. She ought to dry her feet instead. The window is open. Water sink is overflowing. It's obviously summer because the window, as I said, was open. There's supposedly leaves on the trees. Anything else that I'm supposed to pick up? That's fine. You just know anything you can comment what's going on. Well, the kid's going to fall off and Pety kill. The lid is off the cookie jar. He's got one in his hand and handing it to his sister and one he's sneaking another one. Not sneaking. The water is still running in the sink and splashing on the floor. Okay, that's good.",
+  "patient_only_transcript": "The kid on the bench, who's got his hand in the cookie jar and he's falling off. His sister wants one. His mother is standing in a puddle of water because she didn't turn off the faucet and she's trying to dry a dish. She ought to dry her feet instead. The window is open. Water sink is overflowing. It's obviously summer because the window, as I said, was open. There's supposedly leaves on the trees. Anything else that I'm supposed to pick up? Well, the kid's going to fall off and Pety kill. The lid is off the cookie jar. He's got one in his hand and handing it to his sister and one he's sneaking another one. Not sneaking. The water is still running in the sink and splashing on the floor.",
+  "speaker_turn_summary": [
+    "Examiner: What you see going on in the picture?",
+    "Patient: Describes scene including kid, cookie jar, falling, sister, mother, puddle, open window, overflowing sink, summer, leaves.",
+    "Examiner: That's fine. You just know anything you can comment what's going on.",
+    "Patient: Adds detail about kid falling, 'Pety kill', lid off, handing cookie, sneaking another, water still running."
+  ],
+  "patient_cue_summary": [
+    "Patient provides coherent, task-relevant description of multiple scene elements.",
+    "Patient includes core actors (kid, sister, mother), actions (reaching, falling, drying, running water), and environmental cues (open window, summer, leaves).",
+    "Patient exhibits mild self-correction ('Not sneaking'), minor hesitation ('Pety kill'), and some repetition ('the water is still running').",
+    "Patient does not show clear word-finding breakdown, semantic vagueness, or disorganization.",
+    "Patient completes the task without examiner scaffolding or abandonment."
+  ],
+  "transcript_request_id": "chatcmpl-41763761-8adb-95d5-b2ab-d8b10d50431f",
+  "classification_request_id": "chatcmpl-801bfa48-aad3-98d6-b6b2-78bc224353c6",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__150_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__150_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient identifies multiple key actors, actions, and environmental details from the picture.",
+        "evidence": "Mentions kid falling, sister wanting cookie, mother in puddle, open window, overflowing sink, summer season, leaves on trees.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Speech Fluency and Coherence",
+        "summary": "Speech is fluent with minor self-corrections and hesitations, but maintains task relevance and narrative flow.",
+        "evidence": "Uses connected clauses, correct grammar, and self-corrects 'sneaking' to 'not sneaking'.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Independence",
+        "summary": "Patient completes the task without examiner prompting or scaffolding, indicating task comprehension and execution ability.",
+        "evidence": "Describes full scene after initial prompt; no signs of abandonment or confusion.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, task-relevant description of a picture depicting a child reaching into a cookie jar while falling, a mother standing in a puddle, and an overflowing sink. Minor self-corrections and hesitations are present but do not indicate cognitive impairment. No persuasive impairment-like signals are observed.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Task completion without examiner scaffolding",
+      "Accurate identification of multiple scene elements",
+      "Coherent narrative structure with causal links",
+      "No semantic vagueness or word-finding breakdown"
+    ],
+    "alternative_explanations": [
+      "Mild speech hesitations may reflect task processing rather than impairment",
+      "Minor self-corrections may reflect natural speech fluency",
+      "Task context may influence speech style (e.g., picture description requires concise reporting)"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Continue routine monitoring",
+      "No immediate clinical intervention required",
+      "Consider re-administering task in future visit if concerns arise"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of progressive decline or impairment.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-compliant despite minor hesitations.",
+      "No evidence of dementia-like impairment in this single clip."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The kid on the bench, who's got his hand in the cookie jar and he's falling off. His sister wants one. His mother is standing in a puddle of water because she didn't turn off the faucet and she's trying to dry a dish. She ought to dry her feet instead. The window is open. Water sink is overflowing. It's obviously summer because the window, as I said, was open. There's supposedly leaves on the trees. Anything else that I'm supposed to pick up? Well, the kid's going to fall off and Pety kill. The lid is off the cookie jar. He's got one in his hand and handing it to his sister and one he's sneaking another one. Not sneaking. The water is still running in the sink and splashing on the floor.",
+    "speaker_turn_summary": [
+      "Examiner: What you see going on in the picture?",
+      "Patient: Describes scene including kid, cookie jar, falling, sister, mother, puddle, open window, overflowing sink, summer, leaves.",
+      "Examiner: That's fine. You just know anything you can comment what's going on.",
+      "Patient: Adds detail about kid falling, 'Pety kill', lid off, handing cookie, sneaking another, water still running."
+    ],
+    "patient_cue_summary": [
+      "Patient provides coherent, task-relevant description of multiple scene elements.",
+      "Patient includes core actors (kid, sister, mother), actions (reaching, falling, drying, running water), and environmental cues (open window, summer, leaves).",
+      "Patient exhibits mild self-correction ('Not sneaking'), minor hesitation ('Pety kill'), and some repetition ('the water is still running').",
+      "Patient does not show clear word-finding breakdown, semantic vagueness, or disorganization.",
+      "Patient completes the task without examiner scaffolding or abandonment."
+    ]
+  },
+  "latency_ms": 20082,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/150-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/150-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__dementia__cookie__639_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "Look at this picture. Tell me everything that you see going on in this picture, everything that you see happening here. Well, the sink is running over. She's drying the dishes. They're getting in the cookie jar and they're upsetting the stool. The girl is reaching for a cookie. The lady here standing right in the water. She seems to be looking out the window at the lawn. Anything else? Is that about it? That's about it.",
+  "patient_only_transcript": "Well, the sink is running over. She's drying the dishes. They're getting in the cookie jar and they're upsetting the stool. The girl is reaching for a cookie. The lady here standing right in the water. She seems to be looking out the window at the lawn. Anything else? Is that about it? That's about it.",
+  "speaker_turn_summary": [
+    "Examiner: Look at this picture. Tell me everything that you see going on in this picture, everything that you see happening here.",
+    "Patient: Well, the sink is running over. She's drying the dishes. They're getting in the cookie jar and they're upsetting the stool. The girl is reaching for a cookie. The lady here standing right in the water. She seems to be looking out the window at the lawn. Anything else? Is that about it? That's about it.",
+    "Examiner: (implied follow-up, not spoken in clip)"
+  ],
+  "patient_cue_summary": [
+    "Patient provides a coherent, task-relevant description of the picture scene with multiple actors and actions.",
+    "Speech is intelligible and contains specific scene elements: sink running, dishes drying, cookie jar, stool tipping, girl reaching, lady in water, looking out window.",
+    "Patient ends with self-questioning and confirmation ('Anything else? Is that about it? That's about it?'), indicating possible uncertainty or task completion.",
+    "No clear word-finding pauses, restarts, circumlocution, or examiner dependence observed in the audio.",
+    "No evidence of semantic vagueness, disorganization, or tangential drift",
+    "narrative is linear and task-focused."
+  ],
+  "transcript_request_id": "chatcmpl-0a88350a-9b58-9431-b794-5da4029a1276",
+  "classification_request_id": "chatcmpl-b29a071b-11ed-9af8-a8ad-8e5d556629d1",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__639_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__639_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identifies multiple key elements of the picture: sink overflow, dish drying, cookie jar intrusion, stool tipping, girl reaching, lady in water, window view.",
+        "evidence": "Patient's transcript explicitly names all major actors and actions in the scene without omission or confusion.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Fluency",
+        "summary": "Patient completes the task with a single, continuous response, showing sustained fluency and task adherence.",
+        "evidence": "Response is not fragmented, does not require prompting, and covers the full scope of the picture without examiner scaffolding.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Self-Reflection or Uncertainty",
+        "summary": "Patient ends with a self-questioning phrase ('Anything else? Is that about it? That's about it?'), suggesting possible hesitation or completion check.",
+        "evidence": "Patient's final utterances indicate a meta-cognitive check rather than confusion or breakdown.",
+        "confidence": 0.25
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, accurate, and task-relevant description of the picture scene with no clear signs of cognitive breakdown. Minor self-questioning at the end may indicate uncertainty or completion check, but does not suggest impairment. Further observation or follow-up may be warranted if other indicators emerge.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Coherent, fluent, single-response structure",
+      "No word-finding pauses, restarts, or examiner dependence",
+      "Task completion without scaffolding or confusion"
+    ],
+    "alternative_explanations": [
+      "Patient may be cautious or self-monitoring at task end, not indicative of cognitive impairment",
+      "Task may be challenging for some individuals, leading to brief self-checking",
+      "Audio quality or recording context may limit full assessment of affect or nonverbal cues"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule follow-up to observe consistency in picture description tasks",
+      "Consider additional cognitive screening if other domains show concern",
+      "Monitor for task-specific hesitation or repetition in future sessions"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if other concerns arise",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline observed.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-compliant, with no clear impairment signals.",
+      "Self-questioning at end is not sufficient for cognitive_risk classification without additional breakdown cues."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, the sink is running over. She's drying the dishes. They're getting in the cookie jar and they're upsetting the stool. The girl is reaching for a cookie. The lady here standing right in the water. She seems to be looking out the window at the lawn. Anything else? Is that about it? That's about it.",
+    "speaker_turn_summary": [
+      "Examiner: Look at this picture. Tell me everything that you see going on in this picture, everything that you see happening here.",
+      "Patient: Well, the sink is running over. She's drying the dishes. They're getting in the cookie jar and they're upsetting the stool. The girl is reaching for a cookie. The lady here standing right in the water. She seems to be looking out the window at the lawn. Anything else? Is that about it? That's about it.",
+      "Examiner: (implied follow-up, not spoken in clip)"
+    ],
+    "patient_cue_summary": [
+      "Patient provides a coherent, task-relevant description of the picture scene with multiple actors and actions.",
+      "Speech is intelligible and contains specific scene elements: sink running, dishes drying, cookie jar, stool tipping, girl reaching, lady in water, looking out window.",
+      "Patient ends with self-questioning and confirmation ('Anything else? Is that about it? That's about it?'), indicating possible uncertainty or task completion.",
+      "No clear word-finding pauses, restarts, circumlocution, or examiner dependence observed in the audio.",
+      "No evidence of semantic vagueness, disorganization, or tangential drift",
+      "narrative is linear and task-focused."
+    ]
+  },
+  "latency_ms": 19582,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/639-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/639-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

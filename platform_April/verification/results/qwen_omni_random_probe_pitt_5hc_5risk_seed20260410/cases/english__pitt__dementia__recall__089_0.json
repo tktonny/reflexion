@@ -1,0 +1,22 @@
+{
+  "case_id": "english__pitt__dementia__recall__089_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "speaker_turn_summary": [],
+  "patient_cue_summary": [],
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__recall__089_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__recall__089_0/audio.mp3",
+  "latency_ms": 106,
+  "error": "unsupported_media: audio file exceeds 7340032 bytes before base64 encoding",
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/recall/089-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/recall/089-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "case_id": "english__pitt__control__cookie__054_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "A boy with a cookie in his one hand and his hand in the cookie jar, standing on a stool which is tipping over. Little girl's got her hand up for one, and I don't know what the hand means to the mouth. Does it mean she wants to eat? The kitchen sink is running over, the water running out on the floor. The mother is drying the dishes, frowning but not turning off the faucet. Two cups on the counter, plate. Mother standing in the middle of the room. Curtains at the windows. Lid's fallen off the cookie jar. Cupboards half open. That's it, okay?",
+  "patient_only_transcript": "A boy with a cookie in his one hand and his hand in the cookie jar, standing on a stool which is tipping over. Little girl's got her hand up for one, and I don't know what the hand means to the mouth. Does it mean she wants to eat? The kitchen sink is running over, the water running out on the floor. The mother is drying the dishes, frowning but not turning off the faucet. Two cups on the counter, plate. Mother standing in the middle of the room. Curtains at the windows. Lid's fallen off the cookie jar. Cupboards half open. That's it, okay?",
+  "speaker_turn_summary": [
+    "Examiner: Prompt for picture description task.",
+    "Patient: Describes scene with multiple elements but shows uncertainty, vagueness, and fragmented phrasing (e.g., 'I don't know what the hand means to the mouth', 'Does it mean she wants to eat?').",
+    "Examiner: May prompt or acknowledge, but no clear turn is isolated as examiner in the provided audio."
+  ],
+  "patient_cue_summary": [
+    "Describes multiple scene elements (boy, cookie, stool, sink, mother, cups, lid, cupboards) but with low informational density.",
+    "Uses uncertain phrasing ('I don't know', 'Does it mean...') indicating possible word-finding difficulty or lack of confidence.",
+    "Fragmented sentence structure and lack of causal or narrative cohesion between events.",
+    "Ends with 'That's it, okay?' suggesting possible abandonment or examiner-dependence.",
+    "No clear evidence of disorganized speech or repetition, but vagueness and hesitation are present."
+  ],
+  "transcript_request_id": "chatcmpl-88b03039-a58e-99b5-9c88-f8454a4985b4",
+  "classification_request_id": "chatcmpl-79175da6-2aa2-9a2d-bc48-10539c7f3718",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__054_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__054_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient lists multiple scene elements but lacks logical sequencing or causal connections between them.",
+        "evidence": "Patient mentions boy, cookie, stool, sink, mother, cups, lid, cupboards but does not link them into a coherent narrative or explain relationships.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses vague or uncertain phrasing ('I don't know what the hand means to the mouth') and asks interpretive questions instead of stating facts.",
+        "evidence": "Patient questions whether 'hand to mouth' means 'wants to eat', indicating possible difficulty with semantic or pragmatic interpretation.",
+        "confidence": null
+      },
+      {
+        "label": "Task Completion and Engagement",
+        "summary": "Patient appears to complete the task but with low confidence, fragmented delivery, and possible reliance on examiner to prompt or validate.",
+        "evidence": "Ends with 'That's it, okay?' suggesting possible completion without full confidence or elaboration.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient describes a picture scene with multiple elements but shows signs of lexical uncertainty, fragmented phrasing, and lack of narrative cohesion. While not diagnostic, these cues suggest possible mild cognitive impairment requiring further clinical review.",
+    "evidence_for_risk": [
+      "Vague phrasing and interpretive questions indicating possible word-finding difficulty.",
+      "Fragmented sentence structure and lack of causal or narrative organization.",
+      "Possible examiner-dependence or abandonment of task completion."
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple scene elements (cookie, sink, mother, stool, etc.).",
+      "No signs of severe disorganization, repetition, or incoherence.",
+      "Task appears completed, albeit with low confidence."
+    ],
+    "alternative_explanations": [
+      "The patient may be young, anxious, or unfamiliar with the task format.",
+      "The patient may be responding to examiner prompts or cues not captured in the audio.",
+      "The patient may be describing the scene accurately but with limited vocabulary or confidence."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty about scene interpretation ('I don't know what the hand means to the mouth')."
+    ],
+    "emotional_assessment_findings": [
+      "No clear emotional cues detected",
+      "tone appears neutral or slightly hesitant."
+    ],
+    "risk_control_suggestions": [
+      "Follow up with a formal cognitive screening tool (e.g., MoCA, MMSE).",
+      "Observe patient’s performance in structured narrative or memory tasks.",
+      "Consider caregiver report or multi-session longitudinal assessment."
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up evaluation recommended.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further assessment needed to determine progression or stability.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio from a picture-description task.",
+      "Patient speech is intelligible but shows mild impairment-like cues.",
+      "Task context: cookie-theft picture description",
+      "patient is expected to describe the scene coherently and informatively."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "A boy with a cookie in his one hand and his hand in the cookie jar, standing on a stool which is tipping over. Little girl's got her hand up for one, and I don't know what the hand means to the mouth. Does it mean she wants to eat? The kitchen sink is running over, the water running out on the floor. The mother is drying the dishes, frowning but not turning off the faucet. Two cups on the counter, plate. Mother standing in the middle of the room. Curtains at the windows. Lid's fallen off the cookie jar. Cupboards half open. That's it, okay?",
+    "speaker_turn_summary": [
+      "Examiner: Prompt for picture description task.",
+      "Patient: Describes scene with multiple elements but shows uncertainty, vagueness, and fragmented phrasing (e.g., 'I don't know what the hand means to the mouth', 'Does it mean she wants to eat?').",
+      "Examiner: May prompt or acknowledge, but no clear turn is isolated as examiner in the provided audio."
+    ],
+    "patient_cue_summary": [
+      "Describes multiple scene elements (boy, cookie, stool, sink, mother, cups, lid, cupboards) but with low informational density.",
+      "Uses uncertain phrasing ('I don't know', 'Does it mean...') indicating possible word-finding difficulty or lack of confidence.",
+      "Fragmented sentence structure and lack of causal or narrative cohesion between events.",
+      "Ends with 'That's it, okay?' suggesting possible abandonment or examiner-dependence.",
+      "No clear evidence of disorganized speech or repetition, but vagueness and hesitation are present."
+    ]
+  },
+  "latency_ms": 35786,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/054-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/054-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

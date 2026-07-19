@@ -1,0 +1,126 @@
+{
+  "case_id": "mandarin__chou__mci__006__006_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.75,
+  "transcript": "就是有一个男人在家里烫衣，烫衣服用不到这个扇。嗯，他的小孩子很调皮呀，就要去把这个插头啊，那个手伸进去。这个狗吓一跳，就一直叫，这个猫也吓了一跳，结果就这个猫就弄翻了这个花瓶里面的水，这个水就是倒在这个毯子、浴巾上面。就是一个家里面的卧室，然后又挂有日历呀。小孩子大概一岁多，还吃奶嘴。",
+  "patient_only_transcript": "有一个男人在家里烫衣服，用不到这个扇。他的小孩子很调皮，要去把插头手伸进去。狗吓一跳一直叫，猫也吓一跳，结果猫弄翻了花瓶里的水，水倒到毯子浴巾上。家里是卧室，挂着日历。小孩子一岁多，还吃奶嘴。",
+  "speaker_turn_summary": [
+    "Patient describes a domestic scene with multiple elements: man ironing, child reaching for plug, dog and cat startled, vase knocked over, water spilled on towel, room setting with calendar, child age and behavior."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with multiple objects and actions",
+    "Specific nouns used: 插头, 狗, 猫, 花瓶, 水, 毯子, 浴巾, 卧室, 日历, 奶嘴",
+    "Logical sequence of events described without major breaks or restarts",
+    "No obvious word-finding pauses, circumlocution, or semantic vagueness",
+    "No repetition, abandonment, or examiner dependence detected in the patient's speech",
+    "Patient appears to self-sustain the narrative without prompting"
+  ],
+  "transcript_request_id": "chatcmpl-3ceb729c-bfb8-9361-8ad5-6b8f980211c1",
+  "classification_request_id": "chatcmpl-c7d165dd-14e4-9890-b868-21cdc0b555b3",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__006__006_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__006__006_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "narrative coherence",
+        "summary": "Patient provides a multi-element domestic scene with logical sequencing and specific object references.",
+        "evidence": "Patient describes a complex household event involving multiple agents (man, child, dog, cat), objects (plug, vase, towel, calendar), and causal outcomes (water spilled, animals startled).",
+        "confidence": null
+      },
+      {
+        "label": "lexical retrieval",
+        "summary": "Patient uses specific, contextually appropriate vocabulary without hesitation or substitution.",
+        "evidence": "Patient correctly names objects and actions: 插头 (plug), 花瓶 (vase), 水 (water), 狗 (dog), 猫 (cat), 奶嘴 (pacifier), 卧室 (bedroom), 日历 (calendar).",
+        "confidence": null
+      },
+      {
+        "label": "task completion",
+        "summary": "Patient appears to complete a rich picture-description task without examiner prompting or assistance.",
+        "evidence": "Patient delivers a continuous, self-contained description of the scene without pauses for clarification or restarts.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, detailed, and self-sustained description of a complex domestic scene with specific object and action references. No signs of word-finding difficulty, disorganization, or examiner dependence are observed. The patient appears to have intact narrative and lexical retrieval abilities in this audio-only context.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No hesitation, repetition, or circumlocution in speech",
+      "No semantic vagueness or omission of core scene elements",
+      "No reliance on examiner prompts or assistance",
+      "Narrative is logically sequenced and contextually rich"
+    ],
+    "alternative_explanations": [
+      "Audio quality may limit full assessment of speech fluency or prosody",
+      "Patient may be describing a familiar scene from memory, which may not reflect real-time cognitive load",
+      "Lack of visual cues prevents assessment of nonverbal indicators of cognitive impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Continue routine monitoring if no other clinical concerns exist",
+      "Consider follow-up if additional behavioral or functional concerns emerge",
+      "Avoid overinterpreting single audio-only clips without multimodal data"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single audio clip. No persuasive evidence of cognitive decline is present in this assessment.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio content.",
+      "Patient appears to be the primary respondent in a dialogue-style screening task.",
+      "No examiner dominance or overlapping speech detected in the patient's turn.",
+      "Patient's speech is intelligible and task-relevant despite low audio quality."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "有一个男人在家里烫衣服，用不到这个扇。他的小孩子很调皮，要去把插头手伸进去。狗吓一跳一直叫，猫也吓一跳，结果猫弄翻了花瓶里的水，水倒到毯子浴巾上。家里是卧室，挂着日历。小孩子一岁多，还吃奶嘴。",
+    "speaker_turn_summary": [
+      "Patient describes a domestic scene with multiple elements: man ironing, child reaching for plug, dog and cat startled, vase knocked over, water spilled on towel, room setting with calendar, child age and behavior."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with multiple objects and actions",
+      "Specific nouns used: 插头, 狗, 猫, 花瓶, 水, 毯子, 浴巾, 卧室, 日历, 奶嘴",
+      "Logical sequence of events described without major breaks or restarts",
+      "No obvious word-finding pauses, circumlocution, or semantic vagueness",
+      "No repetition, abandonment, or examiner dependence detected in the patient's speech",
+      "Patient appears to self-sustain the narrative without prompting"
+    ]
+  },
+  "latency_ms": 15640,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/006/006_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/006/006_Daddy.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

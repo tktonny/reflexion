@@ -1,0 +1,135 @@
+{
+  "case_id": "mandarin__chou__mci__071__071_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "这个是两个老人家在象下象棋，他们在这里下象棋，然后这两个在拍打羽毛球。那他在拍的时候，这个他在遛狗，然后那个狗咬住他的衣服。这边两个在荡秋千。哎，在打羽毛球嘛，结果狗就咬住他的衣服了。那整个故事是这样，那那这个这个这个公公老公公啊，他可能是看到他们这样，那狗咬他的衣服，所以他在笑。我在想是这样的啊，是不是这样我就不知道了。",
+  "patient_only_transcript": "这个是两个老人家在下象棋，他们在这里下象棋，然后这两个在拍打羽毛球。那他在拍的时候，这个他在遛狗，然后那个狗咬住他的衣服。这边两个在荡秋千。哎，在打羽毛球嘛，结果狗就咬住他的衣服了。那整个故事是这样，那那这个这个这个公公老公公啊，他可能是看到他们这样，那狗咬他的衣服，所以他在笑。我在想是这样的啊，是不是这样我就不知道了。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes a multi-scene narrative with multiple characters and events, but with pauses, uncertainty, and vague phrasing (e.g., '我在想是这样的啊，是不是这样我就不知道了')."
+  ],
+  "patient_cue_summary": [
+    "Narrative contains multiple scene elements but lacks coherent sequencing or causal linkage.",
+    "Use of vague phrases: '这个这个这个公公老公公啊', '我在想是这样的啊，是不是这样我就不知道了'.",
+    "Evidence of word-finding hesitation or uncertainty in final summary.",
+    "Patient relies on examiner context to complete description",
+    "no clear task completion or structured response.",
+    "No clear retrieval of specific object roles or actions beyond general description."
+  ],
+  "transcript_request_id": "chatcmpl-b79a6fa1-0af8-9bdd-912f-8ceaa4a8d71d",
+  "classification_request_id": "chatcmpl-e4014881-ba65-9ef0-a8f9-666437ba04d7",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__071__071_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__071__071_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "narrative coherence",
+        "summary": "Patient attempts to describe a multi-scene scenario but lacks logical sequencing and clear causal links between events.",
+        "evidence": "Patient mentions multiple activities (chess, badminton, dog biting clothes, swinging) but does not connect them coherently or assign clear roles or timelines.",
+        "confidence": null
+      },
+      {
+        "label": "lexical retrieval and specificity",
+        "summary": "Patient uses vague pronouns and repetitive phrasing, suggesting possible word-finding difficulty or semantic flattening.",
+        "evidence": "Phrases like '这个这个这个公公老公公啊' and '我在想是这样的啊，是不是这样我就不知道了' indicate circumlocution and uncertainty.",
+        "confidence": null
+      },
+      {
+        "label": "task completion and structure",
+        "summary": "Patient does not complete the task with structured or informative output; response appears fragmented and examiner-dependent.",
+        "evidence": "Patient ends with uncertainty and does not provide a clear conclusion or summary of the scene.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented, vague, and uncertain description of a multi-scene scenario. While some scene elements are correctly identified, the narrative lacks coherence, specificity, and structure. Patient expresses uncertainty and relies on examiner context. These cues suggest possible early cognitive changes warranting further observation.",
+    "evidence_for_risk": [
+      "Vague, repetitive phrasing and circumlocution.",
+      "Lack of coherent sequencing or causal linkage between events.",
+      "Uncertainty expressed at the end of the description.",
+      "Examiner-dependent completion of the narrative task."
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple scene elements (chess, badminton, dog, swing).",
+      "No signs of severe disorientation or incoherence.",
+      "Patient maintains a light, engaged tone without signs of distress or apathy."
+    ],
+    "alternative_explanations": [
+      "Narrative may be incomplete due to task design or examiner prompting.",
+      "Patient may be describing a memory or imagination task rather than a visual scene.",
+      "Uncertainty may reflect natural conversational style rather than cognitive impairment."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty about narrative accuracy ('是不是这样我就不知道了')."
+    ],
+    "emotional_assessment_findings": [
+      "Patient exhibits mild amusement or lighthearted tone when describing the dog biting the clothes, possibly indicating affective engagement."
+    ],
+    "risk_control_suggestions": [
+      "Repeat the task with structured prompts or visual aids to assess consistency.",
+      "Administer formal cognitive screening tools (e.g., MoCA, MMSE) in follow-up.",
+      "Observe for task persistence, word-finding effort, and narrative reorganization across multiple trials."
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and longitudinal observation.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip. Further observation is needed to determine if symptoms are progressive or task-specific.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment relies solely on audio.",
+      "Patient speech is intelligible but lacks structure and specificity.",
+      "Examiner role is inferred from context",
+      "patient is the primary subject of evaluation."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这个是两个老人家在下象棋，他们在这里下象棋，然后这两个在拍打羽毛球。那他在拍的时候，这个他在遛狗，然后那个狗咬住他的衣服。这边两个在荡秋千。哎，在打羽毛球嘛，结果狗就咬住他的衣服了。那整个故事是这样，那那这个这个这个公公老公公啊，他可能是看到他们这样，那狗咬他的衣服，所以他在笑。我在想是这样的啊，是不是这样我就不知道了。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes a multi-scene narrative with multiple characters and events, but with pauses, uncertainty, and vague phrasing (e.g., '我在想是这样的啊，是不是这样我就不知道了')."
+    ],
+    "patient_cue_summary": [
+      "Narrative contains multiple scene elements but lacks coherent sequencing or causal linkage.",
+      "Use of vague phrases: '这个这个这个公公老公公啊', '我在想是这样的啊，是不是这样我就不知道了'.",
+      "Evidence of word-finding hesitation or uncertainty in final summary.",
+      "Patient relies on examiner context to complete description",
+      "no clear task completion or structured response.",
+      "No clear retrieval of specific object roles or actions beyond general description."
+    ]
+  },
+  "latency_ms": 19114,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/071/071_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/071/071_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

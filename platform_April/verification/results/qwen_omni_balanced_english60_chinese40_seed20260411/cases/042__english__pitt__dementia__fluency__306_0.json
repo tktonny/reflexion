@@ -1,0 +1,172 @@
+{
+  "case_id": "english__pitt__dementia__fluency__306_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.5,
+  "transcript": "And you can begin now. Okay, rabbit, dog, cat. Let's see, horse, mule, pig, cow. Let's see, some more, some more about the. . . I keep thinking of fish, I'm thinking of. . . Let me see. Oh boy, oh boy, oh boy. There should be a lot more animals. Boy, I'm a mess for you. Elephant, pigs, rhinoceros. . . Alligators are considered fish. That's right. Okay, time's up. Okay. Okay, now. Okay, and you can begin. And it can be a name, you can. No, right. And you can begin now. Finger. Descriptor like a fowl. Okay. Or finger fowl, pig, fish. Oh boy, oh boy, oh boy. Now I can think of some other. . . Oh boy, I can't. You have about 15 seconds to go. Frown. That's good. Okay. Okay.",
+  "patient_only_transcript": "rabbit, dog, cat, horse, mule, pig, cow, elephant, rhinoceros, alligator (considered fish). I keep thinking of fish. Oh boy, oh boy, oh boy. There should be a lot more animals. I'm a mess for you. Finger. Descriptor like a fowl. Pig, fish. Oh boy, oh boy, oh boy. I can't think of some other. Frown. That's good.",
+  "speaker_turn_summary": [
+    "Examiner: 'And you can begin now.'",
+    "Patient: 'Okay, rabbit, dog, cat... horse, mule, pig, cow... elephant, rhinoceros... alligator is considered fish.'",
+    "Examiner: 'That's right. Okay, time's up.'",
+    "Examiner: 'Okay, now. And you can begin. And it can be a name, you can.'",
+    "Patient: 'Finger. Descriptor like a fowl. Or finger fowl, pig, fish. Oh boy, oh boy, oh boy. I can't think of some other.'",
+    "Examiner: 'You have about 15 seconds to go.'",
+    "Patient: 'Frown. That's good.'"
+  ],
+  "patient_cue_summary": [
+    "Moderate item productivity with some repetition (e.g., 'oh boy, oh boy, oh boy')",
+    "Task drift: mentions 'finger' and 'descriptor like a fowl' suggesting possible confusion or shift from animal fluency task",
+    "Self-reported retrieval difficulty: 'I can't think of some other', 'I'm a mess for you'",
+    "Examiner scaffolding required to continue task",
+    "No clear semantic or categorical organization beyond initial animal list",
+    "Task completion with examiner prompt, not independently sustained"
+  ],
+  "transcript_request_id": "chatcmpl-eabec3f9-ad57-910b-8f09-f64ef42f0b4b",
+  "classification_request_id": "chatcmpl-78adb05d-0e23-9fd3-8752-cc066bca30b9",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__306_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__306_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "speech_rate",
+        "summary": "Slow, hesitant speech with frequent pauses and fillers",
+        "evidence": "Multiple 'oh boy' repetitions, long pauses, self-correction, and hesitation markers ('uh', 'let's see')",
+        "confidence": 0.5
+      },
+      {
+        "label": "lexical_retrieval",
+        "summary": "Difficulty retrieving specific category items; relies on repetition and examiner prompts",
+        "evidence": "Patient repeats 'oh boy' and says 'I can't think of some other' after initial animal list",
+        "confidence": 0.5
+      },
+      {
+        "label": "task_adherence",
+        "summary": "Partial task adherence with drift into unrelated descriptors ('finger', 'descriptor like a fowl')",
+        "evidence": "Shift from animal fluency to describing body parts or descriptors without clear task alignment",
+        "confidence": 0.5
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "verbal_fluency_productivity",
+        "summary": "Moderate item count (8–10 animals) with some repetition and incomplete list",
+        "evidence": "Patient lists rabbit, dog, cat, horse, mule, pig, cow, elephant, rhinoceros, alligator — but stops before completing task without prompting",
+        "confidence": 0.5
+      },
+      {
+        "label": "semantic_coherence",
+        "summary": "Low semantic coherence; category drift and non-sequitur responses",
+        "evidence": "After animal list, patient says 'finger', 'descriptor like a fowl', which are not animals and suggest task confusion",
+        "confidence": 0.5
+      },
+      {
+        "label": "task_control",
+        "summary": "Poor task control; requires examiner prompts to continue and shows signs of abandonment",
+        "evidence": "Patient says 'I can't think of some other' and 'I'm a mess for you' — indicating loss of task autonomy",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates moderate verbal fluency with some correct animal items but shows signs of retrieval difficulty, task drift, and self-reported frustration. Task control is poor without examiner prompting. No strong dementia-level impairment is evident, but impairment-like signals are present and warrant further clinical observation.",
+    "evidence_for_risk": [
+      "Self-reported retrieval difficulty ('I can't think of some other')",
+      "Repeated exasperation ('oh boy, oh boy, oh boy')",
+      "Task drift into non-animal descriptors ('finger', 'descriptor like a fowl')",
+      "Need for examiner scaffolding to continue task",
+      "Incomplete fluency output without independent completion"
+    ],
+    "evidence_against_risk": [
+      "Patient remains coherent and intelligible throughout",
+      "Correctly identifies several animals and even clarifies 'alligator is considered fish'",
+      "No evidence of severe disorientation, incoherence, or loss of context",
+      "Task is completed with examiner assistance, not abandoned"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive fatigue or stress during testing",
+      "Lack of familiarity with verbal fluency task structure",
+      "Mild anxiety or performance pressure affecting retrieval",
+      "Possible mild executive or working memory load during task"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient self-reports difficulty: 'I can't think of some other', 'I'm a mess for you'",
+      "Patient expresses frustration and uncertainty: 'Oh boy, oh boy, oh boy'"
+    ],
+    "emotional_assessment_findings": [
+      "Visible frustration and self-deprecation: 'I'm a mess for you'",
+      "Repeated exasperation: 'Oh boy, oh boy, oh boy'",
+      "Low affective engagement: minimal emotional expression beyond frustration"
+    ],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency task with different categories to assess consistency",
+      "Administer additional cognitive screening tools (e.g., MMSE, MoCA)",
+      "Observe patient’s performance in unstructured conversation for spontaneous retrieval",
+      "Consider caregiver report on daily functional changes"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up is recommended to assess consistency and progression",
+    "reviewer_confidence": 0.5,
+    "context_notes": [
+      "Audio-only, no visual cues available",
+      "Patient speech is intelligible but shows impairment-like signals",
+      "Task context is verbal fluency with examiner prompts",
+      "Patient is clearly the target subject, not examiner"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "rabbit, dog, cat, horse, mule, pig, cow, elephant, rhinoceros, alligator (considered fish). I keep thinking of fish. Oh boy, oh boy, oh boy. There should be a lot more animals. I'm a mess for you. Finger. Descriptor like a fowl. Pig, fish. Oh boy, oh boy, oh boy. I can't think of some other. Frown. That's good.",
+    "speaker_turn_summary": [
+      "Examiner: 'And you can begin now.'",
+      "Patient: 'Okay, rabbit, dog, cat... horse, mule, pig, cow... elephant, rhinoceros... alligator is considered fish.'",
+      "Examiner: 'That's right. Okay, time's up.'",
+      "Examiner: 'Okay, now. And you can begin. And it can be a name, you can.'",
+      "Patient: 'Finger. Descriptor like a fowl. Or finger fowl, pig, fish. Oh boy, oh boy, oh boy. I can't think of some other.'",
+      "Examiner: 'You have about 15 seconds to go.'",
+      "Patient: 'Frown. That's good.'"
+    ],
+    "patient_cue_summary": [
+      "Moderate item productivity with some repetition (e.g., 'oh boy, oh boy, oh boy')",
+      "Task drift: mentions 'finger' and 'descriptor like a fowl' suggesting possible confusion or shift from animal fluency task",
+      "Self-reported retrieval difficulty: 'I can't think of some other', 'I'm a mess for you'",
+      "Examiner scaffolding required to continue task",
+      "No clear semantic or categorical organization beyond initial animal list",
+      "Task completion with examiner prompt, not independently sustained"
+    ]
+  },
+  "latency_ms": 57281,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/306-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/306-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

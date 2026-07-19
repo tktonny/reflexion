@@ -1,0 +1,173 @@
+{
+  "case_id": "english__pitt__control__cookie__225_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "Okay, mother is washing or drying the dishes. The water is overflowing onto the floor. The little boy is almost falling off of the stool and is getting a cookie, and he's giving it to his little sister. And you can see they walk out the window. The curtains are seem to be shaking in the wind. The window is open. And water splashing on the floor. What do we tell time with? What? What do you do with a razor? A woman is standing in the water. Razor. A wet floor. I'm saying I'm going to cut myself. That's what I'm. It just like as if you cut. The little girl is. It's not like. . . You avoid cutting it. That's what I'm trying to say. You shouldn't play around with razors is what I'm trying to say. Why is the mother won't know he's going to get cookie out of the jar? Wash. And she's reaching up. Right. To get the cookie that he's handing her. What color is grass? Green. What do we light a cigarette with? A match. How many things are there? A woman has a dishcloth in her hand. Twelve. What color is coal? Black. The dishes. Where do you go to buy medicine? The one dish. At the drugstore. That's bad.",
+  "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running. That is about all I see. What do we tell time with? What? What do you do with a razor? A woman is standing in the water. Razor. A wet floor. I'm saying I'm going to cut myself. That's what I'm. It just like as if you cut. The little girl is. It's not like. . . You avoid cutting it. That's what I'm trying to say. You shouldn't play around with razors is what I'm trying to say. Why is the mother won't know he's going to get cookie out of the jar? Wash. And she's reaching up. Right. To get the cookie that he's handing her. What color is grass? Green. What do we light a cigarette with? A match. How many things are there? A woman has a dishcloth in her hand. Twelve. What color is coal? Black. The dishes. Where do you go to buy medicine? The one dish. At the drugstore. That's bad.",
+  "speaker_turn_summary": [
+    "Examiner: 'Okay, mother is washing or drying the dishes...'",
+    "Patient: 'The boy is reaching for the cookies...'",
+    "Examiner: 'What do we tell time with?'",
+    "Patient: 'What? What do you do with a razor?'",
+    "Examiner: 'A woman is standing in the water.'",
+    "Patient: 'Razor. A wet floor. I'm saying I'm going to cut myself...'",
+    "Examiner: 'Why is the mother won't know he's going to get cookie out of the jar?'",
+    "Patient: 'Wash. And she's reaching up. Right. To get the cookie that he's handing her.'",
+    "Examiner: 'What color is grass?'",
+    "Patient: 'Green.'",
+    "Examiner: 'What do we light a cigarette with?'",
+    "Patient: 'A match.'",
+    "Examiner: 'How many things are there?'",
+    "Patient: 'A woman has a dishcloth in her hand. Twelve.'",
+    "Examiner: 'What color is coal?'",
+    "Patient: 'Black.'",
+    "Examiner: 'The dishes. Where do you go to buy medicine?'",
+    "Patient: 'The one dish. At the drugstore. That's bad.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides brief but accurate scene description of boy, cookie, stool, mother, water, and window.",
+    "Patient responds to direct questions with short, formulaic answers (e.g., 'Green', 'A match', 'Twelve').",
+    "Patient exhibits hesitation, self-correction, and fragmented phrasing ('I'm saying I'm going to cut myself. That's what I'm. It just like as if you cut.')",
+    "Patient shows examiner dependence — many answers are prompted and delivered in response to examiner questions.",
+    "Patient ends with 'That's bad.' — vague, non-task-relevant, possibly indicating frustration or task fatigue.",
+    "Patient does not sustain narrative or elaboration beyond basic scene elements or direct prompts.",
+    "Patient does not demonstrate clear breakdown in word retrieval or semantic coherence, but does not demonstrate fluent, self-initiated task completion."
+  ],
+  "transcript_request_id": "chatcmpl-978811dd-3dfa-9d77-89fa-72e8a509ea19",
+  "classification_request_id": "chatcmpl-314bd339-fc38-9def-a735-3d4fac6bad5f",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__225_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__225_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient correctly identifies key actors and actions in the picture: boy reaching for cookie, mother at sink, water overflowing, window open, curtains shaking.",
+        "evidence": "Patient: 'The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Response to Direct Questions",
+        "summary": "Patient responds to examiner prompts with short, formulaic answers (e.g., 'Green', 'A match', 'Twelve'), indicating task dependence.",
+        "evidence": "Examiner: 'What color is grass?' Patient: 'Green.'; Examiner: 'What do we light a cigarette with?' Patient: 'A match.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Speech Fragmentation and Self-Correction",
+        "summary": "Patient exhibits hesitation, self-correction, and incomplete utterances, suggesting mild retrieval or fluency challenge.",
+        "evidence": "Patient: 'I'm saying I'm going to cut myself. That's what I'm. It just like as if you cut.'",
+        "confidence": 0.25
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides accurate but minimal scene description and formulaic responses to direct questions. Exhibits mild hesitation and examiner dependence, but no clear evidence of retrieval failure, disorganization, or task breakdown. Further observation or structured assessment recommended.",
+    "evidence_for_risk": [
+      "Fragmented phrasing and self-correction",
+      "Examiner dependence in answering questions",
+      "Limited elaboration despite rich visual prompt"
+    ],
+    "evidence_against_risk": [
+      "Accurate identification of core scene elements (boy, cookie, mother, water, window)",
+      "No semantic confusion or incoherence",
+      "No signs of disorientation, repetition, or tangential drift",
+      "Intelligible speech with minimal filler or circumlocution"
+    ],
+    "alternative_explanations": [
+      "Task may be cognitively demanding for patient",
+      "response style may reflect task fatigue or low confidence",
+      "Patient may be responding to examiner prompts rather than generating spontaneous content",
+      "Audio quality and multiple speakers may limit full assessment of fluency or affect"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Mild frustration or fatigue evident in final utterance ('That's bad.')",
+      "No clear signs of anxiety, apathy, or emotional flattening",
+      "Engagement appears task-dependent, not sustained or spontaneous"
+    ],
+    "risk_control_suggestions": [
+      "Repeat task with structured prompts and time limits to assess consistency",
+      "Observe patient’s ability to initiate and sustain narrative without examiner scaffolding",
+      "Consider administering formal screening tools (e.g., MoCA, MMSE) if clinical concern persists"
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening recommended. No urgent clinical evaluation needed at this time.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip. Further assessment required to determine if symptoms are transient or progressive.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible but task-dependent",
+      "not sufficient for cognitive_risk classification.",
+      "Scene description task was completed with minimal elaboration and examiner scaffolding.",
+      "No evidence of dementia-level impairment",
+      "mild task-related hesitation noted."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running. That is about all I see. What do we tell time with? What? What do you do with a razor? A woman is standing in the water. Razor. A wet floor. I'm saying I'm going to cut myself. That's what I'm. It just like as if you cut. The little girl is. It's not like. . . You avoid cutting it. That's what I'm trying to say. You shouldn't play around with razors is what I'm trying to say. Why is the mother won't know he's going to get cookie out of the jar? Wash. And she's reaching up. Right. To get the cookie that he's handing her. What color is grass? Green. What do we light a cigarette with? A match. How many things are there? A woman has a dishcloth in her hand. Twelve. What color is coal? Black. The dishes. Where do you go to buy medicine? The one dish. At the drugstore. That's bad.",
+    "speaker_turn_summary": [
+      "Examiner: 'Okay, mother is washing or drying the dishes...'",
+      "Patient: 'The boy is reaching for the cookies...'",
+      "Examiner: 'What do we tell time with?'",
+      "Patient: 'What? What do you do with a razor?'",
+      "Examiner: 'A woman is standing in the water.'",
+      "Patient: 'Razor. A wet floor. I'm saying I'm going to cut myself...'",
+      "Examiner: 'Why is the mother won't know he's going to get cookie out of the jar?'",
+      "Patient: 'Wash. And she's reaching up. Right. To get the cookie that he's handing her.'",
+      "Examiner: 'What color is grass?'",
+      "Patient: 'Green.'",
+      "Examiner: 'What do we light a cigarette with?'",
+      "Patient: 'A match.'",
+      "Examiner: 'How many things are there?'",
+      "Patient: 'A woman has a dishcloth in her hand. Twelve.'",
+      "Examiner: 'What color is coal?'",
+      "Patient: 'Black.'",
+      "Examiner: 'The dishes. Where do you go to buy medicine?'",
+      "Patient: 'The one dish. At the drugstore. That's bad.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides brief but accurate scene description of boy, cookie, stool, mother, water, and window.",
+      "Patient responds to direct questions with short, formulaic answers (e.g., 'Green', 'A match', 'Twelve').",
+      "Patient exhibits hesitation, self-correction, and fragmented phrasing ('I'm saying I'm going to cut myself. That's what I'm. It just like as if you cut.')",
+      "Patient shows examiner dependence — many answers are prompted and delivered in response to examiner questions.",
+      "Patient ends with 'That's bad.' — vague, non-task-relevant, possibly indicating frustration or task fatigue.",
+      "Patient does not sustain narrative or elaboration beyond basic scene elements or direct prompts.",
+      "Patient does not demonstrate clear breakdown in word retrieval or semantic coherence, but does not demonstrate fluent, self-initiated task completion."
+    ]
+  },
+  "latency_ms": 24681,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/225-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/225-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

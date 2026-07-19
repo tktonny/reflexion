@@ -1,0 +1,142 @@
+{
+  "case_id": "english__pitt__dementia__fluency__120_3",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.55,
+  "reviewer_confidence": 0.7,
+  "transcript": "Now I want you to name as many things as you can think of to eat in one minute. As many things as you can think of to eat. Ready? Begin. Apple, apricots, asparagus, artichokes, anchovies, bananas, broccoli, beets, carrots, cantaloupe, cabbage, ketchup, corn. D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D,",
+  "patient_only_transcript": "apple, apricots, asparagus, artichokes, anchovies, bananas, broccoli, beets, carrots, cantaloupe, cabbage, ketchup, corn. D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D. Salt, sand, sorghum, sweets, sugar, syrup, sweet potatoes, sunflower seed, sandpaper, satin, seashore, sea, salmon. This is things, not just things to eat or things... just things.",
+  "speaker_turn_summary": [
+    "Examiner: 'Now I want you to name as many things as you can think of to eat in one minute... Begin.'",
+    "Patient: 'Apple, apricots, asparagus, artichokes, anchovies, bananas, broccoli, beets, carrots, cantaloupe, cabbage, ketchup, corn.'",
+    "Patient: 'D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D.'",
+    "Examiner: 'Now I want you to name as many words as you can think of beginning with the letter S... Begin.'",
+    "Patient: 'Salt, sand, sorghum, sweets, sugar, syrup, sweet potatoes, sunflower seed, sandpaper, satin, seashore, sea, salmon. This is things, not just things to eat or things... just things.'"
+  ],
+  "patient_cue_summary": [
+    "Initial fluency output is adequate but followed by phonemic repetition indicating retrieval difficulty.",
+    "Task reorientation and self-correction suggest impaired task monitoring or executive control.",
+    "Moderate item count with hesitation and restarts during second fluency task supports cognitive risk signal."
+  ],
+  "transcript_request_id": "chatcmpl-55c2f07f-e59c-90d2-a800-c758339deec2",
+  "classification_request_id": "chatcmpl-f44c722b-16bd-971c-8764-76adcfc08afc",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__120_3/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__120_3/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "speech_fluency_breakdown",
+        "summary": "Patient exhibits significant pauses, repetition of sounds ('D, D, D...'), and difficulty retrieving words during verbal fluency tasks.",
+        "evidence": "Patient begins listing food items but then produces extended series of 'D' sounds, indicating retrieval difficulty. Later, during the 'S' word task, patient struggles to generate items, repeats 'um', and appears to restart or self-correct multiple times.",
+        "confidence": 0.85
+      },
+      {
+        "label": "task_control_loss",
+        "summary": "Patient shows signs of losing task focus or control, particularly during the second fluency task, where they appear to drift or become uncertain about the rules.",
+        "evidence": "Patient says, 'This is things, not just things to eat or things... just things,' indicating confusion or reorientation of the task, suggesting impaired task monitoring or executive control.",
+        "confidence": 0.75
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "verbal_fluency_performance",
+        "summary": "Patient generates a moderate number of food items initially but then experiences a breakdown in fluency, including phonemic repetition and semantic drift.",
+        "evidence": "Patient lists: 'apple, apricots, asparagus, artichokes, anchovies, bananas, broccoli, beets, carrots, cantaloupe, cabbage, ketchup, corn.' Then produces 'D, D, D...' before restarting. Later, for 'S' words, patient says: 'salt, sand, sorghum, sweets, sugar, syrup, sweet potatoes, sunflower seed, sandpaper, satin, seashore, sea, salmon.' But shows hesitation, self-correction, and uncertainty.",
+        "confidence": 0.8
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.55,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "medium",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates impairment-like features during verbal fluency tasks, including phonemic repetition, task confusion, and retrieval difficulty. While not definitive for dementia, these signs suggest cognitive risk requiring further clinical evaluation.",
+    "evidence_for_risk": [
+      "Extended phonemic repetition ('D, D, D...') during fluency task.",
+      "Self-correction and task reorientation ('This is things, not just things to eat...').",
+      "Inconsistent productivity and hesitation during both fluency tasks."
+    ],
+    "evidence_against_risk": [
+      "Patient initially generates a reasonable number of correct items.",
+      "No overt emotional distress or disengagement is observed.",
+      "Task is completed with examiner support, suggesting preserved basic comprehension."
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive fatigue or stress during testing.",
+      "Language processing delay or mild articulation difficulty unrelated to dementia.",
+      "Task-specific anxiety or unfamiliarity with fluency structure."
+    ],
+    "risk_factor_findings": [
+      "repeated word-finding pauses",
+      "task-related confusion",
+      "phonemic repetition and semantic drift"
+    ],
+    "subjective_assessment_findings": [
+      "Patient does not report memory complaints or cognitive concerns during the clip.",
+      "No caregiver or examiner report of functional decline or prior diagnosis is audible."
+    ],
+    "emotional_assessment_findings": [
+      "Patient exhibits mild frustration or uncertainty during task breakdowns, as evidenced by pauses and self-correction.",
+      "No overt signs of anxiety, apathy, or emotional flattening are audible."
+    ],
+    "risk_control_suggestions": [
+      "Schedule formal neuropsychological screening with validated dementia assessment tools.",
+      "Consider repeat testing in a less pressured environment to rule out situational factors.",
+      "Obtain collateral history from caregiver or family regarding functional changes."
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with cognitive specialist for further assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; follow-up testing is recommended to monitor for progression or stabilization.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient-only transcript reconstructed from audio",
+      "examiner prompts are excluded.",
+      "Fluency task breakdowns are consistent with early cognitive impairment signals but not diagnostic."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "apple, apricots, asparagus, artichokes, anchovies, bananas, broccoli, beets, carrots, cantaloupe, cabbage, ketchup, corn. D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D. Salt, sand, sorghum, sweets, sugar, syrup, sweet potatoes, sunflower seed, sandpaper, satin, seashore, sea, salmon. This is things, not just things to eat or things... just things.",
+    "speaker_turn_summary": [
+      "Examiner: 'Now I want you to name as many things as you can think of to eat in one minute... Begin.'",
+      "Patient: 'Apple, apricots, asparagus, artichokes, anchovies, bananas, broccoli, beets, carrots, cantaloupe, cabbage, ketchup, corn.'",
+      "Patient: 'D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D, D.'",
+      "Examiner: 'Now I want you to name as many words as you can think of beginning with the letter S... Begin.'",
+      "Patient: 'Salt, sand, sorghum, sweets, sugar, syrup, sweet potatoes, sunflower seed, sandpaper, satin, seashore, sea, salmon. This is things, not just things to eat or things... just things.'"
+    ],
+    "patient_cue_summary": [
+      "Initial fluency output is adequate but followed by phonemic repetition indicating retrieval difficulty.",
+      "Task reorientation and self-correction suggest impaired task monitoring or executive control.",
+      "Moderate item count with hesitation and restarts during second fluency task supports cognitive risk signal."
+    ]
+  },
+  "latency_ms": 26751,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/120-3.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/120-3.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "case_id": "english__pitt__control__cookie__209_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.88,
+  "transcript": "So tell me what action you see going on in that picture. Okay, the boy in the process of stealing cookies from the jar is about to fall from his stool. His sister, I think, is admonishing him to be quiet. The mother is drying dishes. At the point she's drying dishes, the water, perhaps from the noise, the water is spilling over the sink and onto the floor. Okay? Okay, okay. And there's just the, the mother is frowning, which is a form of action, I was thinking about. That's it.",
+  "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing.",
+  "speaker_turn_summary": [
+    "Examiner: 'So tell me what action you see going on in that picture.'",
+    "Patient: 'Okay, the boy in the process of stealing cookies from the jar is about to fall from his stool. His sister, I think, is admonishing him to be quiet. The mother is drying dishes. At the point she's drying dishes, the water, perhaps from the noise, the water is spilling over the sink and onto the floor. Okay? Okay, okay. And there's just the, the mother is frowning, which is a form of action, I was thinking about. That's it.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides coherent scene description with specific content words",
+    "Main events linked logically and sequentially",
+    "Minor hesitations and fillers ('uh', 'the, the') but no significant word-finding failure or disorganization",
+    "Examiner prompts are minimal and patient self-sustains description",
+    "No evidence of semantic vagueness, repetition, or abandonment of task"
+  ],
+  "transcript_request_id": "chatcmpl-5da18d06-74a4-91fc-af99-a1f54405da4d",
+  "classification_request_id": "chatcmpl-298368cb-95f9-9a6a-a091-bcf852bf12a8",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__209_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__209_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a logically sequenced, content-rich description of the pictured scene, including multiple actors and actions.",
+        "evidence": "Patient correctly identifies the boy stealing cookies, stool tipping, sister admonishing, mother drying dishes, water spilling, and mother frowning — all key elements of the picture task.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific, task-relevant vocabulary without circumlocution or vagueness.",
+        "evidence": "Terms like 'cookie jar', 'stool tipping', 'spilling over the sink', 'mother frowning' indicate precise lexical retrieval.",
+        "confidence": 0.8
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description in a causal and spatially coherent manner, linking events without confusion.",
+        "evidence": "Patient sequences events chronologically and links actions to consequences (e.g., stool tipping → boy falling, water spilling → floor wet).",
+        "confidence": 0.82
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, detailed, and logically organized description of the pictured scene, with no signs of retrieval difficulty, disorganization, or examiner dependence. The response is consistent with healthy cognitive function for a picture-description task.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent narrative structure",
+      "Specific and accurate vocabulary",
+      "No word-finding pauses or semantic vagueness",
+      "Self-sustained description without examiner prompting"
+    ],
+    "alternative_explanations": [
+      "Minor fillers ('uh', 'the, the') may reflect natural speech rhythm rather than impairment",
+      "Examiner's initial prompt may have influenced phrasing, but patient response remains independent and complete"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Routine follow-up in next annual visit if part of longitudinal screening",
+      "No further cognitive screening indicated based on this clip"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of cognitive decline in this assessment.",
+    "reviewer_confidence": 0.88,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment relies solely on audio and provided metadata.",
+      "Patient speech is intelligible and task-relevant despite minor hesitations.",
+      "No signs of dementia-like impairment observed in patient's response."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing.",
+    "speaker_turn_summary": [
+      "Examiner: 'So tell me what action you see going on in that picture.'",
+      "Patient: 'Okay, the boy in the process of stealing cookies from the jar is about to fall from his stool. His sister, I think, is admonishing him to be quiet. The mother is drying dishes. At the point she's drying dishes, the water, perhaps from the noise, the water is spilling over the sink and onto the floor. Okay? Okay, okay. And there's just the, the mother is frowning, which is a form of action, I was thinking about. That's it.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides coherent scene description with specific content words",
+      "Main events linked logically and sequentially",
+      "Minor hesitations and fillers ('uh', 'the, the') but no significant word-finding failure or disorganization",
+      "Examiner prompts are minimal and patient self-sustains description",
+      "No evidence of semantic vagueness, repetition, or abandonment of task"
+    ]
+  },
+  "latency_ms": 23593,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/209-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/209-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "case_id": "english__pitt__dementia__cookie__001_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "patient_only_transcript": "The boy is going in the cookie jar... the stool is falling... water is overflowing... the mother is near the girl... she's trying to wipe dishes... I can't think of the word... I don't know if that's more than one... I'm saying he's a boy because it's hard to tell anymore...",
+  "patient_cue_summary": [
+    "word-finding pauses and circumlocution ('I can't think of the word')",
+    "vague and fragmented descriptions ('the water is running... and the mother... uh...')",
+    "repetition and self-correction ('I'm saying he's a boy because it's hard to tell anymore')",
+    "examiner-dependent continuation ('I don't know if that's more than one')",
+    "partial scene description with missing causal links and weak organization"
+  ],
+  "classification_request_id": "chatcmpl-713e9808-8d6a-9b0a-9f02-f292be6a21c2",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Word-Finding Difficulty",
+        "summary": "Patient repeatedly struggles to retrieve specific nouns or descriptors, using circumlocutions and filler phrases.",
+        "evidence": "Patient says 'I can't think of the word' and 'I don't know if that's more than one'.",
+        "confidence": 0.7
+      },
+      {
+        "label": "Fragmented Scene Description",
+        "summary": "Patient describes elements of the scene but fails to link them coherently or maintain narrative flow.",
+        "evidence": "Patient mentions 'boy', 'cookie jar', 'stool', 'water overflowing', 'mother', but lacks causal or sequential structure.",
+        "confidence": 0.65
+      },
+      {
+        "label": "Examiner Dependence",
+        "summary": "Patient relies on examiner prompts and appears to need repeated clarification or direction.",
+        "evidence": "Patient says 'I don't know if that's more than one' and 'I'm saying he's a boy because it's hard to tell anymore', suggesting reliance on external cues.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "uncertain",
+    "target_patient_basis": "externally_provided",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates mild impairment-like cues including word-finding difficulty, fragmented scene description, and examiner dependence. These suggest possible cognitive decline but are not conclusive. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Repeated word-finding pauses and circumlocutions",
+      "Lack of coherent narrative structure despite task relevance",
+      "Reliance on examiner prompts to continue description"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key scene elements (boy, cookie jar, mother, water, stool)",
+      "No overt confusion or disorientation in task context",
+      "Speech is not unintelligible, though low-information"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive load or fatigue during task",
+      "Language processing delay unrelated to dementia",
+      "Task-specific difficulty or unfamiliarity with picture description format"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty about identifying gender and scene elements",
+      "Patient reports difficulty retrieving specific words or concepts"
+    ],
+    "emotional_assessment_findings": [
+      "Frustration or cognitive effort audible in pauses and filler phrases",
+      "Low affective engagement or hesitation in describing scene"
+    ],
+    "risk_control_suggestions": [
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Repeat picture description task with structured prompts",
+      "Assess functional daily activities and caregiver reports"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up assessments recommended to track progression.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component unavailable; assessment based solely on audio.",
+      "Patient speech is partially intelligible but shows impairment-like features.",
+      "Examiner prompts dominate speech; patient response is fragmented and hesitant."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "target_patient_uncertain",
+      "interviewer_dominant",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is going in the cookie jar... the stool is falling... water is overflowing... the mother is near the girl... she's trying to wipe dishes... I can't think of the word... I don't know if that's more than one... I'm saying he's a boy because it's hard to tell anymore...",
+    "patient_cue_summary": [
+      "word-finding pauses and circumlocution ('I can't think of the word')",
+      "vague and fragmented descriptions ('the water is running... and the mother... uh...')",
+      "repetition and self-correction ('I'm saying he's a boy because it's hard to tell anymore')",
+      "examiner-dependent continuation ('I don't know if that's more than one')",
+      "partial scene description with missing causal links and weak organization"
+    ]
+  },
+  "latency_ms": 14090,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/001-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/001-2.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

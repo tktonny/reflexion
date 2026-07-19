@@ -1,0 +1,127 @@
+{
+  "case_id": "mandarin__chou__hc__064__064_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "这张小朋友是在玩那个捞鱼那个。妈妈说是，妈妈带来的，这个阿妈带来的，这个小朋友注意在捞，那个捞鱼。所以谁打算画那个捞鱼的那个，那个制制作的那个捞鱼的房子。啊，这个是小朋友在玩水池。玩水池玩的很高兴，他好像，就是很嗨的样子。他在这里把手要给他偷拿东西。这个就是好像是刚摔死的那个主人。啊，小朋友不懂啊，都去玩这水池啊，就这样子。",
+  "patient_only_transcript": "小朋友在玩捞鱼，妈妈带来的，阿嬷带来的，小朋友注意在捞鱼，玩水池玩得很开心，他好像很嗨的样子，他在这里把手要给他偷拿东西，这个好像是刚摔死的那个主人，小朋友不懂，都去玩这水池，就这样子。",
+  "speaker_turn_summary": [
+    "Examiner: prompts scene description task",
+    "Patient: describes multiple scene elements including children, mother, grandmother, fishing game, water pool, stealing action, and a deceased person, with colloquial fillers and vague referents"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple actors (小朋友, 妈妈, 阿嬷) and actions (捞鱼, 玩水池, 偷拿东西)",
+    "Uses colloquial Mandarin with fillers (啊, 那个, 这个) and vague referents, but maintains topic continuity",
+    "Narrative is fragmented and lacks causal structure, but scene elements are mostly recoverable",
+    "No clear naming collapse, contradiction, or abandonment of core task elements",
+    "Emotional tone is neutral to positive (玩得很开心, 很嗨), no signs of distress or confusion"
+  ],
+  "transcript_request_id": "chatcmpl-776681fd-1b58-95ce-9281-971b65f48bc9",
+  "classification_request_id": "chatcmpl-c9a34dc6-2439-921c-ade1-d6d7bfba3ea6",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__064__064_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__064__064_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient describes multiple visible elements in the market scene including children, adults, fishing game, water pool, and a deceased person, with colloquial phrasing and vague referents.",
+        "evidence": "Patient names actors (小朋友, 妈妈, 阿嬷), actions (捞鱼, 玩水池, 偷拿东西), and objects (水池, 捞鱼的房子), despite using generic terms and fillers.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Lexical Retrieval and Referential Clarity",
+        "summary": "Patient uses vague referents (那个, 这个) and fillers (啊) but does not show naming collapse or semantic failure.",
+        "evidence": "Patient refers to '那个捞鱼的房子' and '刚摔死的那个主人' without clear confusion or contradiction; scene elements remain identifiable.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Narrative is fragmented and lacks causal structure, but does not abandon the task or lose referential continuity.",
+        "evidence": "Patient lists multiple scene elements in sequence without major contradiction or topic drift; examiner likely prompted the description.",
+        "confidence": 0.25
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented but generally intelligible description of a market scene with multiple actors and actions. Uses colloquial Mandarin with fillers and vague referents, but does not show naming collapse, contradiction, or abandonment of task. Emotional tone is positive. No strong impairment-like cues detected. Further observation or formal screening recommended due to limited modality and low-confidence reconstruction.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient identifies multiple scene elements (children, adults, fishing game, water pool, stealing action)",
+      "Narrative remains topic-relevant despite fragmentation and colloquial phrasing",
+      "No signs of confusion, contradiction, or emotional distress",
+      "Emotional reactivity is positive and engaged"
+    ],
+    "alternative_explanations": [
+      "Colloquial Mandarin with fillers and vague referents is normal in spontaneous speech, especially in informal settings",
+      "Fragmented narrative may reflect task difficulty or recording quality rather than cognitive impairment",
+      "Patient may be a child or young adult",
+      "age cannot be inferred from audio alone"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Positive affect: expresses enjoyment of play (玩得很开心, 很嗨)",
+      "No signs of frustration, anxiety, apathy, or emotional flattening"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with a structured scene-description task in a quieter setting",
+      "Use visual cues or prompts to support narrative organization if available",
+      "Consider repeating the task with clearer examiner scaffolding"
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening recommended; no urgent clinical evaluation needed based on this clip alone.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited; single clip does not support dementia classification. Further observation or multi-visit assessment recommended.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio with moderate intelligibility and transcription uncertainty.",
+      "Patient speech is intelligible enough to reconstruct multiple scene elements, which is counterevidence against cognitive_risk in Chinese screening.",
+      "Colloquial phrasing and vague referents are not sufficient alone to indicate impairment in Mandarin spontaneous speech."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "小朋友在玩捞鱼，妈妈带来的，阿嬷带来的，小朋友注意在捞鱼，玩水池玩得很开心，他好像很嗨的样子，他在这里把手要给他偷拿东西，这个好像是刚摔死的那个主人，小朋友不懂，都去玩这水池，就这样子。",
+    "speaker_turn_summary": [
+      "Examiner: prompts scene description task",
+      "Patient: describes multiple scene elements including children, mother, grandmother, fishing game, water pool, stealing action, and a deceased person, with colloquial fillers and vague referents"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple actors (小朋友, 妈妈, 阿嬷) and actions (捞鱼, 玩水池, 偷拿东西)",
+      "Uses colloquial Mandarin with fillers (啊, 那个, 这个) and vague referents, but maintains topic continuity",
+      "Narrative is fragmented and lacks causal structure, but scene elements are mostly recoverable",
+      "No clear naming collapse, contradiction, or abandonment of core task elements",
+      "Emotional tone is neutral to positive (玩得很开心, 很嗨), no signs of distress or confusion"
+    ]
+  },
+  "latency_ms": 18124,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/064/064_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/064/064_market.mp3?f=save",
+    "expected_group_audio_count": 120
+  }
+}

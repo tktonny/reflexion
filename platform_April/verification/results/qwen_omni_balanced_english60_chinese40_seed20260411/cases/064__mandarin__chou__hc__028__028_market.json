@@ -1,0 +1,126 @@
+{
+  "case_id": "mandarin__chou__hc__028__028_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "在玩那个甩子啊，这边有食物就可以吃东西了。这边小朋友在捞鱼，有网子在这，有椅子可以坐。这个是是晚上的时候，夜间有那个灯。哦，这是他在偷他，他在玩的东西，他不注意，他偷他东西，偷他包包里面偷他东西。他他是卖冰淇淋的，他在捞鱼的时候逗小朋友买买那买那冰淇淋的。这这老婆叫小孩子来捞鱼啊。",
+  "patient_only_transcript": "在玩那个甩子啊，这边有食物就可以吃东西了。这边小朋友在捞鱼，有网子在这，有椅子可以坐。这个是是晚上的时候，夜间有那个灯。哦，这是他在偷他，他在玩的东西，他不注意，他偷他东西，偷他包包里面偷他东西。他他是卖冰淇淋的，他在捞鱼的时候逗小朋友买买那买那冰淇淋的。这这老婆叫小孩子来捞鱼啊。",
+  "speaker_turn_summary": [
+    "Patient describes market scene with multiple actors and objects: children playing, fishing, ice cream vendor, stealing, lighting, seating.",
+    "Patient uses repetitive phrases and filler particles (哦, 这这), but maintains scene coherence.",
+    "Examiner likely prompts or acknowledges, but no clear examiner speech is reconstructable from audio alone."
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple scene elements: children, fishing net, chairs, night lighting, ice cream vendor, stealing action, wife calling children.",
+    "Patient uses colloquial Mandarin with fillers and repetitions (这个是是, 这这), but does not abandon task or lose referential clarity.",
+    "Narrative is somewhat disorganized with minor self-corrections and pauses, but overall scene description remains intact and task-relevant.",
+    "No evidence of naming collapse, semantic poverty, or major contradiction",
+    "patient reconstructs a complex multi-actor scene despite speech imperfections."
+  ],
+  "transcript_request_id": "chatcmpl-ba5cd3dc-ed96-95fa-b2ea-c8775a6f71e0",
+  "classification_request_id": "chatcmpl-b05110e3-2d10-9760-b5c3-b55583fc48d9",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__028__028_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__028__028_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes a multi-actor market scene with multiple objects and actions, including children fishing, ice cream vendor, stealing, and lighting, despite speech imperfections.",
+        "evidence": "Patient lists multiple relevant scene elements: fishing net, chairs, night lights, ice cream, stealing, wife calling children. Narrative is partially fragmented but task-relevant and coherent.",
+        "confidence": 0.5
+      },
+      {
+        "label": "speech_repetition_and_fillers",
+        "summary": "Patient uses colloquial fillers and repetitions (这个是是, 这这, 哦), which are common in spontaneous Mandarin speech but do not indicate impairment.",
+        "evidence": "Filler particles and self-corrections are present but do not disrupt task completion or scene reconstruction. No evidence of word-finding failure or semantic poverty.",
+        "confidence": 0.5
+      },
+      {
+        "label": "task_completion_and_relevance",
+        "summary": "Patient remains task-relevant and completes a multi-element scene description despite speech noise and disorganization.",
+        "evidence": "Patient identifies actors, actions, objects, and temporal context (nighttime, lighting) without abandoning the task. No major omission of core elements.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, multi-element description of a market scene despite speech noise, fillers, and minor disorganization. No evidence of naming collapse, semantic poverty, or task abandonment. Colloquial Mandarin features are normal for spontaneous speech. Further observation or formal screening is recommended due to audio quality and speech intelligibility limitations.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient identifies multiple relevant scene elements without omission or confusion.",
+      "Narrative remains task-relevant and coherent despite speech imperfections.",
+      "No signs of word-finding failure, semantic poverty, or major disorganization.",
+      "Colloquial fillers and repetitions are consistent with normal spontaneous Mandarin speech."
+    ],
+    "alternative_explanations": [
+      "Poor audio quality may mask subtle impairment cues.",
+      "Patient may be speaking in a casual, unscripted manner, which is common in naturalistic settings.",
+      "Task may be challenging for non-native or elderly speakers, but no impairment indicators are present."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the scene-description task with clearer audio or visual support.",
+      "Use structured prompts to reduce reliance on spontaneous narration.",
+      "Consider formal cognitive screening if patient is elderly or has known risk factors."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if risk factors are present or if symptoms progress.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip with audio quality limitations. Further observation is recommended.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment is based solely on audio with poor quality.",
+      "Patient speech is intelligible enough to reconstruct scene elements, but not fully clear due to noise and speech characteristics.",
+      "Colloquial Mandarin features (fillers, repetitions) are not impairment indicators in this context."
+    ],
+    "quality_flags": [
+      "poor_audio",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "在玩那个甩子啊，这边有食物就可以吃东西了。这边小朋友在捞鱼，有网子在这，有椅子可以坐。这个是是晚上的时候，夜间有那个灯。哦，这是他在偷他，他在玩的东西，他不注意，他偷他东西，偷他包包里面偷他东西。他他是卖冰淇淋的，他在捞鱼的时候逗小朋友买买那买那冰淇淋的。这这老婆叫小孩子来捞鱼啊。",
+    "speaker_turn_summary": [
+      "Patient describes market scene with multiple actors and objects: children playing, fishing, ice cream vendor, stealing, lighting, seating.",
+      "Patient uses repetitive phrases and filler particles (哦, 这这), but maintains scene coherence.",
+      "Examiner likely prompts or acknowledges, but no clear examiner speech is reconstructable from audio alone."
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple scene elements: children, fishing net, chairs, night lighting, ice cream vendor, stealing action, wife calling children.",
+      "Patient uses colloquial Mandarin with fillers and repetitions (这个是是, 这这), but does not abandon task or lose referential clarity.",
+      "Narrative is somewhat disorganized with minor self-corrections and pauses, but overall scene description remains intact and task-relevant.",
+      "No evidence of naming collapse, semantic poverty, or major contradiction",
+      "patient reconstructs a complex multi-actor scene despite speech imperfections."
+    ]
+  },
+  "latency_ms": 27588,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/028/028_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/028/028_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

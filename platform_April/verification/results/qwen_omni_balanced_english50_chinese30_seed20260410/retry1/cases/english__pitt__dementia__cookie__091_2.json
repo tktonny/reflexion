@@ -1,0 +1,136 @@
+{
+  "case_id": "english__pitt__dementia__cookie__091_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.6,
+  "transcript": "Picture. The boy is after the cookie jar for him and his girl. And the girl or the woman is drying dishes and the water is leaking on the floor. Spilling on the floor. Can you tell me what else is going on in the picture? What else do you see? The boy is getting cookies out of the jar and the jack or the cushion or the pad is falling over. He's gonna fall. And the water's spilling for the woman drying the dishes. Is that all? Okay, that's fine.",
+  "patient_only_transcript": "The boy is after the cookie jar for him and his girl. And the girl or the woman is drying dishes and the water is leaking on the floor. Spilling on the floor. The boy is getting cookies out of the jar and the jack or the cushion or the pad is falling over. He's gonna fall. And the water's spilling for the woman drying the dishes. Is that all?",
+  "speaker_turn_summary": [
+    "Examiner: Picture. Can you tell me what else is going on in the picture? What else do you see?",
+    "Patient: The boy is after the cookie jar for him and his girl. And the girl or the woman is drying dishes and the water is leaking on the floor. Spilling on the floor. The boy is getting cookies out of the jar and the jack or the cushion or the pad is falling over. He's gonna fall. And the water's spilling for the woman drying the dishes. Is that all?",
+    "Examiner: Okay, that's fine."
+  ],
+  "patient_cue_summary": [
+    "Patient provides a coherent but vague scene description with some semantic imprecision (e.g., 'jack or the cushion or the pad')",
+    "Patient uses filler/uncertain terms ('or the girl or the woman', 'jack or the cushion or the pad') indicating possible word-finding difficulty",
+    "Patient repeats key elements (water spilling, boy reaching for cookies) but lacks precise object identification or causal linkage",
+    "Patient’s description is task-relevant and complete in scope but lacks specificity and lexical precision",
+    "Patient does not initiate or expand beyond examiner prompts",
+    "response is self-contained but not elaborated"
+  ],
+  "transcript_request_id": "chatcmpl-d25eb816-4fd9-9e18-bad5-6501c9346c19",
+  "classification_request_id": "chatcmpl-09712665-70bc-99ff-87a2-bd58b9d975b2",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__091_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__091_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a generally coherent but vague description of the picture, with some semantic imprecision.",
+        "evidence": "Patient mentions key elements (boy, cookies, woman, water spilling) but uses uncertain terms ('jack or the cushion or the pad') and lacks precise object identification.",
+        "confidence": 0.7
+      },
+      {
+        "label": "Lexical Retrieval",
+        "summary": "Patient exhibits possible word-finding difficulty through use of vague or alternative terms.",
+        "evidence": "Use of 'jack or the cushion or the pad' suggests difficulty retrieving specific object names.",
+        "confidence": 0.6
+      },
+      {
+        "label": "Task Engagement",
+        "summary": "Patient responds to examiner prompts with a self-contained but minimally elaborated description.",
+        "evidence": "Patient does not initiate elaboration; response is complete but lacks depth or detail beyond basic elements.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.3,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a generally coherent but imprecise description of a picture depicting a boy reaching for cookies and a woman drying dishes with water spilling. Use of vague terms ('jack or the cushion or the pad'), semantic imprecision, and lack of lexical specificity suggest mild retrieval or organizational difficulty. Not sufficient for dementia classification, but warrants further clinical review.",
+    "evidence_for_risk": [
+      "Use of vague, uncertain terms indicating possible word-finding difficulty",
+      "Semantic imprecision in object identification ('jack or the cushion or the pad')",
+      "Coherent but shallow description lacking causal or spatial precision",
+      "No spontaneous elaboration or expansion beyond examiner prompts"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key scene elements (boy, cookies, woman, water spilling)",
+      "Response is task-relevant and complete in scope",
+      "No signs of disorientation, confusion, or incoherence",
+      "No emotional dysregulation or affective flattening observed"
+    ],
+    "alternative_explanations": [
+      "Language or dialect variation may account for imprecise phrasing",
+      "Task fatigue or mild anxiety may contribute to vague wording",
+      "Examiner prompting may have constrained elaboration, not cognitive impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Obtain collateral history from caregiver regarding functional changes",
+      "Repeat picture description task with structured prompts to assess consistency",
+      "Monitor for progression in daily functioning and memory complaints"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up with primary care or neurology",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment required to determine trajectory",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio dialogue",
+      "Patient is clearly the target subject based on interaction role",
+      "Task context: picture description of cookie-theft scene",
+      "Patient’s speech is intelligible but shows mild retrieval/organization cues"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is after the cookie jar for him and his girl. And the girl or the woman is drying dishes and the water is leaking on the floor. Spilling on the floor. The boy is getting cookies out of the jar and the jack or the cushion or the pad is falling over. He's gonna fall. And the water's spilling for the woman drying the dishes. Is that all?",
+    "speaker_turn_summary": [
+      "Examiner: Picture. Can you tell me what else is going on in the picture? What else do you see?",
+      "Patient: The boy is after the cookie jar for him and his girl. And the girl or the woman is drying dishes and the water is leaking on the floor. Spilling on the floor. The boy is getting cookies out of the jar and the jack or the cushion or the pad is falling over. He's gonna fall. And the water's spilling for the woman drying the dishes. Is that all?",
+      "Examiner: Okay, that's fine."
+    ],
+    "patient_cue_summary": [
+      "Patient provides a coherent but vague scene description with some semantic imprecision (e.g., 'jack or the cushion or the pad')",
+      "Patient uses filler/uncertain terms ('or the girl or the woman', 'jack or the cushion or the pad') indicating possible word-finding difficulty",
+      "Patient repeats key elements (water spilling, boy reaching for cookies) but lacks precise object identification or causal linkage",
+      "Patient’s description is task-relevant and complete in scope but lacks specificity and lexical precision",
+      "Patient does not initiate or expand beyond examiner prompts",
+      "response is self-contained but not elaborated"
+    ]
+  },
+  "latency_ms": 23503,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/091-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/091-2.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

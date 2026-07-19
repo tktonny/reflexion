@@ -1,0 +1,127 @@
+{
+  "case_id": "english__pitt__control__cookie__245_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.9,
+  "transcript": "Okay, the boy is standing on a stool that is tilting over. He's reaching for cookies in a cookie jar, and his sister is standing beside him, reaching up for some of the cookie. And the mother is standing right near them, washing dishes in the sink. The water is running into the sink and the sink is flooding over with water. And do you want scenery description or anything like? Okay, outside the window where the mother is, there's a walkway. It looks like it's going out to a garage. And also on this kitchen sink area, there's like a coffee cup, two cups and a plate. And I did say the stool was tilting.",
+  "patient_only_transcript": "The boy is standing on a stool that is tilting over. He's reaching for cookies in a cookie jar, and his sister is standing beside him, reaching up for some of the cookie. And the mother is standing right near them, washing dishes in the sink. The water is running into the sink and the sink is flooding over with water. And outside the window where the mother is, there's a walkway. It looks like it's going out to a garage. And also on this kitchen sink area, there's like a coffee cup, two cups and a plate. And I did say the stool was tilting.",
+  "speaker_turn_summary": [
+    "Examiner: Do you want scenery description or anything like?",
+    "Patient: The boy is standing on a stool that is tilting over. He's reaching for cookies in a cookie jar, and his sister is standing beside him, reaching up for some of the cookie. And the mother is standing right near them, washing dishes in the sink. The water is running into the sink and the sink is flooding over with water. And outside the window where the mother is, there's a walkway. It looks like it's going out to a garage. And also on this kitchen sink area, there's like a coffee cup, two cups and a plate. And I did say the stool was tilting."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with specific content words",
+    "Main events linked logically and sequentially",
+    "Minimal examiner dependence in response structure",
+    "No obvious word-finding pauses, repetitions, or circumlocutions",
+    "Complete coverage of task elements: characters, actions, objects, spatial relations"
+  ],
+  "transcript_request_id": "chatcmpl-3a18fa49-037e-95d3-81d2-29045d19d912",
+  "classification_request_id": "chatcmpl-cb9a4112-8eaf-9666-a05a-0d8f8662ea1a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__245_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__245_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential, and logically connected description of a multi-element kitchen scene involving characters, actions, and spatial relationships.",
+        "evidence": "Patient accurately names and links: boy on stool, cookie jar, sister reaching, mother washing dishes, overflowing sink, walkway to garage, coffee cups and plate. No contradictions or omissions.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Vocabulary",
+        "summary": "Patient uses precise, contextually appropriate vocabulary without hesitation or circumlocution.",
+        "evidence": "Terms like 'tilting over', 'flooding over', 'walkway', 'coffee cup', 'two cups and a plate' are used accurately and without filler or vagueness.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description in a clear, causal, and spatially coherent manner without needing prompting to restructure or clarify.",
+        "evidence": "Response begins with the boy’s action, moves to sister, then mother, then environmental details (window, sink, dishes, objects), showing spatial and functional coherence.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a complete, coherent, and detailed description of a complex visual scene without signs of word-finding difficulty, disorganization, or examiner dependence. All task elements are accurately retrieved and sequenced. No impairment-like cues are observed in speech or content.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No pauses, repetitions, or circumlocutions",
+      "No semantic vagueness or omission of key elements",
+      "Highly structured and spatially coherent narrative",
+      "No signs of confusion or disorientation in role or action"
+    ],
+    "alternative_explanations": [
+      "Patient may be a child or young adult with strong descriptive skills",
+      "Task may be well-practiced or familiar to the patient",
+      "Examiner may have provided implicit scaffolding, but patient response is self-contained"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed",
+      "Continue routine developmental or cognitive monitoring if appropriate for age group"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline is present in this assessment.",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio and transcript reconstruction.",
+      "Patient speech is fully intelligible and task-relevant",
+      "no signs of cognitive impairment detected.",
+      "Examiner prompts are minimal and do not dominate the response",
+      "patient is the primary respondent."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "target_patient_uncertain",
+      "interviewer_dominant",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is standing on a stool that is tilting over. He's reaching for cookies in a cookie jar, and his sister is standing beside him, reaching up for some of the cookie. And the mother is standing right near them, washing dishes in the sink. The water is running into the sink and the sink is flooding over with water. And outside the window where the mother is, there's a walkway. It looks like it's going out to a garage. And also on this kitchen sink area, there's like a coffee cup, two cups and a plate. And I did say the stool was tilting.",
+    "speaker_turn_summary": [
+      "Examiner: Do you want scenery description or anything like?",
+      "Patient: The boy is standing on a stool that is tilting over. He's reaching for cookies in a cookie jar, and his sister is standing beside him, reaching up for some of the cookie. And the mother is standing right near them, washing dishes in the sink. The water is running into the sink and the sink is flooding over with water. And outside the window where the mother is, there's a walkway. It looks like it's going out to a garage. And also on this kitchen sink area, there's like a coffee cup, two cups and a plate. And I did say the stool was tilting."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with specific content words",
+      "Main events linked logically and sequentially",
+      "Minimal examiner dependence in response structure",
+      "No obvious word-finding pauses, repetitions, or circumlocutions",
+      "Complete coverage of task elements: characters, actions, objects, spatial relations"
+    ]
+  },
+  "latency_ms": 18748,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/245-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/245-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

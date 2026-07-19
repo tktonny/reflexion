@@ -1,0 +1,301 @@
+label,url,split,gender,age,race,glasses,facial hair,headwear,dominant pose,indoor/outdoor,solo/multi-person,author
+dementia,https://youtu.be/uAlkCMfTASQ,test,male,71,white/caucasian,yes,yes,no,frontal,indoor,solo,caregiver
+dementia,https://youtu.be/iJJerSu8DxE,test,female,90,white/caucasian,no,no,no,frontal,indoor,solo,caregiver
+dementia,https://youtu.be/E09agP3swYs,test,male,80,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://youtu.be/195rRDIN6_Y,test,male,62,white/caucasian,no,no,no,frontal,outdoor,solo,caregiver
+dementia,https://youtu.be/o73Ls8iyVOQ,test,male,72,white/caucasian,yes,yes,no,frontal,indoor,solo,caregiver
+dementia,https://youtu.be/m0VOv_ZV-Xc,test,male,60,white/caucasian,no,no,no,frontal,outdoor,solo,caregiver
+dementia,https://www.youtube.com/shorts/4qI8djrKniM?feature=share,test,male,64,white/caucasian,no,yes,no,angled,indoor,solo,research organization
+dementia,https://youtu.be/jN8GkHIMkis,test,male,39,white/caucasian,no,no,no,angled,indoor,solo,research organization
+dementia,https://www.youtube.com/shorts/9ajJQWym6QU?feature=share,test,male,80,white/caucasian,yes,no,no,angled,indoor,solo,celebrity
+dementia,https://www.youtube.com/shorts/L7ESquhxFeM,test,male,64,white/caucasian,no,yes,no,angled,indoor,solo,research organization
+dementia,https://youtu.be/CPulwcrkcxA,test,male,55,white/caucasian,yes,no,no,angled,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=8Nna8ZWr720,test,female,56,white/caucasian,yes,no,no,angled,indoor,solo,health magazine
+dementia,https://youtu.be/4nday-TWJj8,test,female,84,white/caucasian,yes,no,no,angled,indoor,multi-person,care center
+dementia,https://youtu.be/JiUfMMinPcU,train,female,56,white/caucasian,yes,no,no,frontal,indoor,solo,care center
+dementia,https://youtu.be/uJLYrMS7hXc,train,female,56,white/caucasian,yes,no,no,angled,indoor,solo,research organization
+dementia,https://youtu.be/gpZeHFDPaxQ,train,female,45,east asian,yes,no,no,angled,indoor,solo,research organization
+dementia,https://youtu.be/T2scj_7ZHi8,train,male,50,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization) 
+dementia,https://www.youtube.com/watch?v=om88gLOJaaI,train,male,49,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization) 
+dementia,https://www.youtube.com/watch?v=lIp0SgAMmII,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization) 
+dementia,https://youtu.be/7HyERDiSrpA,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/tw1qB4do5dE,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/lE6sw48niZI,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/_On0LtzJ43Y,train,male,50,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/YBh8WztAAFs,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/Q-xm_MMwxK4,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/FFPlzDIzHQM,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/vsfCYXcHZ1g,train,male,52,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/H3md0LpIHKk,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/V7LAQYE9jO0,train,male,52,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/y8xH_0WMQd8,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/o5X2dDdey9E,train,male,49,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/I1pN757sN3I,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/D0O_KhocDd0,train,male,52,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/hTFJllvlJXo,train,male,53,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/SZLHZRbBbRY,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/uDmUDsUwCQw,train,male,53,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/tkizJ6Edq3E,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/cmIpogb10mw,train,male,54,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/ZPPaStSXKOA,train,male,51,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/ngEw_cBalfI,train,male,46,white/caucasian,no,no,no,frontal,indoor,solo,caregiver
+dementia,https://youtu.be/_I_-TTgYmVQ,train,male,46,white/caucasian,no,no,no,frontal,indoor,solo,caregiver
+dementia,https://youtu.be/3r_TDiVW7oM,train,male,45,white/caucasian,no,no,no,frontal,indoor,multi-person,caregiver
+dementia,https://youtu.be/fz0KZBNEkck,train,male,45,white/caucasian,no,no,no,frontal,indoor,solo,caregiver
+dementia,https://www.youtube.com/watch?v=Eyi7-G-n-WE,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=47SOGAfnNBg,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=_9BUHCOFxTc,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=k7sJ2MjOYNc,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=rxtg_XpKwNQ,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=jAU1faoB5jM,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=tJsF74LBH6c,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=FLy4oXtITTo,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=64xZ8Z_Jb_8,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=lKWwuYetmUo&pp=0gcJCQMKAYcqIYzv,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=Xu4S6jSIjkw,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=iND7abHZoXI,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://www.youtube.com/watch?v=PQbQfnOJjns&pp=0gcJCQMKAYcqIYzv,train,male,52,white/caucasian,yes,yes,no,frontal,indoor,solo,research organization
+dementia,https://youtu.be/TXIq0CM2w-k,train,male,59,white/caucasian,yes,no,no,frontal,indoor,solo,self(doctor)
+dementia,https://youtu.be/HySdtX5pjRM,train,male,60,white/caucasian,yes,no,no,frontal,indoor,solo,self(doctor)
+dementia,https://youtu.be/zHXvujbWyLs,train,male,59,white/caucasian,yes,no,no,frontal,indoor,solo,self(doctor)
+dementia,https://youtu.be/PNSV6ksviTo,train,male,59,white/caucasian,yes,no,no,frontal,indoor,solo,self(doctor)
+dementia,https://youtu.be/3lC5Wke8MQE,train,male,59,white/caucasian,yes,no,no,frontal,indoor,solo,self(doctor)
+dementia,https://youtu.be/KZsY8X15U0g,train,male,59,white/caucasian,yes,no,no,frontal,indoor,solo,self(doctor)
+dementia,https://www.youtube.com/watch?v=RlQh0zwPE9U&pp=0gcJCQMKAYcqIYzv,train,female,54,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/SOyyWsS-HNw,train,female,55,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/W6RCpwUrQ8E,train,female,55,white/caucasian,yes,no,no,angled,indoor,solo,self
+dementia,https://youtu.be/vW3vy83OVwg,train,female,55,white/caucasian,yes,no,no,angled,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=xmeasjOHu7Q,train,female,56,white/caucasian,no,no,no,angled,indoor,solo,self
+dementia,https://youtu.be/y_gbXRyPVMY,train,female,55,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/eNQvyzKPUAM,train,female,55,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/azJiuCjvbH8,train,female,55,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/NhwWsDyVzZI,train,female,55,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/JkByJfPzR64,train,female,55,white/caucasian,yes,no,no,angled,outdoor,solo,self
+dementia,https://www.youtube.com/watch?v=3orLKsgccLM,train,female,55,white/caucasian,yes,no,no,angled,outdoor,solo,self
+dementia,https://www.youtube.com/watch?v=dX74EXQB6bg,train,female,55,white/caucasian,yes,no,no,angled,outdoor,solo,self
+dementia,https://www.youtube.com/watch?v=lgRyAakex3E,train,female,55,white/caucasian,yes,no,no,angled,outdoor,solo,self
+dementia,https://www.youtube.com/watch?v=zirMmjLyZ44,train,female,55,white/caucasian,yes,no,no,frontal,outdoor,solo,self
+dementia,https://www.youtube.com/watch?v=DdrdE4_rgDA,train,female,55,white/caucasian,no,no,no,frontal,outdoor,solo,self
+dementia,https://www.youtube.com/watch?v=WNYoYhiCHq4,train,female,55,white/caucasian,no,no,no,angled,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=60HYff4J3rQ,train,female,55,white/caucasian,yes,no,no,frontal,outdoor,solo,self
+dementia,https://youtu.be/RYintt3hk4I,train,female,55,white/caucasian,no,no,no,angled,indoor,solo,self
+dementia,https://youtu.be/VMa6q6MRGIQ,train,female,55,white/caucasian,no,no,no,frontal,outdoor,solo,self
+dementia,https://www.youtube.com/watch?v=1mdrIJHhzBI,train,female,55,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/e4CaeEeSH2Q,train,female,55,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/K2MLdX5jYaw,train,female,55-65,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/ZxoIZjv5nP0,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/aY1m-m-u6hc,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/SOlXTTqW2kA,train,female,55,white/caucasian,yes,no,no,angled,indoor,solo,self
+dementia,https://youtu.be/iaQXVT3C0Vk,train,male,74,white/caucasian,yes,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=G9-vDDzPoRA,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/BBJdmjnRWL8,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/Wcvj9isbJJk,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/db3KXhdiGag,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/mZdDJNCW3ic,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/5oUto7pIOoU,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/QISCaUhLTPc,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=T2qPRJCoAQ4,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/Vnlhal5wX14,train,male,74,white/caucasian,no,yes,no,frontal,outdoor,multi-person,self(also posted by research organization)
+dementia,https://youtu.be/HdhwU12qpYU,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/f8d76FQGQJs,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/Br_miJGLQ30,train,male,74,white/caucasian,no,yes,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/K1Vyz_qyLOQ,train,male,74,white/caucasian,no,yes,no,angled,outdoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/IPD9no7ycfU,train,male,74,white/caucasian,no,yes,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/vfVTtJff9_Q,train,male,65,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/OKUbMk-EerQ,train,male,65,white/caucasian,no,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/86bPywOmJAA,train,male,65,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/Iv9XjHmTZWE,train,male,65,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/7xtunpxunuQ,train,male,65,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=F3wU-QLlRF0,train,male,65,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=EF7lcNqlvGc,train,male,65,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=T_StcMZHNrA,train,male,65,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=ImuLWnLlrAQ,train,male,65,white/caucasian,no,no,no,angled,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=aMvJj6j-Neg,train,male,66,white/caucasian,no,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=glKqCMi7UhU,train,male,66,white/caucasian,no,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=uLjqZZ_Lrfw,train,male,66,white/caucasian,no,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=rLAQ9LyVf_M,train,male,66,white/caucasian,no,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=3aumkiM5ib8,train,male,66,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=konzKcMwmbY,train,male,66,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=H_NPE0ymVjk,train,male,66,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=SAI4mtiauLc,train,male,66,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=vMupDGgaBow,train,male,66,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/-W1p5x8fU5o,train,male,66,white/caucasian,no,no,no,frontal,outdoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/-bmKJrMiQD0,train,male,61,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/W4WSUgF1TF8,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=hlz5rIQ26bk,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=hbyGjim1aUU,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=DtEfpby3Myw,train,female,52,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=43t7mNYGZ6E,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=lADogzzi0gU,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=RWGcyOuLZyE,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=m_jlcq6vlsQ,train,female,56,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=CSyqREC7ZPA,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=CfRwqqJZIOc,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=JQJRgEj7v68,train,female,53,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=tBELKlpcoSs,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=33qpsY5JzFY,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=sbrYGv7Mccs,train,female,57,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/d5jnLvskbhk,train,female,55,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/E88GXwgLGFk,train,male,66,white/caucasian,yes,no,no,angled,outdoor,solo,self
+dementia,https://youtu.be/hQQbJX68JJA,train,female,26,white/caucasian,yes,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=PARytTSd_Ok,train,male,52,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=_xYkYpXhRl8,train,male,52,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=pJe8hfbC6Rk&pp=0gcJCQMKAYcqIYzv,train,male,52,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://www.youtube.com/watch?v=iKK5bA5sa9s,train,male,52,white/caucasian,yes,no,no,frontal,indoor,solo,self(also posted by research organization)
+dementia,https://youtu.be/Q_OTVTL3OP8,train,male,65,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/zQ46tO09YgM,train,male,65,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=EXofNOT0e8o,train,male,65,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=hXvYb3y1XOc,train,male,65,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://www.youtube.com/watch?v=tTJWa9Q4N7A,train,male,65,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/tTJWa9Q4N7A,train,male,65,white/caucasian,no,no,no,frontal,indoor,solo,self
+dementia,https://youtu.be/SeOycRJYshE,train,male,65,white/caucasian,no,no,no,frontal,indoor,solo,self
+Normotypical,https://youtu.be/3oIBJoZLc7Y,train,female,18,sub-saharan african,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/n8I4Rd5iFg4,train,female,18,sub-saharan african,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/muZ6QG3izmI,train,female,23,hispanic,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/kabE5xW7vL8,train,male,34,sub-saharan african,no,yes,yes,frontal,indoor,solo,no
+Normotypical,https://youtu.be/NxK-iFsf_S0,train,female,23,south asian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/4IFOvGMfeT8,train,female,23,south asian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/t5bKC2Jm7ak,train,male,22,south east asian,yes,yes,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/sbY0f6muDP4,train,male,29,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/HGoGFvBYlYA,train,male,47,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/LX1yakUDXxE,train,male,47,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/edbPgLRUtbI,train,male,49,white/caucasian,yes,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/Tlxy_rERLfA,train,male,37,sub-saharan african,no,yes,yes,frontal,indoor,solo,no
+Normotypical,https://youtu.be/cBWG2FCU8tg,train,male,57,Japanese,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/SxntHEWu4nk,train,male,41,sub-saharan african,yes,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/5b3CBQJy3qI,train,male,18,hispanic,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/wIoD_bINIBQ,train,female,16,east asian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/rciqGyRirmA,train,male,43,sub-saharan african,no,yes,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/DHI-3s0a6h4,train,male,53,white/caucasian,yes,yes,no,angled,outdoor,solo,no
+Normotypical,https://youtu.be/7KDKpfzi2UY,train,female,25,white/caucasian,no,no,no,angled,outdoor,solo,no
+Normotypical,https://youtu.be/xXRJKnfJ4Bc,train,male,36,white/caucasian,no,yes,no,frontal,indoor,multi-person,no
+Normotypical,https://youtu.be/647pWp6IUew,train,female,37,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/74rAQpeuM5w,train,male,47,white/caucasian,no,no,yes,frontal,indoor,solo,no
+Normotypical,https://youtu.be/fbt9kG5FHk8,train,male,47,white/caucasian,no,no,yes,frontal,indoor,solo,no
+Normotypical,https://youtu.be/SsPFhu_lrw4,train,male,43,hispanic,no,no,yes,frontal,indoor,solo,no
+Normotypical,https://youtu.be/o0X4V4QfwLM,train,male,53,hispanic,yes,yes,yes,frontal,indoor,solo,no
+Normotypical,https://youtu.be/n4vALwrMlQM,train,male,43,east asian,yes,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/REBY6BQ15ig,train,male,33,east asian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/z1FiopDzgEE,train,male,46,sub-saharan african,yes,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/uqRihkfyrHo,train,male,41,east asian,yes,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/zZp4R12V184,train,male,38,east asian,yes,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/3EiAhCn5Sws,train,female,43,east asian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/UWwD6kzEDV0,train,male,38,south asian,yes,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/q5gl8hmG5AY,train,female,34,soth east asian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/uGBQwCsIhn0,train,male,34,south asian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/IpxNz3sy35A,train,female,36,hispanic,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/3nwcvtoZgbk,train,male,43,hispanic,yes,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/hpC3QAcAlus,train,female,38,white/caucasian,yes,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/xSY4NWO3f8U,train,female,49,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/r395V0B6Tg4,train,male,41,sub-saharan african,yes,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/MaLVc8eg3g4,train,male,50,sub-saharan african,yes,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/rjgES0Up4-I,train,male,42,sub-saharan african,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/DrhhaZcmvZo,train,male,46,sub-saharan african,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/JwZWBmq3oQg,train,male,58,white/caucasian,no,yes,yes,frontal,indoor,solo,no
+Normotypical,https://youtu.be/kBtDfx0LvuQ,train,male,45,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/n-jvNkpvgjE,train,male,45,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/7uoXRdXeq0U,train,male,41,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/y_5vDrxoPvM,train,male,61,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/Q76t0bIR80w,train,male,28,sub-saharan african,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/G7hN02djgR8,train,male,23,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/czTRsEF6F2U,train,male,25,sub-saharan african,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/4Q6fagPONxk,train,male,58,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/kpS-Q62KSbc,train,male,56,sub-saharan african,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/OwgSnW6oFZ0,train,female,29,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/xOXhWJqihUs,train,female,50,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/tWg-nnPogRA,train,male,54,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/OJZZWrFj-48,train,female,54,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/hPzg3Jk7d6U,train,male,44,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/FRAIxOonkBI,train,male,54,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/FNWY5oKkFCk,train,male,45,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/qsdugSR1Rk0,train,female,36,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/7CpUr_ts2RA,train,female,31,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/93UMccxbppI,train,female,55,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/8qYaguqe9vA,train,male,24,sub-saharan african,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/PEbSlRBLGPk,train,male,36,sub-saharan african,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/NrgAXS8vg3E,train,male,26,sub-saharan african,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/D03tUup9r20,train,male,29,sub-saharan african,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/J1qMcwkVs8E,train,male,25,sub-saharan african,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/LAm-5DlSuOA,train,female,24,sub-saharan african,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/svzUw1LzoEM,train,female,47,sub-saharan african,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/mmQcX6HpCGs,train,female,35,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/P86JJJLhWac,train,female,27,sub-saharan african,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/Vp8JvAg-2xE,train,female,26,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/1gn0ezZY2zo,train,female,47,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/49D-NesfkOE,train,female,67,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/Jhi74HNNR88,train,female,64,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/Jg4fORQU_E0,train,female,57,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/ojn3TkOwqCs,train,female,54,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/0SXK2cq6usE,train,female,49,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/ZlJVnjSVPnI,train,male,57,white/caucasian,no,yes,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/MURR5KWjsIU,train,female,62,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/vCcp9D7ghJ0,train,female,22,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/GUOrEYzHbS0,train,female,21,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/2nrIa5sTyg8,train,female,24,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/OzW2doi7fE0,train,female,19,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/4NAvZLVzv6U,train,female,20,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/as7w6XtBvCg,train,female,17,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/cAXqDhOzdsg,train,female,20,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/y7eQb_0d6nY,train,male,21,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/xKkqQJUypo4,train,male,23,white/caucasian,no,yes,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/D1r39tIG-wk,train,male,22,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/aB2v3kq4aq0,train,male,20,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/HMRjYPsT6PA,train,female,19,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/VacenomkbL0,train,male,24,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/amBt2CFJ6cw,train,male,19,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/PyzdhG292PU,train,male,19,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/2xYnC3ILGas,train,male,29,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/2ewhQYQV5yo,train,male,29,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/bgotZQ3sa5Q,train,female,25,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/TGxhS3_4KGU,train,female,25,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/rCtcpgZ8SaM,train,male,23,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/cEMbjdMaRsg,train,male,26,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/0ajkFWY8ldY,train,male,34,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/MPEwuPLIGwM,train,male,29,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/-A2evL307-c,train,male,28,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/rAp5Sa8rGbM,train,male,35,white/caucasian,no,yes,no,indoor,indoor,solo,no
+Normotypical,https://youtu.be/j1dPUx1mHco,train,male,27,sub-saharan african,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/DDfah4ZQhHI,test,male,23,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/vhYjpR-un-E,test,male,26,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/DRno-ujLSUY,test,male,28,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/IzL4IriAmf4,test,male,29,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/jVZmy-qNUfg,test,male,25,white/caucasian,no,no,no,angled,indoor,solo,no
+Normotypical,https://youtu.be/59fg__ff3WA,test,male,32,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/01XUctdXxro,test,male,43,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/CJ3PH4-OosI,test,female,27,sub-saharan african,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/PFb6GcUZ_Zg,test,male,43,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/b5vc9cQyZCs,test,male,33,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/9OJGPjqJJtg,test,male,33,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/m1Bn46a4MhA,test,male,53,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/WVXy3cAprSM,test,female,24,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/ZzRMLi1SS8o,test,female,23,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/i_WS8TlAacs,test,female,25,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/EOkxkMS09v8,test,female,22,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/SX-TQVMYU8w,test,male,23,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/nsmpRwZrYnk,test,male,25,white/caucasian,no,yes,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/9vsO0PRd1QY,test,male,22,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/U76CirOfeC0,test,male,32,sub-saharan african,no,yes,yes,frontal,indoor,solo,no
+Normotypical,https://youtu.be/8IL418ebDiE,test,male,29,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/LGrPMXr0gfY,test,male,37,sub-saharan african,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/EvLllE61z-s,train,male,26,sub-saharan african,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/oICCf3zyvGc,train,male,23,white/caucasian,no,no,yes,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/l8WRMoC3cJk,train,male,21,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/5l1lUvam9MU,train,male,27,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/hVxgWLWbj9Q,train,male,29,sub-saharan african,no,yes,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/qFeH0dZu9o8,train,male,25,sub-saharan african,no,yes,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/2LeXLrqXA6U,train,male,24,hispanic,no,yes,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/qQ1g0xxO-IE,train,male,39,white/caucasian,no,yes,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/guo-tH_GPJ4,train,male,28,hispanic,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/J82_-CkbEqI,train,male,27,sub-saharan african,no,yes,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/9ou51twrxZM,train,male,49,white/caucasian,yes,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/2pODXjMBljA,train,male,43,white/caucasian,no,yes,yes,frontal,indoor,solo,no
+Normotypical,https://youtu.be/lbFw2ZnXkFs,train,male,19,sub-saharan african,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/hUWMcv5vgdc,train,male,23,white/caucasian,no,no,no,frontal,outdoor,solo,no
+Normotypical,https://youtu.be/jygrCcGlKZI,train,male,26,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/vEMPeuZTnnM,train,female,24,east asian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/nEwzt3KYJpU,train,female,21,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/XBzSChcMTqE,train,female,26,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/dj85o3a6iFY,train,male,56,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/MkUxWYKrAXU,train,male,49,white/caucasian,no,no,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/6WaO9RlxRFc,train,male,54,white/caucasian,no,yes,no,frontal,indoor,solo,no
+Normotypical,https://youtu.be/ShTalz5vRb8,train,male,57,white/caucasian,no,yes,no,frontal,indoor,solo,no

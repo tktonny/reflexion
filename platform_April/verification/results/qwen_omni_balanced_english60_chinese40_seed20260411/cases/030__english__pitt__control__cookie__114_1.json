@@ -1,0 +1,129 @@
+{
+  "case_id": "english__pitt__control__cookie__114_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.9,
+  "transcript": "Okay, there it is. What do you see going on in that picture? Well, the boy is getting cookies and he's gonna fall off the stool. And the mother is doing dishes and the water is running over out of the sink. She has the faucet on. She's spilling water all over the floor. Anything else? Well, the boy is handing the little girl a cookie. Anything else? Nothing that I can see of action. Okay.",
+  "patient_only_transcript": "Well, the boy is getting cookies and he's gonna fall off the stool. And the mother is doing dishes and the water is running over out of the sink. She has the faucet on. She's spilling water all over the floor. Well, the boy is handing the little girl a cookie. Nothing that I can see of action.",
+  "speaker_turn_summary": [
+    "Examiner: 'What do you see going on in that picture?'",
+    "Patient: 'Well, the boy is getting cookies and he's gonna fall off the stool...'",
+    "Examiner: 'Anything else?'",
+    "Patient: 'Well, the boy is handing the little girl a cookie.'",
+    "Examiner: 'Anything else?'",
+    "Patient: 'Nothing that I can see of action.'"
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies core actors (boy, mother, little girl) and actions (getting cookies, falling off stool, doing dishes, spilling water, handing cookie).",
+    "Patient provides coherent, task-relevant description with minimal hesitation or filler.",
+    "Patient ends with a self-acknowledged limit ('Nothing that I can see of action'), which is contextually appropriate for a structured picture description task.",
+    "No evidence of word-finding breakdown, semantic vagueness, repetition, or disorganization.",
+    "No examiner scaffolding or rescue required",
+    "patient completes task independently with full content coverage."
+  ],
+  "transcript_request_id": "chatcmpl-8fb83ed6-2339-9e5b-b322-13862c2517af",
+  "classification_request_id": "chatcmpl-3da28886-c02b-9128-ac8c-67ebcd24c525",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__114_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__114_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identifies multiple actors, objects, and actions in the picture description task.",
+        "evidence": "Patient described boy falling off stool, mother spilling water, and handing cookie to girl — all core elements of the picture.",
+        "confidence": 0.9
+      },
+      {
+        "label": "Task Completion and Relevance",
+        "summary": "Patient completed the structured picture description task with full task relevance and minimal prompting.",
+        "evidence": "Patient responded to examiner prompts without needing clarification or scaffolding; provided full narrative coverage.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Lexical Retrieval and Fluency",
+        "summary": "Patient demonstrated intact lexical retrieval and fluent, coherent speech without pauses, restarts, or circumlocution.",
+        "evidence": "Speech was clear, grammatically complete, and contained no signs of retrieval difficulty or disfluency.",
+        "confidence": 0.9
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provided a coherent, accurate, and complete description of the pictured scene without signs of cognitive breakdown. Task completion was independent and fluent. No impairment-like cues were observed.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Fluent, grammatically complete speech",
+      "No hesitation, repetition, or examiner dependence",
+      "Task completion without scaffolding or rescue"
+    ],
+    "alternative_explanations": [
+      "Patient may have limited elaboration but still met task requirements",
+      "Self-acknowledged limit ('Nothing that I can see') may reflect task boundary awareness, not impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Continue routine cognitive screening as part of standard assessment",
+      "No further clinical intervention indicated based on this clip"
+    ],
+    "visit_recommendation": "routine follow-up or standard cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline observed.",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible, task-relevant, and complete.",
+      "No signs of dementia-like impairment observed in this structured picture description task."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, the boy is getting cookies and he's gonna fall off the stool. And the mother is doing dishes and the water is running over out of the sink. She has the faucet on. She's spilling water all over the floor. Well, the boy is handing the little girl a cookie. Nothing that I can see of action.",
+    "speaker_turn_summary": [
+      "Examiner: 'What do you see going on in that picture?'",
+      "Patient: 'Well, the boy is getting cookies and he's gonna fall off the stool...'",
+      "Examiner: 'Anything else?'",
+      "Patient: 'Well, the boy is handing the little girl a cookie.'",
+      "Examiner: 'Anything else?'",
+      "Patient: 'Nothing that I can see of action.'"
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies core actors (boy, mother, little girl) and actions (getting cookies, falling off stool, doing dishes, spilling water, handing cookie).",
+      "Patient provides coherent, task-relevant description with minimal hesitation or filler.",
+      "Patient ends with a self-acknowledged limit ('Nothing that I can see of action'), which is contextually appropriate for a structured picture description task.",
+      "No evidence of word-finding breakdown, semantic vagueness, repetition, or disorganization.",
+      "No examiner scaffolding or rescue required",
+      "patient completes task independently with full content coverage."
+    ]
+  },
+  "latency_ms": 21956,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/114-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/114-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

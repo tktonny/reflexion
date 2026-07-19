@@ -1,0 +1,125 @@
+{
+  "case_id": "mandarin__chou__hc__040__040_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.65,
+  "transcript": "没有什么顺序嘛，嗯，然后这个应该是在夜市，因为都开了很多灯。然后右边就是，哎，小时候我没有玩过，听人家说过有洗巴拉，就是丢骰子，看可不可以有香肠，呃，就是抽香肠，然后有就是两个小朋友在抽，老板在那边看着。那，呃，背红背包，紫红背包的那个小朋友的旁边有一个扒手，把手伸到他背包里面去。然后那另外一边就是一个奶奶带着小孙子在捞鱼。那呃，另外一个妈妈跟她的带着小小女儿在那边捞鱼，她妈妈拿着双淇淋，啊，指教她怎么捞，一个手指着，太专心了，那就双淇淋就滴下来了，应该是看小女生伸舌头，不知道怎么那么巧可以让她刚好舔到。然后另外还有一个小女生，不知道她的家长是谁，应该也是那个妈妈吧，然后扎马尾巴也是在捞鱼。",
+  "patient_only_transcript": "没有什么顺序嘛，嗯，然后这个应该是在夜市，因为都开了很多灯。然后右边就是，哎，小时候我没有玩过，听人家说过有洗巴拉，就是丢骰子，看可不可以有香肠，呃，就是抽香肠，然后有就是两个小朋友在抽，老板在那边看着。那，呃，背红背包，紫红背包的那个小朋友的旁边有一个扒手，把手伸到他背包里面去。然后那另外一边就是一个奶奶带着小孙子在捞鱼。那呃，另外一个妈妈跟她的带着小小女儿在那边捞鱼，她妈妈拿着双淇淋，啊，指教她怎么捞，一个手指着，太专心了，那就双淇淋就滴下来了，应该是看小女生伸舌头，不知道怎么那么巧可以让她刚好舔到。然后另外还有一个小女生，不知道她的家长是谁，应该也是那个妈妈吧，然后扎马尾巴也是在捞鱼。",
+  "speaker_turn_summary": [
+    "Patient describes night market scene with multiple actors and actions: kids playing dice, pickpocket, grandma with grandson fishing, mother with daughter fishing, ice cream dripping, girl licking it, girl with ponytail fishing."
+  ],
+  "patient_cue_summary": [
+    "Patient uses colloquial Mandarin with discourse particles (嗯, 哎, 啊, 呃) and generic referents (这个, 那个) but maintains coherent scene description.",
+    "Patient identifies multiple distinct actors and actions across the scene without major contradictions or abandonment.",
+    "Patient’s speech is intelligible enough to reconstruct multiple scene elements, though slightly hesitant and fragmented, consistent with natural spontaneous speech in Chinese.",
+    "No evidence of naming collapse, semantic vagueness, or task abandonment",
+    "patient completes a multi-part description despite pauses and fillers."
+  ],
+  "transcript_request_id": "chatcmpl-ec9b718a-83d4-9c9b-b0dc-76c394cb788b",
+  "classification_request_id": "chatcmpl-e2628b40-9357-9f78-8958-299716b05d11",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__040__040_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__040__040_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient describes multiple actors and actions in a night market scene with reasonable detail and sequence.",
+        "evidence": "Patient identifies dice game, pickpocket, fishing with grandma, mother-daughter fishing, ice cream drip, girl licking, ponytail girl fishing — all distinct and contextually relevant.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Speech Fluency and Structure",
+        "summary": "Speech is fluent with natural colloquial Mandarin, including fillers and topic-comment phrasing, but remains coherent and task-relevant.",
+        "evidence": "Use of 嗯, 哎, 啊, 呃, and generic terms like 这个/那个 does not impede comprehension or task completion.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Engagement",
+        "summary": "Patient completes a multi-part description without abandonment or major contradictions, indicating sustained attention and task engagement.",
+        "evidence": "Patient describes at least 7 distinct scene elements across different areas of the market, with minimal pauses and no need for examiner rescue.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a detailed, multi-element description of a night market scene with multiple actors and actions. Speech is intelligible, coherent, and uses natural colloquial Mandarin with fillers and topic-comment phrasing. No persuasive impairment-like cues are present. However, audio quality is poor and video is unavailable, limiting confidence. Further observation or formal screening is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies and describes multiple scene elements: dice game, pickpocket, fishing with grandma, mother with daughter, ice cream drip, girl licking, ponytail girl fishing.",
+      "Narrative remains largely intact despite pauses and fillers",
+      "no major disorganization or abandonment.",
+      "No evidence of word-finding failure, naming collapse, or semantic vagueness beyond normal colloquial speech patterns."
+    ],
+    "alternative_explanations": [
+      "Poor audio quality may mask subtle cues",
+      "patient may be more impaired than detected.",
+      "Patient’s speech style is naturally colloquial and may not reflect cognitive status.",
+      "Lack of visual channel prevents assessment of nonverbal cues such as gaze, facial expression, or gesture."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the scene-description task with clearer audio or in a controlled setting.",
+      "Add visual observation if possible to assess nonverbal behavior.",
+      "Consider formal cognitive screening tools (e.g., MoCA, MMSE) if patient is at risk for cognitive decline."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening in clinic setting.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio-only clip; further assessments needed for trend evaluation.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Patient speech is intelligible and task-compliant despite poor audio quality.",
+      "No visual cues available",
+      "assessment limited to audio-only content.",
+      "Chinese colloquial speech patterns (fillers, topic-comment, generic referents) are not impairment indicators in this context."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "没有什么顺序嘛，嗯，然后这个应该是在夜市，因为都开了很多灯。然后右边就是，哎，小时候我没有玩过，听人家说过有洗巴拉，就是丢骰子，看可不可以有香肠，呃，就是抽香肠，然后有就是两个小朋友在抽，老板在那边看着。那，呃，背红背包，紫红背包的那个小朋友的旁边有一个扒手，把手伸到他背包里面去。然后那另外一边就是一个奶奶带着小孙子在捞鱼。那呃，另外一个妈妈跟她的带着小小女儿在那边捞鱼，她妈妈拿着双淇淋，啊，指教她怎么捞，一个手指着，太专心了，那就双淇淋就滴下来了，应该是看小女生伸舌头，不知道怎么那么巧可以让她刚好舔到。然后另外还有一个小女生，不知道她的家长是谁，应该也是那个妈妈吧，然后扎马尾巴也是在捞鱼。",
+    "speaker_turn_summary": [
+      "Patient describes night market scene with multiple actors and actions: kids playing dice, pickpocket, grandma with grandson fishing, mother with daughter fishing, ice cream dripping, girl licking it, girl with ponytail fishing."
+    ],
+    "patient_cue_summary": [
+      "Patient uses colloquial Mandarin with discourse particles (嗯, 哎, 啊, 呃) and generic referents (这个, 那个) but maintains coherent scene description.",
+      "Patient identifies multiple distinct actors and actions across the scene without major contradictions or abandonment.",
+      "Patient’s speech is intelligible enough to reconstruct multiple scene elements, though slightly hesitant and fragmented, consistent with natural spontaneous speech in Chinese.",
+      "No evidence of naming collapse, semantic vagueness, or task abandonment",
+      "patient completes a multi-part description despite pauses and fillers."
+    ]
+  },
+  "latency_ms": 17650,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/040/040_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/040/040_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

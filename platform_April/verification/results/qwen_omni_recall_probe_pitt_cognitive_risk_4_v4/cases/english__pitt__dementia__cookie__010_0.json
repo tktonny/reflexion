@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__dementia__cookie__010_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Here's the picture. Oh boy. Well, the boy's one of them could be dark, that's coming there, falling off the yard, and the sister is just wondering about it, leaning in the bottom. Mama has a sink overrunning, with water splashing down onto her shoe. She's in the process of drying dishes and looking out an open window at the same time. Looking out the window, maybe it, I don't know if it's the breeze blowing the curtains because the curtains are a little bit over the window blind, so the window looks a little bit puffy. So maybe there's a slight breeze coming in the kitchen. Mama's drying the dishes and she's looking at herself. The water is overflowing in the sink down onto the floor, splashing into her shoe. All right, there are two cups and a plate on the counter to the right of the sink. And the boy, well, I can tell you the boy is getting ready to fall off the chair. The sister is looking out the cookie jar. The door's open, of course he can't get the cover. That's about it.",
+  "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing. There are two cups and a plate on the counter. The mother is looking out the window while drying dishes. The curtains are moving, maybe from a breeze. The boy is getting ready to fall off the chair. The sister is looking out the cookie jar. The door is open. That’s about it.",
+  "speaker_turn_summary": [
+    "Examiner: Here's the picture.",
+    "Patient: Oh boy. Well, the boy's one of them could be dark, that's coming there, falling off the yard, and the sister is just wondering about it, leaning in the bottom. Mama has a sink overrunning, with water splashing down onto her shoe. She's in the process of drying dishes and looking out an open window at the same time. Looking out the window, maybe it, I don't know if it's the breeze blowing the curtains because the curtains are a little bit over the window blind, so the window looks a little bit puffy. So maybe there's a slight breeze coming in the kitchen. Mama's drying the dishes and she's looking at herself. The water is overflowing in the sink down onto the floor, splashing into her shoe. All right, there are two cups and a plate on the counter to the right of the sink. And the boy, well, I can tell you the boy is getting ready to fall off the chair. The sister is looking out the cookie jar. The door's open, of course he can't get the cover. That's about it."
+  ],
+  "patient_cue_summary": [
+    "Use of vague phrases: 'one of them could be dark', 'I don't know if it's the breeze'",
+    "Repetitive structure: 'Mama's drying the dishes and she's looking at herself'",
+    "Fragmented sequencing: 'And the boy, well, I can tell you the boy is getting ready to fall off the chair'",
+    "Unclear referents: 'that's coming there', 'leaning in the bottom'",
+    "Partial omission of key scene elements: no clear mention of cookie theft or the boy reaching for the jar",
+    "Examiner-dependent completion: 'That's about it.' after long description"
+  ],
+  "transcript_request_id": "chatcmpl-4d01795d-6ecf-986c-990b-0bcf64106a68",
+  "classification_request_id": "chatcmpl-9846a4ff-34e2-9b07-9771-d859756d10f8",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Narrative Organization",
+        "summary": "Disorganized and fragmented description with weak causal links between events.",
+        "evidence": "Patient describes multiple scene elements but fails to connect them into a coherent narrative; uses phrases like 'well, I can tell you the boy is getting ready to fall off the chair' after describing unrelated details.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval",
+        "summary": "Use of vague and circumlocutory terms instead of precise vocabulary.",
+        "evidence": "Phrases such as 'one of them could be dark', 'I don't know if it's the breeze', and 'leaning in the bottom' suggest difficulty retrieving specific words or concepts.",
+        "confidence": null
+      },
+      {
+        "label": "Task Completeness",
+        "summary": "Incomplete description with omission of key elements of the picture task.",
+        "evidence": "Fails to clearly describe the cookie theft or the boy reaching for the jar; ends with 'That's about it.' after a long description, suggesting task abandonment or lack of focus.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient provides a partially coherent but vague and disorganized description of the picture, with frequent hesitations, circumlocutions, and unclear referents. While some scene elements are correctly identified, the narrative lacks clear causal links and specific detail, suggesting possible mild retrieval or organizational difficulties. Further clinical review is warranted.",
+    "evidence_for_risk": [
+      "Vague and circumlocutory language",
+      "Fragmented and repetitive sentence structure",
+      "Partial omission of key task elements (e.g., cookie theft)",
+      "Examiner-dependent completion of description"
+    ],
+    "evidence_against_risk": [
+      "Some correct identification of scene objects (sink, mother, cups, plate, window)",
+      "Coherent attempt to describe spatial relationships and actions"
+    ],
+    "alternative_explanations": [
+      "Possible fatigue or distraction during task",
+      "Temporary cognitive load or task unfamiliarity",
+      "Non-clinical speech disfluency or hesitation"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the picture description task with structured prompts",
+      "Administer formal cognitive screening tools (e.g., MoCA, MMSE)",
+      "Observe for consistency across multiple sessions"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up evaluation recommended",
+    "future_risk_trend_summary": "Longitudinal prediction limited based on single clip; further assessment needed to determine progression",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and transcript",
+      "Patient speech is partially intelligible but shows mild impairment-like cues",
+      "Task context: picture description for cognitive screening"
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible",
+      "limited_speaking_time"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing. There are two cups and a plate on the counter. The mother is looking out the window while drying dishes. The curtains are moving, maybe from a breeze. The boy is getting ready to fall off the chair. The sister is looking out the cookie jar. The door is open. That’s about it.",
+    "speaker_turn_summary": [
+      "Examiner: Here's the picture.",
+      "Patient: Oh boy. Well, the boy's one of them could be dark, that's coming there, falling off the yard, and the sister is just wondering about it, leaning in the bottom. Mama has a sink overrunning, with water splashing down onto her shoe. She's in the process of drying dishes and looking out an open window at the same time. Looking out the window, maybe it, I don't know if it's the breeze blowing the curtains because the curtains are a little bit over the window blind, so the window looks a little bit puffy. So maybe there's a slight breeze coming in the kitchen. Mama's drying the dishes and she's looking at herself. The water is overflowing in the sink down onto the floor, splashing into her shoe. All right, there are two cups and a plate on the counter to the right of the sink. And the boy, well, I can tell you the boy is getting ready to fall off the chair. The sister is looking out the cookie jar. The door's open, of course he can't get the cover. That's about it."
+    ],
+    "patient_cue_summary": [
+      "Use of vague phrases: 'one of them could be dark', 'I don't know if it's the breeze'",
+      "Repetitive structure: 'Mama's drying the dishes and she's looking at herself'",
+      "Fragmented sequencing: 'And the boy, well, I can tell you the boy is getting ready to fall off the chair'",
+      "Unclear referents: 'that's coming there', 'leaning in the bottom'",
+      "Partial omission of key scene elements: no clear mention of cookie theft or the boy reaching for the jar",
+      "Examiner-dependent completion: 'That's about it.' after long description"
+    ]
+  },
+  "latency_ms": 25928,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/010-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/010-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

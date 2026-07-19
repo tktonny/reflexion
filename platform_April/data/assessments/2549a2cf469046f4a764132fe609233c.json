@@ -1,0 +1,109 @@
+{
+  "assessment_id": "2549a2cf469046f4a764132fe609233c",
+  "patient_id": "patient-001",
+  "language": "en",
+  "created_at": "2026-04-07T11:26:44.098550Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Neutral to slightly downward gaze; minimal emotional expression; occasional blinking and head movement.",
+      "evidence": "Patient maintains direct gaze at camera for most of the clip, with occasional downward glances. Facial muscles appear relaxed without signs of distress, confusion, or agitation.",
+      "confidence": 0.85
+    },
+    {
+      "label": "Body Posture",
+      "summary": "Sitting upright, one hand resting near neck/shoulder; no signs of fidgeting or disorientation.",
+      "evidence": "Patient’s posture remains stable throughout. No visible signs of physical discomfort or unsteady balance.",
+      "confidence": 0.9
+    }
+  ],
+  "body_findings": [],
+  "voice_findings": [
+    {
+      "label": "Speech Fluency",
+      "summary": "Speech is fluent, with normal rate and rhythm; no pauses, repetitions, or word-finding difficulties observed.",
+      "evidence": "Patient speaks continuously without hesitation or disfluency. No evidence of circumlocution or phonemic errors.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Vocal Tone and Pitch",
+      "summary": "Vocal tone is steady and even; pitch remains within normal range for adult male speaker.",
+      "evidence": "No vocal tremor, monotony, or excessive pitch variation observed.",
+      "confidence": 0.85
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Self-Reported Routine",
+      "summary": "Patient describes daily routine (breakfast, work, lunch) in a coherent, sequential manner without indication of memory deficit.",
+      "evidence": "Patient states: 'In the morning I wake up and have my breakfast and later I start working... I ordered takeout and have my lunch... I prepare them all by myself.' No contradictions or omissions observed.",
+      "confidence": 0.95
+    },
+    {
+      "label": "Language Comprehension",
+      "summary": "Patient demonstrates appropriate vocabulary and syntax for describing daily activities.",
+      "evidence": "No evidence of semantic errors, paraphasias, or anomia. Sentence structure is grammatically correct and contextually appropriate.",
+      "confidence": 0.9
+    }
+  ],
+  "speaker_structure": "single_speaker",
+  "target_patient_presence": "clear",
+  "target_patient_basis": "visual_focus",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 0.95,
+  "risk_score": 0.15,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "The patient demonstrates coherent speech, appropriate facial expression, stable posture, and clear self-report of daily routine without signs of cognitive impairment. No observable indicators of memory, language, or executive dysfunction are present in this clip.",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [
+    "No speech disfluencies or word-finding difficulties.",
+    "No signs of confusion, disorientation, or emotional dysregulation.",
+    "Self-reported routine is logically sequenced and complete."
+  ],
+  "alternative_explanations": [
+    "The patient may be well-rested or in a familiar environment, which could contribute to optimal performance.",
+    "The clip duration may be insufficient to capture episodic memory or complex executive function tasks."
+  ],
+  "risk_factor_findings": [],
+  "subjective_assessment_findings": [],
+  "emotional_assessment_findings": [
+    "Neutral affect; no signs of anxiety, frustration, or apathy observed.",
+    "Engagement appears consistent with a standard interview setting; no signs of disengagement or emotional flattening."
+  ],
+  "risk_control_suggestions": [
+    "No immediate intervention required.",
+    "Consider routine follow-up if additional concerns arise in future assessments."
+  ],
+  "visit_recommendation": "Routine follow-up or no further action at this time.",
+  "future_risk_trend_summary": "Insufficient data to predict future cognitive decline from a single clip.",
+  "reviewer_confidence": 0.9,
+  "context_notes": [
+    "Clip is usable with clear visual focus on the target patient.",
+    "No evidence of caregiver or interviewer dominance.",
+    "Speech is intelligible and in English with no language mismatch."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "b3ddfdc0-7184-9277-9081-fedf13618175",
+    "latency_ms": 20454,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 20454
+    }
+  ],
+  "fallback_message": null
+}

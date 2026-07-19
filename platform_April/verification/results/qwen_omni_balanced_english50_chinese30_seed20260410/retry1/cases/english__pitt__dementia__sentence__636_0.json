@@ -1,0 +1,147 @@
+{
+  "case_id": "english__pitt__dementia__sentence__636_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Put that into a sentence for me. The table. Hold on to the table, it's going to fall. Okay. How about this word, pencil? I was writing with a pencil and it broke. Okay. How about tree? Tree? Tree. Tree. The wind blew the tree down. Okay, now I'm going to give you two words, and I still want you to give me a brief, simple sentence. Child and hospital. Use both words in a sentence. Child, hospital. Put some cha. How about cold, winter? Cold winter. Make a sentence using those two words. The snow. . . No, I wouldn't be no good. When the snow is on the ground, it's cold. Okay.",
+  "patient_only_transcript": "Put some cha. The snow... No, I wouldn't be no good. When the snow is on the ground, it's cold.",
+  "speaker_turn_summary": [
+    "Examiner: 'Put that into a sentence for me.'",
+    "Patient: 'The table. Hold on to the table, it's going to fall.'",
+    "Examiner: 'How about this word, pencil?'",
+    "Patient: 'I was writing with a pencil and it broke.'",
+    "Examiner: 'How about tree?'",
+    "Patient: 'Tree. Tree. The wind blew the tree down.'",
+    "Examiner: 'Child and hospital. Use both words in a sentence.'",
+    "Patient: 'Put some cha.'",
+    "Examiner: 'Cold, winter. Make a sentence using those two words.'",
+    "Patient: 'The snow... No, I wouldn't be no good. When the snow is on the ground, it's cold.'"
+  ],
+  "patient_cue_summary": [
+    "Failed to construct full sentence with 'child' and 'hospital' — produced 'Put some cha'",
+    "Used self-correction and hesitation ('No, I wouldn't be no good')",
+    "Provided partial, non-targeted response to 'cold winter' task",
+    "Demonstrated intact vocabulary but weak syntactic and narrative execution"
+  ],
+  "transcript_request_id": "chatcmpl-851a4d92-938d-9102-b4c1-ef490b57ca90",
+  "classification_request_id": "chatcmpl-551b12de-5a5b-99b4-a327-6638dc6206c1",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__636_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__636_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "sentence_reconstruction",
+        "summary": "Patient struggled to construct coherent sentences using given words, showed pauses, repetition, and examiner dependence.",
+        "evidence": "Patient said 'Put some cha' when asked to use 'child' and 'hospital'; for 'cold winter', responded with 'The snow... No, I wouldn't be no good. When the snow is on the ground, it's cold.' — showing hesitation, self-correction, and incomplete phrasing.",
+        "confidence": 0.8
+      },
+      {
+        "label": "lexical_retrieval_difficulty",
+        "summary": "Patient used vague or incomplete phrasing, such as 'Put some cha' instead of a full sentence with 'child' and 'hospital'.",
+        "evidence": "Patient failed to correctly construct a sentence with 'child' and 'hospital' on first attempt, producing only 'Put some cha' — indicating possible word-finding or syntactic difficulty.",
+        "confidence": 0.7
+      },
+      {
+        "label": "task_organization_weakness",
+        "summary": "Patient's responses were fragmented, required examiner prompting, and lacked logical or causal structure in sentence construction.",
+        "evidence": "Patient responded to 'cold winter' with a partially constructed sentence that included self-correction ('No, I wouldn't be no good') and then shifted to a general observation about snow, not directly answering the prompt.",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrated mild impairment-like cues in structured sentence construction tasks, including examiner dependence, word-finding pauses, and incomplete phrasing. No strong dementia-level signs present. Further clinical evaluation recommended.",
+    "evidence_for_risk": [
+      "Inability to construct full sentences with given word pairs",
+      "Use of fragmented or self-corrected utterances",
+      "Reliance on examiner prompting to complete tasks"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identified and used some target words (e.g., 'pencil', 'tree', 'cold', 'winter')",
+      "No overt confusion or disorientation in task context",
+      "No signs of severe aphasia or mutism"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive fatigue or test anxiety",
+      "Language processing delay without dementia",
+      "Non-clinical speech disfluency or articulation difficulty"
+    ],
+    "risk_factor_findings": [
+      "Examiner-dependent sentence construction",
+      "Word-finding hesitation and incomplete phrasing",
+      "Reduced syntactic and narrative coherence in structured language task"
+    ],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Minimal emotional reactivity or frustration audible",
+      "No signs of anxiety or apathy",
+      "neutral affect"
+    ],
+    "risk_control_suggestions": [
+      "Schedule formal cognitive screening (e.g., MoCA, MMSE)",
+      "Observe patient in multiple contexts for consistency of performance",
+      "Consider caregiver report for functional impact"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment.",
+    "future_risk_trend_summary": "Single-clip assessment limits longitudinal prediction; repeated assessments recommended for trend analysis.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech shows mild impairment-like features but not sufficient for dementia classification.",
+      "Examiner prompts are neutral context",
+      "patient responses are the primary evaluation focus."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Put some cha. The snow... No, I wouldn't be no good. When the snow is on the ground, it's cold.",
+    "speaker_turn_summary": [
+      "Examiner: 'Put that into a sentence for me.'",
+      "Patient: 'The table. Hold on to the table, it's going to fall.'",
+      "Examiner: 'How about this word, pencil?'",
+      "Patient: 'I was writing with a pencil and it broke.'",
+      "Examiner: 'How about tree?'",
+      "Patient: 'Tree. Tree. The wind blew the tree down.'",
+      "Examiner: 'Child and hospital. Use both words in a sentence.'",
+      "Patient: 'Put some cha.'",
+      "Examiner: 'Cold, winter. Make a sentence using those two words.'",
+      "Patient: 'The snow... No, I wouldn't be no good. When the snow is on the ground, it's cold.'"
+    ],
+    "patient_cue_summary": [
+      "Failed to construct full sentence with 'child' and 'hospital' — produced 'Put some cha'",
+      "Used self-correction and hesitation ('No, I wouldn't be no good')",
+      "Provided partial, non-targeted response to 'cold winter' task",
+      "Demonstrated intact vocabulary but weak syntactic and narrative execution"
+    ]
+  },
+  "latency_ms": 19463,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/636-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/636-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

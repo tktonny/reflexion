@@ -1,0 +1,105 @@
+{
+  "case_id": "english__pitt__control__cookie__124_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.6,
+  "transcript": "Yeah.",
+  "patient_only_transcript": "Yeah.",
+  "speaker_turn_summary": [
+    "Examiner: prompts or asks a question (not transcribed).",
+    "Patient: responds with 'Yeah.'"
+  ],
+  "patient_cue_summary": [
+    "Single-word response to an open-ended picture-description task.",
+    "No elaboration, no scene elements identified, no task completion.",
+    "Highly examiner-dependent, no evidence of self-generated content.",
+    "No observable hesitation, filler, or restart — but also no meaningful content."
+  ],
+  "transcript_request_id": "chatcmpl-f0d887d2-0a27-9b53-80f9-9c25b32a93df",
+  "classification_request_id": "chatcmpl-493c53a0-17c2-9952-85dc-8932b6353800",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__124_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__124_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provided only a single-word response ('Yeah.') to a structured picture-description task. No meaningful content, no scene elements, no elaboration. While the clip is usable for basic interaction, it lacks sufficient cognitive screening evidence to support cognitive_risk. Further observation or formal assessment is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No observable impairment-like speech breakdowns (e.g., pauses, restarts, tangents).",
+      "Response is not necessarily indicative of cognitive decline — may reflect disengagement, fatigue, or task misunderstanding.",
+      "No caregiver or examiner-reported concerns in available audio.",
+      "No emotional or affective signs of distress or apathy observed."
+    ],
+    "alternative_explanations": [
+      "Patient may be disengaged, distracted, or not fully understanding the task.",
+      "Response may reflect a cultural or conversational style rather than cognitive impairment.",
+      "Single-word response may be due to audio cutoff or recording limitation rather than cognitive deficit."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the picture-description task with clearer prompting or visual support.",
+      "Observe patient engagement and task persistence in subsequent interactions.",
+      "Consider administering a formal cognitive screening battery if clinical concern persists."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if clinical concern remains.",
+    "future_risk_trend_summary": "Longitudinal prediction is not possible from a single clip with minimal patient output.",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient response is minimal and task-incomplete",
+      "no impairment-like cues detected.",
+      "Classification remains conservative: 'needs_observation' due to insufficient data for definitive HC or cognitive_risk."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Yeah.",
+    "speaker_turn_summary": [
+      "Examiner: prompts or asks a question (not transcribed).",
+      "Patient: responds with 'Yeah.'"
+    ],
+    "patient_cue_summary": [
+      "Single-word response to an open-ended picture-description task.",
+      "No elaboration, no scene elements identified, no task completion.",
+      "Highly examiner-dependent, no evidence of self-generated content.",
+      "No observable hesitation, filler, or restart — but also no meaningful content."
+    ]
+  },
+  "latency_ms": 13724,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/124-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/124-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

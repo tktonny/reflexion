@@ -1,0 +1,130 @@
+{
+  "case_id": "english__pitt__dementia__fluency__624_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.7,
+  "transcript": "Ready? Go ahead, tell me the animals. Squirrel, rabbit, fox, bear, tiger. Did I say horse? Elephant, jaguar. Okay, that's a minute. Now I'm going to give you another minute, and in that minute's time I want you to name for me as many words as you can think of beginning with the letter F. All of the words that start with the letter F. I don't want any proper names of people or places, and I only want one form of the word. For instance, if you gave me the word walk, I wouldn't want you to give me walking and walked. Just one form of the word, no proper names, all of the words you can think of beginning with the letter F. Okay? Ready? Go ahead. Faith. Hope. All of the words beginning with F. Oh, faith, friend, fan, fingers. Did I say friends? Anything starting with F. Feet, flag, foreign. Okay, that's a minute. Good.",
+  "patient_only_transcript": "Squirrel, rabbit, fox, bear, tiger. Did I say horse? Elephant, jaguar. Faith, hope, friend, fan, fingers. Did I say friends? Feet, flag, foreign.",
+  "speaker_turn_summary": [
+    "Examiner: 'Ready? Go ahead, tell me the animals.'",
+    "Patient: 'Squirrel, rabbit, fox, bear, tiger.'",
+    "Examiner: 'Did I say horse?'",
+    "Patient: 'Elephant, jaguar.'",
+    "Examiner: 'Now I'm going to give you another minute... name as many words as you can think of beginning with the letter F.'",
+    "Patient: 'Faith, hope, friend, fan, fingers. Did I say friends? Feet, flag, foreign.'"
+  ],
+  "patient_cue_summary": [
+    "Moderate productivity in both fluency tasks",
+    "Self-correction and mild uncertainty without breakdown",
+    "Compliance with task constraints (no proper names, one form per word)",
+    "No semantic drift or abandonment of task"
+  ],
+  "transcript_request_id": "chatcmpl-f40e77bf-d745-96fd-969d-bff415b87770",
+  "classification_request_id": "chatcmpl-33d57c18-954f-99b3-b5a3-2366c8726ff5",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__624_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__624_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Animal Naming Task",
+        "summary": "Patient names animals in sequence: squirrel, rabbit, fox, bear, tiger. Later questions if 'horse' was said, then adds 'elephant, jaguar'.",
+        "evidence": "Patient produces 7 animal names with minimal hesitation. Shows mild self-correction ('Did I say horse?') and adds two more animals after prompting. No repetition or clear retrieval failure.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Letter F Fluency Task",
+        "summary": "Patient generates 10+ F-words: faith, hope, friend, fan, fingers, feet, flag, foreign. Shows hesitation, self-questioning ('Did I say friends?'), and pauses. No proper nouns or multiple forms of same word.",
+        "evidence": "Patient produces a moderate number of F-words with some self-correction and pauses. No clear semantic drift or task abandonment. Words are mostly concrete nouns, with 'faith' and 'hope' as abstract exceptions.",
+        "confidence": 0.8
+      },
+      {
+        "label": "Task Engagement and Clarity",
+        "summary": "Patient follows task instructions, acknowledges examiner prompts, and attempts to comply with constraints (no proper names, one form per word). Shows mild uncertainty but no confusion or disengagement.",
+        "evidence": "Patient responds to examiner’s instructions, repeats the prompt’s constraints, and attempts to comply. Minor self-corrections and pauses suggest mild retrieval effort but not breakdown.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient completes both verbal fluency tasks with moderate productivity and minimal self-correction. No clear signs of retrieval failure, semantic drift, or task abandonment. Mild uncertainty is present but does not indicate impairment. Further clinical observation or formal screening is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient completes both tasks with reasonable item count and task compliance",
+      "No repetition, abandonment, or semantic drift",
+      "Self-corrections are brief and do not disrupt task flow"
+    ],
+    "alternative_explanations": [
+      "Mild uncertainty may reflect test-taking behavior or momentary retrieval effort rather than cognitive impairment",
+      "Patient may be cautious or self-monitoring, which is not necessarily pathological"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Mild uncertainty expressed through self-questioning ('Did I say horse?', 'Did I say friends?')",
+      "No signs of frustration, anxiety, or apathy",
+      "tone remains neutral and cooperative"
+    ],
+    "risk_control_suggestions": [
+      "Schedule follow-up for formal cognitive screening if clinical concern persists",
+      "Consider repeating the fluency tasks in a different context or with additional cues",
+      "Monitor for functional changes or caregiver-reported concerns"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if no prior evaluation or if clinical concern is present",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of progressive decline or strong impairment.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment is based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible and task-relevant",
+      "examiner prompts are not counted as patient output.",
+      "No visual cues available to assess facial expression, gaze, or gesture."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Squirrel, rabbit, fox, bear, tiger. Did I say horse? Elephant, jaguar. Faith, hope, friend, fan, fingers. Did I say friends? Feet, flag, foreign.",
+    "speaker_turn_summary": [
+      "Examiner: 'Ready? Go ahead, tell me the animals.'",
+      "Patient: 'Squirrel, rabbit, fox, bear, tiger.'",
+      "Examiner: 'Did I say horse?'",
+      "Patient: 'Elephant, jaguar.'",
+      "Examiner: 'Now I'm going to give you another minute... name as many words as you can think of beginning with the letter F.'",
+      "Patient: 'Faith, hope, friend, fan, fingers. Did I say friends? Feet, flag, foreign.'"
+    ],
+    "patient_cue_summary": [
+      "Moderate productivity in both fluency tasks",
+      "Self-correction and mild uncertainty without breakdown",
+      "Compliance with task constraints (no proper names, one form per word)",
+      "No semantic drift or abandonment of task"
+    ]
+  },
+  "latency_ms": 22709,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/624-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/624-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

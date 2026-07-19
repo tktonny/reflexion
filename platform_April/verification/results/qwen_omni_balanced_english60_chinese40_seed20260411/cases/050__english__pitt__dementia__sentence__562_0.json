@@ -1,0 +1,139 @@
+{
+  "case_id": "english__pitt__dementia__sentence__562_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.95,
+  "transcript": "Pencil. The pencil needs sharpened. Okay. How about tree? Tree. Can you give me a short simple sentence using the word tree? Um. The leaves fall off the tree. Okay. Now I'm going to give you two words. Don't worry about the order that I give them to you, just use both of them in one short simple sentence. Child, hospital. I don't know. Can you come up with a sentence using those words, child, hospital? The child is in the hospital. Good. How about cold winter? Weather, weather. Can you come up with a short simple sentence using the words cold winter? It's been a cold winter. Now I'm going to give you three words. I want you to come up with a short simple sentence using the words chair, doctor, sit. The doctor sat in the chair. Are any of them right that I. . . You're doing fine so far, they're perfect. Now I want you to come up with a sentence using bureau, open, drawer. The bureau drawer is open.",
+  "patient_only_transcript": "The leaves fall off the tree. The child is in the hospital. It's been a cold winter. The doctor sat in the chair. The bureau drawer is open.",
+  "speaker_turn_summary": [
+    "Examiner: 'How about tree? Can you give me a short simple sentence using the word tree?'",
+    "Patient: 'The leaves fall off the tree.'",
+    "Examiner: 'Now I'm going to give you two words. Child, hospital.'",
+    "Patient: 'The child is in the hospital.'",
+    "Examiner: 'How about cold winter?'",
+    "Patient: 'It's been a cold winter.'",
+    "Examiner: 'Now I'm going to give you three words. Chair, doctor, sit.'",
+    "Patient: 'The doctor sat in the chair.'",
+    "Examiner: 'Now I want you to come up with a sentence using bureau, open, drawer.'",
+    "Patient: 'The bureau drawer is open.'"
+  ],
+  "patient_cue_summary": [
+    "Task-compliant sentence generation for each prompt",
+    "Clear transformation beyond bare prompt echo",
+    "Stable fluency and syntactic completeness",
+    "No retrieval failure or hesitation",
+    "No circumlocution, filler, or self-correction",
+    "Accurate use of all required words in each sentence"
+  ],
+  "transcript_request_id": "chatcmpl-1fc61fc6-ca86-9380-8195-d07da1ea98b5",
+  "classification_request_id": "chatcmpl-8df4febf-297f-9d9d-a71c-6bb9c647fb17",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__562_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__562_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Sentence Construction Task Performance",
+        "summary": "Patient generated grammatically correct, semantically complete sentences using all required words for each prompt without hesitation or error.",
+        "evidence": "Responses: 'The leaves fall off the tree.', 'The child is in the hospital.', 'It's been a cold winter.', 'The doctor sat in the chair.', 'The bureau drawer is open.'",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Compliance and Fluency",
+        "summary": "Patient completed all five sentence construction tasks with full fluency, no pauses, fillers, or self-corrections.",
+        "evidence": "All responses were delivered in a single utterance per prompt, with no restarts or hesitation markers.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Lexical Retrieval and Semantic Accuracy",
+        "summary": "Patient accurately retrieved and used all target words in contextually appropriate sentences.",
+        "evidence": "Each sentence correctly incorporated the required words (tree, child/hospital, cold/winter, chair/doctor/sit, bureau/open/drawer) without substitution or omission.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "The patient consistently generated accurate, grammatically complete, and task-relevant sentences using all required words for each prompt. No signs of retrieval difficulty, hesitation, or task breakdown were observed. The responses were fluent, concise, and directly addressed the examiner's instructions without prompting or scaffolding.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "All patient responses were complete, coherent, and semantically accurate.",
+      "No signs of word-finding difficulty, circumlocution, or syntactic breakdown.",
+      "Responses were generated without examiner correction or repeated prompting.",
+      "No emotional dysregulation, apathy, or disengagement was audible."
+    ],
+    "alternative_explanations": [
+      "The patient may have strong language and executive function for their age or baseline.",
+      "The task may have been within the patient's cognitive capacity for sentence construction.",
+      "The patient may have been well-prepared or familiar with the task structure."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No further action required at this time.",
+      "Continue routine monitoring if other cognitive domains are being assessed.",
+      "Consider re-screening in 6–12 months if clinical concerns arise."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no persuasive evidence of cognitive decline is present.",
+    "reviewer_confidence": 0.95,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient responses were consistently accurate and task-compliant.",
+      "No impairment-like signals were detected in speech or content."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The leaves fall off the tree. The child is in the hospital. It's been a cold winter. The doctor sat in the chair. The bureau drawer is open.",
+    "speaker_turn_summary": [
+      "Examiner: 'How about tree? Can you give me a short simple sentence using the word tree?'",
+      "Patient: 'The leaves fall off the tree.'",
+      "Examiner: 'Now I'm going to give you two words. Child, hospital.'",
+      "Patient: 'The child is in the hospital.'",
+      "Examiner: 'How about cold winter?'",
+      "Patient: 'It's been a cold winter.'",
+      "Examiner: 'Now I'm going to give you three words. Chair, doctor, sit.'",
+      "Patient: 'The doctor sat in the chair.'",
+      "Examiner: 'Now I want you to come up with a sentence using bureau, open, drawer.'",
+      "Patient: 'The bureau drawer is open.'"
+    ],
+    "patient_cue_summary": [
+      "Task-compliant sentence generation for each prompt",
+      "Clear transformation beyond bare prompt echo",
+      "Stable fluency and syntactic completeness",
+      "No retrieval failure or hesitation",
+      "No circumlocution, filler, or self-correction",
+      "Accurate use of all required words in each sentence"
+    ]
+  },
+  "latency_ms": 19129,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/562-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/562-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "case_id": "english__pitt__dementia__fluency__344_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "And you can begin now. Kangaroo, horses, dogs, alligators. Oh, does fish? You can. Walruses. Oh, that's another one. Rabbits. Uh-uh, got a block. Got about 30 seconds, as many animals as you can think of. You want no birds or no fish? That's right, okay. Think of that begin with the letter F, and you can begin now. Falling, failure, figure, funny, frigid, fantastic, false, fretful, ferocious, ferocious, frivolous, farm, falcon, false, feather. Did I say father? Okay.",
+  "patient_only_transcript": "Kangaroo, horses, dogs, alligators. Oh, does fish? Walruses. Oh, that's another one. Rabbits. Uh-uh, got a block. Falling, failure, figure, funny, frigid, fantastic, false, fretful, ferocious, ferocious, frivolous, farm, falcon, false, feather. Did I say father?",
+  "speaker_turn_summary": [
+    "Examiner: 'And you can begin now.'",
+    "Patient: 'Kangaroo, horses, dogs, alligators. Oh, does fish? Walruses. Oh, that's another one. Rabbits. Uh-uh, got a block.'",
+    "Examiner: 'Got about 30 seconds, as many animals as you can think of. You want no birds or no fish?'",
+    "Examiner: 'That's right, okay. Think of that begin with the letter F, and you can begin now.'",
+    "Patient: 'Falling, failure, figure, funny, frigid, fantastic, false, fretful, ferocious, ferocious, frivolous, farm, falcon, false, feather. Did I say father?'"
+  ],
+  "patient_cue_summary": [
+    "Initial animal list with pauses and self-correction ('Oh, does fish?')",
+    "Self-reported blockage ('Uh-uh, got a block')",
+    "Switch to F-words with repetition ('ferocious, ferocious')",
+    "Uncertainty and self-questioning ('Did I say father?')",
+    "Fragmented, non-sequential, low-information lexical retrieval",
+    "Examiner-dependent continuation and task reset"
+  ],
+  "transcript_request_id": "chatcmpl-95a1a7e3-eab1-9f26-9c54-f7f49a288ee8",
+  "classification_request_id": "chatcmpl-ff05fe03-aad3-9f01-a724-fc56d90d6e0b",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__344_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__344_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "Speech fluency",
+        "summary": "Speech is fragmented, with pauses, self-corrections, and repetition of words.",
+        "evidence": "Patient says 'Uh-uh, got a block' and repeats 'ferocious' twice. Ends with 'Did I say father?' indicating uncertainty.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical retrieval",
+        "summary": "Lexical retrieval appears effortful, with non-specific or generic terms and repetition.",
+        "evidence": "Patient lists animals then switches to F-words with no clear semantic connection. Uses 'false', 'frigid', 'funny' — not animal-related.",
+        "confidence": null
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "Verbal fluency task performance",
+        "summary": "Patient struggles to generate category-specific items, shows retrieval difficulty, and requires examiner prompting to restart.",
+        "evidence": "Patient begins with animals, then pauses, then switches to F-words without clear task alignment. Repeats 'ferocious' and questions own utterance.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates signs of mild word-finding difficulty and task disengagement during verbal fluency tasks. Speech is fragmented, with self-corrections and uncertainty. No strong dementia-level evidence, but impairment-like cues suggest need for further clinical evaluation.",
+    "evidence_for_risk": [
+      "Self-reported blockage during fluency task",
+      "Repetition of words ('ferocious')",
+      "Uncertainty and self-questioning ('Did I say father?')",
+      "Switching from animal category to unrelated F-words without clear task alignment"
+    ],
+    "evidence_against_risk": [
+      "Patient successfully generated some category items (e.g., 'kangaroo', 'horses', 'dogs')",
+      "No overt disorientation or incoherence",
+      "Task completion was attempted despite difficulty"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive fatigue or test anxiety",
+      "Non-optimal audio quality affecting speech clarity",
+      "Mild age-related slowing without clinical impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Self-reported cognitive blockage",
+      "Uncertainty and hesitation in speech",
+      "Possible mild frustration or self-doubt in questioning 'Did I say father?'"
+    ],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency task with clearer instructions and time cues",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Obtain collateral history from caregiver or family member",
+      "Schedule follow-up visit for longitudinal assessment"
+    ],
+    "visit_recommendation": "Formal cognitive screening and clinical evaluation recommended",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment needed to determine progression or stability",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Audio quality is poor",
+      "speech is partially unintelligible.",
+      "Patient is clearly the target subject, but examiner prompts are frequent and necessary.",
+      "No visual cues available",
+      "assessment is based solely on audio content and structure."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "poor_audio",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Kangaroo, horses, dogs, alligators. Oh, does fish? Walruses. Oh, that's another one. Rabbits. Uh-uh, got a block. Falling, failure, figure, funny, frigid, fantastic, false, fretful, ferocious, ferocious, frivolous, farm, falcon, false, feather. Did I say father?",
+    "speaker_turn_summary": [
+      "Examiner: 'And you can begin now.'",
+      "Patient: 'Kangaroo, horses, dogs, alligators. Oh, does fish? Walruses. Oh, that's another one. Rabbits. Uh-uh, got a block.'",
+      "Examiner: 'Got about 30 seconds, as many animals as you can think of. You want no birds or no fish?'",
+      "Examiner: 'That's right, okay. Think of that begin with the letter F, and you can begin now.'",
+      "Patient: 'Falling, failure, figure, funny, frigid, fantastic, false, fretful, ferocious, ferocious, frivolous, farm, falcon, false, feather. Did I say father?'"
+    ],
+    "patient_cue_summary": [
+      "Initial animal list with pauses and self-correction ('Oh, does fish?')",
+      "Self-reported blockage ('Uh-uh, got a block')",
+      "Switch to F-words with repetition ('ferocious, ferocious')",
+      "Uncertainty and self-questioning ('Did I say father?')",
+      "Fragmented, non-sequential, low-information lexical retrieval",
+      "Examiner-dependent continuation and task reset"
+    ]
+  },
+  "latency_ms": 18628,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/344-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/344-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

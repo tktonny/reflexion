@@ -1,0 +1,163 @@
+{
+  "dataset": "talkbank_english_pitt",
+  "manifest_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/talkbank/corpora/english/pitt/manifest.jsonl",
+  "results_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/results/qwen_omni_balanced_english60_chinese40_seed20260411/replacement_candidate_cookie_005_2",
+  "metrics": {
+    "evaluated_cases": 1,
+    "successful_cases": 1,
+    "error_cases": 0,
+    "skipped_cases": 0,
+    "accuracy": 0.0,
+    "recall": 0.0,
+    "confusion_matrix": {
+      "true_positive": 0,
+      "true_negative": 0,
+      "false_positive": 0,
+      "false_negative": 1
+    }
+  },
+  "cases": [
+    {
+      "case_id": "english__pitt__dementia__cookie__005_2",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.25,
+      "reviewer_confidence": 0.75,
+      "transcript": "Okay, and there's the picture. Tell me all the action. Okay, it's all over here. Anything else? She's running the water over. Okay. Okay, any more action? Okay, pardon me? Okay. Anything else? Okay, okay, Mr. Stearns, that.",
+      "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+      "speaker_turn_summary": [
+        "Examiner: 'Okay, and there's the picture. Tell me all the action.'",
+        "Patient: 'Okay, it's all over here.'",
+        "Examiner: 'Anything else?'",
+        "Patient: 'She's running the water over.'",
+        "Examiner: 'Okay. Okay, any more action?'",
+        "Patient: 'Okay, pardon me?'",
+        "Examiner: 'Anything else?'",
+        "Patient: 'Okay, okay, Mr. Stearns, that.'"
+      ],
+      "patient_cue_summary": [
+        "Brief but accurate scene description",
+        "Intelligible speech",
+        "Core events identified",
+        "Limited elaboration alone is not enough for cognitive_risk",
+        "Examiner-dependent continuation",
+        "Final utterance is truncated and ends with examiner name"
+      ],
+      "transcript_request_id": "chatcmpl-089f40a1-1e87-96aa-b0bc-d2dbed505109",
+      "classification_request_id": "chatcmpl-ece86ea5-86b3-9e7d-bb0d-4e4f507952fa",
+      "transcript_model": "qwen3-asr-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_2/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_2/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [
+          {
+            "label": "Scene Description",
+            "summary": "Patient identified key actors and actions in the picture: boy reaching for cookies, stool tipping, mother at sink, water running.",
+            "evidence": "Patient said: 'She's running the water over.' and 'That is about all I see.'",
+            "confidence": 0.5
+          },
+          {
+            "label": "Task Completion",
+            "summary": "Response appears truncated; ends with examiner name rather than full description.",
+            "evidence": "Patient said: 'Okay, okay, Mr. Stearns, that.' after being prompted for more.",
+            "confidence": 0.25
+          },
+          {
+            "label": "Examiner Interaction",
+            "summary": "Patient responded to examiner prompts but required multiple prompts to continue.",
+            "evidence": "Examiner asked: 'Anything else?' twice; patient responded with 'Okay, pardon me?' before final utterance.",
+            "confidence": 0.5
+          }
+        ],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.25,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient provides a brief but accurate description of the picture scene, identifying key actors and actions. Speech is intelligible and task-relevant. However, the response is truncated and ends with examiner name, suggesting possible task completion failure or examiner scaffolding. No strong impairment-like cues are present. Further observation or formal screening is recommended.",
+        "evidence_for_risk": [
+          "Patient identified core scene elements: boy, cookies, stool, mother, water running",
+          "Speech is coherent and task-relevant",
+          "No word-finding pauses, circumlocution, or semantic vagueness detected"
+        ],
+        "evidence_against_risk": [
+          "No signs of disorganization, repetition, or abandonment of task",
+          "No examiner dependence beyond minimal prompting",
+          "No emotional flattening, frustration, or apathy observed"
+        ],
+        "alternative_explanations": [
+          "Truncated response may reflect task completion or examiner interruption, not cognitive impairment",
+          "Short response may reflect limited elaboration, not retrieval failure",
+          "Examiner name at end may be a conversational artifact, not a cognitive marker"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [],
+        "risk_control_suggestions": [
+          "Follow up with full picture description task",
+          "Administer formal cognitive screening battery",
+          "Observe patient in structured narrative or memory tasks"
+        ],
+        "visit_recommendation": "formal screening",
+        "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment required for trend inference.",
+        "reviewer_confidence": 0.75,
+        "context_notes": [
+          "Video component unavailable",
+          "assessment based solely on audio.",
+          "Patient speech is intelligible and task-relevant but brief.",
+          "No strong impairment-like cues detected",
+          "classification remains conservative."
+        ],
+        "quality_flags": [
+          "multiple_people",
+          "face_not_visible",
+          "poor_audio",
+          "transcript_unavailable"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+        "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+        "speaker_turn_summary": [
+          "Examiner: 'Okay, and there's the picture. Tell me all the action.'",
+          "Patient: 'Okay, it's all over here.'",
+          "Examiner: 'Anything else?'",
+          "Patient: 'She's running the water over.'",
+          "Examiner: 'Okay. Okay, any more action?'",
+          "Patient: 'Okay, pardon me?'",
+          "Examiner: 'Anything else?'",
+          "Patient: 'Okay, okay, Mr. Stearns, that.'"
+        ],
+        "patient_cue_summary": [
+          "Brief but accurate scene description",
+          "Intelligible speech",
+          "Core events identified",
+          "Limited elaboration alone is not enough for cognitive_risk",
+          "Examiner-dependent continuation",
+          "Final utterance is truncated and ends with examiner name"
+        ]
+      },
+      "latency_ms": 27544,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/005-2.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/005-2.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    }
+  ]
+}

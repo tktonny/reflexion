@@ -1,0 +1,181 @@
+{
+  "case_id": "english__pitt__dementia__sentence__018_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "Okay, the first word is pencil. Can you make a sentence for me out of pencil? The pencil was on the table. Okay, good. How about tree? The trees in autumn are beautiful. Okay, now I'm going to give you two words. Don't worry about the order that I give them to you. Just make a sentence using both words, okay? Child, hospital. Scampering. Scampering. Okay, let's try another one. Here's two more words. Cold, winter. Can you give me a sentence using cold and winter? Cold winter. Slush. Sleep. Okay. Now I'm going to give you three words. Again, I don't want you to worry about the order, but just give me a sentence using the three words. Here are the first three. Chair, doctor, sit. Okay? Okay, can you give me a sentence using them? Can you think of a sentence? Okay, how about these three words? Bureau, open, drawer. Can you give me a sentence with those three? Bureau, open, drawer. Right. And the, the other, chest. Okay, fine, thank you.",
+  "patient_only_transcript": "The pencil was on the table. The trees in autumn are beautiful. Scampering. Scampering. Cold winter. Slush. Sleep. No. Bureau, open, drawer. Right. And the, the other, chest. Okay, fine, thank you.",
+  "speaker_turn_summary": [
+    "Examiner: 'Can you make a sentence for me out of pencil?'",
+    "Patient: 'The pencil was on the table.'",
+    "Examiner: 'How about tree?'",
+    "Patient: 'The trees in autumn are beautiful.'",
+    "Examiner: 'Child, hospital.'",
+    "Patient: 'Scampering. Scampering.'",
+    "Examiner: 'Cold, winter.'",
+    "Patient: 'Cold winter. Slush. Sleep.'",
+    "Examiner: 'Chair, doctor, sit.'",
+    "Patient: 'No.'",
+    "Examiner: 'Bureau, open, drawer.'",
+    "Patient: 'Bureau, open, drawer. Right. And the, the other, chest.'",
+    "Examiner: 'Okay, fine, thank you.'"
+  ],
+  "patient_cue_summary": [
+    "Response to single-word prompts is correct but minimal",
+    "Response to two-word prompts is repetitive or vague ('scampering... scampering...')",
+    "Response to three-word prompts is incomplete or semantically unrelated ('chest')",
+    "Patient says 'no' to sentence request, indicating task disengagement",
+    "Patient ends interaction without further attempt, suggesting low persistence or retrieval failure"
+  ],
+  "transcript_request_id": "chatcmpl-41da171c-2860-9111-945e-ed6854f881d3",
+  "classification_request_id": "chatcmpl-a9f0d2eb-4121-98c9-8f66-93ced07e54cd",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__018_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__018_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "speech_retrieval_difficulty",
+        "summary": "Patient exhibits pauses, repetition, and circumlocution when constructing sentences, particularly with multi-word prompts.",
+        "evidence": "Patient responds to 'child, hospital' with 'scampering... scampering...', then to 'cold, winter' with 'cold winter... slush... sleep...', and to 'chair, doctor, sit' with silence and 'no'. For 'bureau, open, drawer', responds with 'bureau, open, drawer. Right. And the, the other, chest.' — indicating fragmented, incomplete, or disorganized retrieval.",
+        "confidence": 0.7
+      },
+      {
+        "label": "task_abandonment",
+        "summary": "Patient fails to construct complete, coherent sentences for multiple multi-word prompts, especially for three-word combinations.",
+        "evidence": "After examiner prompts for sentences using 'chair, doctor, sit' and 'bureau, open, drawer', patient provides only partial or non-sequitur responses, then ends the interaction with 'Okay, fine, thank you.' — suggesting task disengagement or inability to sustain effort.",
+        "confidence": 0.6
+      },
+      {
+        "label": "lexical_vagueness",
+        "summary": "Patient uses vague or generic terms ('slush', 'sleep', 'chest') instead of specific, contextually relevant words to complete the sentence task.",
+        "evidence": "For 'cold, winter', patient says 'slush... sleep...' — semantically related but not a sentence. For 'bureau, open, drawer', responds with 'chest' — an unrelated object — indicating lexical retrieval failure or semantic confusion.",
+        "confidence": 0.6
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "sentence_construction_failure",
+        "summary": "Patient fails to generate grammatically complete or contextually appropriate sentences for multi-word prompts, especially for three-word combinations.",
+        "evidence": "Patient does not produce a sentence for 'chair, doctor, sit' or 'bureau, open, drawer' despite repeated prompts. Responses are fragmented, incomplete, or irrelevant.",
+        "confidence": 0.7
+      },
+      {
+        "label": "examiner_dependency",
+        "summary": "Patient relies on examiner to rephrase or continue the task, indicating difficulty initiating or sustaining independent sentence production.",
+        "evidence": "After 'can you think of a sentence?', patient does not respond. After 'can you give me a sentence using them?', patient says 'no'. Patient requires examiner to restate the prompt or provide new words to continue.",
+        "confidence": 0.6
+      },
+      {
+        "label": "reduced_informativeness",
+        "summary": "Patient responses are low in semantic content and fail to convey meaningful narrative or situational detail, even when prompted with rich, concrete prompts.",
+        "evidence": "For 'pencil', patient says 'The pencil was on the table' — correct but minimal. For 'tree', says 'The trees in autumn are beautiful' — correct but generic. For multi-word prompts, responses are incomplete or semantically off-topic.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates mild impairment-like features in sentence construction, including word-finding pauses, lexical vagueness, task abandonment, and examiner dependency. Responses are often incomplete or semantically off-topic for multi-word prompts. While some basic sentence structures are correct, the inability to sustain or complete complex sentence tasks suggests possible early cognitive decline. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Fragmented, incomplete responses to multi-word prompts",
+      "Repetition and circumlocution ('scampering... scampering...')",
+      "Failure to construct sentences for three-word combinations",
+      "Use of vague or unrelated terms ('slush', 'sleep', 'chest')",
+      "Examiner dependency and task abandonment"
+    ],
+    "evidence_against_risk": [
+      "Correct basic sentence for single-word prompts ('The pencil was on the table')",
+      "No overt signs of agitation, confusion, or disorientation",
+      "No explicit memory complaints or caregiver concerns reported"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive fatigue or test anxiety",
+      "Language processing delay without dementia",
+      "Limited verbal fluency due to task structure or instruction style"
+    ],
+    "risk_factor_findings": [
+      "word-finding difficulty",
+      "sentence construction impairment",
+      "task disengagement or abandonment"
+    ],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "low affective engagement",
+      "passive response to prompts",
+      "no visible frustration or anxiety"
+    ],
+    "risk_control_suggestions": [
+      "Repeat sentence-generation task with additional prompts or visual cues",
+      "Administer formal cognitive screening tools (e.g., MoCA, MMSE)",
+      "Observe patient’s performance across multiple domains (memory, attention, executive function)",
+      "Consider follow-up visit to assess for progression or stability"
+    ],
+    "visit_recommendation": "Formal cognitive screening and clinical evaluation recommended.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip. Further observation over time is needed to determine if symptoms are progressive or transient.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient is the primary respondent in a structured language task.",
+      "Examiner prompts are neutral context",
+      "patient’s own speech is the primary source of evidence.",
+      "Risk is assigned conservatively based on multiple mild impairment cues, not dementia-level evidence."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The pencil was on the table. The trees in autumn are beautiful. Scampering. Scampering. Cold winter. Slush. Sleep. No. Bureau, open, drawer. Right. And the, the other, chest. Okay, fine, thank you.",
+    "speaker_turn_summary": [
+      "Examiner: 'Can you make a sentence for me out of pencil?'",
+      "Patient: 'The pencil was on the table.'",
+      "Examiner: 'How about tree?'",
+      "Patient: 'The trees in autumn are beautiful.'",
+      "Examiner: 'Child, hospital.'",
+      "Patient: 'Scampering. Scampering.'",
+      "Examiner: 'Cold, winter.'",
+      "Patient: 'Cold winter. Slush. Sleep.'",
+      "Examiner: 'Chair, doctor, sit.'",
+      "Patient: 'No.'",
+      "Examiner: 'Bureau, open, drawer.'",
+      "Patient: 'Bureau, open, drawer. Right. And the, the other, chest.'",
+      "Examiner: 'Okay, fine, thank you.'"
+    ],
+    "patient_cue_summary": [
+      "Response to single-word prompts is correct but minimal",
+      "Response to two-word prompts is repetitive or vague ('scampering... scampering...')",
+      "Response to three-word prompts is incomplete or semantically unrelated ('chest')",
+      "Patient says 'no' to sentence request, indicating task disengagement",
+      "Patient ends interaction without further attempt, suggesting low persistence or retrieval failure"
+    ]
+  },
+  "latency_ms": 42214,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/018-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/018-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "case_id": "english__pitt__control__cookie__086_4",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.9,
+  "transcript": "Okay, picture. Mm-hmm. Um, boy standing on a stool getting a cookie out of the cookie jar. The stool is tipping over. His sister is reaching up asking him, she's asking for another cookie, and he's handing it down to her, and he has one in his left hand for her and one in his right hand for himself, except he's gonna fall down first. Um, the lid's off the cookie jar. The mother's washing, drying, she's washing dishes, she's drying a plate. Somehow she's gotten bemused and let the sink run over. The water's flowing into the sink. There are two cups and a plate on the counter. The window is open, and it must be summer or, you know, maybe autumn, because there are bushes and trees and things and they have leaves on. And it's in the kitchen. That's about, oh, the mother has on a dress that just about comes to her knee. She has an apron and a sleeveless dress. Little girls in a mini skirt and the boys in shorts. That's about it.",
+  "patient_only_transcript": "Boy standing on stool getting cookie, stool tipping. Sister asking for cookie, he hands one down, one for her, one for himself, but he’ll fall first. Lid off jar. Mother washing dishes, drying plate, let sink run. Water flowing. Two cups and plate on counter. Window open. Summer or autumn, bushes and trees with leaves. Kitchen. Mother in knee-length sleeveless dress with apron. Girl in mini skirt, boy in shorts.",
+  "speaker_turn_summary": [
+    "Examiner: 'Okay, picture.'",
+    "Patient: Describes scene in detail, including multiple elements and sequence.",
+    "Examiner: No audible prompts or interruptions during patient response.",
+    "Patient: Completes full description without obvious restarts or pauses."
+  ],
+  "patient_cue_summary": [
+    "Patient provides coherent, detailed description of picture scene.",
+    "Patient names multiple specific elements: stool, cookie jar, mother, sink, window, clothing, season, location.",
+    "Patient maintains logical sequence of events: boy reaching, stool tipping, sister asking, mother washing, water running.",
+    "Patient uses precise vocabulary: 'sleeveless dress', 'mini skirt', 'knee-length', 'bushes and trees with leaves'.",
+    "No evidence of word-finding pauses, circumlocution, repetition, or abandonment.",
+    "Patient does not appear examiner-dependent",
+    "response is self-sustained and complete."
+  ],
+  "transcript_request_id": "chatcmpl-5a84628d-4b66-9704-99d4-0977552eb468",
+  "classification_request_id": "chatcmpl-436dc9dd-1db6-9162-9c8a-98fa77893d0d",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__086_4/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__086_4/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential, and accurate description of a complex picture scene involving multiple characters, actions, and environmental details.",
+        "evidence": "Patient describes boy on stool, cookie jar, sister reaching, mother washing dishes, sink running, window open, season, clothing, and kitchen location — all in logical order with specific vocabulary.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Vocabulary",
+        "summary": "Patient uses precise and appropriate vocabulary to describe objects, clothing, and environmental context without hesitation or substitution.",
+        "evidence": "Terms like 'sleeveless dress', 'knee-length', 'mini skirt', 'bushes and trees with leaves' indicate strong lexical access and semantic specificity.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description with clear causal and temporal sequencing, linking character actions to environmental context.",
+        "evidence": "Patient connects boy’s action (reaching for cookie) to consequence (stool tipping), and links mother’s action (drying plate) to consequence (sink running), showing integrated narrative structure.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient demonstrates strong scene description skills, including coherent sequencing, precise vocabulary, and accurate recall of multiple picture elements. No impairment-like cues detected in speech or content. Patient appears fully engaged and self-sustained in response.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent, detailed, and organized narrative",
+      "Accurate use of specific vocabulary and contextual details",
+      "No signs of word-finding difficulty, disorganization, or examiner dependence"
+    ],
+    "alternative_explanations": [
+      "Patient may be a child or young adult with strong descriptive skills",
+      "Task may be well-practiced or familiar to patient",
+      "Audio quality may mask subtle cues, but patient speech is clear and complete"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed",
+      "Continue routine monitoring if part of longitudinal screening",
+      "Consider task difficulty level if used for comparative assessment"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Limited predictive value from single clip; longitudinal data required for trend assessment.",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio content.",
+      "Patient response is self-contained and does not require examiner prompting.",
+      "No signs of cognitive impairment detected in this single task response."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Boy standing on stool getting cookie, stool tipping. Sister asking for cookie, he hands one down, one for her, one for himself, but he’ll fall first. Lid off jar. Mother washing dishes, drying plate, let sink run. Water flowing. Two cups and plate on counter. Window open. Summer or autumn, bushes and trees with leaves. Kitchen. Mother in knee-length sleeveless dress with apron. Girl in mini skirt, boy in shorts.",
+    "speaker_turn_summary": [
+      "Examiner: 'Okay, picture.'",
+      "Patient: Describes scene in detail, including multiple elements and sequence.",
+      "Examiner: No audible prompts or interruptions during patient response.",
+      "Patient: Completes full description without obvious restarts or pauses."
+    ],
+    "patient_cue_summary": [
+      "Patient provides coherent, detailed description of picture scene.",
+      "Patient names multiple specific elements: stool, cookie jar, mother, sink, window, clothing, season, location.",
+      "Patient maintains logical sequence of events: boy reaching, stool tipping, sister asking, mother washing, water running.",
+      "Patient uses precise vocabulary: 'sleeveless dress', 'mini skirt', 'knee-length', 'bushes and trees with leaves'.",
+      "No evidence of word-finding pauses, circumlocution, repetition, or abandonment.",
+      "Patient does not appear examiner-dependent",
+      "response is self-sustained and complete."
+    ]
+  },
+  "latency_ms": 19560,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/086-4.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/086-4.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

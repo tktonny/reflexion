@@ -1,0 +1,131 @@
+{
+  "case_id": "english__pitt__dementia__cookie__657_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "Picture that has a lot of action going on it. There's a lot of things going on in the picture. Tell me what you see going on in the picture. Well, she's working daisies. He's coming up to get cookies and gonna fall and she's laughing. Okay. And she spilled running water. Anything else? That looks like someone down out there or something. I don't know what that is. Okay.",
+  "patient_only_transcript": "Well, she's working daisies. He's coming up to get cookies and gonna fall and she's laughing. Okay. And she spilled running water. Anything else? That looks like someone down out there or something. I don't know what that is.",
+  "speaker_turn_summary": [
+    "Examiner: Picture that has a lot of action going on it... Tell me what you see going on in the picture.",
+    "Patient: Well, she's working daisies. He's coming up to get cookies and gonna fall and she's laughing. Okay. And she spilled running water. Anything else? That looks like someone down out there or something. I don't know what that is.",
+    "Examiner: Okay."
+  ],
+  "patient_cue_summary": [
+    "Identifies core actors (she, he) and actions (getting cookies, falling, laughing, spilling water) accurately.",
+    "Uses simple, coherent sentence structure with minimal pauses or restarts.",
+    "Expresses uncertainty at the end ('I don't know what that is') but does not abandon task or show breakdown in retrieval.",
+    "Does not exhibit word-finding pauses, circumlocution, or semantic vagueness beyond mild uncertainty.",
+    "Task-relevant and completes core picture description without examiner scaffolding beyond initial prompt."
+  ],
+  "transcript_request_id": "chatcmpl-e975b792-2483-9417-8f1b-d3ada6aa561a",
+  "classification_request_id": "chatcmpl-fd6707eb-2777-96d4-8f18-3e522052fa17",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__657_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__657_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identifies key actors and actions in the picture: a woman (possibly 'working daisies'), a boy reaching for cookies, falling, laughing, and spilled water.",
+        "evidence": "Patient's transcript: 'Well, she's working daisies. He's coming up to get cookies and gonna fall and she's laughing. Okay. And she spilled running water.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Coherence",
+        "summary": "Patient completes the picture description task with minimal hesitation and maintains task relevance despite mild uncertainty at the end.",
+        "evidence": "Patient continues describing the scene after initial prompt, does not repeat or restart, and ends with a non-constructive but not disengaged comment ('I don't know what that is').",
+        "confidence": 0.5
+      },
+      {
+        "label": "Uncertainty vs. Impairment",
+        "summary": "Mild uncertainty ('I don't know what that is') is not sufficient to indicate cognitive impairment; patient still retrieves and reports multiple scene elements accurately.",
+        "evidence": "Patient's response is task-relevant, coherent, and includes multiple specific details without examiner prompting beyond the initial instruction.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, task-relevant description of a complex picture with multiple actors and actions. While mild uncertainty is expressed at the end, there are no signs of retrieval failure, disorganization, or task breakdown. Further observation or follow-up may be warranted, but current evidence does not support cognitive risk.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Coherent sentence structure with minimal pauses",
+      "No word-finding breakdown or circumlocution",
+      "Task completion without examiner scaffolding beyond initial prompt"
+    ],
+    "alternative_explanations": [
+      "Mild uncertainty may reflect natural hesitation or lack of confidence rather than cognitive impairment.",
+      "Audio quality may limit full assessment of speech fluency or prosody.",
+      "Patient may be responding to a complex picture with limited visual cues, leading to incomplete description."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "No clear signs of distress, frustration, or apathy.",
+      "Affective tone is neutral to mildly curious, consistent with task engagement."
+    ],
+    "risk_control_suggestions": [
+      "Follow up with a second picture description task to assess consistency.",
+      "Consider formal cognitive screening if additional behavioral or functional concerns arise.",
+      "Ensure audio quality and visual context are optimized in future assessments."
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening if functional or caregiver concerns emerge.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no persuasive evidence of cognitive decline is present.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-relevant despite mild uncertainty.",
+      "No signs of dementia-like impairment are present in this clip."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, she's working daisies. He's coming up to get cookies and gonna fall and she's laughing. Okay. And she spilled running water. Anything else? That looks like someone down out there or something. I don't know what that is.",
+    "speaker_turn_summary": [
+      "Examiner: Picture that has a lot of action going on it... Tell me what you see going on in the picture.",
+      "Patient: Well, she's working daisies. He's coming up to get cookies and gonna fall and she's laughing. Okay. And she spilled running water. Anything else? That looks like someone down out there or something. I don't know what that is.",
+      "Examiner: Okay."
+    ],
+    "patient_cue_summary": [
+      "Identifies core actors (she, he) and actions (getting cookies, falling, laughing, spilling water) accurately.",
+      "Uses simple, coherent sentence structure with minimal pauses or restarts.",
+      "Expresses uncertainty at the end ('I don't know what that is') but does not abandon task or show breakdown in retrieval.",
+      "Does not exhibit word-finding pauses, circumlocution, or semantic vagueness beyond mild uncertainty.",
+      "Task-relevant and completes core picture description without examiner scaffolding beyond initial prompt."
+    ]
+  },
+  "latency_ms": 25084,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/657-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/657-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

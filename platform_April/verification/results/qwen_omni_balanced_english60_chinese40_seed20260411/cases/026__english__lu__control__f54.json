@@ -1,0 +1,122 @@
+{
+  "case_id": "english__lu__control__f54",
+  "dataset": "talkbank_english_lu",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.95,
+  "transcript": "All I'm gonna have you do is I just want you to describe everything that you see going on here in this picture, and when you're done, just let me know that you're done. Okay. There's a woman washing dishes at the sink, and the water was overflowing from the sink, and there's still other dishes. And you can the window is open and you can see the outside, the grounds and there's trees in the distance. And there are two children in the kitchen. One is on a step stool that is tipping and he's getting cookies from the cookie jar. And there's a girl on the ground who's looking for waiting for a cookie. Um, see, I don't see anything else really. All right, that's it. That's it. All right, perfect. Thank you so much, Regina.",
+  "patient_only_transcript": "There's a woman washing dishes at the sink, and the water was overflowing from the sink, and there's still other dishes. And you can the window is open and you can see the outside, the grounds and there's trees in the distance. And there are two children in the kitchen. One is on a step stool that is tipping and he's getting cookies from the cookie jar. And there's a girl on the ground who's looking for waiting for a cookie. Um, see, I don't see anything else really.",
+  "speaker_turn_summary": [
+    "Examiner: 'All I'm gonna have you do is I just want you to describe everything that you see going on here in this picture, and when you're done, just let me know that you're done.'",
+    "Patient: 'There's a woman washing dishes at the sink, and the water was overflowing from the sink, and there's still other dishes. And you can the window is open and you can see the outside, the grounds and there's trees in the distance. And there are two children in the kitchen. One is on a step stool that is tipping and he's getting cookies from the cookie jar. And there's a girl on the ground who's looking for waiting for a cookie. Um, see, I don't see anything else really.'",
+    "Examiner: 'All right, that's it. That's it. All right, perfect. Thank you so much, Regina.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides a detailed, coherent description of the picture with multiple scene elements correctly identified.",
+    "Patient includes minor hesitations ('Um') and self-correction ('you can the window is open') but does not repeat or restart major clauses.",
+    "Patient ends with mild uncertainty ('I don't see anything else really') but does not abandon the task or show task failure.",
+    "Patient does not exhibit word-finding pauses, circumlocution, or semantic vagueness beyond minor phrasing issues.",
+    "Patient completes the task without examiner prompting or scaffolding beyond the initial instruction."
+  ],
+  "transcript_request_id": "chatcmpl-dcbbfefa-4bc6-9a00-9529-26b23ace4209",
+  "classification_request_id": "chatcmpl-0d2cdce1-aa1e-9fb6-9c0a-8b0746d72a63",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__control__f54/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__control__f54/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient accurately identifies multiple core elements of the picture: woman at sink, overflowing water, window view, trees, two children, tipping stool, cookie jar, girl on ground.",
+        "evidence": "Patient names all major actors, actions, and spatial relationships in the scene without omission of critical components.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Completion and Fluency",
+        "summary": "Patient completes the task without interruption or need for prompting, despite minor phrasing hesitation.",
+        "evidence": "Patient delivers a continuous, relevant response covering all major picture elements, ending with a self-terminating phrase ('I don't see anything else really').",
+        "confidence": 0.75
+      },
+      {
+        "label": "Lexical Retrieval and Coherence",
+        "summary": "Patient retrieves and uses appropriate vocabulary for scene description without semantic vagueness or circumlocution.",
+        "evidence": "Patient uses specific terms ('step stool', 'cookie jar', 'overflowing water') and maintains logical sequencing of events.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a detailed, coherent, and complete description of the picture with no signs of retrieval failure, disorganization, or task breakdown. Minor hesitations and phrasing issues do not indicate cognitive impairment. No risk factors or impairment-like cues are present.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Complete and accurate scene description",
+      "No word-finding pauses or semantic vagueness",
+      "No repetition, restarts, or examiner dependence",
+      "Task completed without scaffolding or prompting"
+    ],
+    "alternative_explanations": [
+      "Minor phrasing hesitation may reflect natural speech variation rather than impairment",
+      "Self-terminating phrase ('I don't see anything else really') may reflect task completion rather than cognitive limitation"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention required",
+      "Routine follow-up may be appropriate if other clinical concerns arise"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline is present in this interaction.",
+    "reviewer_confidence": 0.95,
+    "context_notes": [
+      "Video component is unavailable but not affecting usability of audio-only patient response.",
+      "Patient speech is intelligible, task-relevant, and complete",
+      "no impairment-like cues detected.",
+      "Examiner prompts are neutral context",
+      "patient response is self-contained and sufficient for screening."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "There's a woman washing dishes at the sink, and the water was overflowing from the sink, and there's still other dishes. And you can the window is open and you can see the outside, the grounds and there's trees in the distance. And there are two children in the kitchen. One is on a step stool that is tipping and he's getting cookies from the cookie jar. And there's a girl on the ground who's looking for waiting for a cookie. Um, see, I don't see anything else really.",
+    "speaker_turn_summary": [
+      "Examiner: 'All I'm gonna have you do is I just want you to describe everything that you see going on here in this picture, and when you're done, just let me know that you're done.'",
+      "Patient: 'There's a woman washing dishes at the sink, and the water was overflowing from the sink, and there's still other dishes. And you can the window is open and you can see the outside, the grounds and there's trees in the distance. And there are two children in the kitchen. One is on a step stool that is tipping and he's getting cookies from the cookie jar. And there's a girl on the ground who's looking for waiting for a cookie. Um, see, I don't see anything else really.'",
+      "Examiner: 'All right, that's it. That's it. All right, perfect. Thank you so much, Regina.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides a detailed, coherent description of the picture with multiple scene elements correctly identified.",
+      "Patient includes minor hesitations ('Um') and self-correction ('you can the window is open') but does not repeat or restart major clauses.",
+      "Patient ends with mild uncertainty ('I don't see anything else really') but does not abandon the task or show task failure.",
+      "Patient does not exhibit word-finding pauses, circumlocution, or semantic vagueness beyond minor phrasing issues.",
+      "Patient completes the task without examiner prompting or scaffolding beyond the initial instruction."
+    ]
+  },
+  "latency_ms": 15303,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Lu",
+    "source_group": "Control",
+    "source_relative_path": "Control/F54.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Lu/Control//F54.mp3?f=save",
+    "expected_group_audio_count": 26,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

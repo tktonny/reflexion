@@ -1,0 +1,108 @@
+{
+  "case_id": "english__pitt__control__cookie__121_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.3,
+  "transcript": "Is the action, is the action as opposed to state? Action. All right. All right. Girl is holding her finger up to her face. Is it that kind of sound? All right, pointing towards the cookie jar, or no, reaching out her hand towards the cookie. The stool is falling over. The woman is wiping her face. The water is flowing out of the container. The water is splashing. Okay, fine.",
+  "patient_only_transcript": "The girl is holding her finger up to her face. The stool is falling over. The woman is wiping her face. The water is flowing out of the container. The water is splashing.",
+  "speaker_turn_summary": [
+    "Examiner: Is the action, is the action as opposed to state? Action. All right. All right. Girl is holding her finger up to her face. Is it that kind of sound? All right, pointing towards the cookie jar, or no, reaching out her hand towards the cookie. The stool is falling over. The woman is wiping her face. The water is flowing out of the container. The water is splashing. Okay, fine.",
+    "Patient: [No clear patient speech identified in audio",
+    "all audible speech appears to be examiner prompting or narration.]"
+  ],
+  "patient_cue_summary": [
+    "No clear patient speech identified in audio",
+    "all audible speech appears to be examiner prompting or narration.",
+    "Patient response not discernible",
+    "no evidence of patient-generated content or task completion.",
+    "Absence of patient verbal output prevents assessment of retrieval, coherence, or task control."
+  ],
+  "transcript_request_id": "chatcmpl-39c6341a-c55f-9aed-a00e-e311d88da328",
+  "classification_request_id": "chatcmpl-06954d13-740c-9afb-afc9-663c2a50c783",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__121_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__121_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient speech is not discernible in the audio; all audible content appears to be examiner narration or prompting. No patient-generated response or task completion is observable. Further observation or clearer patient speech is required for meaningful cognitive screening.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No patient speech detected to evaluate for impairment-like cues.",
+      "No observable breakdown in language, coherence, or task performance from patient.",
+      "Absence of patient response prevents any risk signal from being confirmed."
+    ],
+    "alternative_explanations": [
+      "Patient may be silent due to task design, shyness, or recording artifact.",
+      "Examiner may be narrating the scene for context, not patient response.",
+      "Audio may be misattributed or incomplete",
+      "patient may have spoken off-mic or in silence."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat task with clearer patient audio capture or direct patient prompting.",
+      "Use visual or non-verbal cues to elicit patient response if speech remains unavailable.",
+      "Consider alternative screening modalities if patient speech remains undetectable."
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening if patient speech remains unavailable or inconsistent.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited due to lack of patient speech data in this clip.",
+    "reviewer_confidence": 0.3,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio with no discernible patient speech.",
+      "Examiner narration dominates the audio",
+      "patient response cannot be isolated or evaluated.",
+      "Task context is cookie-theft picture description, but patient did not generate relevant content in this clip."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The girl is holding her finger up to her face. The stool is falling over. The woman is wiping her face. The water is flowing out of the container. The water is splashing.",
+    "speaker_turn_summary": [
+      "Examiner: Is the action, is the action as opposed to state? Action. All right. All right. Girl is holding her finger up to her face. Is it that kind of sound? All right, pointing towards the cookie jar, or no, reaching out her hand towards the cookie. The stool is falling over. The woman is wiping her face. The water is flowing out of the container. The water is splashing. Okay, fine.",
+      "Patient: [No clear patient speech identified in audio",
+      "all audible speech appears to be examiner prompting or narration.]"
+    ],
+    "patient_cue_summary": [
+      "No clear patient speech identified in audio",
+      "all audible speech appears to be examiner prompting or narration.",
+      "Patient response not discernible",
+      "no evidence of patient-generated content or task completion.",
+      "Absence of patient verbal output prevents assessment of retrieval, coherence, or task control."
+    ]
+  },
+  "latency_ms": 11864,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/121-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/121-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

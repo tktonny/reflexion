@@ -1,0 +1,157 @@
+{
+  "case_id": "english__pitt__dementia__fluency__213_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.65,
+  "transcript": "Harness around the neck of an oxen. Oak. Okay, go ahead any types. Dog, cats, leopards, tigers, sharks, fish, zebras, horse, cows, worms, snails. Okay, good. Two words that begin with F. Go ahead. Fish, fowl. Any people? No people. Any words that begin with F? Fowl, I guess I gave you fowls. Okay.",
+  "patient_only_transcript": "Dog, cats, leopards, tigers, sharks, fish, zebras, horse, cows, worms, snails. Fish, fowl. Fowl, I guess I gave you fowls.",
+  "speaker_turn_summary": [
+    "Examiner: Harness around the neck of an oxen. Oak. Okay, go ahead any types.",
+    "Patient: Dog, cats, leopards, tigers, sharks, fish, zebras, horse, cows, worms, snails.",
+    "Examiner: Two words that begin with F. Go ahead.",
+    "Patient: Fish, fowl.",
+    "Examiner: Any people? No people. Any words that begin with F?",
+    "Patient: Fowl, I guess I gave you fowls."
+  ],
+  "patient_cue_summary": [
+    "Patient generates a long list of animals without prompting, showing moderate fluency.",
+    "Patient correctly identifies 'fish' and 'fowl' for F-words task.",
+    "Patient self-corrects and repeats 'fowl' with hesitation and uncertainty ('I guess I gave you fowls').",
+    "Patient does not initiate or sustain elaboration beyond required responses",
+    "task-dependent.",
+    "No evidence of semantic drift, tangentiality, or retrieval failure beyond mild hesitation on F-words."
+  ],
+  "transcript_request_id": "chatcmpl-23679565-204e-9ccb-9923-6d92fe7a7ac5",
+  "classification_request_id": "chatcmpl-54422156-a529-9d3e-b9a7-4a281d0bea81",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__213_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__213_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "Speech Clarity",
+        "summary": "Speech is intelligible but slightly muffled; patient's voice is clear enough to reconstruct key responses.",
+        "evidence": "Patient's animal list and F-word responses are understandable despite background noise.",
+        "confidence": 0.7
+      },
+      {
+        "label": "Speech Fluency",
+        "summary": "Moderate fluency with brief pauses and self-correction; no prolonged disfluencies or breakdowns.",
+        "evidence": "Patient delivers long animal list without interruption; F-word response includes mild hesitation but completes task.",
+        "confidence": 0.75
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "Verbal Fluency Task Performance",
+        "summary": "Patient successfully generates 11 animal names and correctly identifies 'fish' and 'fowl' for F-word task.",
+        "evidence": "Patient's output: 'Dog, cats, leopards, tigers, sharks, fish, zebras, horse, cows, worms, snails. Fish, fowl. Fowl, I guess I gave you fowls.'",
+        "confidence": 0.8
+      },
+      {
+        "label": "Task Compliance",
+        "summary": "Patient follows examiner prompts without deviation or abandonment; task structure is maintained.",
+        "evidence": "Patient responds to prompts sequentially: animal list → F-words → self-correction.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Retrieval Effort",
+        "summary": "Mild retrieval hesitation on F-word task, but no failure to retrieve or semantic confusion.",
+        "evidence": "Patient says 'I guess I gave you fowls' after initial 'fowl', indicating mild uncertainty but not retrieval failure.",
+        "confidence": 0.65
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates adequate verbal fluency in animal naming and partial success in F-word task, with mild hesitation and self-correction on the latter. No clear signs of retrieval failure, disorganization, or task breakdown. Audio quality is poor, limiting confidence. Further observation or formal screening recommended.",
+    "evidence_for_risk": [
+      "Mild hesitation and self-correction on F-word task ('I guess I gave you fowls').",
+      "Limited elaboration beyond required responses",
+      "task-dependent output."
+    ],
+    "evidence_against_risk": [
+      "No semantic drift, repetition, or abandonment of task.",
+      "Patient successfully completes animal naming task with high item count.",
+      "No signs of confusion, disorientation, or emotional dysregulation.",
+      "Task completion is coherent and relevant to prompt."
+    ],
+    "alternative_explanations": [
+      "Poor audio quality may mask subtle retrieval difficulties.",
+      "Mild hesitation may reflect task difficulty or fatigue rather than cognitive impairment.",
+      "Patient may be responding to examiner scaffolding rather than demonstrating deficit."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Mild uncertainty expressed during F-word task ('I guess I gave you fowls').",
+      "No signs of frustration, anxiety, or apathy",
+      "tone remains neutral and cooperative."
+    ],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency task with clearer audio or visual cues.",
+      "Administer formal screening tools (e.g., MoCA, MMSE) if clinical concern persists.",
+      "Monitor for consistency across multiple sessions or tasks."
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended if clinical concern remains or symptoms progress.",
+    "future_risk_trend_summary": "Limited predictive value from single clip; longitudinal assessment needed for trend evaluation.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio with poor quality.",
+      "Patient is clearly identifiable as primary respondent in structured fluency task.",
+      "No evidence of dementia-level impairment",
+      "mild hesitation does not meet cognitive_risk threshold alone."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Dog, cats, leopards, tigers, sharks, fish, zebras, horse, cows, worms, snails. Fish, fowl. Fowl, I guess I gave you fowls.",
+    "speaker_turn_summary": [
+      "Examiner: Harness around the neck of an oxen. Oak. Okay, go ahead any types.",
+      "Patient: Dog, cats, leopards, tigers, sharks, fish, zebras, horse, cows, worms, snails.",
+      "Examiner: Two words that begin with F. Go ahead.",
+      "Patient: Fish, fowl.",
+      "Examiner: Any people? No people. Any words that begin with F?",
+      "Patient: Fowl, I guess I gave you fowls."
+    ],
+    "patient_cue_summary": [
+      "Patient generates a long list of animals without prompting, showing moderate fluency.",
+      "Patient correctly identifies 'fish' and 'fowl' for F-words task.",
+      "Patient self-corrects and repeats 'fowl' with hesitation and uncertainty ('I guess I gave you fowls').",
+      "Patient does not initiate or sustain elaboration beyond required responses",
+      "task-dependent.",
+      "No evidence of semantic drift, tangentiality, or retrieval failure beyond mild hesitation on F-words."
+    ]
+  },
+  "latency_ms": 18898,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/213-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/213-2.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

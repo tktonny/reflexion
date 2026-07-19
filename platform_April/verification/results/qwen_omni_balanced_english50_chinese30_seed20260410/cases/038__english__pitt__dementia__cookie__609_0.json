@@ -1,0 +1,143 @@
+{
+  "case_id": "english__pitt__dementia__cookie__609_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Now I'm going to give you a picture that has a lot of things going on in it. I want you to tell me everything you see going on in the picture. Tell me what you see going on in the picture. Well, they're grabbing the cookie jar, right? And mother is working. Tell me if you see anything else going on here. What else is going on in that picture? Well, the mother is just taking care of this. And like I said, they're grabbing the cookie jar. I wonder what my husband is doing. Can you tell me what else you see going on right here? What else is going on here? Well, this is going to fall. Okay. And I think that he'll lose his cookies. Well, she's having problems here. Can you tell me what's going on there? Yeah, it's overflowing the onto the floor. Okay, let me take that away.",
+  "patient_only_transcript": "Well, they're grabbing the cookie jar, right? And mother is working. Well, the mother is just taking care of this. And like I said, they're grabbing the cookie jar. Well, this is going to fall. Okay. And I think that he'll lose his cookies. Well, she's having problems here. Yeah, it's overflowing the onto the floor.",
+  "speaker_turn_summary": [
+    "Examiner: Introduces task and prompts description.",
+    "Patient: Describes cookie jar theft, mother working, impending fall, cookies lost, overflow.",
+    "Examiner: Asks for more details.",
+    "Patient: Repeats or rephrases key elements, adds 'she's having problems', 'overflowing onto the floor'."
+  ],
+  "patient_cue_summary": [
+    "Repetitive phrasing: 'they're grabbing the cookie jar' repeated.",
+    "Vague or incomplete phrasing: 'mother is working', 'taking care of this'.",
+    "Fragmented causal link: 'this is going to fall' without clear subject or consequence.",
+    "Examiner-dependent elaboration: 'Well, she's having problems here' after prompting.",
+    "Low-information content: 'overflowing the onto the floor' — grammatically incomplete, lacks specificity.",
+    "No clear scene organization: events are listed, not sequenced or causally linked."
+  ],
+  "transcript_request_id": "chatcmpl-18e8b239-ab77-9e56-b33a-5da86f947059",
+  "classification_request_id": "chatcmpl-09ad025b-8b69-9b0a-8dbc-960e9373ba56",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__609_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__609_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Task Response Coherence",
+        "summary": "Patient provides fragmented, repetitive, and examiner-dependent description of picture scene.",
+        "evidence": "Patient repeats 'they're grabbing the cookie jar', uses vague phrases like 'mother is working', and adds 'she's having problems' only after prompting.",
+        "confidence": 0.7
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses low-information, generic terms and incomplete phrasing, lacking specific scene details.",
+        "evidence": "Phrases like 'taking care of this' and 'overflowing the onto the floor' show semantic vagueness and grammatical incompleteness.",
+        "confidence": 0.65
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient fails to organize events causally or sequentially; description is disjointed and lacks logical flow.",
+        "evidence": "Events are listed without clear cause-effect or temporal structure; 'this is going to fall' is disconnected from prior content.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates fragmented, repetitive, and examiner-dependent description of a complex picture. While some key elements (cookie jar, mother, overflow) are mentioned, the response lacks coherence, specificity, and narrative organization. These features are suggestive of mild cognitive impairment and warrant further clinical evaluation.",
+    "evidence_for_risk": [
+      "Repetitive phrasing and lack of elaboration.",
+      "Vague, incomplete, and grammatically flawed descriptions.",
+      "Examiner dependence for content elaboration.",
+      "Absence of causal or sequential narrative structure."
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key objects (cookie jar, mother, overflow).",
+      "No signs of severe disorientation or confusion.",
+      "Speech is intelligible, though sparse and disorganized."
+    ],
+    "alternative_explanations": [
+      "Task difficulty or unfamiliarity with picture description format.",
+      "Temporary cognitive load or fatigue during testing.",
+      "Non-clinical factors such as anxiety or distraction during interview."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient exhibits fragmented, repetitive, and examiner-dependent description.",
+      "Lacks coherent narrative structure despite task context.",
+      "Shows signs of word-finding difficulty and semantic vagueness."
+    ],
+    "emotional_assessment_findings": [
+      "No clear emotional reactivity or affective flattening observed.",
+      "No signs of frustration, anxiety, or apathy in speech tone or pacing."
+    ],
+    "risk_control_suggestions": [
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE).",
+      "Repeat picture description task with structured prompts or visual aids.",
+      "Assess functional impact and caregiver report for consistency."
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up with repeated assessments recommended.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but organizationally weak.",
+      "Task context: picture description of cookie-theft scene.",
+      "Examiner prompts are neutral",
+      "patient response is the primary signal."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, they're grabbing the cookie jar, right? And mother is working. Well, the mother is just taking care of this. And like I said, they're grabbing the cookie jar. Well, this is going to fall. Okay. And I think that he'll lose his cookies. Well, she's having problems here. Yeah, it's overflowing the onto the floor.",
+    "speaker_turn_summary": [
+      "Examiner: Introduces task and prompts description.",
+      "Patient: Describes cookie jar theft, mother working, impending fall, cookies lost, overflow.",
+      "Examiner: Asks for more details.",
+      "Patient: Repeats or rephrases key elements, adds 'she's having problems', 'overflowing onto the floor'."
+    ],
+    "patient_cue_summary": [
+      "Repetitive phrasing: 'they're grabbing the cookie jar' repeated.",
+      "Vague or incomplete phrasing: 'mother is working', 'taking care of this'.",
+      "Fragmented causal link: 'this is going to fall' without clear subject or consequence.",
+      "Examiner-dependent elaboration: 'Well, she's having problems here' after prompting.",
+      "Low-information content: 'overflowing the onto the floor' — grammatically incomplete, lacks specificity.",
+      "No clear scene organization: events are listed, not sequenced or causally linked."
+    ]
+  },
+  "latency_ms": 33282,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/609-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/609-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

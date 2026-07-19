@@ -1,0 +1,122 @@
+{
+  "assessment_id": "82cec224a2ee456195965152fb49bd4f",
+  "patient_id": "iJJerSu8DxE",
+  "language": "en",
+  "created_at": "2026-04-07T01:57:35.613076Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Patient exhibits mild confusion and hesitation during recall tasks, with furrowed brow and gaze shifting while attempting to retrieve names.",
+      "evidence": "Patient pauses, looks away, and expresses uncertainty when asked for children's names and last name, indicating possible retrieval difficulty.",
+      "confidence": 0.7
+    },
+    {
+      "label": "Hand Gesture",
+      "summary": "Patient holds a small food item and occasionally gestures with it while speaking, which may indicate distraction or mild motor coordination.",
+      "evidence": "Patient holds and manipulates food item throughout the clip, occasionally bringing it to mouth while speaking.",
+      "confidence": 0.8
+    }
+  ],
+  "body_findings": [],
+  "voice_findings": [
+    {
+      "label": "Speech Clarity",
+      "summary": "Speech is generally clear but includes pauses, self-corrections, and expressions of uncertainty during recall tasks.",
+      "evidence": "Patient says, 'I don't think I know any of them,' 'Maybe one or two,' and 'I don't know, honey' when asked for names, indicating possible memory retrieval difficulty.",
+      "confidence": 0.8
+    },
+    {
+      "label": "Speech Fluency",
+      "summary": "Speech is fluent overall but contains hesitations and repetitions, particularly when recalling personal information.",
+      "evidence": "Patient repeats 'My last name' and 'That's your last name' while confirming identity, suggesting mild disorientation or retrieval effort.",
+      "confidence": 0.7
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Name Recall",
+      "summary": "Patient struggles to recall children's names and last name, requiring prompting and confirmation from interviewer.",
+      "evidence": "Patient initially cannot recall children's names, then lists four names with uncertainty, and later confuses first and last name, requiring correction.",
+      "confidence": 0.8
+    },
+    {
+      "label": "Self-Reported Age",
+      "summary": "Patient guesses age incorrectly and expresses uncertainty, suggesting possible memory or self-perception impairment.",
+      "evidence": "Patient guesses 'probably about 22' and then 'maybe more than that,' followed by 'I don't know, honey,' indicating uncertainty about personal age.",
+      "confidence": 0.7
+    }
+  ],
+  "speaker_structure": "multi_speaker",
+  "target_patient_presence": "clear",
+  "target_patient_basis": "speaking_time",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 1.0,
+  "risk_score": 0.55,
+  "risk_label": "cognitive_risk",
+  "risk_tier": "medium",
+  "screening_classification": "needs_observation",
+  "screening_summary": "Patient demonstrates signs of possible memory retrieval difficulty, including uncertainty when recalling children's names, last name, and age. While speech is generally clear and affect is cooperative, the need for prompting and self-reported doubt suggest cognitive screening should be pursued further.",
+  "evidence_for_risk": [
+    "Patient unable to recall children's names without prompting",
+    "Patient confuses first and last name, requiring correction",
+    "Patient guesses age incorrectly and expresses uncertainty"
+  ],
+  "evidence_against_risk": [
+    "Patient is able to follow conversation and respond appropriately",
+    "Patient exhibits positive affect and cooperation",
+    "No signs of severe disorientation or agitation"
+  ],
+  "alternative_explanations": [
+    "Normal age-related memory variability",
+    "Temporary distraction or fatigue",
+    "Emotional or situational stress affecting recall"
+  ],
+  "risk_factor_findings": [
+    "Difficulty recalling personal information (names, age)",
+    "Need for prompting and confirmation during recall tasks"
+  ],
+  "subjective_assessment_findings": [
+    "Patient expresses uncertainty and doubt about personal details",
+    "Patient acknowledges memory difficulty and seeks reassurance"
+  ],
+  "emotional_assessment_findings": [
+    "Mild frustration and hesitation during recall tasks",
+    "Cooperative and polite demeanor despite confusion",
+    "Smiling and positive affect after receiving confirmation"
+  ],
+  "risk_control_suggestions": [
+    "Administer formal cognitive screening tools (e.g., MMSE, MoCA)",
+    "Obtain collateral history from caregiver or family member",
+    "Schedule follow-up visit to assess consistency of findings"
+  ],
+  "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and caregiver input.",
+  "future_risk_trend_summary": "Without longitudinal data, trend cannot be determined. Single clip suggests possible early cognitive concern requiring monitoring.",
+  "reviewer_confidence": 0.7,
+  "context_notes": [
+    "Interviewer provides prompting and positive reinforcement, which may influence patient performance.",
+    "Patient is holding food, which may contribute to mild distraction or motor coordination.",
+    "No prior medical or cognitive history provided in clip."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "4d81e410-91e1-9fea-84b4-4599d5bcbfdd",
+    "latency_ms": 28265,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 28265
+    }
+  ],
+  "fallback_message": null
+}

@@ -1,0 +1,133 @@
+{
+  "case_id": "english__pitt__dementia__cookie__016_4",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Take a look at this picture and tell me everything that you see going on, everything that you see happening in this picture. Well, the little girl wants the cookie that the guy steal kid is stealing from the cookie jar with the lid off and he's tripping off the stool. The water's overflowing in the sink. The woman is drying dishes. There's a hedge outside and the letters are upside down. And there's a plate and a cup on the kitchen cabinet and a, well, that's all that. And the drapes and the sash window and the window on the adjacent part of the building. There's a path through the lawn. She's stepping, the woman's stepping in the water with slippers or sandals or something. That's about it.",
+  "patient_only_transcript": "Well, the little girl wants the cookie that the guy steal kid is stealing from the cookie jar with the lid off and he's tripping off the stool. The water's overflowing in the sink. The woman is drying dishes. There's a hedge outside and the letters are upside down. And there's a plate and a cup on the kitchen cabinet and a, well, that's all that. And the drapes and the sash window and the window on the adjacent part of the building. There's a path through the lawn. She's stepping, the woman's stepping in the water with slippers or sandals or something. That's about it.",
+  "speaker_turn_summary": [
+    "Examiner: Take a look at this picture and tell me everything that you see going on, everything that you see happening in this picture.",
+    "Patient: Well, the little girl wants the cookie that the guy steal kid is stealing from the cookie jar with the lid off and he's tripping off the stool. The water's overflowing in the sink. The woman is drying dishes. There's a hedge outside and the letters are upside down. And there's a plate and a cup on the kitchen cabinet and a, well, that's all that. And the drapes and the sash window and the window on the adjacent part of the building. There's a path through the lawn. She's stepping, the woman's stepping in the water with slippers or sandals or something. That's about it."
+  ],
+  "patient_cue_summary": [
+    "Fragmented and disorganized sentence structure",
+    "Repetitive phrasing: 'the guy steal kid is stealing'",
+    "Vague filler: 'well, that's all that'",
+    "Incomplete or abandoned clauses: 'And there's a plate and a cup on the kitchen cabinet and a, well, that's all that'",
+    "Low-information descriptors: 'slippers or sandals or something'",
+    "Weak causal or spatial linking between scene elements",
+    "Examiner-dependent completion of scene description"
+  ],
+  "transcript_request_id": "chatcmpl-8c99bccb-7b2f-9e8c-bcec-e16395f6cb9a",
+  "classification_request_id": "chatcmpl-d52c18de-6754-95d1-8646-20cc5ca94c6a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__016_4/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__016_4/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Disorganized Scene Description",
+        "summary": "Patient's description of the picture is fragmented, with repeated phrases and incomplete clauses.",
+        "evidence": "Patient says: 'the guy steal kid is stealing from the cookie jar... he's tripping off the stool... well, that's all that...'",
+        "confidence": 0.8
+      },
+      {
+        "label": "Vague and Incomplete Detailing",
+        "summary": "Patient uses vague descriptors and fails to fully specify scene elements or their relationships.",
+        "evidence": "Patient says: 'slippers or sandals or something' and 'there's a plate and a cup... and a, well, that's all that'.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Examiner-Dependent Completion",
+        "summary": "Patient appears to rely on examiner prompting to complete the description, suggesting retrieval difficulty.",
+        "evidence": "Patient begins with 'Well, the little girl wants the cookie...' and ends with 'That's about it.' — implying task completion was prompted.",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient provides a partially coherent description of a picture, but with disorganized syntax, vague phrasing, and incomplete clauses. While some scene elements are correctly identified, the response lacks consistent narrative structure and shows signs of word-finding difficulty and fragmented organization. These cues suggest possible early cognitive impairment and warrant further clinical review.",
+    "evidence_for_risk": [
+      "Disorganized sentence structure and repetition",
+      "Use of vague fillers and incomplete clauses",
+      "Examiner-dependent completion of description",
+      "Weak spatial and causal linking between scene elements"
+    ],
+    "evidence_against_risk": [
+      "Some correct identification of scene elements (e.g., cookie jar, sink, woman, stool)",
+      "No overt confusion or contradiction in content",
+      "Patient appears to follow task instructions"
+    ],
+    "alternative_explanations": [
+      "Temporary distraction or fatigue during task",
+      "Language processing delay or mild articulation difficulty",
+      "Non-clinical cognitive load or task unfamiliarity"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule formal cognitive screening with validated tools (e.g., MoCA, MMSE)",
+      "Observe patient performance across multiple tasks for consistency",
+      "Consider caregiver report for functional changes outside the clinic"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; follow-up assessments are needed to determine progression or stability.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but shows impairment-like features in organization and retrieval.",
+      "Task context: picture description of a cookie-theft scene",
+      "patient response is partially adequate but not fully coherent."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, the little girl wants the cookie that the guy steal kid is stealing from the cookie jar with the lid off and he's tripping off the stool. The water's overflowing in the sink. The woman is drying dishes. There's a hedge outside and the letters are upside down. And there's a plate and a cup on the kitchen cabinet and a, well, that's all that. And the drapes and the sash window and the window on the adjacent part of the building. There's a path through the lawn. She's stepping, the woman's stepping in the water with slippers or sandals or something. That's about it.",
+    "speaker_turn_summary": [
+      "Examiner: Take a look at this picture and tell me everything that you see going on, everything that you see happening in this picture.",
+      "Patient: Well, the little girl wants the cookie that the guy steal kid is stealing from the cookie jar with the lid off and he's tripping off the stool. The water's overflowing in the sink. The woman is drying dishes. There's a hedge outside and the letters are upside down. And there's a plate and a cup on the kitchen cabinet and a, well, that's all that. And the drapes and the sash window and the window on the adjacent part of the building. There's a path through the lawn. She's stepping, the woman's stepping in the water with slippers or sandals or something. That's about it."
+    ],
+    "patient_cue_summary": [
+      "Fragmented and disorganized sentence structure",
+      "Repetitive phrasing: 'the guy steal kid is stealing'",
+      "Vague filler: 'well, that's all that'",
+      "Incomplete or abandoned clauses: 'And there's a plate and a cup on the kitchen cabinet and a, well, that's all that'",
+      "Low-information descriptors: 'slippers or sandals or something'",
+      "Weak causal or spatial linking between scene elements",
+      "Examiner-dependent completion of scene description"
+    ]
+  },
+  "latency_ms": 21802,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/016-4.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/016-4.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

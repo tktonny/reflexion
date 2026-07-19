@@ -1,0 +1,138 @@
+{
+  "case_id": "mandarin__chou__mci__135__135_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.65,
+  "transcript": "这个大人在不傻，像小孩子来插头这边有有线了，怕触到电了。啊，这这个这个鸽子不在叫，这小孩子给他哦哦哦，啊啊这个这个花这个花瓶好像有水倒下去，鸟这个是不不知道怎么样讲了，嗯。啊，这个大人吓一下子啊，哎，一个怕一下子啊，哎。",
+  "patient_only_transcript": "这个大人在不傻，像小孩子来插头这边有有线了，怕触到电了。啊，这这个这个鸽子不在叫，这小孩子给他哦哦哦，啊啊这个这个花这个花瓶好像有水倒下去，鸟这个是不不知道怎么样讲了，嗯。啊，这个大人吓一下子啊，哎，一个怕一下子啊，哎。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes scene with multiple elements (adult, child, plug, wire, pigeon, flowerpot, water, bird, shock)",
+    "Patient: uses repeated particles (啊, 嗯), vague referents (这个, 那个), and incomplete clauses"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple scene elements: adult, child, plug, wire, pigeon, flowerpot, water, bird, shock",
+    "Patient uses repeated particles and vague pronouns (这个, 那个) but maintains topic continuity",
+    "Patient exhibits mild lexical retrieval hesitation and incomplete clause construction (e.g., '鸟这个是不不知道怎么样讲了')",
+    "Patient does not abandon the task or lose referential clarity",
+    "scene elements remain identifiable despite disfluency",
+    "Patient does not show severe naming collapse, contradiction, or disorganization"
+  ],
+  "transcript_request_id": "chatcmpl-b94f7952-aa75-9639-a70d-0170b84cea55",
+  "classification_request_id": "chatcmpl-ee9db448-78d0-9cd5-b5b9-187e9e92a790",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__135__135_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__135__135_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "speech_disfluency",
+        "summary": "Frequent use of fillers (啊, 嗯), vague referents (这个, 那个), and incomplete clauses",
+        "evidence": "Patient speech contains multiple discourse particles, repeated pronouns, and fragmented sentence structures, but scene elements remain identifiable",
+        "confidence": 0.7
+      },
+      {
+        "label": "lexical_retrieval_hesitation",
+        "summary": "Mild difficulty retrieving specific terms (e.g., '鸟这个是不不知道怎么样讲了')",
+        "evidence": "Patient substitutes '鸟' for a specific object or action, then self-corrects or pauses, indicating mild retrieval effort",
+        "confidence": 0.6
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "scene_description_intelligibility",
+        "summary": "Patient describes multiple relevant scene elements despite disfluency",
+        "evidence": "Patient names adult, child, plug, wire, pigeon, flowerpot, water, bird, and shock — indicating functional scene comprehension",
+        "confidence": 0.8
+      },
+      {
+        "label": "narrative_coherence",
+        "summary": "Narrative is fragmented but maintains topic focus and does not collapse",
+        "evidence": "Patient does not abandon the task or contradict earlier statements; scene elements are sequentially referenced despite pauses and repetitions",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates functional scene comprehension with multiple identifiable elements despite mild disfluency, vague referents, and lexical hesitation. No severe impairment cues are present. Further observation or formal screening is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient identifies multiple relevant scene elements",
+      "Narrative remains topic-focused and does not collapse",
+      "No evidence of naming failure, contradiction, or abandonment"
+    ],
+    "alternative_explanations": [
+      "Mild disfluency and vague referents may reflect natural colloquial Mandarin speech patterns rather than cognitive impairment",
+      "Poor audio quality may exaggerate perceived hesitation or incoherence",
+      "Patient may be under situational stress or distraction, not cognitive decline"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Mild anxiety or concern audible in tone when mentioning '怕触到电了' and '吓一下子'",
+      "No signs of distress, apathy, or emotional flattening"
+    ],
+    "risk_control_suggestions": [
+      "Schedule follow-up for formal cognitive screening if symptoms persist",
+      "Use structured scene-description tasks with visual support to reduce ambiguity",
+      "Consider caregiver report for corroborative evidence of functional changes"
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation or multi-visit assessment is needed for trend evaluation.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment relies solely on audio with moderate quality",
+      "Patient speech is partially intelligible and contains normal colloquial features",
+      "Scene description task context supports functional comprehension despite disfluency"
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable",
+      "poor_audio"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这个大人在不傻，像小孩子来插头这边有有线了，怕触到电了。啊，这这个这个鸽子不在叫，这小孩子给他哦哦哦，啊啊这个这个花这个花瓶好像有水倒下去，鸟这个是不不知道怎么样讲了，嗯。啊，这个大人吓一下子啊，哎，一个怕一下子啊，哎。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes scene with multiple elements (adult, child, plug, wire, pigeon, flowerpot, water, bird, shock)",
+      "Patient: uses repeated particles (啊, 嗯), vague referents (这个, 那个), and incomplete clauses"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple scene elements: adult, child, plug, wire, pigeon, flowerpot, water, bird, shock",
+      "Patient uses repeated particles and vague pronouns (这个, 那个) but maintains topic continuity",
+      "Patient exhibits mild lexical retrieval hesitation and incomplete clause construction (e.g., '鸟这个是不不知道怎么样讲了')",
+      "Patient does not abandon the task or lose referential clarity",
+      "scene elements remain identifiable despite disfluency",
+      "Patient does not show severe naming collapse, contradiction, or disorganization"
+    ]
+  },
+  "latency_ms": 15342,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/135/135_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/135/135_Daddy.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

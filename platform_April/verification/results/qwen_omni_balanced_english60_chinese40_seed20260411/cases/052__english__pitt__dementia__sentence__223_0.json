@@ -1,0 +1,148 @@
+{
+  "case_id": "english__pitt__dementia__sentence__223_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.7,
+  "transcript": "Dinner is on the table. Just a simple sentence using the word that I'm going to give you. Okay. First word is pencil. Pencil. Now I'm to make a statement. Put the word pencil into a sentence for me. Who lost the pencil? Tree. Who planted the tree? Now then. I'm going to give you two words and I want you to use both words in one brief simple sentence. Okay. You don't need to worry about the order. Child, hospital. Why is a child in the hospital? Cold, winter. You want a sentence? Make a sentence. We've had a very cold winter. Now then. Three words. Use all three words in one brief simple sentence and don't worry about the order. Chair, doctor, sit. Chair, doctor, and sit. Uh huh. How would it be? Say that the doctor sat in that chair. Bureau, open, drawer. Who opened the bureau drawer? Uh huh. Good question.",
+  "patient_only_transcript": "Who lost the pencil? Who planted the tree? We've had a very cold winter. The doctor sat in that chair. Who opened the bureau drawer? Good question.",
+  "speaker_turn_summary": [
+    "Examiner: 'Dinner is on the table. Just a simple sentence using the word that I'm going to give you. Okay. First word is pencil.'",
+    "Patient: 'Pencil. Now I'm to make a statement. Put the word pencil into a sentence for me. Who lost the pencil?'",
+    "Examiner: 'Tree.'",
+    "Patient: 'Who planted the tree?'",
+    "Examiner: 'Now then. I'm going to give you two words... Child, hospital.'",
+    "Patient: 'Why is a child in the hospital?'",
+    "Examiner: 'Cold, winter.'",
+    "Patient: 'You want a sentence? Make a sentence. We've had a very cold winter.'",
+    "Examiner: 'Now then. Three words... Chair, doctor, sit.'",
+    "Patient: 'Chair, doctor, and sit. Uh huh. How would it be? Say that the doctor sat in that chair.'",
+    "Examiner: 'Bureau, open, drawer.'",
+    "Patient: 'Who opened the bureau drawer? Uh huh. Good question.'"
+  ],
+  "patient_cue_summary": [
+    "Patient generates task-compliant sentences using provided keywords",
+    "Patient demonstrates basic sentence construction with subject-verb-object structure",
+    "Patient occasionally pauses or seeks phrasing guidance ('How would it be?')",
+    "Patient shows mild uncertainty or self-questioning ('Good question')",
+    "Patient does not exhibit word-finding failure, semantic vagueness, or disorganized sequencing",
+    "Patient completes all prompts with minimal examiner scaffolding"
+  ],
+  "transcript_request_id": "chatcmpl-3679ce32-2729-9d92-ab11-7e61a4a9ad8c",
+  "classification_request_id": "chatcmpl-e3f49e4f-1063-9252-b052-be1b7fa685f5",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__223_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__223_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Sentence Construction",
+        "summary": "Patient generates grammatically simple, task-compliant sentences using provided keywords without significant retrieval failure or syntactic breakdown.",
+        "evidence": "Patient responded to 'pencil' with 'Who lost the pencil?', to 'tree' with 'Who planted the tree?', to 'child, hospital' with 'Why is a child in the hospital?', to 'cold, winter' with 'We've had a very cold winter.', to 'chair, doctor, sit' with 'The doctor sat in that chair.', and to 'bureau, open, drawer' with 'Who opened the bureau drawer? Good question.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Compliance",
+        "summary": "Patient consistently follows instructions to use keywords in simple sentences, even when prompted to reorder or combine words.",
+        "evidence": "Patient correctly used all three-word prompts (e.g., 'The doctor sat in that chair') and responded to two-word prompts with coherent single-sentence answers.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Fluency and Initiation",
+        "summary": "Patient initiates responses with minimal hesitation and does not require repeated prompting or scaffolding beyond the examiner's initial instruction.",
+        "evidence": "Patient begins responses immediately after prompts, with only minor self-correction or phrasing adjustment ('How would it be?').",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates adequate sentence construction and task compliance using provided keywords. Minor self-questioning and phrasing hesitation observed, but no evidence of retrieval failure, disorganization, or semantic vagueness. Further observation or formal screening recommended due to limited data and absence of visual cues.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Task-compliant sentence generation across all prompts",
+      "No word-finding pauses or semantic breakdowns",
+      "Consistent grammatical structure and subject-verb-object clarity",
+      "Minimal examiner scaffolding required"
+    ],
+    "alternative_explanations": [
+      "Mild uncertainty may reflect task unfamiliarity or natural speech hesitation rather than cognitive impairment",
+      "Limited visual data prevents full assessment of nonverbal cues or engagement level"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Mild uncertainty or self-questioning observed in tone",
+      "No signs of frustration, anxiety, or apathy",
+      "Engagement appears consistent with task compliance"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with additional language or memory screening tasks",
+      "Consider repeat assessment in a more structured or familiar setting",
+      "Include caregiver report or functional history if available"
+    ],
+    "visit_recommendation": "Formal cognitive screening or routine follow-up in 6–12 months",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline observed.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video data unavailable",
+      "assessment based solely on audio and transcript.",
+      "Patient speech is intelligible and task-relevant",
+      "no signs of dementia-level impairment.",
+      "Examiner prompts are neutral context",
+      "patient responses are self-generated and coherent."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Who lost the pencil? Who planted the tree? We've had a very cold winter. The doctor sat in that chair. Who opened the bureau drawer? Good question.",
+    "speaker_turn_summary": [
+      "Examiner: 'Dinner is on the table. Just a simple sentence using the word that I'm going to give you. Okay. First word is pencil.'",
+      "Patient: 'Pencil. Now I'm to make a statement. Put the word pencil into a sentence for me. Who lost the pencil?'",
+      "Examiner: 'Tree.'",
+      "Patient: 'Who planted the tree?'",
+      "Examiner: 'Now then. I'm going to give you two words... Child, hospital.'",
+      "Patient: 'Why is a child in the hospital?'",
+      "Examiner: 'Cold, winter.'",
+      "Patient: 'You want a sentence? Make a sentence. We've had a very cold winter.'",
+      "Examiner: 'Now then. Three words... Chair, doctor, sit.'",
+      "Patient: 'Chair, doctor, and sit. Uh huh. How would it be? Say that the doctor sat in that chair.'",
+      "Examiner: 'Bureau, open, drawer.'",
+      "Patient: 'Who opened the bureau drawer? Uh huh. Good question.'"
+    ],
+    "patient_cue_summary": [
+      "Patient generates task-compliant sentences using provided keywords",
+      "Patient demonstrates basic sentence construction with subject-verb-object structure",
+      "Patient occasionally pauses or seeks phrasing guidance ('How would it be?')",
+      "Patient shows mild uncertainty or self-questioning ('Good question')",
+      "Patient does not exhibit word-finding failure, semantic vagueness, or disorganized sequencing",
+      "Patient completes all prompts with minimal examiner scaffolding"
+    ]
+  },
+  "latency_ms": 25565,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/223-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/223-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

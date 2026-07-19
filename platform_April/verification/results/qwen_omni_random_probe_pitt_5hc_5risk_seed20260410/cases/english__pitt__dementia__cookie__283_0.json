@@ -1,0 +1,131 @@
+{
+  "case_id": "english__pitt__dementia__cookie__283_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "Tell me everything that you see going on. Well, a youngster got up on his stool and he's trying to get into the cookie jar and the little girl is already waiting for the cookie, so she's standing there with her hand out. Oh my, and mother is very busy. Oy, she forgot to look at the spigots. They're still open and the water is pouring from the sink and she's looking at it like it's, what am I gonna do now? And there are some dishes on the countertop and you can see out into the yard. The curtains are nice. This little boy is on tilt though. That little stool is going to fall. She has a dish in her hand that she's drying and she looks a little perplexed. Hmm, what am I gonna do with all this water on the floor? And you can see there's another house next door, evidently. Looks like a house and a tree back there beyond the house.",
+  "patient_only_transcript": "Well, a youngster got up on his stool and he's trying to get into the cookie jar and the little girl is already waiting for the cookie, so she's standing there with her hand out. Oh my, and mother is very busy. Oy, she forgot to look at the spigots. They're still open and the water is pouring from the sink and she's looking at it like it's, what am I gonna do now? And there are some dishes on the countertop and you can see out into the yard. The curtains are nice. This little boy is on tilt though. That little stool is going to fall. She has a dish in her hand that she's drying and she looks a little perplexed. Hmm, what am I gonna do with all this water on the floor? And you can see there's another house next door, evidently. Looks like a house and a tree back there beyond the house.",
+  "speaker_turn_summary": [
+    "Examiner: Tell me everything that you see going on.",
+    "Patient: Well, a youngster got up on his stool and he's trying to get into the cookie jar and the little girl is already waiting for the cookie, so she's standing there with her hand out. Oh my, and mother is very busy. Oy, she forgot to look at the spigots. They're still open and the water is pouring from the sink and she's looking at it like it's, what am I gonna do now? And there are some dishes on the countertop and you can see out into the yard. The curtains are nice. This little boy is on tilt though. That little stool is going to fall. She has a dish in her hand that she's drying and she looks a little perplexed. Hmm, what am I gonna do with all this water on the floor? And you can see there's another house next door, evidently. Looks like a house and a tree back there beyond the house."
+  ],
+  "patient_cue_summary": [
+    "Patient provides detailed scene description with multiple elements (boy, cookie jar, girl, mother, sink, stool, dishes, yard, house, tree).",
+    "Patient uses filler words ('Oh my', 'Oy', 'Hmm') and self-reflective phrases ('what am I gonna do now?') indicating possible cognitive load or hesitation.",
+    "Patient’s description is coherent and sequentially organized, with causal links (e.g., mother forgot to look → water pouring → perplexed).",
+    "No evidence of word-finding failure, semantic vagueness, repetition, or abandonment of utterance.",
+    "Patient appears to independently describe the entire scene without examiner prompting or dependency."
+  ],
+  "transcript_request_id": "chatcmpl-75a92451-f8d9-9646-86eb-32ee100b71bf",
+  "classification_request_id": "chatcmpl-a919ac9f-d907-937c-95d3-600599e0732d",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__283_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__283_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential, and causally linked description of a multi-element picture scene.",
+        "evidence": "Patient describes boy on stool, cookie jar, girl waiting, mother’s distraction, open spigot, pouring water, dishes, yard, house, tree — all connected logically.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Vocabulary",
+        "summary": "Patient uses specific, accurate vocabulary to describe objects and actions without substitution or vagueness.",
+        "evidence": "Terms like 'cookie jar', 'spigots', 'stool', 'dishes', 'perplexed' are used appropriately and precisely.",
+        "confidence": null
+      },
+      {
+        "label": "Examiner Dependency",
+        "summary": "Patient does not rely on examiner prompting or assistance; response is self-initiated and complete.",
+        "evidence": "Patient begins and completes the description independently after examiner prompt, without interruption or need for clarification.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a detailed, coherent, and largely self-sufficient description of a complex picture scene, including multiple characters, actions, and environmental details. Minor use of fillers and reflective phrases suggests mild cognitive load but not impairment. No evidence of retrieval failure, disorganization, or examiner dependence. Further observation or formal screening may be warranted if context suggests clinical concern.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient accurately names and links multiple scene elements without prompting.",
+      "Narrative is logically sequenced and causally connected.",
+      "No signs of word-finding pauses, semantic vagueness, or disorganization.",
+      "Patient appears engaged and self-sufficient in task completion."
+    ],
+    "alternative_explanations": [
+      "Filler words and reflective phrases may reflect natural conversational style rather than cognitive impairment.",
+      "Task may be challenging for some individuals, leading to slight hesitation without indicating pathology.",
+      "Lack of visual cues prevents full assessment of nonverbal behavior, but audio alone does not suggest impairment."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Patient exhibits mild perplexity and uncertainty ('what am I gonna do now?', 'Hmm') — not indicative of clinical distress or affective flattening.",
+      "No signs of frustration, anxiety, or apathy",
+      "tone is observational and slightly amused or surprised."
+    ],
+    "risk_control_suggestions": [
+      "Consider follow-up with formal cognitive screening if clinical concern persists.",
+      "Monitor for consistency across multiple assessments or tasks.",
+      "Avoid overinterpreting fillers or reflective phrases as impairment without corroborating evidence."
+    ],
+    "visit_recommendation": "routine follow-up or formal screening if indicated by clinical context.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of progressive decline or strong risk signal.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio of patient’s description.",
+      "Patient appears to be the primary respondent in a picture-description task.",
+      "No signs of dementia-like impairment in patient’s speech",
+      "description is coherent and informative.",
+      "Examiner prompt is neutral context",
+      "patient response is self-contained and task-relevant."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, a youngster got up on his stool and he's trying to get into the cookie jar and the little girl is already waiting for the cookie, so she's standing there with her hand out. Oh my, and mother is very busy. Oy, she forgot to look at the spigots. They're still open and the water is pouring from the sink and she's looking at it like it's, what am I gonna do now? And there are some dishes on the countertop and you can see out into the yard. The curtains are nice. This little boy is on tilt though. That little stool is going to fall. She has a dish in her hand that she's drying and she looks a little perplexed. Hmm, what am I gonna do with all this water on the floor? And you can see there's another house next door, evidently. Looks like a house and a tree back there beyond the house.",
+    "speaker_turn_summary": [
+      "Examiner: Tell me everything that you see going on.",
+      "Patient: Well, a youngster got up on his stool and he's trying to get into the cookie jar and the little girl is already waiting for the cookie, so she's standing there with her hand out. Oh my, and mother is very busy. Oy, she forgot to look at the spigots. They're still open and the water is pouring from the sink and she's looking at it like it's, what am I gonna do now? And there are some dishes on the countertop and you can see out into the yard. The curtains are nice. This little boy is on tilt though. That little stool is going to fall. She has a dish in her hand that she's drying and she looks a little perplexed. Hmm, what am I gonna do with all this water on the floor? And you can see there's another house next door, evidently. Looks like a house and a tree back there beyond the house."
+    ],
+    "patient_cue_summary": [
+      "Patient provides detailed scene description with multiple elements (boy, cookie jar, girl, mother, sink, stool, dishes, yard, house, tree).",
+      "Patient uses filler words ('Oh my', 'Oy', 'Hmm') and self-reflective phrases ('what am I gonna do now?') indicating possible cognitive load or hesitation.",
+      "Patient’s description is coherent and sequentially organized, with causal links (e.g., mother forgot to look → water pouring → perplexed).",
+      "No evidence of word-finding failure, semantic vagueness, repetition, or abandonment of utterance.",
+      "Patient appears to independently describe the entire scene without examiner prompting or dependency."
+    ]
+  },
+  "latency_ms": 23607,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/283-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/283-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

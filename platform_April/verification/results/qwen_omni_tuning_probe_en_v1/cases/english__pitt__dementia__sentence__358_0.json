@@ -1,0 +1,121 @@
+{
+  "case_id": "english__pitt__dementia__sentence__358_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.9,
+  "transcript": "Pencil. The pencil is mine. Tree. The tree is oak. Now I'm going to give you two words. I'd like you to use both of them for me in a short sentence. Child, hospital. The child is in the hospital. Cold, winter. It is a cold winter day. Now I'm going to give you three words. I'd like you to use them all for me in a sentence. Chair, doctor, sit. The doctor sit in the chair. Bureau, open, drawer. The bureau drawer is open.",
+  "patient_only_transcript": "The pencil is mine. The tree is oak. The child is in the hospital. It is a cold winter day. The doctor sit in the chair. The bureau drawer is open.",
+  "speaker_turn_summary": [
+    "Examiner: 'Pencil. The pencil is mine.'",
+    "Patient: 'The pencil is mine.'",
+    "Examiner: 'Tree. The tree is oak.'",
+    "Patient: 'The tree is oak.'",
+    "Examiner: 'Now I'm going to give you two words... Child, hospital.'",
+    "Patient: 'The child is in the hospital.'",
+    "Examiner: 'Cold, winter.'",
+    "Patient: 'It is a cold winter day.'",
+    "Examiner: 'Now I'm going to give you three words... Chair, doctor, sit.'",
+    "Patient: 'The doctor sit in the chair.'",
+    "Examiner: 'Bureau, open, drawer.'",
+    "Patient: 'The bureau drawer is open.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides accurate, task-compliant responses to all prompts.",
+    "Responses are grammatically simple but semantically complete and relevant.",
+    "Minor grammatical error in 'The doctor sit in the chair' (should be 'sits'), but no evidence of word-finding failure or semantic breakdown.",
+    "No hesitation, restarts, circumlocution, or examiner dependence observed.",
+    "Responses are concise but sufficient for the task",
+    "brevity is not impairment-like in this structured context."
+  ],
+  "transcript_request_id": "chatcmpl-d8fb1f90-f172-9797-bc77-246a11784c5e",
+  "classification_request_id": "chatcmpl-97d95c74-902d-912d-b656-cb9e1f4cd4ab",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__358_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__358_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient completed all structured sentence tasks accurately and coherently with minimal errors. No observable signs of cognitive impairment in language production or task execution. Responses are brief but sufficient and task-relevant.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "All patient responses are accurate and complete for the given prompts.",
+      "No signs of word-finding difficulty, disorganization, or task failure.",
+      "Minor grammatical error does not indicate cognitive impairment",
+      "it may reflect speech production or learning context."
+    ],
+    "alternative_explanations": [
+      "Minor grammatical error may reflect developmental, educational, or speech fluency factors, not cognitive decline.",
+      "Concise responses are expected in structured sentence tasks",
+      "brevity alone is not indicative of impairment."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No further cognitive screening needed based on this clip.",
+      "Routine follow-up is appropriate if other clinical concerns arise."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline in this assessment.",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible, task-compliant, and shows no impairment-like features.",
+      "Minor grammatical error is not sufficient to infer cognitive risk in this context."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The pencil is mine. The tree is oak. The child is in the hospital. It is a cold winter day. The doctor sit in the chair. The bureau drawer is open.",
+    "speaker_turn_summary": [
+      "Examiner: 'Pencil. The pencil is mine.'",
+      "Patient: 'The pencil is mine.'",
+      "Examiner: 'Tree. The tree is oak.'",
+      "Patient: 'The tree is oak.'",
+      "Examiner: 'Now I'm going to give you two words... Child, hospital.'",
+      "Patient: 'The child is in the hospital.'",
+      "Examiner: 'Cold, winter.'",
+      "Patient: 'It is a cold winter day.'",
+      "Examiner: 'Now I'm going to give you three words... Chair, doctor, sit.'",
+      "Patient: 'The doctor sit in the chair.'",
+      "Examiner: 'Bureau, open, drawer.'",
+      "Patient: 'The bureau drawer is open.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides accurate, task-compliant responses to all prompts.",
+      "Responses are grammatically simple but semantically complete and relevant.",
+      "Minor grammatical error in 'The doctor sit in the chair' (should be 'sits'), but no evidence of word-finding failure or semantic breakdown.",
+      "No hesitation, restarts, circumlocution, or examiner dependence observed.",
+      "Responses are concise but sufficient for the task",
+      "brevity is not impairment-like in this structured context."
+    ]
+  },
+  "latency_ms": 11799,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/358-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/358-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

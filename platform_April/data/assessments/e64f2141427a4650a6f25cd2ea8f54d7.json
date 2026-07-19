@@ -1,0 +1,95 @@
+{
+  "assessment_id": "e64f2141427a4650a6f25cd2ea8f54d7",
+  "patient_id": "test_002",
+  "language": "en",
+  "created_at": "2026-04-06T14:16:42.374718Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Patient displays consistent smiling and engaged facial expressions during interaction.",
+      "evidence": "Patient is seen smiling and maintaining eye contact with mirror/reflection during conversation, indicating positive affect and engagement.",
+      "confidence": 0.85
+    }
+  ],
+  "body_findings": [],
+  "voice_findings": [
+    {
+      "label": "Speech Clarity",
+      "summary": "Speech is clear and articulate with no signs of dysarthria or phonological errors.",
+      "evidence": "Patient's speech is easily understood, with normal prosody and pacing during the interaction.",
+      "confidence": 0.9
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Cognitive Content",
+      "summary": "Patient expresses a desire to go somewhere but is unsure of destination, suggesting mild uncertainty or lack of directionality.",
+      "evidence": "Patient says, 'I like to go somewhere but I don't know where,' indicating possible disorientation or planning difficulty.",
+      "confidence": 0.75
+    }
+  ],
+  "speaker_structure": "multi_speaker",
+  "target_patient_presence": "probable",
+  "target_patient_basis": "speaking_time",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 0.95,
+  "risk_score": 0.35,
+  "risk_label": "cognitive_risk",
+  "risk_tier": "low",
+  "screening_classification": "needs_observation",
+  "screening_summary": "Patient exhibits mild verbal uncertainty regarding destination but maintains clear speech, positive affect, and engagement. No overt signs of cognitive impairment are evident, but the self-reported disorientation warrants further observation.",
+  "evidence_for_risk": [
+    "Self-reported uncertainty about destination"
+  ],
+  "evidence_against_risk": [
+    "Clear speech, consistent smiling, and engaged demeanor during interaction"
+  ],
+  "alternative_explanations": [
+    "The uncertainty may reflect situational indecision or lack of immediate plans rather than cognitive impairment.",
+    "Patient may be engaging in a role-play or scripted scenario, which could affect interpretation of spontaneous behavior."
+  ],
+  "risk_factor_findings": [
+    "Self-reported uncertainty about destination"
+  ],
+  "subjective_assessment_findings": [
+    "Patient reports not knowing where to go, indicating possible disorientation or planning difficulty."
+  ],
+  "emotional_assessment_findings": [
+    "Patient displays positive affect, smiling and engaged during interaction, suggesting preserved emotional regulation."
+  ],
+  "risk_control_suggestions": [
+    "Follow up with a brief cognitive screening tool such as the MoCA or MMSE to assess orientation and planning abilities.",
+    "Observe for consistency in disorientation across multiple contexts or over time.",
+    "Consider caregiver report for functional impact in daily activities."
+  ],
+  "visit_recommendation": "Routine follow-up with cognitive screening in 3–6 months; prompt clinical evaluation if disorientation persists or worsens.",
+  "future_risk_trend_summary": "Limited predictive value from single clip; longitudinal observation recommended for trend assessment.",
+  "reviewer_confidence": 0.7,
+  "context_notes": [
+    "Patient is likely the target individual based on speaking time and interaction role.",
+    "Clip is usable with clear audio and visual content, though only one interaction is observed.",
+    "No signs of distress, agitation, or affective flattening observed."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "739916cb-ab46-9f86-960d-12c0827f9636",
+    "latency_ms": 25645,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 25645
+    }
+  ],
+  "fallback_message": null
+}

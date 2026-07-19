@@ -1,0 +1,129 @@
+{
+  "case_id": "mandarin__chou__mci__051__051_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "哎，两个爷在下象棋，两个小朋友在打羽毛球。后面一个男生皮蛋在玩那个狗，狗狗在拉那个妹妹的那个衣角。啊，这边还有两个人在荡秋千。哦，泡茶，这个在泡茶，这个在泡茶，他们在象棋。他们在打羽毛球，这个还有滑梯，他们在荡秋千。啊，狗狗在咬妹妹的衣服。",
+  "patient_only_transcript": "两个爷在下象棋，两个小朋友在打羽毛球。后面一个男生皮蛋在玩那个狗，狗狗在拉那个妹妹的那个衣角。啊，这边还有两个人在荡秋千。哦，泡茶，这个在泡茶，这个在泡茶，他们在象棋。他们在打羽毛球，这个还有滑梯，他们在荡秋千。啊，狗狗在咬妹妹的衣服。",
+  "speaker_turn_summary": [
+    "Examiner: prompts scene description task",
+    "Patient: describes multiple park activities including chess, badminton, dog, swing, tea, slide, clothing interaction",
+    "Examiner: minimal interjections or prompts detected"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple actors and actions in the scene",
+    "Uses colloquial Mandarin with discourse particles (啊、哦) and generic referents (这个、那个)",
+    "Narrative is largely coherent and task-relevant despite some repetition and filler",
+    "No evidence of naming collapse, semantic vagueness, or abandonment of task",
+    "No contradictions or disorganization in scene description"
+  ],
+  "transcript_request_id": "chatcmpl-fb4a7a06-e8ea-95e3-ac11-5ca564afd3a5",
+  "classification_request_id": "chatcmpl-fc526f8a-b094-91f2-aef4-14e0fc6d974a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__051__051_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__051__051_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes multiple visible elements in the park scene with reasonable detail and task relevance.",
+        "evidence": "Patient lists chess players, badminton players, a boy named '皮蛋', a dog pulling a girl's clothing, people on swings, tea preparation, and a slide — all relevant to the scene.",
+        "confidence": 0.5
+      },
+      {
+        "label": "linguistic_style",
+        "summary": "Speech uses colloquial Mandarin with fillers and generic pronouns, which are normal in spontaneous speech and not indicative of impairment.",
+        "evidence": "Use of '啊', '哦', '这个', '那个' is consistent with natural conversational Mandarin, not cognitive impairment.",
+        "confidence": 0.75
+      },
+      {
+        "label": "task_completion",
+        "summary": "Patient completes the scene-description task with multiple correct elements, showing adequate lexical retrieval and narrative organization.",
+        "evidence": "Patient successfully identifies at least 7 distinct actors or actions in the scene without needing prompting or correction.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, task-relevant description of a multi-actor park scene using colloquial Mandarin. No clear signs of cognitive impairment are observed. However, audio quality and lack of visual data limit confidence. Further observation or formal screening is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies multiple scene elements",
+      "Narrative is task-relevant and largely coherent",
+      "No evidence of naming failure, semantic collapse, or abandonment",
+      "Colloquial speech patterns are normal for spontaneous Mandarin"
+    ],
+    "alternative_explanations": [
+      "Audio quality may limit full assessment of speech fluency or prosody",
+      "Patient may be naturally verbose or hesitant, not cognitively impaired",
+      "Scene description task may be inherently fragmented, not indicative of impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat scene-description task with clearer audio or visual cues",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Observe patient in naturalistic setting for consistency of performance"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of progressive decline or impairment in this segment.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-compliant despite colloquial style.",
+      "No signs of cognitive impairment detected in this clip",
+      "conservative classification applied."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "两个爷在下象棋，两个小朋友在打羽毛球。后面一个男生皮蛋在玩那个狗，狗狗在拉那个妹妹的那个衣角。啊，这边还有两个人在荡秋千。哦，泡茶，这个在泡茶，这个在泡茶，他们在象棋。他们在打羽毛球，这个还有滑梯，他们在荡秋千。啊，狗狗在咬妹妹的衣服。",
+    "speaker_turn_summary": [
+      "Examiner: prompts scene description task",
+      "Patient: describes multiple park activities including chess, badminton, dog, swing, tea, slide, clothing interaction",
+      "Examiner: minimal interjections or prompts detected"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple actors and actions in the scene",
+      "Uses colloquial Mandarin with discourse particles (啊、哦) and generic referents (这个、那个)",
+      "Narrative is largely coherent and task-relevant despite some repetition and filler",
+      "No evidence of naming collapse, semantic vagueness, or abandonment of task",
+      "No contradictions or disorganization in scene description"
+    ]
+  },
+  "latency_ms": 15643,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/051/051_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/051/051_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

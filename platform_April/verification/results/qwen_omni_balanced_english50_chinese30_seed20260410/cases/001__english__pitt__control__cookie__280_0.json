@@ -1,0 +1,130 @@
+{
+  "case_id": "english__pitt__control__cookie__280_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "What do you see going on in that picture? Oh, I see the sink is running over. I see the stool is tipping over. Little boy's trying to get cookies at. Little girl is reaching to get a cookie. Mother is drying dishes. Window's open. As I say, she's washing. Oh, she's drying dishes. Let's go look. And she's standing in the water. The cupboard door is open. There's a cookie jar. The lid is leaning against the cookie jar. Curtains on the window. I can see the grass and some shrubbery outside and the house next door. Okay. Kitchen cabinets. Is that it? I feel I see three people in there, a mother and a little boy and a girl. Okay.",
+  "patient_only_transcript": "Oh, I see the sink is running over. I see the stool is tipping over. Little boy's trying to get cookies at. Little girl is reaching to get a cookie. Mother is drying dishes. Window's open. As I say, she's washing. Oh, she's drying dishes. Let's go look. And she's standing in the water. The cupboard door is open. There's a cookie jar. The lid is leaning against the cookie jar. Curtains on the window. I can see the grass and some shrubbery outside and the house next door. Okay. Kitchen cabinets. Is that it? I feel I see three people in there, a mother and a little boy and a girl. Okay.",
+  "speaker_turn_summary": [
+    "Examiner: What do you see going on in that picture?",
+    "Patient: Oh, I see the sink is running over. I see the stool is tipping over. Little boy's trying to get cookies at. Little girl is reaching to get a cookie. Mother is drying dishes. Window's open. As I say, she's washing. Oh, she's drying dishes. Let's go look. And she's standing in the water. The cupboard door is open. There's a cookie jar. The lid is leaning against the cookie jar. Curtains on the window. I can see the grass and some shrubbery outside and the house next door. Okay. Kitchen cabinets. Is that it? I feel I see three people in there, a mother and a little boy and a girl. Okay."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with specific content words",
+    "Main events linked logically",
+    "Little examiner dependence",
+    "Minor hesitations and self-corrections (e.g., 'As I say, she's washing. Oh, she's drying dishes.')",
+    "Final summary includes role identification and spatial awareness"
+  ],
+  "transcript_request_id": "chatcmpl-cad75af2-bda5-9f09-90fd-e6c6f76193d8",
+  "classification_request_id": "chatcmpl-bf252e7d-0941-93aa-b183-04762dea0e1d",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__280_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__280_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential description of the picture, including objects, actions, and spatial relationships.",
+        "evidence": "Patient mentions sink, stool, cookies, mother, cookie jar, window, grass, house next door, kitchen cabinets, and identifies three people with roles.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific, accurate terms rather than vague or generic language.",
+        "evidence": "Terms like 'cookie jar', 'lid leaning against', 'curtains on the window', 'grass and shrubbery' demonstrate precise vocabulary.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient structures the description logically, moving from foreground to background elements and including spatial context.",
+        "evidence": "Response begins with sink/stool, moves to people and actions, then to window and exterior, ending with kitchen cabinets and role identification.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "The patient provides a detailed, coherent description of the pictured scene, including multiple objects, actions, and spatial relationships. Although there are minor self-corrections and hesitations, the overall response is informative, organized, and task-relevant. No persuasive impairment-like cues are present.",
+    "evidence_for_risk": [
+      "Patient accurately names key objects and actions: sink, stool, cookies, mother, cookie jar, window, grass, house next door.",
+      "Patient organizes the description sequentially and links events logically.",
+      "Patient demonstrates spatial awareness and role identification (mother, boy, girl)."
+    ],
+    "evidence_against_risk": [
+      "No word-finding pauses or semantic vagueness.",
+      "No repetition, abandonment, or disorganization.",
+      "No examiner dependence beyond initial prompt.",
+      "Response is self-sufficient and complete for the task."
+    ],
+    "alternative_explanations": [
+      "Minor self-corrections may reflect natural speech fluency rather than cognitive impairment.",
+      "Task may be well-practiced or familiar to the patient.",
+      "Audio quality may introduce minor ambiguity, but patient speech remains clear and structured."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed.",
+      "Continue routine monitoring if part of longitudinal screening.",
+      "Consider repeating the task in a different context if future concerns arise."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of progressive decline is present.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment relies solely on audio.",
+      "Patient speech is intelligible and task-relevant despite minor hesitations.",
+      "No signs of cognitive impairment detected in this single clip."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Oh, I see the sink is running over. I see the stool is tipping over. Little boy's trying to get cookies at. Little girl is reaching to get a cookie. Mother is drying dishes. Window's open. As I say, she's washing. Oh, she's drying dishes. Let's go look. And she's standing in the water. The cupboard door is open. There's a cookie jar. The lid is leaning against the cookie jar. Curtains on the window. I can see the grass and some shrubbery outside and the house next door. Okay. Kitchen cabinets. Is that it? I feel I see three people in there, a mother and a little boy and a girl. Okay.",
+    "speaker_turn_summary": [
+      "Examiner: What do you see going on in that picture?",
+      "Patient: Oh, I see the sink is running over. I see the stool is tipping over. Little boy's trying to get cookies at. Little girl is reaching to get a cookie. Mother is drying dishes. Window's open. As I say, she's washing. Oh, she's drying dishes. Let's go look. And she's standing in the water. The cupboard door is open. There's a cookie jar. The lid is leaning against the cookie jar. Curtains on the window. I can see the grass and some shrubbery outside and the house next door. Okay. Kitchen cabinets. Is that it? I feel I see three people in there, a mother and a little boy and a girl. Okay."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with specific content words",
+      "Main events linked logically",
+      "Little examiner dependence",
+      "Minor hesitations and self-corrections (e.g., 'As I say, she's washing. Oh, she's drying dishes.')",
+      "Final summary includes role identification and spatial awareness"
+    ]
+  },
+  "latency_ms": 38262,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/280-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/280-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

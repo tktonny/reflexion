@@ -1,0 +1,131 @@
+{
+  "case_id": "mandarin__chou__hc__003__003_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "现在台北市有很多休闲的公园都建的不错，啊，有一些，有一些呢，它又设了小孩的玩具，溜滑梯、荡秋千，啊，都设计的很好，还有那个凉亭，给老先生、老太太他们啊下棋、聊天，哦，还有那个球场，哦，给小朋友打球、打羽毛球，或或或者是打什么休闲活动的球都可以。啊，也有人就带狗到公园来遛狗，但是呢，这个狗呢，啊，看到那个打球的小朋友，啊，就去咬那个小朋友，那小朋友惊吓了，也没有办法打，啊，这这样实在是一个不好的行为。哦，如果说市民哈，要带狗出来遛狗的话，哦，除了说要有绳子绑着，也要注意，哎，狗狗狗的突发状况会咬人或大叫吵了人家哈，那大小便要处理好，这样才能够保持公园的干净，给市民一个良好的休闲地方。",
+  "patient_only_transcript": "现在台北市有很多休闲的公园都建的不错，啊，有一些，有一些呢，它又设了小孩的玩具，溜滑梯、荡秋千，啊，都设计的很好，还有那个凉亭，给老先生、老太太他们啊下棋、聊天，哦，还有那个球场，哦，给小朋友打球、打羽毛球，或或或者是打什么休闲活动的球都可以。啊，也有人就带狗到公园来遛狗，但是呢，这个狗呢，啊，看到那个打球的小朋友，啊，就去咬那个小朋友，那小朋友惊吓了，也没有办法打，啊，这这样实在是一个不好的行为。哦，如果说市民哈，要带狗出来遛狗的话，哦，除了说要有绳子绑着，也要注意，哎，狗狗狗的突发状况会咬人或大叫吵了人家哈，那大小便要处理好，这样才能够保持公园的干净，给市民一个良好的休闲地方。",
+  "speaker_turn_summary": [
+    "Patient describes park features and a dog incident in a continuous monologue.",
+    "No clear examiner prompts or interruptions detected in the audio."
+  ],
+  "patient_cue_summary": [
+    "Patient uses multiple discourse particles (啊, 哦, 嗯) and repetitions (有一些, 有一些呢, 或或或者是) but maintains coherent topic chain.",
+    "Patient identifies multiple scene elements: children's play equipment, pavilions for elders, sports courts, dog-walking behavior, and safety concerns.",
+    "Patient describes a specific incident (dog biting child) with emotional consequence (child frightened, unable to play), indicating narrative coherence and referential clarity.",
+    "Patient provides practical suggestions (leash, monitor dog behavior, clean up waste), indicating functional awareness and task completion.",
+    "No evidence of word-finding failure, naming collapse, or semantic vagueness",
+    "all referents are contextually clear (e.g., '小孩', '老先生老太太', '打球的小朋友')."
+  ],
+  "transcript_request_id": "chatcmpl-86b80e42-7512-90d4-adb0-1db396da064a",
+  "classification_request_id": "chatcmpl-89e8f37f-0d7d-9ccf-923c-bdb29044a22d",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__003__003_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__003__003_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient provides a detailed, multi-element description of park facilities and a behavioral incident, with clear referents and logical sequencing.",
+        "evidence": "Patient lists children's equipment, elder pavilions, sports courts, dog-walking, and safety concerns in a connected narrative with emotional consequence (child frightened).",
+        "confidence": 0.5
+      },
+      {
+        "label": "task_completion",
+        "summary": "Patient completes the implied task of describing a park scene with multiple actors and actions, including a problem and solution.",
+        "evidence": "Patient identifies at least 5 distinct user groups (children, elders, dog walkers, players, general public) and describes their activities and potential conflicts.",
+        "confidence": 0.5
+      },
+      {
+        "label": "lexical_retrieval",
+        "summary": "Patient retrieves and uses appropriate vocabulary for park features and social behavior without naming collapse or semantic failure.",
+        "evidence": "Terms like '溜滑梯', '荡秋千', '凉亭', '打球', '打羽毛球', '遛狗', '绳子绑着', '大小便' are all accurately used and contextually appropriate.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "externally_provided",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, multi-element description of a park scene with social behavioral commentary and practical suggestions. Discourse particles and repetitions are normal colloquial features, not impairment indicators. No evidence of cognitive decline or naming failure. Task completion is adequate. Further observation may be warranted if this is part of a larger screening battery.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient maintains referential clarity across multiple actors and actions.",
+      "Patient provides a complete narrative with emotional and practical dimensions.",
+      "No lexical or semantic collapse, no abandonment, no contradiction.",
+      "Discourse particles and repetitions are consistent with normal Mandarin conversational style, not cognitive impairment."
+    ],
+    "alternative_explanations": [
+      "Colloquial speech patterns (discourse particles, repetitions) may be misinterpreted as impairment without context.",
+      "Task may be designed to elicit spontaneous description",
+      "patient successfully fulfills task requirements.",
+      "Audio quality or recording setup may limit visual cues, but patient speech remains intelligible and task-relevant."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Patient expresses concern and disapproval regarding dog behavior, indicating emotional engagement with social norms.",
+      "No signs of anxiety, apathy, or affective flattening",
+      "tone is conversational and informative."
+    ],
+    "risk_control_suggestions": [
+      "Continue with full cognitive screening battery to confirm baseline.",
+      "Monitor for consistency across multiple tasks and sessions.",
+      "Avoid overinterpreting colloquial speech features as impairment."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if other risk factors emerge.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of progressive decline or impairment in this segment.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Patient speech is intelligible and task-compliant despite colloquial features.",
+      "No visual or body cues available",
+      "assessment relies solely on audio content.",
+      "Patient appears engaged and socially aware, with no signs of cognitive impairment in this clip."
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "现在台北市有很多休闲的公园都建的不错，啊，有一些，有一些呢，它又设了小孩的玩具，溜滑梯、荡秋千，啊，都设计的很好，还有那个凉亭，给老先生、老太太他们啊下棋、聊天，哦，还有那个球场，哦，给小朋友打球、打羽毛球，或或或者是打什么休闲活动的球都可以。啊，也有人就带狗到公园来遛狗，但是呢，这个狗呢，啊，看到那个打球的小朋友，啊，就去咬那个小朋友，那小朋友惊吓了，也没有办法打，啊，这这样实在是一个不好的行为。哦，如果说市民哈，要带狗出来遛狗的话，哦，除了说要有绳子绑着，也要注意，哎，狗狗狗的突发状况会咬人或大叫吵了人家哈，那大小便要处理好，这样才能够保持公园的干净，给市民一个良好的休闲地方。",
+    "speaker_turn_summary": [
+      "Patient describes park features and a dog incident in a continuous monologue.",
+      "No clear examiner prompts or interruptions detected in the audio."
+    ],
+    "patient_cue_summary": [
+      "Patient uses multiple discourse particles (啊, 哦, 嗯) and repetitions (有一些, 有一些呢, 或或或者是) but maintains coherent topic chain.",
+      "Patient identifies multiple scene elements: children's play equipment, pavilions for elders, sports courts, dog-walking behavior, and safety concerns.",
+      "Patient describes a specific incident (dog biting child) with emotional consequence (child frightened, unable to play), indicating narrative coherence and referential clarity.",
+      "Patient provides practical suggestions (leash, monitor dog behavior, clean up waste), indicating functional awareness and task completion.",
+      "No evidence of word-finding failure, naming collapse, or semantic vagueness",
+      "all referents are contextually clear (e.g., '小孩', '老先生老太太', '打球的小朋友')."
+    ]
+  },
+  "latency_ms": 19742,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/003/003_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/003/003_park.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

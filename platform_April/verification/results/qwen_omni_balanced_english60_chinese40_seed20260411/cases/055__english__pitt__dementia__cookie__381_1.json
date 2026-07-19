@@ -1,0 +1,129 @@
+{
+  "case_id": "english__pitt__dementia__cookie__381_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "Tell me what you see going on in the picture. Well, the boy's in the cookie jar, and his sister is trying to take it from him, and he's on a stool going like this. And then there's a female over here with a plate in her hand, and she's drying dishes. The water went overboard on the sink. It's on the floor. And the boy's cooking, getting cookies, and his chair's wobbling. Okay. Okay. Right here, see? Okay, good. Thank you.",
+  "patient_only_transcript": "Well, the boy's in the cookie jar, and his sister is trying to take it from him, and he's on a stool going like this. And then there's a female over here with a plate in her hand, and she's drying dishes. The water went overboard on the sink. It's on the floor. And the boy's cooking, getting cookies, and his chair's wobbling.",
+  "speaker_turn_summary": [
+    "Examiner: Tell me what you see going on in the picture.",
+    "Patient: Well, the boy's in the cookie jar, and his sister is trying to take it from him, and he's on a stool going like this. And then there's a female over here with a plate in her hand, and she's drying dishes. The water went overboard on the sink. It's on the floor. And the boy's cooking, getting cookies, and his chair's wobbling.",
+    "Examiner: Okay. Okay. Right here, see? Okay, good. Thank you."
+  ],
+  "patient_cue_summary": [
+    "Patient provides a coherent, task-relevant description of the picture scene.",
+    "Patient names multiple actors (boy, sister, female), actions (taking cookies, drying dishes, water running), and objects (cookie jar, stool, plate, sink, chair).",
+    "Speech is intelligible and mostly fluent, with minor pauses and filler-like phrasing ('going like this', 'getting cookies').",
+    "No clear word-finding breakdown, repetition, restart, or examiner-dependent scaffolding observed.",
+    "Patient completes the full task without abandonment or significant disorganization."
+  ],
+  "transcript_request_id": "chatcmpl-6b83d6db-e642-971e-80f5-c01e0fb800c3",
+  "classification_request_id": "chatcmpl-9dbee872-449d-972a-9e5c-e4b47c5d043d",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__381_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__381_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description",
+        "summary": "Patient accurately describes multiple actors, actions, and objects in the picture task.",
+        "evidence": "Patient names boy, sister, female; describes cookie jar, stool, water spill, chair wobbling, and dish-drying activity.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Speech Fluency",
+        "summary": "Speech is mostly fluent with minor pauses and filler phrases, but no breakdown in retrieval or organization.",
+        "evidence": "No restarts, repetitions, or examiner dependence observed; patient completes full description.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Relevance",
+        "summary": "Patient remains focused on the picture description task without tangential drift or confusion.",
+        "evidence": "All utterances relate to the picture content; no off-topic or contradictory statements.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient provides a coherent, task-relevant description of a picture scene involving multiple actors and actions. Speech is intelligible and fluent, with no clear signs of retrieval breakdown, disorganization, or examiner dependence. While the clip is audio-only and lacks visual confirmation, the patient’s verbal performance meets basic task demands without impairment-like cues. Further observation or multimodal assessment is recommended due to modality limitations.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Task completion without breakdown",
+      "Intelligible, fluent speech",
+      "Accurate identification of multiple scene elements",
+      "No word-finding pauses or circumlocution",
+      "No examiner scaffolding or restarts"
+    ],
+    "alternative_explanations": [
+      "Audio quality limitations may mask subtle cues",
+      "Single clip limits longitudinal or multimodal assessment",
+      "Patient may be fatigued or distracted but still performed adequately"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a full visual cognitive screening battery",
+      "Repeat the picture description task with clearer audio or visual cues",
+      "Consider caregiver report for functional context"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single audio-only clip; no persuasive evidence of cognitive decline is present in this sample.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is task-relevant and coherent, but modality constraints limit diagnostic confidence.",
+      "No explicit dementia risk factors or subjective concerns are reported in the clip."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, the boy's in the cookie jar, and his sister is trying to take it from him, and he's on a stool going like this. And then there's a female over here with a plate in her hand, and she's drying dishes. The water went overboard on the sink. It's on the floor. And the boy's cooking, getting cookies, and his chair's wobbling.",
+    "speaker_turn_summary": [
+      "Examiner: Tell me what you see going on in the picture.",
+      "Patient: Well, the boy's in the cookie jar, and his sister is trying to take it from him, and he's on a stool going like this. And then there's a female over here with a plate in her hand, and she's drying dishes. The water went overboard on the sink. It's on the floor. And the boy's cooking, getting cookies, and his chair's wobbling.",
+      "Examiner: Okay. Okay. Right here, see? Okay, good. Thank you."
+    ],
+    "patient_cue_summary": [
+      "Patient provides a coherent, task-relevant description of the picture scene.",
+      "Patient names multiple actors (boy, sister, female), actions (taking cookies, drying dishes, water running), and objects (cookie jar, stool, plate, sink, chair).",
+      "Speech is intelligible and mostly fluent, with minor pauses and filler-like phrasing ('going like this', 'getting cookies').",
+      "No clear word-finding breakdown, repetition, restart, or examiner-dependent scaffolding observed.",
+      "Patient completes the full task without abandonment or significant disorganization."
+    ]
+  },
+  "latency_ms": 15730,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/381-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/381-1.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "case_id": "english__pitt__dementia__fluency__061_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "And you can begin now. Ham, eggs, pork, pork, beef, and different kinds of vegetables. Corn, potatoes, lettuce, beets, turnips, beans, soy, bread, toast. Donuts. No, I don't eat. You don't eat that. Fowl, duck, chicken, turkey, squirrel, rabbit. Okay, good. Squirrel and rabbit. You see that on television? You know that crazy show? I didn't see it either. I just saw a little. I'm thinking. Okay. Okay, here we go. Ready? Begin now. Words beginning with letter S. Yeah, there are. It's W. Sandwich. That's one. You got it. Sky. But thirty seconds left. You know I can't think. Pumpkin. That's not quite gonna cut it. Hey, there's one. Oh no, that's a C. That's right. Okay.",
+  "patient_only_transcript": "Ham, eggs, pork, beef, corn, potatoes, lettuce, beets, turnips, beans, soy, bread, toast, donuts. No, I don't eat. Fowl, duck, chicken, turkey, squirrel, rabbit. You see that on television? You know that crazy show? I didn't see it either. I just saw a little. I'm thinking. Words beginning with letter S. Yeah, there are. It's W. Sandwich. Sky. You know I can't think. Pumpkin. Hey, there's one. Oh no, that's a C.",
+  "speaker_turn_summary": [
+    "Examiner: 'And you can begin now.'",
+    "Patient: 'Ham, eggs, pork, beef, corn, potatoes, lettuce, beets, turnips, beans, soy, bread, toast, donuts. No, I don't eat.'",
+    "Examiner: 'You don't eat that.'",
+    "Patient: 'Fowl, duck, chicken, turkey, squirrel, rabbit.'",
+    "Examiner: 'Okay, good. Squirrel and rabbit.'",
+    "Patient: 'You see that on television? You know that crazy show? I didn't see it either. I just saw a little. I'm thinking.'",
+    "Examiner: 'Okay, here we go. Ready? Begin now. Words beginning with letter S.'",
+    "Patient: 'Yeah, there are. It's W. Sandwich. Sky.'",
+    "Examiner: 'But thirty seconds left.'",
+    "Patient: 'You know I can't think. Pumpkin. Hey, there's one. Oh no, that's a C.'"
+  ],
+  "patient_cue_summary": [
+    "Frequent pauses and filler phrases ('I'm thinking', 'I just saw a little')",
+    "Repetition and self-correction ('It's W. Sandwich. Sky. Oh no, that's a C.')",
+    "Vague or incomplete task responses ('You know that crazy show? I didn't see it either.')",
+    "Examiner-dependent continuation and task restarts",
+    "Lexical retrieval effort with pauses and circumlocution ('You know I can't think')",
+    "Inconsistent or abandoned fluency task output ('Sky' as a response to 'words beginning with S')",
+    "Low-information content despite prompting, with some correct item naming but weak organization"
+  ],
+  "transcript_request_id": "chatcmpl-35557b6e-5a0d-9625-aea5-20c6762fdc6c",
+  "classification_request_id": "chatcmpl-d43221f3-d032-9734-a759-5cfe7739a24a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__061_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__061_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Verbal Fluency Task Response",
+        "summary": "Patient generates category items with pauses, self-corrections, and examiner dependence.",
+        "evidence": "Patient says 'Ham, eggs, pork, beef, corn, potatoes, lettuce, beets, turnips, beans, soy, bread, toast, donuts.' then self-corrects and restarts. Later says 'Sky' as response to 'words beginning with S' and corrects to 'Oh no, that's a C.'",
+        "confidence": null
+      },
+      {
+        "label": "Task Engagement and Effort",
+        "summary": "Patient attempts to respond but shows lexical retrieval difficulty and low-information output.",
+        "evidence": "Patient says 'You know I can't think.' and 'I just saw a little.' indicating effort and uncertainty.",
+        "confidence": null
+      },
+      {
+        "label": "Emotional and Cognitive Affect",
+        "summary": "Patient displays mild frustration and distraction, not severe apathy or flatness.",
+        "evidence": "Patient says 'You know I can't think.' and 'You see that on television? You know that crazy show?' indicating distraction or mild frustration.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient exhibits mild impairment-like cues during verbal fluency task: frequent pauses, circumlocution, self-correction, examiner dependence, and low-information responses. Task completion is incomplete and disorganized. No dementia-level signs present. Further clinical evaluation recommended.",
+    "evidence_for_risk": [
+      "Patient frequently pauses and uses filler phrases ('I'm thinking', 'I just saw a little')",
+      "Self-correction and abandonment of responses ('Sky' as a response to 'words beginning with S')",
+      "Examiner-dependent continuation and task restarts",
+      "Vague, tangential responses to prompts ('You see that on television?')",
+      "Lexical retrieval effort with hesitation ('You know I can't think.')"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly names some common food items and animals",
+      "Patient remains engaged and attempts to respond to prompts",
+      "No overt disorientation, aggression, or severe disorganization observed",
+      "Task context is interactive and examiner-supported, not purely spontaneous"
+    ],
+    "alternative_explanations": [
+      "Fatigue or temporary cognitive load during task",
+      "Non-clinical distraction or conversational digression",
+      "Mild anxiety or uncertainty affecting fluency performance",
+      "Poor audio quality may obscure clearer speech patterns"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Frustration or uncertainty audible in 'You know I can't think.'",
+      "Mild amusement or distraction in 'You see that on television? You know that crazy show?'",
+      "Low affective intensity, no strong emotional reactivity or flattening observed"
+    ],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency task with clearer prompts and time cues",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Obtain collateral history from caregiver or family member",
+      "Schedule follow-up visit for longitudinal comparison"
+    ],
+    "visit_recommendation": "Formal cognitive screening and clinical evaluation recommended",
+    "future_risk_trend_summary": "Single-clip assessment limits longitudinal prediction; trend cannot be determined without follow-up data",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Audio-only, no visual cues available",
+      "Patient speech is partially intelligible but shows impairment-like features",
+      "Task context is verbal fluency with examiner prompts",
+      "Patient response is examiner-dependent and disorganized",
+      "No dementia-level signs present, but mild risk cues warrant further evaluation"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "poor_audio",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Ham, eggs, pork, beef, corn, potatoes, lettuce, beets, turnips, beans, soy, bread, toast, donuts. No, I don't eat. Fowl, duck, chicken, turkey, squirrel, rabbit. You see that on television? You know that crazy show? I didn't see it either. I just saw a little. I'm thinking. Words beginning with letter S. Yeah, there are. It's W. Sandwich. Sky. You know I can't think. Pumpkin. Hey, there's one. Oh no, that's a C.",
+    "speaker_turn_summary": [
+      "Examiner: 'And you can begin now.'",
+      "Patient: 'Ham, eggs, pork, beef, corn, potatoes, lettuce, beets, turnips, beans, soy, bread, toast, donuts. No, I don't eat.'",
+      "Examiner: 'You don't eat that.'",
+      "Patient: 'Fowl, duck, chicken, turkey, squirrel, rabbit.'",
+      "Examiner: 'Okay, good. Squirrel and rabbit.'",
+      "Patient: 'You see that on television? You know that crazy show? I didn't see it either. I just saw a little. I'm thinking.'",
+      "Examiner: 'Okay, here we go. Ready? Begin now. Words beginning with letter S.'",
+      "Patient: 'Yeah, there are. It's W. Sandwich. Sky.'",
+      "Examiner: 'But thirty seconds left.'",
+      "Patient: 'You know I can't think. Pumpkin. Hey, there's one. Oh no, that's a C.'"
+    ],
+    "patient_cue_summary": [
+      "Frequent pauses and filler phrases ('I'm thinking', 'I just saw a little')",
+      "Repetition and self-correction ('It's W. Sandwich. Sky. Oh no, that's a C.')",
+      "Vague or incomplete task responses ('You know that crazy show? I didn't see it either.')",
+      "Examiner-dependent continuation and task restarts",
+      "Lexical retrieval effort with pauses and circumlocution ('You know I can't think')",
+      "Inconsistent or abandoned fluency task output ('Sky' as a response to 'words beginning with S')",
+      "Low-information content despite prompting, with some correct item naming but weak organization"
+    ]
+  },
+  "latency_ms": 29232,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/061-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/061-1.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

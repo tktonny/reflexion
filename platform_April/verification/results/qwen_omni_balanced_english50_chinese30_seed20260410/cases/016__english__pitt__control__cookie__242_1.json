@@ -1,0 +1,142 @@
+{
+  "case_id": "english__pitt__control__cookie__242_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Kid's gonna fall off the stool getting cookies out of the jar that his sister's holding her finger up to him, don't talk, and she wants a cookie. The water's running over in the sink. The mother's standing in the water as she's drying the dishes. What else you want to see? You want to see what's wrong with the picture? Not what's wrong. Oh no. And the window's open. She's drying the dishes. She's back to the kid. Cupboard's open. Little girl telling him not to talk too much, not to tell on him. I don't know the picture. Summer, grass is growing. Pushing the grass is growing. Looks like a towel. He understands that towel situation. Looks like half on, unless the other part of the curtain.",
+  "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing. The window's open. Cupboard's open. Little girl telling him not to talk too much. I don't know the picture. Summer, grass is growing. Pushing the grass is growing. Looks like a towel. He understands that towel situation. Looks like half on, unless the other part of the curtain.",
+  "speaker_turn_summary": [
+    "Examiner: What else you want to see? You want to see what's wrong with the picture?",
+    "Patient: Kid's gonna fall off the stool... mother's standing in the water... water's running over... sister holding finger up... don't talk... cookie... cupboard open... little girl telling him not to talk too much... I don't know the picture... summer, grass... towel... half on, unless the other part of the curtain.",
+    "Examiner: Not what's wrong. Oh no."
+  ],
+  "patient_cue_summary": [
+    "Partial scene description with fragmented details",
+    "Repetition of 'I don't know the picture' indicating uncertainty or retrieval difficulty",
+    "Vague or incomplete descriptions ('grass is growing', 'looks like a towel')",
+    "Disorganized sequencing and lack of causal or spatial coherence",
+    "Reliance on examiner prompts to continue description",
+    "Use of non-specific terms ('that one', 'stuff') not clearly present but implied by vagueness"
+  ],
+  "transcript_request_id": "chatcmpl-9e0c4c6d-09be-97fc-9279-23403d69a211",
+  "classification_request_id": "chatcmpl-313a4c49-d0b7-98de-bbe2-8b62b20091c2",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__242_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__242_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides partial, fragmented, and disorganized description of picture content.",
+        "evidence": "Patient mentions key elements (boy, cookie jar, mother, sink, window, cupboard) but fails to link them coherently or describe spatial/temporal relationships. Repeats 'I don't know the picture' and ends with ambiguous phrases ('half on, unless the other part of the curtain').",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses vague or non-specific language and lacks precise vocabulary for scene elements.",
+        "evidence": "Phrases like 'grass is growing', 'looks like a towel', 'half on' suggest weak lexical retrieval or circumlocution. No clear naming of objects or actions beyond basic nouns.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization and Task Completion",
+        "summary": "Patient struggles to organize description or complete the task without examiner prompting.",
+        "evidence": "Patient begins description but appears to lose focus or direction. Requires examiner to prompt continuation. Ends with incomplete or irrelevant observations.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented, disorganized, and vague description of a picture-based task, with signs of lexical retrieval difficulty and task disengagement. While some key elements are mentioned, the lack of coherence, specificity, and narrative control suggests possible cognitive impairment. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Fragmented and disorganized scene description",
+      "Use of vague, non-specific language",
+      "Expression of uncertainty ('I don't know the picture')",
+      "Reliance on examiner prompts to continue"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies some visible elements (cookie jar, mother, sink, window)",
+      "No overt signs of agitation, confusion, or emotional dysregulation",
+      "Speech is intelligible despite being sparse and disorganized"
+    ],
+    "alternative_explanations": [
+      "Task difficulty or unfamiliarity with picture description format",
+      "Temporary distraction or fatigue during testing",
+      "Examiner prompting may have influenced response structure"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty about picture content ('I don't know the picture')",
+      "Patient appears to require prompting to continue description"
+    ],
+    "emotional_assessment_findings": [
+      "No clear emotional reactivity or affective flattening observed",
+      "No signs of frustration, anxiety, or apathy in speech tone"
+    ],
+    "risk_control_suggestions": [
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Repeat picture description task with structured prompts",
+      "Assess for functional memory or executive function deficits in daily activities"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up with repeated assessments recommended to track cognitive trajectory.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but shows impairment-like features in organization and retrieval.",
+      "Task context: picture description of cookie-theft scene",
+      "patient should describe events coherently.",
+      "Examiner prompts are neutral context",
+      "patient's own speech is the primary signal."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing. The window's open. Cupboard's open. Little girl telling him not to talk too much. I don't know the picture. Summer, grass is growing. Pushing the grass is growing. Looks like a towel. He understands that towel situation. Looks like half on, unless the other part of the curtain.",
+    "speaker_turn_summary": [
+      "Examiner: What else you want to see? You want to see what's wrong with the picture?",
+      "Patient: Kid's gonna fall off the stool... mother's standing in the water... water's running over... sister holding finger up... don't talk... cookie... cupboard open... little girl telling him not to talk too much... I don't know the picture... summer, grass... towel... half on, unless the other part of the curtain.",
+      "Examiner: Not what's wrong. Oh no."
+    ],
+    "patient_cue_summary": [
+      "Partial scene description with fragmented details",
+      "Repetition of 'I don't know the picture' indicating uncertainty or retrieval difficulty",
+      "Vague or incomplete descriptions ('grass is growing', 'looks like a towel')",
+      "Disorganized sequencing and lack of causal or spatial coherence",
+      "Reliance on examiner prompts to continue description",
+      "Use of non-specific terms ('that one', 'stuff') not clearly present but implied by vagueness"
+    ]
+  },
+  "latency_ms": 15644,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/242-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/242-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

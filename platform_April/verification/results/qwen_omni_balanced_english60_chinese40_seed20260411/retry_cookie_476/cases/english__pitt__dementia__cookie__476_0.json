@@ -1,0 +1,138 @@
+{
+  "case_id": "english__pitt__dementia__cookie__476_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "Okay, what do you see going on in the picture? The woman of the house is drying the dishes. Her sink is overflowing. The boy's stool is tipping. He's taking cookies out of a jar. He's handing one to his sister. And she's, oh, she's already dried some dishes right here, I guess. What is this, honey? I can't make that out. It looks like a. . . All you need to tell me is the action. Oh, action. Anything going on? She's drying the dishes. She's standing in water. That's action. Okay. And the door is open where the cookies are. They all have their shoes on. Oh, she's got an apron on over her dress. Kind of homely girl, isn't she? She's not doing much. She's just got a. . . And how many did I get wrong? That's fine. You did fine.",
+  "patient_only_transcript": "The woman of the house is drying the dishes. Her sink is overflowing. The boy's stool is tipping. He's taking cookies out of a jar. He's handing one to his sister. And she's, oh, she's already dried some dishes right here, I guess. She's standing in water. That's action. And the door is open where the cookies are. They all have their shoes on. Oh, she's got an apron on over her dress. Kind of homely girl, isn't she? She's not doing much. She's just got a. . . And how many did I get wrong?",
+  "speaker_turn_summary": [
+    "Examiner: 'Okay, what do you see going on in the picture?'",
+    "Patient: 'The woman of the house is drying the dishes. Her sink is overflowing. The boy's stool is tipping. He's taking cookies out of a jar. He's handing one to his sister. And she's, oh, she's already dried some dishes right here, I guess.'",
+    "Examiner: 'What is this, honey? I can't make that out. It looks like a... All you need to tell me is the action.'",
+    "Patient: 'Oh, action. Anything going on? She's drying the dishes. She's standing in water. That's action.'",
+    "Examiner: 'Okay.'",
+    "Patient: 'And the door is open where the cookies are. They all have their shoes on. Oh, she's got an apron on over her dress. Kind of homely girl, isn't she? She's not doing much. She's just got a. . . And how many did I get wrong?'",
+    "Examiner: 'That's fine. You did fine.'"
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies multiple core scene elements: woman drying dishes, overflowing sink, boy’s tipping stool, cookie jar, sister receiving cookie.",
+    "Patient exhibits mild hesitation and self-correction ('And she's, oh, she's already dried some dishes right here, I guess').",
+    "Patient repeats examiner’s prompt ('Oh, action. Anything going on?') and then provides a minimal but task-relevant response ('She's standing in water. That's action.').",
+    "Patient adds tangential, non-task-relevant commentary ('Kind of homely girl, isn't she?') and self-evaluative question ('And how many did I get wrong?').",
+    "Patient’s speech is intelligible, task-relevant, and includes multiple correct scene descriptors despite some disorganization and examiner scaffolding."
+  ],
+  "transcript_request_id": "chatcmpl-3630fa77-840e-97d7-866d-f87e1d7ed4f1",
+  "classification_request_id": "chatcmpl-7bb552b6-5b3c-9ba6-9d46-66bb134733a9",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__476_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__476_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient correctly identifies multiple key actors and actions in the picture: woman drying dishes, overflowing sink, boy taking cookies, sister receiving cookie, stool tipping, apron, shoes on.",
+        "evidence": "Patient lists multiple scene elements accurately despite some hesitation and tangential commentary.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Engagement and Scaffolding",
+        "summary": "Patient responds to examiner prompts and completes the task, but requires examiner clarification ('All you need to tell me is the action') and repeats prompts.",
+        "evidence": "Patient repeats 'Oh, action. Anything going on?' and provides minimal response to prompt, indicating some reliance on examiner scaffolding.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Self-Evaluation and Emotional Tone",
+        "summary": "Patient expresses uncertainty and seeks validation, suggesting possible anxiety or self-doubt, but no signs of cognitive breakdown.",
+        "evidence": "Patient asks 'how many did I get wrong?' and receives reassurance from examiner.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a generally accurate, though slightly disorganized, description of the picture scene, identifying multiple key elements. Mild self-doubt and reliance on examiner prompts are noted, but no clear signs of cognitive impairment. Further observation or follow-up is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient accurately identifies multiple core scene elements",
+      "Speech is intelligible and task-relevant",
+      "No evidence of word-finding failure, disorganization, or task abandonment"
+    ],
+    "alternative_explanations": [
+      "Mild anxiety or self-consciousness may explain self-evaluation questions",
+      "Examiner scaffolding may have influenced response structure",
+      "Task may be challenging for patient despite adequate comprehension"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient expresses self-doubt ('how many did I get wrong?') and seeks reassurance ('That's fine. You did fine.')"
+    ],
+    "emotional_assessment_findings": [
+      "Mild self-consciousness and uncertainty expressed through questioning tone and self-evaluation",
+      "No signs of distress, agitation, or affective flattening",
+      "tone remains conversational and cooperative"
+    ],
+    "risk_control_suggestions": [
+      "Schedule follow-up to observe consistency in picture description tasks",
+      "Consider brief cognitive screening battery if self-doubt persists",
+      "Reassure patient to reduce anxiety during future assessments"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if self-doubt or task scaffolding persists",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no strong evidence of cognitive decline.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-relevant despite some hesitation and tangential commentary.",
+      "Examiner prompts are not counted as patient content",
+      "patient’s own responses are evaluated for cognitive signal."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The woman of the house is drying the dishes. Her sink is overflowing. The boy's stool is tipping. He's taking cookies out of a jar. He's handing one to his sister. And she's, oh, she's already dried some dishes right here, I guess. She's standing in water. That's action. And the door is open where the cookies are. They all have their shoes on. Oh, she's got an apron on over her dress. Kind of homely girl, isn't she? She's not doing much. She's just got a. . . And how many did I get wrong?",
+    "speaker_turn_summary": [
+      "Examiner: 'Okay, what do you see going on in the picture?'",
+      "Patient: 'The woman of the house is drying the dishes. Her sink is overflowing. The boy's stool is tipping. He's taking cookies out of a jar. He's handing one to his sister. And she's, oh, she's already dried some dishes right here, I guess.'",
+      "Examiner: 'What is this, honey? I can't make that out. It looks like a... All you need to tell me is the action.'",
+      "Patient: 'Oh, action. Anything going on? She's drying the dishes. She's standing in water. That's action.'",
+      "Examiner: 'Okay.'",
+      "Patient: 'And the door is open where the cookies are. They all have their shoes on. Oh, she's got an apron on over her dress. Kind of homely girl, isn't she? She's not doing much. She's just got a. . . And how many did I get wrong?'",
+      "Examiner: 'That's fine. You did fine.'"
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies multiple core scene elements: woman drying dishes, overflowing sink, boy’s tipping stool, cookie jar, sister receiving cookie.",
+      "Patient exhibits mild hesitation and self-correction ('And she's, oh, she's already dried some dishes right here, I guess').",
+      "Patient repeats examiner’s prompt ('Oh, action. Anything going on?') and then provides a minimal but task-relevant response ('She's standing in water. That's action.').",
+      "Patient adds tangential, non-task-relevant commentary ('Kind of homely girl, isn't she?') and self-evaluative question ('And how many did I get wrong?').",
+      "Patient’s speech is intelligible, task-relevant, and includes multiple correct scene descriptors despite some disorganization and examiner scaffolding."
+    ]
+  },
+  "latency_ms": 23377,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/476-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/476-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "case_id": "mandarin__chou__hc__031__031_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "两个妈妈带小朋友去抓鱼啊，抓鱼啊，这边抓鱼啊，抓得欢喜，跟说来去边有一个小，这个小墙的，这个灌墙，这个灌墙有老人六七八啦，两三个囡仔踮啊甲这个头家踮啊咧六七八啦。",
+  "patient_only_transcript": "两个妈妈带小朋友去抓鱼啊，抓鱼啊，这边抓鱼啊，抓得欢喜，跟说来去边有一个小，这个小墙的，这个灌墙，这个灌墙有老人六七八啦，两三个囡仔踮啊甲这个头家踮啊咧六七八啦。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes scene with repetitive phrases, vague spatial references, and unclear numerical references (e.g., '六七八啦'), lacks coherent event sequencing, uses redundant or fragmented phrasing."
+  ],
+  "patient_cue_summary": [
+    "Repetitive phrasing: '抓鱼啊' repeated multiple times without elaboration",
+    "Vague spatial reference: '边有一个小，这个小墙的'",
+    "Unclear numerical reference: '六七八啦' — ambiguous and non-sequential",
+    "Fragmented sentence structure: '这个灌墙有老人六七八啦，两三个囡仔踮啊甲这个头家踮啊咧六七八啦'",
+    "Lack of causal or temporal sequencing: events are listed without clear order or connection",
+    "Reliance on examiner context: no independent narrative structure or task completion"
+  ],
+  "transcript_request_id": "chatcmpl-de810760-7014-9b9c-928d-814146e2f98a",
+  "classification_request_id": "chatcmpl-fa6f3bb3-9d74-9750-94f3-2b5248cecd77",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__031__031_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__031__031_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "word_retrieval_or_organizational_difficulty",
+        "summary": "Patient uses repetitive phrases, vague spatial references, and ambiguous numerical expressions without clear narrative structure.",
+        "evidence": "Patient repeats '抓鱼啊' multiple times; uses '六七八啦' without context; describes '小墙' and '灌墙' without clear spatial or temporal relation; lacks event sequencing.",
+        "confidence": 0.7
+      },
+      {
+        "label": "incomplete_narrative_structure",
+        "summary": "Patient’s description is fragmented, lacks causal or temporal coherence, and appears dependent on examiner context.",
+        "evidence": "Sentences are disconnected; no clear beginning, middle, or end; references to '老人' and '囡仔' are not integrated into a coherent scene.",
+        "confidence": 0.65
+      },
+      {
+        "label": "examiner_dependence",
+        "summary": "Patient’s speech appears to respond to an implicit prompt without independent elaboration or task completion.",
+        "evidence": "No self-initiated elaboration; relies on examiner context to continue description; uses filler-like phrases ('啦') to fill pauses or gaps.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient’s speech exhibits signs of mild retrieval difficulty, fragmented narrative structure, and examiner dependence. While some scene elements are named, the description lacks coherence, sequencing, and informativeness. Further clinical review is recommended.",
+    "evidence_for_risk": [
+      "Repetitive, non-informative phrasing",
+      "Vague spatial and numerical references",
+      "Lack of narrative coherence or event sequencing",
+      "Reliance on examiner context for continuation"
+    ],
+    "evidence_against_risk": [
+      "Patient mentions recognizable scene elements (e.g., '妈妈', '小朋友', '抓鱼', '老人', '囡仔')",
+      "Speech is not entirely unintelligible — some content is understandable"
+    ],
+    "alternative_explanations": [
+      "Language or dialect variation may contribute to perceived vagueness",
+      "Task design or examiner prompting may influence response structure",
+      "Temporary distraction or fatigue may affect narrative coherence"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with structured narrative or picture-description tasks",
+      "Include caregiver report on daily functional memory or language use",
+      "Consider formal cognitive screening tools (e.g., MoCA, MMSE) in next visit"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended in next clinical visit.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation or multi-visit assessment needed for trend evaluation.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video unavailable — assessment based solely on audio and ASR transcript.",
+      "Patient speech is partially intelligible but lacks coherence and task completion.",
+      "Examiner role is inferred from context",
+      "patient is primary evaluation subject."
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable",
+      "limited_speaking_time"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "两个妈妈带小朋友去抓鱼啊，抓鱼啊，这边抓鱼啊，抓得欢喜，跟说来去边有一个小，这个小墙的，这个灌墙，这个灌墙有老人六七八啦，两三个囡仔踮啊甲这个头家踮啊咧六七八啦。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes scene with repetitive phrases, vague spatial references, and unclear numerical references (e.g., '六七八啦'), lacks coherent event sequencing, uses redundant or fragmented phrasing."
+    ],
+    "patient_cue_summary": [
+      "Repetitive phrasing: '抓鱼啊' repeated multiple times without elaboration",
+      "Vague spatial reference: '边有一个小，这个小墙的'",
+      "Unclear numerical reference: '六七八啦' — ambiguous and non-sequential",
+      "Fragmented sentence structure: '这个灌墙有老人六七八啦，两三个囡仔踮啊甲这个头家踮啊咧六七八啦'",
+      "Lack of causal or temporal sequencing: events are listed without clear order or connection",
+      "Reliance on examiner context: no independent narrative structure or task completion"
+    ]
+  },
+  "latency_ms": 17441,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/031/031_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/031/031_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

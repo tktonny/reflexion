@@ -1,0 +1,138 @@
+{
+  "case_id": "mandarin__chou__mci__094__094_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "这两个小娃在那边打打打个羽球啊，然后这个男的带拉一条狗，然后狗跑进去，咬咬那咬那小小鬼的那个厚厚厚衣服吧，然后这两个下棋的人看了，一个一个一个在大笑，一个一个觉得觉得觉得很很挫啊，差不多就这样子吧，然后这边有人在荡荡秋千了。没有，他们这边煮煮煮一壶水在开了吧，就这样子。",
+  "patient_only_transcript": "这两个小娃在那边打打打个羽球啊，然后这个男的带拉一条狗，然后狗跑进去，咬咬那咬那小小鬼的那个厚厚厚衣服吧，然后这两个下棋的人看了，一个一个一个在大笑，一个一个觉得觉得觉得很很挫啊，差不多就这样子吧，然后这边有人在荡荡秋千了。没有，他们这边煮煮煮一壶水在开了吧，就这样子。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets up scene description task",
+    "Patient: describes a complex multi-agent scene with multiple actions, objects, and emotional reactions, but with fragmented phrasing, repetitions, and vague descriptors (e.g., '厚厚厚衣服', '觉得很很挫', '煮煮煮一壶水')",
+    "Examiner: may prompt or acknowledge, but no clear turn is isolated as examiner-only"
+  ],
+  "patient_cue_summary": [
+    "Repetitive phrasing ('打打打', '煮煮煮', '一个一个一个', '觉得很很挫')",
+    "Vague descriptors ('厚厚厚衣服', '小小鬼')",
+    "Fragmented sentence structure with pauses and incomplete clauses",
+    "Inconsistent or redundant word usage ('咬咬那咬那')",
+    "Lack of clear causal or temporal sequencing between events",
+    "Emotional labeling ('觉得很很挫') without elaboration or context",
+    "Self-correction or hesitation implied by '没有，他们这边...' after prior description"
+  ],
+  "transcript_request_id": "chatcmpl-8ebbab71-8cf2-9f7f-9179-ee235d049400",
+  "classification_request_id": "chatcmpl-ee070e95-0e4f-9f9d-a2a7-a3e6abc07812",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__094__094_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__094__094_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "narrative coherence",
+        "summary": "Patient describes a multi-agent scene with multiple actions and emotional reactions, but with fragmented phrasing, repetitions, and vague descriptors.",
+        "evidence": "Patient uses repetitive phrasing ('打打打', '煮煮煮'), vague descriptors ('厚厚厚衣服', '小小鬼'), and incomplete clauses. Emotional labeling ('觉得很很挫') lacks elaboration.",
+        "confidence": null
+      },
+      {
+        "label": "lexical retrieval",
+        "summary": "Patient exhibits circumlocution and redundancy, suggesting possible word-finding difficulty or reduced lexical precision.",
+        "evidence": "Use of '咬咬那咬那' and '觉得很很挫' indicates possible circumlocution or emotional flattening rather than precise vocabulary.",
+        "confidence": null
+      },
+      {
+        "label": "narrative organization",
+        "summary": "Patient struggles to sequence events logically or connect causal relationships between agents and actions.",
+        "evidence": "Events are listed in loose succession without clear causal or temporal links. Self-correction ('没有，他们这边...') suggests disorganization.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented, repetitive, and vague description of a complex scene. While some scene elements are correctly identified, the narrative lacks coherence, lexical precision, and logical sequencing. These features suggest possible mild cognitive impairment and warrant further clinical observation.",
+    "evidence_for_risk": [
+      "Repetitive phrasing and redundant word usage",
+      "Vague descriptors and circumlocution",
+      "Fragmented sentence structure and incomplete clauses",
+      "Lack of causal or temporal sequencing between events",
+      "Self-correction or hesitation indicating disorganization"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple scene elements (e.g., children, dog, chess players, swing, boiling water)",
+      "Patient maintains a general narrative thread despite fragmentation"
+    ],
+    "alternative_explanations": [
+      "Language processing delay or disfluency due to task complexity or fatigue",
+      "Non-native Mandarin speaker or dialectal variation",
+      "Temporary distraction or lack of task focus",
+      "Normal variation in spontaneous speech production"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Observe for consistency across multiple sessions or tasks",
+      "Assess functional impact in daily activities if available",
+      "Consider caregiver report for additional context"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip. Further observation is needed to determine if symptoms are progressive or transient.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio and transcript.",
+      "Patient speech is intelligible but shows multiple mild impairment-like cues.",
+      "Examiner role is inferred but not directly observed",
+      "patient is the primary evaluation subject.",
+      "Risk is assigned conservatively based on multiple low-confidence cues, not a single strong indicator."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这两个小娃在那边打打打个羽球啊，然后这个男的带拉一条狗，然后狗跑进去，咬咬那咬那小小鬼的那个厚厚厚衣服吧，然后这两个下棋的人看了，一个一个一个在大笑，一个一个觉得觉得觉得很很挫啊，差不多就这样子吧，然后这边有人在荡荡秋千了。没有，他们这边煮煮煮一壶水在开了吧，就这样子。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets up scene description task",
+      "Patient: describes a complex multi-agent scene with multiple actions, objects, and emotional reactions, but with fragmented phrasing, repetitions, and vague descriptors (e.g., '厚厚厚衣服', '觉得很很挫', '煮煮煮一壶水')",
+      "Examiner: may prompt or acknowledge, but no clear turn is isolated as examiner-only"
+    ],
+    "patient_cue_summary": [
+      "Repetitive phrasing ('打打打', '煮煮煮', '一个一个一个', '觉得很很挫')",
+      "Vague descriptors ('厚厚厚衣服', '小小鬼')",
+      "Fragmented sentence structure with pauses and incomplete clauses",
+      "Inconsistent or redundant word usage ('咬咬那咬那')",
+      "Lack of clear causal or temporal sequencing between events",
+      "Emotional labeling ('觉得很很挫') without elaboration or context",
+      "Self-correction or hesitation implied by '没有，他们这边...' after prior description"
+    ]
+  },
+  "latency_ms": 15319,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/094/094_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/094/094_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

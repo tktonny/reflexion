@@ -1,0 +1,140 @@
+{
+  "case_id": "english__pitt__control__cookie__182_3",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Look at this picture and tell me everything that you see happening in that picture. Everything you see going on. Well, Johnny's falling off the stool. The boy's falling off the stool after trying to steal cookies out of a cookie jar. Gonna give them to his sister. The mother's washing dishes. Water's running on the floor. Window's open. Water's running. Can't think of anything. They're in the kitchen. Little girl's whispering or motioning to be quiet. I guess that's it.",
+  "patient_only_transcript": "Well, Johnny's falling off the stool. The boy's falling off the stool after trying to steal cookies out of a cookie jar. Gonna give them to his sister. The mother's washing dishes. Water's running on the floor. Window's open. Water's running. Can't think of anything. They're in the kitchen. Little girl's whispering or motioning to be quiet. I guess that's it.",
+  "speaker_turn_summary": [
+    "Examiner: Look at this picture and tell me everything that you see happening in that picture. Everything you see going on.",
+    "Patient: Well, Johnny's falling off the stool. The boy's falling off the stool after trying to steal cookies out of a cookie jar. Gonna give them to his sister. The mother's washing dishes. Water's running on the floor. Window's open. Water's running. Can't think of anything. They're in the kitchen. Little girl's whispering or motioning to be quiet. I guess that's it."
+  ],
+  "patient_cue_summary": [
+    "Patient provides some scene elements correctly (boy, cookie jar, mother, water, window, kitchen, girl whispering).",
+    "Patient exhibits word-finding difficulty: 'Can't think of anything.'",
+    "Patient's description is fragmented and lacks causal or narrative cohesion.",
+    "Patient's utterances are disconnected and lack sustained organization.",
+    "Patient ends with 'I guess that's it.' — suggests incomplete or abandoned effort.",
+    "Patient relies on examiner prompt and does not self-initiate or expand beyond basic elements."
+  ],
+  "transcript_request_id": "chatcmpl-3112bed7-5dbd-963a-9db6-11dc32416c90",
+  "classification_request_id": "chatcmpl-03410e91-79dd-9caf-8458-f6e402101673",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__182_3/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__182_3/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient provides fragmented, disconnected description of picture elements without clear narrative or causal structure.",
+        "evidence": "Patient lists elements (boy, cookie jar, mother, water, window, kitchen, girl) but fails to link them into a coherent scene or sequence of events.",
+        "confidence": 0.85
+      },
+      {
+        "label": "lexical_retrieval_difficulty",
+        "summary": "Patient exhibits word-finding pause and expresses inability to recall details ('Can't think of anything').",
+        "evidence": "Patient explicitly states 'Can't think of anything' after listing several elements, indicating retrieval difficulty.",
+        "confidence": 0.8
+      },
+      {
+        "label": "task_completion_effort",
+        "summary": "Patient appears to complete the task with minimal elaboration and ends prematurely ('I guess that's it.').",
+        "evidence": "Patient provides only a basic list of elements and concludes without further elaboration or self-correction.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "externally_provided",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides partial, fragmented description of a picture scene with evidence of word-finding difficulty and lack of narrative cohesion. While some correct elements are named, the response is disorganized and ends prematurely. No strong dementia-level signs are present, but mild impairment-like cues suggest need for further clinical review.",
+    "evidence_for_risk": [
+      "Patient explicitly states 'Can't think of anything' during task.",
+      "Description lacks causal or sequential organization despite multiple scene elements.",
+      "Response ends with 'I guess that's it.' — suggests incomplete or abandoned effort."
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies several key elements (boy, cookie jar, mother, kitchen, water, window, girl).",
+      "No signs of severe disorientation, confusion, or incoherence in speech."
+    ],
+    "alternative_explanations": [
+      "Task fatigue or anxiety may have contributed to incomplete response.",
+      "Patient may have been distracted or unsure how to structure the description.",
+      "Limited verbal fluency or cognitive load may have affected elaboration."
+    ],
+    "risk_factor_findings": [
+      "Self-reported difficulty recalling details ('Can't think of anything')",
+      "Fragmented, disorganized description of picture scene"
+    ],
+    "subjective_assessment_findings": [
+      "Patient reports inability to recall details despite being prompted to describe the entire scene."
+    ],
+    "emotional_assessment_findings": [
+      "No clear emotional reactivity or affective flattening observed",
+      "tone is neutral and matter-of-fact."
+    ],
+    "risk_control_suggestions": [
+      "Repeat the picture description task with prompting or visual cues.",
+      "Administer formal cognitive screening tools (e.g., MoCA, MMSE) for objective assessment.",
+      "Consider caregiver report or longitudinal follow-up to track consistency of performance."
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and caregiver input.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation or multi-session assessment is needed to determine clinical trajectory.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but shows mild impairment-like features.",
+      "Task context: picture description of cookie-theft scene",
+      "patient should describe all visible elements coherently.",
+      "Examiner prompt is neutral and does not dominate patient response."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, Johnny's falling off the stool. The boy's falling off the stool after trying to steal cookies out of a cookie jar. Gonna give them to his sister. The mother's washing dishes. Water's running on the floor. Window's open. Water's running. Can't think of anything. They're in the kitchen. Little girl's whispering or motioning to be quiet. I guess that's it.",
+    "speaker_turn_summary": [
+      "Examiner: Look at this picture and tell me everything that you see happening in that picture. Everything you see going on.",
+      "Patient: Well, Johnny's falling off the stool. The boy's falling off the stool after trying to steal cookies out of a cookie jar. Gonna give them to his sister. The mother's washing dishes. Water's running on the floor. Window's open. Water's running. Can't think of anything. They're in the kitchen. Little girl's whispering or motioning to be quiet. I guess that's it."
+    ],
+    "patient_cue_summary": [
+      "Patient provides some scene elements correctly (boy, cookie jar, mother, water, window, kitchen, girl whispering).",
+      "Patient exhibits word-finding difficulty: 'Can't think of anything.'",
+      "Patient's description is fragmented and lacks causal or narrative cohesion.",
+      "Patient's utterances are disconnected and lack sustained organization.",
+      "Patient ends with 'I guess that's it.' — suggests incomplete or abandoned effort.",
+      "Patient relies on examiner prompt and does not self-initiate or expand beyond basic elements."
+    ]
+  },
+  "latency_ms": 15177,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/182-3.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/182-3.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

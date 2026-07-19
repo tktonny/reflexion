@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__dementia__cookie__057_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "Ready? Mm-hmm. The little girl is reaching up to get a cookie, and the little boy is reaching for a cookie. He's going for the chair, the stool is tilting, and he's holding on to the cookie and the pan. And the mother is drying the dishes, and the water, the dish water is on, and it's pouring over onto the floor. And the curtains are blowing. She's crying. The leaves have blown on the tree.",
+  "patient_only_transcript": "The little girl is reaching up to get a cookie, and the little boy is reaching for a cookie. He's going for the chair, the stool is tilting, and he's holding on to the cookie and the pan. And the mother is drying the dishes, and the water, the dish water is on, and it's pouring over onto the floor. And the curtains are blowing. She's crying. The leaves have blown on the tree.",
+  "speaker_turn_summary": [
+    "Examiner: Ready? Mm-hmm.",
+    "Patient: The little girl is reaching up to get a cookie, and the little boy is reaching for a cookie. He's going for the chair, the stool is tilting, and he's holding on to the cookie and the pan. And the mother is drying the dishes, and the water, the dish water is on, and it's pouring over onto the floor. And the curtains are blowing. She's crying. The leaves have blown on the tree."
+  ],
+  "patient_cue_summary": [
+    "Patient provides a detailed, coherent description of the scene including multiple actors and actions.",
+    "Patient uses specific nouns and verbs (e.g., 'stool is tilting', 'pouring over onto the floor').",
+    "Patient includes extraneous but contextually relevant details (e.g., 'She's crying. The leaves have blown on the tree.') which may indicate tangential or over-associative speech.",
+    "No obvious word-finding pauses, repetitions, or abandonment of utterances.",
+    "Patient appears to self-sustain the narrative without examiner prompting during the main description.",
+    "Patient's speech is largely intelligible and task-relevant despite some minor semantic drift at the end."
+  ],
+  "transcript_request_id": "chatcmpl-a00cc5eb-10eb-9ac9-b57d-a631c8e34d0a",
+  "classification_request_id": "chatcmpl-7443d8ad-d182-98f6-ab00-3882c30d9945",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__057_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__057_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, mostly coherent description of a picture-based scene involving multiple actors and actions.",
+        "evidence": "Patient describes the girl reaching for a cookie, the boy reaching for a cookie, the stool tilting, the mother drying dishes, water pouring on the floor, curtains blowing, and additional details like 'She's crying' and 'leaves have blown on the tree'.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific nouns and verbs relevant to the task, indicating adequate lexical retrieval.",
+        "evidence": "Terms like 'stool is tilting', 'pouring over onto the floor', 'drying the dishes' show precise vocabulary use.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description logically, linking events and actors without obvious disorganization.",
+        "evidence": "Patient sequences events in a way that reflects understanding of the scene's causal and spatial relationships.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient provides a detailed, mostly coherent description of a picture-based scene involving children, a mother, and household activity. While the description includes some tangential or over-associative details (e.g., 'She's crying. The leaves have blown on the tree.'), the patient does not exhibit clear signs of word-finding difficulty, disorganization, or examiner dependence. The speech is intelligible and task-relevant. Due to the absence of visual modality and limited speaking time, further observation is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent, detailed scene description",
+      "Use of specific nouns and verbs",
+      "No obvious word-finding pauses or repetitions",
+      "Self-sustained narrative without prompting"
+    ],
+    "alternative_explanations": [
+      "Tangential details may reflect creative or associative thinking rather than impairment",
+      "Lack of visual modality limits full assessment",
+      "Audio quality limitations may mask subtle cues"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a full picture description task in a controlled visual setting",
+      "Administer a standardized cognitive screening tool (e.g., MoCA, MMSE) if available",
+      "Monitor for consistency across multiple sessions or tasks"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single audio-only clip; further assessment is needed to determine clinical significance.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video modality is unavailable",
+      "assessment is based solely on audio.",
+      "Patient appears to be describing a picture-based task (cookie-theft scenario).",
+      "Patient speech is largely intelligible and task-relevant, but lacks visual context for full evaluation.",
+      "No clear signs of dementia-like impairment in this single clip."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible",
+      "limited_speaking_time"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The little girl is reaching up to get a cookie, and the little boy is reaching for a cookie. He's going for the chair, the stool is tilting, and he's holding on to the cookie and the pan. And the mother is drying the dishes, and the water, the dish water is on, and it's pouring over onto the floor. And the curtains are blowing. She's crying. The leaves have blown on the tree.",
+    "speaker_turn_summary": [
+      "Examiner: Ready? Mm-hmm.",
+      "Patient: The little girl is reaching up to get a cookie, and the little boy is reaching for a cookie. He's going for the chair, the stool is tilting, and he's holding on to the cookie and the pan. And the mother is drying the dishes, and the water, the dish water is on, and it's pouring over onto the floor. And the curtains are blowing. She's crying. The leaves have blown on the tree."
+    ],
+    "patient_cue_summary": [
+      "Patient provides a detailed, coherent description of the scene including multiple actors and actions.",
+      "Patient uses specific nouns and verbs (e.g., 'stool is tilting', 'pouring over onto the floor').",
+      "Patient includes extraneous but contextually relevant details (e.g., 'She's crying. The leaves have blown on the tree.') which may indicate tangential or over-associative speech.",
+      "No obvious word-finding pauses, repetitions, or abandonment of utterances.",
+      "Patient appears to self-sustain the narrative without examiner prompting during the main description.",
+      "Patient's speech is largely intelligible and task-relevant despite some minor semantic drift at the end."
+    ]
+  },
+  "latency_ms": 27459,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/057-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/057-1.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

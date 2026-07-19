@@ -1,0 +1,127 @@
+{
+  "case_id": "mandarin__chou__hc__056__056_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "这是一个公园。这公园里面有一个打羽毛球的球场。有两个小朋友，女生正在打羽毛球。可是有一个男生牵着小狗在公园里面去。结果呢，这个小狗把这个打球的这个女生的衣服咬着不放。让这个女生很惊慌。然后有一对老先生在那边喝茶下棋，坐在亭子下面喝茶下棋，看到了这个事情。有一个老先生觉得很好笑，另外一个老先生反而是有一点这个皱眉，啊，抽烟的老先生在皱眉头。然后旁边有一个溜滑梯跟荡秋千的位置。有两个小女生在那边荡秋千。公园里面有两张椅子，然后还有旁边有一些灌木跟目前看到是两棵大树。这是一个晴朗的天，因为可以看到蓝天白云。也可以看到这个亭子旁边还有一些花跟草开着，所以应该不是一个冬天，有一点是春天夏天的感觉。好，差不多了，好。",
+  "patient_only_transcript": "这是一个公园。这公园里面有一个打羽毛球的球场。有两个小朋友，女生正在打羽毛球。可是有一个男生牵着小狗在公园里面去。结果呢，这个小狗把这个打球的这个女生的衣服咬着不放。让这个女生很惊慌。然后有一对老先生在那边喝茶下棋，坐在亭子下面喝茶下棋，看到了这个事情。有一个老先生觉得很好笑，另外一个老先生反而是有一点这个皱眉，啊，抽烟的老先生在皱眉头。然后旁边有一个溜滑梯跟荡秋千的位置。有两个小女生在那边荡秋千。公园里面有两张椅子，然后还有旁边有一些灌木跟目前看到是两棵大树。这是一个晴朗的天，因为可以看到蓝天白云。也可以看到这个亭子旁边还有一些花跟草开着，所以应该不是一个冬天，有一点是春天夏天的感觉。好，差不多了，好。",
+  "speaker_turn_summary": [
+    "Patient describes park scene with multiple actors and actions in sequence.",
+    "Examiner likely prompts or listens without interrupting.",
+    "Patient completes full description with minor pauses and fillers (e.g., '啊')."
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple scene elements: park, badminton court, two girls playing, boy with dog, dog biting shirt, girls panicking, old men watching, one laughing, one frowning, slide and swing area, two girls swinging, two chairs, bushes, two big trees, sunny weather, flowers and grass, seasonal inference (spring/summer).",
+    "Narrative is coherent, sequential, and contextually accurate despite colloquial fillers ('啊') and minor pauses.",
+    "No evidence of naming collapse, semantic vagueness, or major disorganization.",
+    "Patient maintains referential clarity across multiple actors and objects without needing examiner rescue.",
+    "No signs of repetition, abandonment, or circumlocution beyond normal colloquial speech patterns."
+  ],
+  "transcript_request_id": "chatcmpl-a1228528-ed36-9002-8561-d65e0aaad745",
+  "classification_request_id": "chatcmpl-7353decc-102c-9ee1-91bc-a9e3bfe20f7f",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__056__056_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__056__056_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient provides a detailed, sequential description of multiple actors and objects in a park scene.",
+        "evidence": "Patient names the park, badminton court, two girls playing, boy with dog, dog biting shirt, girls panicking, old men watching, one laughing, one frowning, slide and swing area, two girls swinging, two chairs, bushes, two big trees, sunny weather, flowers and grass, seasonal inference.",
+        "confidence": 0.9
+      },
+      {
+        "label": "colloquial_speech_patterns",
+        "summary": "Patient uses normal colloquial fillers and pauses without impairing comprehension or referential clarity.",
+        "evidence": "Patient says '啊' and pauses naturally, but maintains full narrative continuity and scene accuracy.",
+        "confidence": 0.85
+      },
+      {
+        "label": "task_completion",
+        "summary": "Patient completes the full scene description without needing examiner rescue or showing task abandonment.",
+        "evidence": "Patient describes all major elements of the scene without omission or confusion, even with minor pauses.",
+        "confidence": 0.9
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a detailed, coherent, and contextually accurate description of a park scene with multiple actors and objects. Speech is intelligible, with normal colloquial fillers and pauses. No impairment-like cues are present. The description meets basic cognitive screening criteria for scene recall and referential clarity. Further observation may be warranted if clinical context suggests concern, but no persuasive evidence of cognitive decline is present in this clip.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient identifies multiple scene elements accurately and sequentially.",
+      "Narrative is complete and contextually grounded without semantic collapse.",
+      "No signs of word-finding failure, disorganization, or abandonment.",
+      "Colloquial speech patterns (e.g., '啊') are normal and do not indicate impairment."
+    ],
+    "alternative_explanations": [
+      "Patient may be describing a familiar or rehearsed scene, reducing cognitive load.",
+      "Audio quality or background noise may limit fine-grained analysis, but core content remains clear.",
+      "Patient may be responding to examiner prompts without needing explicit direction."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Monitor for consistency in future scene-description tasks.",
+      "Consider formal cognitive screening if clinical concern persists.",
+      "Avoid overinterpreting colloquial speech patterns as impairment."
+    ],
+    "visit_recommendation": "routine follow-up or formal screening if clinical concern exists.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of progressive decline or cognitive deterioration is present.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment relies solely on audio.",
+      "Patient speech is intelligible and task-compliant despite colloquial style.",
+      "No evidence of dementia-like impairment in this clip."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这是一个公园。这公园里面有一个打羽毛球的球场。有两个小朋友，女生正在打羽毛球。可是有一个男生牵着小狗在公园里面去。结果呢，这个小狗把这个打球的这个女生的衣服咬着不放。让这个女生很惊慌。然后有一对老先生在那边喝茶下棋，坐在亭子下面喝茶下棋，看到了这个事情。有一个老先生觉得很好笑，另外一个老先生反而是有一点这个皱眉，啊，抽烟的老先生在皱眉头。然后旁边有一个溜滑梯跟荡秋千的位置。有两个小女生在那边荡秋千。公园里面有两张椅子，然后还有旁边有一些灌木跟目前看到是两棵大树。这是一个晴朗的天，因为可以看到蓝天白云。也可以看到这个亭子旁边还有一些花跟草开着，所以应该不是一个冬天，有一点是春天夏天的感觉。好，差不多了，好。",
+    "speaker_turn_summary": [
+      "Patient describes park scene with multiple actors and actions in sequence.",
+      "Examiner likely prompts or listens without interrupting.",
+      "Patient completes full description with minor pauses and fillers (e.g., '啊')."
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple scene elements: park, badminton court, two girls playing, boy with dog, dog biting shirt, girls panicking, old men watching, one laughing, one frowning, slide and swing area, two girls swinging, two chairs, bushes, two big trees, sunny weather, flowers and grass, seasonal inference (spring/summer).",
+      "Narrative is coherent, sequential, and contextually accurate despite colloquial fillers ('啊') and minor pauses.",
+      "No evidence of naming collapse, semantic vagueness, or major disorganization.",
+      "Patient maintains referential clarity across multiple actors and objects without needing examiner rescue.",
+      "No signs of repetition, abandonment, or circumlocution beyond normal colloquial speech patterns."
+    ]
+  },
+  "latency_ms": 18573,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/056/056_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/056/056_park.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

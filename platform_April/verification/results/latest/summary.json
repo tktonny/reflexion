@@ -1,0 +1,33 @@
+{
+  "dataset": "yt_demtalk_smoke",
+  "manifest_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/smoke/manifest.jsonl",
+  "results_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/results/latest",
+  "metrics": {
+    "evaluated_cases": 1,
+    "successful_cases": 0,
+    "error_cases": 1,
+    "skipped_cases": 0,
+    "confusion_matrix": {
+      "true_positive": 0,
+      "true_negative": 0,
+      "false_positive": 0,
+      "false_negative": 0
+    }
+  },
+  "cases": [
+    {
+      "case_id": "iJJerSu8DxE",
+      "dataset": "yt_demtalk_smoke",
+      "split": "test",
+      "ground_truth_label": "cognitive_risk",
+      "transcript_model": "qwen3-asr-flash",
+      "classifier_model": "qwen3.5-plus",
+      "latency_ms": 624,
+      "error": "provider_unavailable: audio_only request failed: [Errno 8] nodename nor servname provided, or not known",
+      "metadata": {
+        "source_url": "https://youtu.be/iJJerSu8DxE",
+        "clip_window": "0:00-1:30"
+      }
+    }
+  ]
+}

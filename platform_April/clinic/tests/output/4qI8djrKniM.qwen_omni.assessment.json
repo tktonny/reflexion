@@ -1,0 +1,105 @@
+{
+  "assessment_id": "3b1d2e9575694bd480436d24bfa0c0ad",
+  "patient_id": "demo-patient",
+  "language": "en",
+  "created_at": "2026-04-06T05:53:42.020762Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "The patient displays somber, reflective, and occasionally distressed facial expressions, including furrowed brows and downcast eyes, consistent with emotional distress.",
+      "evidence": "Facial expressions show sadness and concern during self-report of depression and guilt; no signs of agitation or inappropriate affect.",
+      "confidence": 0.8
+    }
+  ],
+  "body_findings": [],
+  "voice_findings": [
+    {
+      "label": "Speech Fluency",
+      "summary": "Speech is fluent, with normal rate and rhythm; no signs of hesitations, word-finding difficulties, or disorganized syntax.",
+      "evidence": "The patient speaks in complete, grammatically correct sentences with consistent articulation and pacing throughout the clip.",
+      "confidence": 0.9
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Self-Reported Emotional State",
+      "summary": "The patient explicitly reports depression, guilt, and fear of rapid cognitive decline, which he later attributes to misconceptions and ignorance.",
+      "evidence": "Patient states: 'I was depressed,' 'I felt a lot of guilt,' 'I thought my life was over,' 'I thought I was going to go into the late stages overnight.'",
+      "confidence": 0.9
+    },
+    {
+      "label": "Cognitive Reorientation",
+      "summary": "The patient describes a shift from fear to proactive research and knowledge accumulation, indicating intact metacognition and motivation to understand his condition.",
+      "evidence": "Patient states: 'I decided to understand this illness I didn’t know about,' 'the more research I did, the more knowledge I accumulated.'",
+      "confidence": 0.85
+    }
+  ],
+  "speaker_structure": "single_speaker",
+  "target_patient_presence": "clear",
+  "target_patient_basis": "visual_focus",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 1.0,
+  "risk_score": 0.15,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "The patient demonstrates coherent speech, intact fluency, and reflective emotional processing. While he reports emotional distress and initial fear of cognitive decline, he also shows clear insight, motivation to learn, and cognitive reorientation — all consistent with a non-dementia-related emotional response to a health diagnosis. No signs of cognitive impairment are observed.",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [
+    "No speech or cognitive disorganization",
+    "No signs of memory or language deficits",
+    "Patient demonstrates metacognitive awareness and proactive learning"
+  ],
+  "alternative_explanations": [
+    "Emotional distress following a health diagnosis, not indicative of cognitive impairment",
+    "Misconceptions about disease progression causing temporary fear, resolved through education"
+  ],
+  "risk_factor_findings": [
+    "Self-reported depression and guilt",
+    "Initial fear of rapid cognitive decline"
+  ],
+  "subjective_assessment_findings": [
+    "Patient reports feeling depressed and guilty",
+    "Patient reports fear of rapid progression to late-stage cognitive decline",
+    "Patient reports a shift from fear to proactive education about the illness"
+  ],
+  "emotional_assessment_findings": [
+    "Expresses sadness and distress during recounting of emotional experience",
+    "Shows reflective and somber affect, consistent with emotional processing of a health crisis",
+    "Demonstrates emotional resilience by transitioning from distress to proactive learning"
+  ],
+  "risk_control_suggestions": [
+    "Provide emotional support and psychoeducation to reinforce patient’s coping strategy",
+    "Monitor for persistent depressive symptoms or functional decline in follow-up"
+  ],
+  "visit_recommendation": "Routine follow-up to monitor emotional well-being and ensure continued engagement with health information.",
+  "future_risk_trend_summary": "No evidence of cognitive decline in this single clip; longitudinal prediction is not supported by available data.",
+  "reviewer_confidence": 0.85,
+  "context_notes": [
+    "This is a single-clinic screening video; further assessment is needed for cognitive diagnosis.",
+    "Patient’s emotional distress is contextually linked to health diagnosis, not cognitive impairment.",
+    "No visual or auditory cues suggest memory, language, or executive function deficits."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "e0e5b625-b89a-9f89-9084-b339753c9b39",
+    "latency_ms": 20321,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 20321
+    }
+  ],
+  "fallback_message": null
+}

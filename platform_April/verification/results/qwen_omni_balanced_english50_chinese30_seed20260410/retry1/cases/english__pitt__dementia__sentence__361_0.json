@@ -1,0 +1,159 @@
+{
+  "case_id": "english__pitt__dementia__sentence__361_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.6,
+  "transcript": "Okay, pencil. Can you give me a short complete sentence using the word pencil? I broke the point on the pencil. Okay. How about the word tree? The tree's in full bloom. That don't sound right. Okay, now I'm going to give you two words, okay? I don't want you to worry about the order that I give you the two words in. Just use both of them in one short simple sentence, okay? Here's the words, child, hospital. The child is sick and went to the hospital. Cold, winter. This has been a long cold winter. Okay, now I'm going to give you three words. Again, don't worry about the order that I give them to you. Just use all three of them in one short simple sentence, okay? Chair, doctor, sit. Chair, doctor, sit. Chair, doctor, sit. Sit. Mm-hmm. Chair. I sat in the chair in the doctor's office. Bureau, open, drawer. Bureau, open, drawer. I opened the drawer in the bureau. What's the purpose of these, all these questions? Okay. Remember we were talking earlier. Mm-hmm.",
+  "patient_only_transcript": "I broke the point on the pencil. The tree's in full bloom. That don't sound right. The child is sick and went to the hospital. This has been a long cold winter. Chair, doctor, sit. I sat in the chair in the doctor's office. Bureau, open, drawer. I opened the drawer in the bureau. What's the purpose of these, all these questions?",
+  "speaker_turn_summary": [
+    "Examiner: 'Pencil. Can you give me a short complete sentence using the word pencil?'",
+    "Patient: 'I broke the point on the pencil.'",
+    "Examiner: 'How about the word tree?'",
+    "Patient: 'The tree's in full bloom. That don't sound right.'",
+    "Examiner: 'Now I'm going to give you two words: child, hospital.'",
+    "Patient: 'The child is sick and went to the hospital.'",
+    "Examiner: 'Cold, winter.'",
+    "Patient: 'This has been a long cold winter.'",
+    "Examiner: 'Now I'm going to give you three words: chair, doctor, sit.'",
+    "Patient: 'Chair, doctor, sit. Sit. Mm-hmm. Chair. I sat in the chair in the doctor's office.'",
+    "Examiner: 'Bureau, open, drawer.'",
+    "Patient: 'Bureau, open, drawer. I opened the drawer in the bureau.'",
+    "Patient: 'What's the purpose of these, all these questions?'",
+    "Examiner: 'Remember we were talking earlier. Mm-hmm.'"
+  ],
+  "patient_cue_summary": [
+    "Word-finding pause and self-correction: 'That don't sound right.'",
+    "Repetition of task cues: 'Chair, doctor, sit.'",
+    "Fragmented sentence construction: 'I sat in the chair in the doctor's office.' (after repetition and prompting)",
+    "Examiner dependence: required prompting to complete the three-word sentence task",
+    "Questioning task purpose: 'What's the purpose of these, all these questions?' indicating possible confusion or disengagement",
+    "Coherent but minimal responses to structured prompts, lacking elaboration or narrative depth"
+  ],
+  "transcript_request_id": "chatcmpl-fe134f94-ad95-9a1f-84f1-dec7d71a44d4",
+  "classification_request_id": "chatcmpl-3c5b85ff-718b-9e27-bd16-8ff731e99b14",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__361_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__361_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Word-finding and task completion",
+        "summary": "Patient required prompting to complete three-word sentence task and repeated cues before responding.",
+        "evidence": "Patient repeated 'Chair, doctor, sit' before producing a complete sentence, indicating possible retrieval difficulty.",
+        "confidence": null
+      },
+      {
+        "label": "Self-correction and uncertainty",
+        "summary": "Patient self-corrected 'The tree's in full bloom' with 'That don't sound right,' suggesting possible semantic or syntactic uncertainty.",
+        "evidence": "Patient explicitly rejected own prior response, indicating possible metalinguistic awareness or retrieval failure.",
+        "confidence": null
+      },
+      {
+        "label": "Task engagement and comprehension",
+        "summary": "Patient questioned the purpose of the questions, indicating possible confusion or reduced task motivation.",
+        "evidence": "Patient asked: 'What's the purpose of these, all these questions?' after completing several tasks.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.3,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient completed most sentence tasks with examiner prompting, showed mild self-correction and task questioning, but produced coherent, contextually appropriate responses. No strong evidence of dementia, but mild impairment-like cues suggest need for further clinical review.",
+    "evidence_for_risk": [
+      "Repetition of task cues before response",
+      "Self-correction and uncertainty in response",
+      "Questioning task purpose indicating possible confusion or disengagement"
+    ],
+    "evidence_against_risk": [
+      "Coherent sentence construction in most tasks",
+      "Appropriate use of target words",
+      "No evidence of severe disorientation or incoherence"
+    ],
+    "alternative_explanations": [
+      "Task fatigue or unfamiliarity with structured language tasks",
+      "Mild anxiety or confusion about testing procedure",
+      "Normal variability in language performance under structured prompts"
+    ],
+    "risk_factor_findings": [
+      "Patient questioned the purpose of the task, suggesting possible confusion or reduced engagement"
+    ],
+    "subjective_assessment_findings": [
+      "Patient expressed uncertainty about task relevance: 'What's the purpose of these, all these questions?'"
+    ],
+    "emotional_assessment_findings": [
+      "Mild frustration or confusion indicated by 'That don't sound right.'",
+      "Possible disengagement or cognitive load indicated by questioning task purpose"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery",
+      "Assess for functional impact and caregiver concerns",
+      "Consider repeat testing in different context to rule out situational factors"
+    ],
+    "visit_recommendation": "Formal cognitive screening and clinical evaluation recommended",
+    "future_risk_trend_summary": "Longitudinal prediction limited from single clip; further assessment needed to determine progression risk",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Audio-only, no visual cues available",
+      "Patient speech is intelligible but shows mild impairment-like features",
+      "Task context is structured language elicitation, not spontaneous conversation"
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "I broke the point on the pencil. The tree's in full bloom. That don't sound right. The child is sick and went to the hospital. This has been a long cold winter. Chair, doctor, sit. I sat in the chair in the doctor's office. Bureau, open, drawer. I opened the drawer in the bureau. What's the purpose of these, all these questions?",
+    "speaker_turn_summary": [
+      "Examiner: 'Pencil. Can you give me a short complete sentence using the word pencil?'",
+      "Patient: 'I broke the point on the pencil.'",
+      "Examiner: 'How about the word tree?'",
+      "Patient: 'The tree's in full bloom. That don't sound right.'",
+      "Examiner: 'Now I'm going to give you two words: child, hospital.'",
+      "Patient: 'The child is sick and went to the hospital.'",
+      "Examiner: 'Cold, winter.'",
+      "Patient: 'This has been a long cold winter.'",
+      "Examiner: 'Now I'm going to give you three words: chair, doctor, sit.'",
+      "Patient: 'Chair, doctor, sit. Sit. Mm-hmm. Chair. I sat in the chair in the doctor's office.'",
+      "Examiner: 'Bureau, open, drawer.'",
+      "Patient: 'Bureau, open, drawer. I opened the drawer in the bureau.'",
+      "Patient: 'What's the purpose of these, all these questions?'",
+      "Examiner: 'Remember we were talking earlier. Mm-hmm.'"
+    ],
+    "patient_cue_summary": [
+      "Word-finding pause and self-correction: 'That don't sound right.'",
+      "Repetition of task cues: 'Chair, doctor, sit.'",
+      "Fragmented sentence construction: 'I sat in the chair in the doctor's office.' (after repetition and prompting)",
+      "Examiner dependence: required prompting to complete the three-word sentence task",
+      "Questioning task purpose: 'What's the purpose of these, all these questions?' indicating possible confusion or disengagement",
+      "Coherent but minimal responses to structured prompts, lacking elaboration or narrative depth"
+    ]
+  },
+  "latency_ms": 20639,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/361-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/361-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

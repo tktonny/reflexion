@@ -1,0 +1,73 @@
+{
+  "case_id": "english__pitt__control__cookie__054_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.4,
+  "classification_request_id": "chatcmpl-8db55629-9f1c-938f-a112-1c64a39843ab",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__054_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__054_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient's speech is unintelligible and no visual cues are available. The task context is a picture description task (cookie theft scene), but no meaningful patient response can be evaluated. No persuasive impairment-like signals are observable or audible.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [],
+    "alternative_explanations": [
+      "Speech may be unclear due to recording quality or articulation difficulty unrelated to cognition.",
+      "Patient may be a child or non-native speaker, which is not an indicator of dementia.",
+      "Lack of visual data prevents assessment of behavior, gaze, or facial expression."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the task with clearer audio capture or visual recording.",
+      "Use a structured cognitive screening tool with direct performance measures.",
+      "Ensure examiner prompts are minimal and patient responses are clearly isolated."
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening if clinical concern persists.",
+    "future_risk_trend_summary": "Longitudinal prediction is not possible from this single clip due to insufficient data.",
+    "reviewer_confidence": 0.4,
+    "context_notes": [
+      "Video is unavailable; only audio is present and unintelligible.",
+      "Patient speech cannot be reliably transcribed or evaluated for cognitive content.",
+      "Task context is picture description, but no patient response is assessable."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 7378,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/054-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/054-0.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "case_id": "mandarin__chou__mci__036__036_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "这被狗，小孩被狗追，汪汪汪狗追哈，嗯，被狗追。这，那这喵，猫咪这猫咪叫，猫咪在抓什么？抓这个是抓抓什么？嗯，猫猫咪在抓这个，这个瓜啊，再看呢这，汪汪，这狗被小孩被狗追，追上，嗯，被这狗追，这汪汪，这狗小孩追上，是这样子说。他在挖挖什么？喂，这是什么？在挖挖什么意思？他看到这吓一跳，嗯，是不是吓一跳？这啊，这个猫咪在追的，啊，这个狗在抓追它。",
+  "patient_only_transcript": "小孩被狗追，汪汪汪狗追哈，嗯，被狗追。这，那这喵，猫咪这猫咪叫，猫咪在抓什么？抓这个是抓抓什么？嗯，猫猫咪在抓这个，这个瓜啊，再看呢这，汪汪，这狗被小孩被狗追，追上，嗯，被这狗追，这汪汪，这狗小孩追上，是这样子说。他在挖挖什么？喂，这是什么？在挖挖什么意思？他看到这吓一跳，嗯，是不是吓一跳？这啊，这个猫咪在追的，啊，这个狗在抓追它。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets scene (implied)",
+    "Patient: describes scene with fragmented, repetitive, vague phrasing, pauses, and uncertainty about actions and objects"
+  ],
+  "patient_cue_summary": [
+    "Repetitive phrasing: '抓什么？抓抓什么？' and '挖挖什么？挖挖什么意思？'",
+    "Vague object references: '这个瓜啊', '这个东西', '挖挖什么意思？'",
+    "Fragmented sequencing: '狗被小孩被狗追，追上' — unclear causal or temporal order",
+    "Uncertainty markers: '是不是吓一跳？', '啊，这个猫咪在追的，啊，这个狗在抓追它'",
+    "Inconsistent or incomplete scene description: mentions multiple actors (dog, cat, child, mother) but lacks coherent linkage or detail",
+    "Reliance on examiner context: no clear self-contained narrative or task completion"
+  ],
+  "transcript_request_id": "chatcmpl-025fa941-ff46-9e9e-b5cd-d64aeec871d9",
+  "classification_request_id": "chatcmpl-f881f4bb-5aea-9631-b016-2d4a378be9fb",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__036__036_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__036__036_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Lexical Retrieval Difficulty",
+        "summary": "Patient frequently uses vague or repetitive phrasing ('抓什么？抓抓什么？', '挖挖什么？挖挖什么意思？'), indicating possible word-finding hesitation or semantic vagueness.",
+        "evidence": "Patient repeatedly asks '抓什么？' and '挖挖什么意思？' with pauses and self-correction, suggesting difficulty retrieving or specifying nouns.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Disorganization",
+        "summary": "Patient's description of the scene lacks clear causal or sequential structure; events are described in a disjointed, repetitive manner.",
+        "evidence": "Phrases like '狗被小孩被狗追，追上' and '这个猫咪在追的，啊，这个狗在抓追它' show unclear temporal or agent-action relationships.",
+        "confidence": null
+      },
+      {
+        "label": "Task Incompleteness",
+        "summary": "Patient does not fully complete the scene description task; response is fragmented, incomplete, and relies on examiner context.",
+        "evidence": "Patient does not provide a coherent, self-contained description of the entire scene; instead, responds with questions and partial observations.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates mild impairment-like cues including lexical vagueness, narrative disorganization, and task incompleteness. Speech is intelligible but lacks coherence and informativeness. Further clinical review is recommended.",
+    "evidence_for_risk": [
+      "Repetitive and vague phrasing indicating possible word-finding difficulty",
+      "Disjointed scene description with unclear event sequencing",
+      "Reliance on examiner context and incomplete task response"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies some scene elements (dog, cat, child, '瓜')",
+      "No overt confusion or disorientation in object recognition",
+      "No signs of severe aphasia or mutism"
+    ],
+    "alternative_explanations": [
+      "Language processing delay or mild cognitive load during task",
+      "Examiner prompting or task structure may have influenced response style",
+      "Possible non-pathological variability in expressive language under screening conditions"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Mild surprise or startle response: '吓一跳'",
+      "Uncertainty or hesitation: '是不是吓一跳？', '挖挖什么意思？'",
+      "No clear anxiety, frustration, or apathy — affect appears neutral or mildly reactive"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Observe patient’s performance across multiple tasks for consistency",
+      "Consider caregiver report or functional history to contextualize speech patterns"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up evaluation recommended",
+    "future_risk_trend_summary": "Longitudinal prediction limited based on single clip; further assessment needed to determine progression or stability",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and transcript reconstruction",
+      "Patient speech is partially intelligible but shows multiple mild impairment-like cues",
+      "Examiner prompts are assumed but not analyzed",
+      "only patient response is evaluated",
+      "No visual or physical cues available for additional assessment"
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "小孩被狗追，汪汪汪狗追哈，嗯，被狗追。这，那这喵，猫咪这猫咪叫，猫咪在抓什么？抓这个是抓抓什么？嗯，猫猫咪在抓这个，这个瓜啊，再看呢这，汪汪，这狗被小孩被狗追，追上，嗯，被这狗追，这汪汪，这狗小孩追上，是这样子说。他在挖挖什么？喂，这是什么？在挖挖什么意思？他看到这吓一跳，嗯，是不是吓一跳？这啊，这个猫咪在追的，啊，这个狗在抓追它。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets scene (implied)",
+      "Patient: describes scene with fragmented, repetitive, vague phrasing, pauses, and uncertainty about actions and objects"
+    ],
+    "patient_cue_summary": [
+      "Repetitive phrasing: '抓什么？抓抓什么？' and '挖挖什么？挖挖什么意思？'",
+      "Vague object references: '这个瓜啊', '这个东西', '挖挖什么意思？'",
+      "Fragmented sequencing: '狗被小孩被狗追，追上' — unclear causal or temporal order",
+      "Uncertainty markers: '是不是吓一跳？', '啊，这个猫咪在追的，啊，这个狗在抓追它'",
+      "Inconsistent or incomplete scene description: mentions multiple actors (dog, cat, child, mother) but lacks coherent linkage or detail",
+      "Reliance on examiner context: no clear self-contained narrative or task completion"
+    ]
+  },
+  "latency_ms": 19238,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/036/036_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/036/036_Daddy.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

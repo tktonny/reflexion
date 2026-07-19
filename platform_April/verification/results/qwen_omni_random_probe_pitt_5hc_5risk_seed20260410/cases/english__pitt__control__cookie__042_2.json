@@ -1,0 +1,109 @@
+{
+  "case_id": "english__pitt__control__cookie__042_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Okay, and that's the picture. Okay. Okay, the boy is on the ladder, on the stool, taking cookies out of the cupboard. The stool is falling over. Little girl is reaching up for a cookie. The water is running over in the sink. Mother's drying dishes. She's putting her finger up to her mouth. The little girl is. Okay. She sees what's going to happen here. Okay, fine.",
+  "patient_only_transcript": "The boy is on the stool, taking cookies out of the cupboard. The stool is falling over. Little girl is reaching up for a cookie. The water is running over in the sink. Mother's drying dishes. She's putting her finger up to her mouth. The little girl is. Okay. She sees what's going to happen here.",
+  "speaker_turn_summary": [
+    "Examiner: 'Okay, and that's the picture. Okay. Okay...'",
+    "Patient: 'The boy is on the stool...'",
+    "Examiner: 'Okay, fine.'"
+  ],
+  "patient_cue_summary": [
+    "Partial scene description with some correct elements (boy, stool, cookies, sink, mother)",
+    "Fragmented phrasing: 'The little girl is. Okay. She sees what's going to happen here.'",
+    "Lack of full sentence completion and weak narrative cohesion",
+    "Minimal self-correction or elaboration despite rich visual context",
+    "Examiner-dependent completion of sentence ('She sees what's going to happen here.')"
+  ],
+  "transcript_request_id": "chatcmpl-37a0fdb7-c26f-92e6-8d52-11665cb8ac30",
+  "classification_request_id": "chatcmpl-82ce4531-52e7-9fbc-ad6e-fd6e8bc6fa8e",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__042_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__042_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides partial, fragmented description of picture scene with some correct elements but lacks full coherence, sentence completion, and narrative organization. Relies on examiner to complete or prompt. No strong dementia-level signs, but mild impairment-like cues suggest need for further clinical review.",
+    "evidence_for_risk": [
+      "Fragmented speech with incomplete sentences",
+      "Examiner-dependent completion of key narrative elements",
+      "Weak causal or sequential linking between events in scene"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key objects and actors (boy, cookies, mother, sink, stool)",
+      "No signs of severe disorientation or incoherence",
+      "No explicit memory complaints or caregiver concerns reported"
+    ],
+    "alternative_explanations": [
+      "Audio quality or recording conditions may limit full intelligibility",
+      "Patient may be hesitant or unfamiliar with task format",
+      "Examiner prompts may have influenced patient’s phrasing"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat picture description task with clearer prompts",
+      "Assess for word-finding difficulty or narrative organization in follow-up",
+      "Consider brief cognitive screening battery if clinical concern persists"
+    ],
+    "visit_recommendation": "formal screening or prompt clinical evaluation",
+    "future_risk_trend_summary": "Longitudinal prediction limited from single clip; further observation or multi-session assessment recommended",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and transcript reconstruction",
+      "Patient speech is partially intelligible but organizationally weak",
+      "Task context: picture description of cookie-theft scene"
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is on the stool, taking cookies out of the cupboard. The stool is falling over. Little girl is reaching up for a cookie. The water is running over in the sink. Mother's drying dishes. She's putting her finger up to her mouth. The little girl is. Okay. She sees what's going to happen here.",
+    "speaker_turn_summary": [
+      "Examiner: 'Okay, and that's the picture. Okay. Okay...'",
+      "Patient: 'The boy is on the stool...'",
+      "Examiner: 'Okay, fine.'"
+    ],
+    "patient_cue_summary": [
+      "Partial scene description with some correct elements (boy, stool, cookies, sink, mother)",
+      "Fragmented phrasing: 'The little girl is. Okay. She sees what's going to happen here.'",
+      "Lack of full sentence completion and weak narrative cohesion",
+      "Minimal self-correction or elaboration despite rich visual context",
+      "Examiner-dependent completion of sentence ('She sees what's going to happen here.')"
+    ]
+  },
+  "latency_ms": 9632,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/042-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/042-2.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

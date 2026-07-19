@@ -1,0 +1,129 @@
+{
+  "case_id": "english__lu__control__f50",
+  "dataset": "talkbank_english_lu",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "I was just wondering if you could describe everything that you see going on in that picture and just describe it out loud, and when you're done, just let me know that you're done. Okay, well, the boy is reaching for cookies and he's gonna have an accident and his chair is falling over. And the mother's sink, she's trying to do the dishes and the water's just rolling over and things are not too good at the moment. That's about it. Anything else? Well, there's water on the floor, I mean, you know. From the sink. Yeah. All right, perfect. Thank you so much.",
+  "patient_only_transcript": "The boy is reaching for cookies and he's gonna have an accident and his chair is falling over. And the mother's sink, she's trying to do the dishes and the water's just rolling over and things are not too good at the moment. That's about it. Well, there's water on the floor, I mean, you know. From the sink. Yeah.",
+  "speaker_turn_summary": [
+    "Examiner: Prompt to describe picture.",
+    "Patient: Describes boy reaching for cookies, chair falling, mother at sink, water rolling over, things not good.",
+    "Examiner: Asks if anything else.",
+    "Patient: Adds water on floor, clarifies from sink."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with multiple elements (boy, cookies, chair, mother, sink, water).",
+    "Some hesitation and filler phrases: 'I mean, you know.'",
+    "Minor repetition: 'water's just rolling over' and later 'water on the floor, I mean, you know.'",
+    "Slight redundancy in describing water source and location.",
+    "No obvious word-finding pauses, circumlocution, or abandonment of utterance.",
+    "Task completion achieved without examiner prompting beyond initial instruction."
+  ],
+  "transcript_request_id": "chatcmpl-8e751af9-cfc4-9af7-8886-02b122714828",
+  "classification_request_id": "chatcmpl-862ada2f-f197-920b-b8a5-784eb0960cda",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__control__f50/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__control__f50/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a multi-element description of a picture, including characters, actions, and environmental details.",
+        "evidence": "Patient describes boy reaching for cookies, chair falling, mother at sink, water overflowing, and water on floor.",
+        "confidence": 0.8
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific nouns and verbs (cookies, chair, sink, water, falling, rolling) and links them causally.",
+        "evidence": "Patient names objects and actions accurately and connects them in a plausible narrative sequence.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Narrative Organization and Completeness",
+        "summary": "Patient delivers a complete, sequential description of the scene with minor redundancy but no disorganization or abandonment.",
+        "evidence": "Patient begins with main event (boy reaching), adds secondary event (chair falling), then describes mother’s situation, and finally adds detail about water on floor.",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, detailed, and mostly accurate description of a picture with minimal hesitation or redundancy. No clear signs of word-finding difficulty, disorganization, or examiner dependence. Language and narrative structure are intact.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent, multi-element description",
+      "Accurate naming of objects and actions",
+      "No word-finding pauses or circumlocution",
+      "Complete task response without prompting"
+    ],
+    "alternative_explanations": [
+      "Minor filler phrases may reflect conversational style rather than impairment.",
+      "Redundancy may reflect emphasis or clarification, not cognitive deficit."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed.",
+      "Consider routine follow-up if other cognitive concerns arise."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Limited predictive value from single clip; longitudinal assessment recommended if clinical concerns persist.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-compliant.",
+      "No signs of dementia-like impairment in this single clip."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching for cookies and he's gonna have an accident and his chair is falling over. And the mother's sink, she's trying to do the dishes and the water's just rolling over and things are not too good at the moment. That's about it. Well, there's water on the floor, I mean, you know. From the sink. Yeah.",
+    "speaker_turn_summary": [
+      "Examiner: Prompt to describe picture.",
+      "Patient: Describes boy reaching for cookies, chair falling, mother at sink, water rolling over, things not good.",
+      "Examiner: Asks if anything else.",
+      "Patient: Adds water on floor, clarifies from sink."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with multiple elements (boy, cookies, chair, mother, sink, water).",
+      "Some hesitation and filler phrases: 'I mean, you know.'",
+      "Minor repetition: 'water's just rolling over' and later 'water on the floor, I mean, you know.'",
+      "Slight redundancy in describing water source and location.",
+      "No obvious word-finding pauses, circumlocution, or abandonment of utterance.",
+      "Task completion achieved without examiner prompting beyond initial instruction."
+    ]
+  },
+  "latency_ms": 18065,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Lu",
+    "source_group": "Control",
+    "source_relative_path": "Control/F50.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Lu/Control//F50.mp3?f=save",
+    "expected_group_audio_count": 26,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

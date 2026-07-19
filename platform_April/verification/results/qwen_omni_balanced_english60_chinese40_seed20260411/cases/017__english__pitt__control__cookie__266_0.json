@@ -1,0 +1,127 @@
+{
+  "case_id": "english__pitt__control__cookie__266_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.7,
+  "transcript": "Everything you see going on in that picture. Okay, it looks like the mother is washing dishes. The sink is overflowing. There are two children trying to get in the cookie jar. The boy is on the stool and the stool seems to be toppling over. The little girl has her hand up as though she's poking her brother to give her a cookie. And there's shrubbery outside the window, a curved walkway, curtains at the window. I guess that's about it. Okay.",
+  "patient_only_transcript": "Everything you see going on in that picture. Okay, it looks like the mother is washing dishes. The sink is overflowing. There are two children trying to get in the cookie jar. The boy is on the stool and the stool seems to be toppling over. The little girl has her hand up as though she's poking her brother to give her a cookie. And there's shrubbery outside the window, a curved walkway, curtains at the window. I guess that's about it. Okay.",
+  "speaker_turn_summary": [
+    "Examiner: 'Everything you see going on in that picture.'",
+    "Patient: 'Okay, it looks like the mother is washing dishes...'",
+    "Patient continues describing scene with multiple elements.",
+    "Patient ends with 'I guess that's about it. Okay.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides a structured, multi-element description of the picture.",
+    "Speech is intelligible and task-relevant, covering actors, actions, and setting.",
+    "No clear word-finding pauses, restarts, or semantic vagueness observed.",
+    "Narrative ends with mild uncertainty ('I guess that's about it'), but not indicative of impairment.",
+    "No evidence of examiner dependence, tangential drift, or task failure."
+  ],
+  "transcript_request_id": "chatcmpl-e8069a1c-2860-9546-8ff8-2299171c959c",
+  "classification_request_id": "chatcmpl-6b1815f0-0f2a-9cb2-991e-3ade5d995fc6",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__266_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__266_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient accurately identifies multiple actors, actions, and environmental details in the picture.",
+        "evidence": "Patient described mother washing dishes, sink overflowing, two children reaching for cookie jar, boy on stool, girl poking brother, shrubbery, walkway, curtains.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Speech Coherence and Fluency",
+        "summary": "Speech is fluent, organized, and task-relevant without pauses, restarts, or examiner dependence.",
+        "evidence": "Patient delivered a continuous, structured description without hesitation or correction.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Completion and Closure",
+        "summary": "Patient completed the task with a natural, slightly uncertain closing phrase, not indicative of impairment.",
+        "evidence": "Patient concluded with 'I guess that's about it. Okay.' — a conversational closure, not a cognitive breakdown.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, task-relevant description of a picture in English, naming multiple actors, actions, and environmental details. Speech is intelligible and organized. Mild uncertainty at the end does not indicate impairment. No evidence of cognitive breakdown. Further observation or follow-up may be warranted due to limited modality coverage and lack of visual confirmation.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Task-relevant, accurate scene description with multiple elements identified.",
+      "No word-finding pauses, circumlocution, or semantic vagueness.",
+      "Speech is fluent and organized without restarts or examiner dependence.",
+      "No emotional or affective signs of distress, apathy, or flattening observed."
+    ],
+    "alternative_explanations": [
+      "Mild uncertainty at end may reflect natural conversational closure rather than cognitive impairment.",
+      "Lack of visual channel may limit full assessment, but audio alone does not show impairment signals."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening if clinical concern persists.",
+      "Consider repeating the picture-description task with visual support for confirmation.",
+      "Monitor for functional or memory complaints in caregiver report."
+    ],
+    "visit_recommendation": "routine follow-up with formal screening if indicated by clinical context or caregiver concern.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio clip; no persuasive evidence of cognitive decline observed.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-compliant, but lacks visual corroboration.",
+      "Mild uncertainty at end is not sufficient for cognitive_risk classification."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Everything you see going on in that picture. Okay, it looks like the mother is washing dishes. The sink is overflowing. There are two children trying to get in the cookie jar. The boy is on the stool and the stool seems to be toppling over. The little girl has her hand up as though she's poking her brother to give her a cookie. And there's shrubbery outside the window, a curved walkway, curtains at the window. I guess that's about it. Okay.",
+    "speaker_turn_summary": [
+      "Examiner: 'Everything you see going on in that picture.'",
+      "Patient: 'Okay, it looks like the mother is washing dishes...'",
+      "Patient continues describing scene with multiple elements.",
+      "Patient ends with 'I guess that's about it. Okay.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides a structured, multi-element description of the picture.",
+      "Speech is intelligible and task-relevant, covering actors, actions, and setting.",
+      "No clear word-finding pauses, restarts, or semantic vagueness observed.",
+      "Narrative ends with mild uncertainty ('I guess that's about it'), but not indicative of impairment.",
+      "No evidence of examiner dependence, tangential drift, or task failure."
+    ]
+  },
+  "latency_ms": 21572,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/266-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/266-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

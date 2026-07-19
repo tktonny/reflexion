@@ -1,0 +1,150 @@
+{
+  "case_id": "english__pitt__dementia__cookie__270_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "And there's the picture. All the action. Okay. Well, there is a little boy who has climbed up on a stool to get cookies from the cookie jar, and his sister is asking for cookies too. His mother is washing the dishes, and the water is running over the sink onto the floor. Did I say that the stool was tilted? I don't think I have. Uh, cookie jar is open. The cupboard door is open. The little girl has two different shoes on. Can't tell if those are socks, is what they are. Uh, can't even make out what this is supposed to be. Little boy looks like he's wearing two different shoes, I think. I'm not sure what it is. Oh, and the stool is has like runs of legs. Is that all the action? I was just looking outside to see whether there's any difference. I assume that these are flowers. Oh, okay. Okay, good.",
+  "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing. The little girl has two different shoes on. I can't tell if those are socks. The stool has runs of legs. I'm not sure what it is. I was just looking outside to see if there's any difference. I assume those are flowers.",
+  "speaker_turn_summary": [
+    "Examiner: And there's the picture. All the action. Okay.",
+    "Patient: Well, there is a little boy who has climbed up on a stool to get cookies from the cookie jar, and his sister is asking for cookies too. His mother is washing the dishes, and the water is running over the sink onto the floor.",
+    "Examiner: Did I say that the stool was tilted? I don't think I have.",
+    "Patient: Uh, cookie jar is open. The cupboard door is open. The little girl has two different shoes on. Can't tell if those are socks, is what they are. Uh, can't even make out what this is supposed to be. Little boy looks like he's wearing two different shoes, I think. I'm not sure what it is.",
+    "Examiner: Oh, and the stool is has like runs of legs. Is that all the action?",
+    "Patient: I was just looking outside to see whether there's any difference. I assume that these are flowers. Oh, okay. Okay, good."
+  ],
+  "patient_cue_summary": [
+    "Coherent initial scene description with correct key elements (boy, cookie jar, mother, sink, shoes)",
+    "Subsequent speech shows uncertainty, vagueness, and self-correction (e.g., 'I'm not sure what it is', 'can't even make out what this is supposed to be')",
+    "Repetition and circumlocution ('is what they are', 'I think')",
+    "Fragmented or incomplete descriptions ('the stool is has like runs of legs')",
+    "Tangential additions ('I was just looking outside...') not relevant to task",
+    "Reliance on examiner prompts to continue description ('Did I say that the stool was tilted?')",
+    "Weak narrative organization and lack of causal linkage between events"
+  ],
+  "transcript_request_id": "chatcmpl-222dca1b-b6b8-99dc-ac67-add9a7f7450d",
+  "classification_request_id": "chatcmpl-1800d4cd-ae22-93f2-af70-3d115bf72c05",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__270_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__270_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Inconsistent Scene Description",
+        "summary": "Patient describes key elements of the picture but shows uncertainty, vagueness, and fragmented phrasing, suggesting possible retrieval or organizational difficulty.",
+        "evidence": "Patient says 'I can't even make out what this is supposed to be' and 'I'm not sure what it is' despite describing other elements coherently.",
+        "confidence": null
+      },
+      {
+        "label": "Examiner-Dependent Continuation",
+        "summary": "Patient appears to require prompting to continue description and does not self-sustain the narrative.",
+        "evidence": "Patient responds to examiner's prompt 'Is that all the action?' with a shift to unrelated observation ('I was just looking outside...').",
+        "confidence": null
+      },
+      {
+        "label": "Lexical and Structural Vagueness",
+        "summary": "Use of vague terms ('thing', 'stuff', 'like runs of legs') and circumlocutions indicate possible word-finding difficulty or weak semantic retrieval.",
+        "evidence": "Patient says 'the stool is has like runs of legs' and 'is what they are' instead of clear descriptors.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a partially coherent description of the picture but exhibits signs of lexical retrieval difficulty, uncertainty, and examiner dependence. Narrative organization is weak, and some descriptions are vague or incomplete. These cues are suggestive of mild cognitive concern but not sufficient for dementia classification.",
+    "evidence_for_risk": [
+      "Patient's speech contains multiple cues of possible word-finding difficulty and disorganization",
+      "Patient requires prompting to continue description and adds tangential, non-task-related content",
+      "Patient expresses uncertainty about key elements despite visible cues"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies several key elements of the scene (boy, cookie jar, mother, sink, shoes)",
+      "Speech is mostly intelligible and not fragmented to the point of being incoherent",
+      "No signs of severe disorientation, confusion, or memory loss"
+    ],
+    "alternative_explanations": [
+      "Task difficulty or unfamiliarity with picture-description format",
+      "Temporary distraction or cognitive load during task",
+      "Non-clinical factors such as fatigue or environmental distraction"
+    ],
+    "risk_factor_findings": [
+      "Uncertainty in scene description despite visible cues",
+      "Reliance on examiner prompts to continue narrative",
+      "Use of vague or circumlocutory language"
+    ],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty about details of the picture",
+      "Patient appears to struggle to sustain coherent description without prompting"
+    ],
+    "emotional_assessment_findings": [
+      "Neutral affect with minimal emotional reactivity or frustration",
+      "No signs of anxiety, apathy, or engagement beyond task compliance"
+    ],
+    "risk_control_suggestions": [
+      "Repeat the picture description task with structured prompts",
+      "Administer formal cognitive screening tools (e.g., MMSE, MoCA)",
+      "Consider follow-up assessment to monitor for progression or consistency of symptoms"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and longitudinal follow-up.",
+    "future_risk_trend_summary": "Single-clip assessment limits predictive power; longitudinal observation is needed to determine clinical trajectory.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio and transcript.",
+      "Patient speech is intelligible but shows mild impairment-like cues in organization, retrieval, and task sustainment.",
+      "Examiner prompts are neutral context",
+      "patient's own speech is the primary source of evidence."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing. The little girl has two different shoes on. I can't tell if those are socks. The stool has runs of legs. I'm not sure what it is. I was just looking outside to see if there's any difference. I assume those are flowers.",
+    "speaker_turn_summary": [
+      "Examiner: And there's the picture. All the action. Okay.",
+      "Patient: Well, there is a little boy who has climbed up on a stool to get cookies from the cookie jar, and his sister is asking for cookies too. His mother is washing the dishes, and the water is running over the sink onto the floor.",
+      "Examiner: Did I say that the stool was tilted? I don't think I have.",
+      "Patient: Uh, cookie jar is open. The cupboard door is open. The little girl has two different shoes on. Can't tell if those are socks, is what they are. Uh, can't even make out what this is supposed to be. Little boy looks like he's wearing two different shoes, I think. I'm not sure what it is.",
+      "Examiner: Oh, and the stool is has like runs of legs. Is that all the action?",
+      "Patient: I was just looking outside to see whether there's any difference. I assume that these are flowers. Oh, okay. Okay, good."
+    ],
+    "patient_cue_summary": [
+      "Coherent initial scene description with correct key elements (boy, cookie jar, mother, sink, shoes)",
+      "Subsequent speech shows uncertainty, vagueness, and self-correction (e.g., 'I'm not sure what it is', 'can't even make out what this is supposed to be')",
+      "Repetition and circumlocution ('is what they are', 'I think')",
+      "Fragmented or incomplete descriptions ('the stool is has like runs of legs')",
+      "Tangential additions ('I was just looking outside...') not relevant to task",
+      "Reliance on examiner prompts to continue description ('Did I say that the stool was tilted?')",
+      "Weak narrative organization and lack of causal linkage between events"
+    ]
+  },
+  "latency_ms": 19720,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/270-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/270-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

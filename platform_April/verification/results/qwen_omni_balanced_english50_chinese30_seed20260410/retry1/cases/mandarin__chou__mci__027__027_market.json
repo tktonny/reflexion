@@ -1,0 +1,154 @@
+{
+  "case_id": "mandarin__chou__mci__027__027_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "这是一个妈妈跟阿妈带了一个孙子啊，去街上玩。嗯，右边这个呢是在打那个洗巴啦，台湾叫洗巴啦，嗯嗯嗯嗯，在玩这个洗巴啦。左边这边的小孩子呢，这个老妈跟那个爸爸，嗯，就就在抓那个小鱼啊，嗯，用那个网子抓那个小鱼。结果呢，他妈妈的手上拿一个冰淇淋，不小心把它滴下来，滴在这个小孩的旁边。哎，那么这个呢，老老妈妈呢，她是跟她这个孙子在玩这个钓鱼，帮忙忙帮忙，这个小孩子拿那个那个小瓢啊，就在在在在挖，这个小孩子在挖。哎，结果呢，哇，洗巴啦这个东西啊，有三个小孩，一个小孩很不争很不争气，就看着他打洗巴的时候，中间这个小孩一个背包，他手上就进去把他偷东西，嗯，做那个做那个不正当的行为，嗯嗯嗯，这是，这最主要是这个题目就是说，这故事这个一个故事，这一个故事，这一个故事的时候，妈妈不小心把冰淇淋滴在那个小孩的头上，嗯，小孩子在在抓鱼的时候，结果呢，打那个洗巴的时候，三个小孩子一个不正当的小孩子伸手去偷人家的东西。哦，这，这是瓦烟枪的啦，嗯嗯，就是买买我们台湾那个那个那个街上那个买烟枪，烟枪烟枪打，嗯嗯嗯。",
+  "patient_only_transcript": "妈妈带孙子去街上玩，右边小孩在打洗巴啦，左边小孩和爸妈抓鱼，妈妈手拿冰淇淋滴到小孩旁边，老妈妈和孙子钓鱼，小孩拿小瓢挖，三个小孩中有一个不争气，偷东西，题目是讲这个故事，冰淇淋滴到小孩头上，小孩抓鱼时，打洗巴啦时，有小孩偷东西，台湾街上买烟枪。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context for the story task.",
+    "Patient: describes a multi-character street scene with multiple concurrent activities, but with disorganized sequencing, vague references, and repetition of phrases like '这个故事' and '嗯嗯嗯'."
+  ],
+  "patient_cue_summary": [
+    "Repetitive phrasing ('这个故事', '嗯嗯嗯') indicating possible retrieval difficulty or lack of narrative flow.",
+    "Vague references ('那个东西', '那个不正当的行为') without clear referents or specific nouns.",
+    "Disorganized event sequencing: mixing fishing, ice cream drop, stealing, and '洗巴啦' without clear causal or temporal links.",
+    "Use of filler and hesitation markers ('嗯', '哎', '啊') suggesting effortful speech production.",
+    "Partial task completion: mentions key elements (mother, child, ice cream, stealing) but fails to integrate them into a coherent, structured narrative.",
+    "Examiner dependence: relies on context provided by the examiner’s framing rather than self-initiated elaboration."
+  ],
+  "transcript_request_id": "chatcmpl-93d6c9e9-df4f-9020-adcc-88dc82b1311c",
+  "classification_request_id": "chatcmpl-132e3546-9823-9852-8404-de067ba90525",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__027__027_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__027__027_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "Speech hesitations and fillers",
+        "summary": "Frequent use of '嗯', '哎', '啊' and repeated phrases suggest effortful speech production.",
+        "evidence": "Patient speech contains multiple '嗯嗯嗯' and '这个故事' repetitions, indicating possible retrieval or sequencing difficulty.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Vague referents",
+        "summary": "Use of generic terms like '那个东西' and '那个不正当的行为' without clear specification.",
+        "evidence": "Patient refers to '偷东西' and '那个不正当的行为' without naming specific objects or actors, suggesting possible semantic retrieval difficulty.",
+        "confidence": 0.7
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "Disorganized narrative structure",
+        "summary": "Patient describes multiple concurrent events without clear temporal or causal linkage.",
+        "evidence": "Patient mentions fishing, ice cream drop, stealing, and '洗巴啦' in a jumbled order without connecting them logically.",
+        "confidence": 0.7
+      },
+      {
+        "label": "Partial task completion",
+        "summary": "Patient mentions key elements of the scene but fails to construct a coherent, integrated description.",
+        "evidence": "Patient names characters (mother, child, grandma) and actions (fishing, stealing, ice cream) but does not link them into a unified narrative.",
+        "confidence": 0.65
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient attempts to describe a multi-character street scene but exhibits signs of possible cognitive impairment including disorganized narrative structure, vague referents, repetition, and effortful speech. These cues are suggestive of mild cognitive concern but not sufficient for dementia classification. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Disorganized event sequencing",
+      "Vague and non-specific language",
+      "Repetition and hesitation markers",
+      "Partial task completion despite examiner context"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key characters and actions (mother, child, ice cream, stealing)",
+      "No explicit memory complaint or diagnosis mentioned",
+      "Speech is intelligible enough to reconstruct a basic scene",
+      "No signs of emotional dysregulation or apathy"
+    ],
+    "alternative_explanations": [
+      "Poor audio quality may obscure finer speech details",
+      "Patient may be unfamiliar with the task or language context",
+      "Examiner may have provided insufficient scaffolding for narrative construction",
+      "Cultural or dialectal variation in speech patterns may contribute to perceived vagueness"
+    ],
+    "risk_factor_findings": [
+      "Caregiver-reported or examiner-observed narrative disorganization",
+      "Vague or non-specific language use",
+      "Repetition and hesitation markers indicating possible word-finding difficulty"
+    ],
+    "subjective_assessment_findings": [
+      "Patient appears to attempt to describe a complex scene but struggles with sequencing and referent clarity",
+      "No explicit memory complaint or diagnosis mentioned, but task performance suggests possible cognitive load or retrieval difficulty"
+    ],
+    "emotional_assessment_findings": [
+      "No clear emotional reactivity, frustration, or affective flattening observed in speech tone or pacing",
+      "Speech is neutral in affect, with no signs of anxiety or apathy"
+    ],
+    "risk_control_suggestions": [
+      "Repeat the narrative task with clearer prompts or visual aids",
+      "Administer formal cognitive screening tools (e.g., MoCA, MMSE) in a controlled setting",
+      "Obtain caregiver report on daily functioning and memory concerns",
+      "Schedule follow-up visit to monitor for progression or stability"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up clinical evaluation recommended.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single audio clip. Further observation over time is needed to determine clinical significance.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio and transcript.",
+      "Patient speech is partially intelligible but shows multiple mild impairment-like cues.",
+      "Examiner prompts are assumed to be neutral context",
+      "patient response is evaluated for task performance and language organization.",
+      "No evidence of dementia-level impairment",
+      "classification remains 'needs_observation' for cautious clinical follow-up."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "poor_audio",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "妈妈带孙子去街上玩，右边小孩在打洗巴啦，左边小孩和爸妈抓鱼，妈妈手拿冰淇淋滴到小孩旁边，老妈妈和孙子钓鱼，小孩拿小瓢挖，三个小孩中有一个不争气，偷东西，题目是讲这个故事，冰淇淋滴到小孩头上，小孩抓鱼时，打洗巴啦时，有小孩偷东西，台湾街上买烟枪。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context for the story task.",
+      "Patient: describes a multi-character street scene with multiple concurrent activities, but with disorganized sequencing, vague references, and repetition of phrases like '这个故事' and '嗯嗯嗯'."
+    ],
+    "patient_cue_summary": [
+      "Repetitive phrasing ('这个故事', '嗯嗯嗯') indicating possible retrieval difficulty or lack of narrative flow.",
+      "Vague references ('那个东西', '那个不正当的行为') without clear referents or specific nouns.",
+      "Disorganized event sequencing: mixing fishing, ice cream drop, stealing, and '洗巴啦' without clear causal or temporal links.",
+      "Use of filler and hesitation markers ('嗯', '哎', '啊') suggesting effortful speech production.",
+      "Partial task completion: mentions key elements (mother, child, ice cream, stealing) but fails to integrate them into a coherent, structured narrative.",
+      "Examiner dependence: relies on context provided by the examiner’s framing rather than self-initiated elaboration."
+    ]
+  },
+  "latency_ms": 20825,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/027/027_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/027/027_market.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "case_id": "english__pitt__control__cookie__105_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.9,
+  "transcript": "See going on in the picture. What do I tell you when I see it? Just tell me what you see. As I see it. Uh, is there something going on there? Oh, that's just. Right, I'm just recording it so that I can remember what you said later on. Can you tell me everything that you see going on in that picture? Well, the first bad thing I see is the water running out of the sink, running over. The little boy up stealing cookies and giving one to his sister. And mom is drying the dishes and standing in the water. She's looking the other direction. And the little boy's falling off the stool, standing up on to get the cookie. He's gonna get hurt when he hits that sink. The air conditioner's going crazy. Yeah. Okay, is there anything else that you can say? You can see out the window, out into the yard, and see a window over here on the other side of the house.",
+  "patient_only_transcript": "The first bad thing I see is the water running out of the sink, running over. The little boy up stealing cookies and giving one to his sister. And mom is drying the dishes and standing in the water. She's looking the other direction. And the little boy's falling off the stool, standing up on to get the cookie. He's gonna get hurt when he hits that sink. The air conditioner's going crazy. You can see out the window, out into the yard, and see a window over here on the other side of the house.",
+  "speaker_turn_summary": [
+    "Examiner: 'What do I tell you when I see it? Just tell me what you see.'",
+    "Patient: 'Well, the first bad thing I see is the water running out of the sink...'",
+    "Examiner: 'Okay, is there anything else that you can say?'",
+    "Patient: 'You can see out the window...'"
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies multiple core scene elements: water running over, boy stealing cookies, sister, mother drying dishes, stool falling, sink impact, air conditioner, windows.",
+    "Speech is intelligible and task-relevant with minimal hesitation or filler.",
+    "Narrative is organized and sequentially coherent, though slightly fragmented in delivery.",
+    "No clear word-finding pauses, circumlocution, repetition, or examiner dependence observed.",
+    "Patient completes the task with sufficient detail for a structured picture description, despite not being verbose."
+  ],
+  "transcript_request_id": "chatcmpl-f304bdb5-7f69-9065-8e57-7682eca08484",
+  "classification_request_id": "chatcmpl-bba74a66-3668-926f-900c-815280baaf43",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__105_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__105_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient identifies multiple key actors, actions, and spatial relationships in the picture.",
+        "evidence": "Patient names the boy, sister, mother, sink overflow, stool falling, cookie theft, and windows — all core elements of the picture task.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Relevance and Coherence",
+        "summary": "Patient remains focused on describing the picture without tangential drift or confusion.",
+        "evidence": "Response stays on topic, sequentially describes events, and includes causal link (boy falling → will get hurt).",
+        "confidence": 0.75
+      },
+      {
+        "label": "Lexical Retrieval and Fluency",
+        "summary": "Patient retrieves and uses specific, concrete vocabulary without significant pauses or filler words.",
+        "evidence": "Uses terms like 'running over', 'falling off the stool', 'air conditioner's going crazy' — specific and contextually accurate.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, task-relevant, and detailed description of the pictured scene with accurate identification of multiple actors, actions, and spatial elements. Speech is fluent, intelligible, and organized. No evidence of retrieval breakdown, disorganization, or examiner dependence. This supports a healthy cognitive profile in the context of this screening task.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Coherent narrative structure",
+      "No word-finding pauses or circumlocution",
+      "Task completion without prompting or scaffolding"
+    ],
+    "alternative_explanations": [
+      "Patient may be describing a familiar or emotionally salient scene, which could enhance recall without indicating impairment.",
+      "Task may be within patient’s cognitive capacity, especially if the picture is simple or well-known."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Continue routine cognitive screening as appropriate for age and clinical context.",
+      "No need for immediate follow-up or formal diagnostic evaluation based on this clip alone."
+    ],
+    "visit_recommendation": "routine follow-up or continued monitoring as clinically indicated.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline in this assessment.",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-compliant",
+      "no impairment-like cues detected.",
+      "This clip does not meet threshold for cognitive_risk despite being a structured picture-description task."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The first bad thing I see is the water running out of the sink, running over. The little boy up stealing cookies and giving one to his sister. And mom is drying the dishes and standing in the water. She's looking the other direction. And the little boy's falling off the stool, standing up on to get the cookie. He's gonna get hurt when he hits that sink. The air conditioner's going crazy. You can see out the window, out into the yard, and see a window over here on the other side of the house.",
+    "speaker_turn_summary": [
+      "Examiner: 'What do I tell you when I see it? Just tell me what you see.'",
+      "Patient: 'Well, the first bad thing I see is the water running out of the sink...'",
+      "Examiner: 'Okay, is there anything else that you can say?'",
+      "Patient: 'You can see out the window...'"
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies multiple core scene elements: water running over, boy stealing cookies, sister, mother drying dishes, stool falling, sink impact, air conditioner, windows.",
+      "Speech is intelligible and task-relevant with minimal hesitation or filler.",
+      "Narrative is organized and sequentially coherent, though slightly fragmented in delivery.",
+      "No clear word-finding pauses, circumlocution, repetition, or examiner dependence observed.",
+      "Patient completes the task with sufficient detail for a structured picture description, despite not being verbose."
+    ]
+  },
+  "latency_ms": 28894,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/105-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/105-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

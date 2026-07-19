@@ -1,0 +1,110 @@
+{
+  "assessment_id": "f57e2fa1b73c479f8768a174d5fcaaac",
+  "patient_id": "patient-001",
+  "language": "en",
+  "created_at": "2026-04-07T10:57:37.039412Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Neutral to slightly engaged expression; minimal emotional display.",
+      "evidence": "Patient maintains steady eye contact with camera; facial muscles show no overt signs of distress, confusion, or affective flattening.",
+      "confidence": 0.85
+    },
+    {
+      "label": "Gaze Stability",
+      "summary": "Consistent visual attention directed toward camera or slightly off-camera.",
+      "evidence": "Patient’s gaze remains relatively fixed and does not exhibit frequent shifting, wandering, or fixation on irrelevant objects.",
+      "confidence": 0.8
+    }
+  ],
+  "body_findings": [],
+  "voice_findings": [
+    {
+      "label": "Speech Fluency",
+      "summary": "Speech is fluent, with no observable pauses, repetitions, or word-finding difficulties.",
+      "evidence": "Patient speaks in complete, grammatically correct sentences without hesitation or disfluency.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Pace and Intonation",
+      "summary": "Speech rate is moderate; intonation is natural and context-appropriate.",
+      "evidence": "No signs of slurring, monotony, or excessive variability in pitch or rhythm.",
+      "confidence": 0.85
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Self-Reported Activities",
+      "summary": "Patient describes routine work tasks and daily living context.",
+      "evidence": "Patient states: 'I'm working for the whole day... in the morning I'm dealing with the DDoS testing... in the afternoon with the counter shadow integration... I'm alone in most time.'",
+      "confidence": 0.95
+    },
+    {
+      "label": "Self-Reported Social Context",
+      "summary": "Patient mentions being alone most of the time, but no distress or cognitive complaint is expressed.",
+      "evidence": "Patient says: 'I'm alone in most time.' No emotional tone or behavioral cues suggest loneliness or distress.",
+      "confidence": 0.8
+    }
+  ],
+  "speaker_structure": "single_speaker",
+  "target_patient_presence": "clear",
+  "target_patient_basis": "visual_focus",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 0.95,
+  "risk_score": 0.15,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "The patient demonstrates coherent speech, stable gaze, and appropriate affect. No observable signs of cognitive impairment or emotional dysregulation are present in the clip. The content of speech is self-referential and task-oriented without indicators of memory loss, disorientation, or language breakdown.",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [
+    "Fluent, grammatically correct speech without disfluency or word-finding difficulty",
+    "Stable eye contact and consistent visual attention",
+    "No signs of confusion, agitation, or affective flattening",
+    "Self-reported activities are contextually appropriate and not indicative of functional decline"
+  ],
+  "alternative_explanations": [
+    "The patient may be in a routine work setting, which could explain the neutral affect and focus on task description.",
+    "The mention of being 'alone' may reflect lifestyle or work structure, not emotional or cognitive distress."
+  ],
+  "risk_factor_findings": [],
+  "subjective_assessment_findings": [],
+  "emotional_assessment_findings": [
+    "Neutral affect with minimal emotional expression",
+    "No observable signs of anxiety, frustration, or apathy"
+  ],
+  "risk_control_suggestions": [
+    "No immediate intervention required.",
+    "Continue routine monitoring if part of longitudinal screening protocol."
+  ],
+  "visit_recommendation": "Routine follow-up or no further action based on this clip alone.",
+  "future_risk_trend_summary": "Insufficient data to predict future cognitive decline from a single clip.",
+  "reviewer_confidence": 0.9,
+  "context_notes": [
+    "Clip duration is sufficient for basic screening assessment.",
+    "No caregiver or interviewer input is present to contextualize patient behavior.",
+    "Patient is clearly the sole speaker and visual focus."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "28b38dda-bdb4-9ef3-9b52-692226b89a01",
+    "latency_ms": 20408,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 20408
+    }
+  ],
+  "fallback_message": null
+}

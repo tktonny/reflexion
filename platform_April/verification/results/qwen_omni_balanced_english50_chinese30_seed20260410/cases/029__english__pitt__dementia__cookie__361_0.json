@@ -1,0 +1,153 @@
+{
+  "case_id": "english__pitt__dementia__cookie__361_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Just tell me everything you see going on in the picture. The boy's snitching cookies. The sister's laughing. The bench he stool he's on is slanted. Oh, the mother's. . . The water's spilled over in the sink onto the floor and there's dishes on the. . . She's drying a plate. Curtains. A good view. Oh, and you can see the, I guess the backyard and. . . I don't know if that would be part of the house or the garage or the wall.",
+  "patient_only_transcript": "Just tell me everything you see going on in the picture. The boy's snitching cookies. The sister's laughing. The bench he stool he's on is slanted. Oh, the mother's. . . The water's spilled over in the sink onto the floor and there's dishes on the. . . She's drying a plate. Curtains. A good view. Oh, and you can see the, I guess the backyard and. . . I don't know if that would be part of the house or the garage or the wall.",
+  "speaker_turn_summary": [
+    "Examiner: Just tell me everything you see going on in the picture.",
+    "Patient: The boy's snitching cookies. The sister's laughing. The bench he stool he's on is slanted. Oh, the mother's. . . The water's spilled over in the sink onto the floor and there's dishes on the. . . She's drying a plate. Curtains. A good view. Oh, and you can see the, I guess the backyard and. . . I don't know if that would be part of the house or the garage or the wall."
+  ],
+  "patient_cue_summary": [
+    "Patient begins with correct scene elements (boy, cookies, sister, stool, mother, sink, dishes, curtains, backyard)",
+    "Patient uses fragmented, hesitant phrasing with pauses and fillers ('Oh, the mother's. . .', 'there's dishes on the. . .', 'I don't know if that would be...')",
+    "Patient shows disorganized sequencing and weak causal links between events",
+    "Patient exhibits uncertainty and vagueness in spatial/structural description ('I don't know if that would be part of the house or the garage or the wall')",
+    "Patient relies on examiner prompt to continue description, with incomplete or abandoned clauses",
+    "Patient's speech is partially intelligible but lacks sustained coherence or narrative control"
+  ],
+  "transcript_request_id": "chatcmpl-14e21d15-90c8-91e4-8e15-ae881eba5fcf",
+  "classification_request_id": "chatcmpl-262fe7b6-0fd8-9e44-9665-c7b29e399672",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__361_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__361_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "speech_disfluency",
+        "summary": "Frequent pauses, fillers, and incomplete clauses suggest retrieval difficulty or hesitation.",
+        "evidence": "Patient says 'Oh, the mother's. . .', 'there's dishes on the. . .', 'I don't know if that would be...'.",
+        "confidence": 0.8
+      },
+      {
+        "label": "semantic_vagueness",
+        "summary": "Uncertainty in spatial/structural description indicates possible weak conceptual mapping.",
+        "evidence": "Patient says 'I don't know if that would be part of the house or the garage or the wall.'",
+        "confidence": 0.75
+      },
+      {
+        "label": "narrative_disorganization",
+        "summary": "Events are listed without clear causal or sequential structure, suggesting weak narrative control.",
+        "evidence": "Patient lists elements (boy, sister, stool, mother, sink) without connecting them cohesively.",
+        "confidence": 0.7
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "task_relevance",
+        "summary": "Patient responds to prompt by describing picture elements, though incompletely.",
+        "evidence": "Patient mentions 'boy snitching cookies', 'mother drying plate', 'sink spilled', 'backyard' — all relevant to picture description task.",
+        "confidence": 0.9
+      },
+      {
+        "label": "lexical_retrieval",
+        "summary": "Patient retrieves key nouns but struggles with precise descriptors and connectors.",
+        "evidence": "Uses 'stool he's on' instead of 'bench/stool he's sitting on'; 'I don't know if that would be part of the house...' indicates weak lexical precision.",
+        "confidence": 0.7
+      },
+      {
+        "label": "examiner_dependency",
+        "summary": "Patient requires prompt to continue description and frequently abandons or restarts clauses.",
+        "evidence": "Patient begins with 'The boy's snitching cookies' but then says 'Oh, the mother's. . .', indicating reliance on task structure.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient provides a partially coherent description of a picture scene, naming key elements but exhibiting fragmented phrasing, hesitation, uncertainty, and disorganized sequencing. While not meeting dementia-level criteria, the speech patterns suggest mild cognitive impairment-like features warranting further clinical review.",
+    "evidence_for_risk": [
+      "Fragmented, hesitant speech with pauses and fillers",
+      "Uncertainty and vagueness in spatial description",
+      "Disorganized event sequencing and weak causal links",
+      "Examiner-dependent continuation and incomplete clauses"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple scene elements (cookies, mother, sink, dishes, backyard)",
+      "Speech is partially intelligible and task-relevant",
+      "No overt confusion or disorientation in content"
+    ],
+    "alternative_explanations": [
+      "Speech disfluency may reflect task difficulty or anxiety rather than cognitive impairment",
+      "Audio quality or recording environment may contribute to perceived fragmentation",
+      "Patient may be unfamiliar with picture-description tasks or hesitant to speak"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule formal cognitive screening with validated tools (e.g., MoCA, MMSE)",
+      "Observe patient in structured, repeated picture-description tasks",
+      "Assess functional memory and daily living activities in clinical interview",
+      "Consider caregiver report for consistency with observed speech patterns"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up clinical evaluation recommended",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment needed to determine progression or stability",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio from dialogue-style screening task",
+      "Patient speech is partially intelligible but shows multiple mild impairment-like cues",
+      "Task context: picture description of cookie-theft scene",
+      "patient response is examiner-dependent and disorganized"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Just tell me everything you see going on in the picture. The boy's snitching cookies. The sister's laughing. The bench he stool he's on is slanted. Oh, the mother's. . . The water's spilled over in the sink onto the floor and there's dishes on the. . . She's drying a plate. Curtains. A good view. Oh, and you can see the, I guess the backyard and. . . I don't know if that would be part of the house or the garage or the wall.",
+    "speaker_turn_summary": [
+      "Examiner: Just tell me everything you see going on in the picture.",
+      "Patient: The boy's snitching cookies. The sister's laughing. The bench he stool he's on is slanted. Oh, the mother's. . . The water's spilled over in the sink onto the floor and there's dishes on the. . . She's drying a plate. Curtains. A good view. Oh, and you can see the, I guess the backyard and. . . I don't know if that would be part of the house or the garage or the wall."
+    ],
+    "patient_cue_summary": [
+      "Patient begins with correct scene elements (boy, cookies, sister, stool, mother, sink, dishes, curtains, backyard)",
+      "Patient uses fragmented, hesitant phrasing with pauses and fillers ('Oh, the mother's. . .', 'there's dishes on the. . .', 'I don't know if that would be...')",
+      "Patient shows disorganized sequencing and weak causal links between events",
+      "Patient exhibits uncertainty and vagueness in spatial/structural description ('I don't know if that would be part of the house or the garage or the wall')",
+      "Patient relies on examiner prompt to continue description, with incomplete or abandoned clauses",
+      "Patient's speech is partially intelligible but lacks sustained coherence or narrative control"
+    ]
+  },
+  "latency_ms": 37266,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/361-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/361-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

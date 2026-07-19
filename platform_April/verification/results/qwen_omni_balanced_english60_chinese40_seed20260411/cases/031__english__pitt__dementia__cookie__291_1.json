@@ -1,0 +1,119 @@
+{
+  "case_id": "english__pitt__dementia__cookie__291_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "Going on in the picture? The boy in the cookie jar. Mm-hmm. The little girl waiting for the cookie, or hanging it up. The mother drying dishes. Sink running over. The stool the little boy is on is tilting. Anything else that you see going on in the picture? No. Okay, that's fine.",
+  "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+  "speaker_turn_summary": [
+    "Examiner: Going on in the picture? The boy in the cookie jar. Mm-hmm. The little girl waiting for the cookie, or hanging it up. The mother drying dishes. Sink running over. The stool the little boy is on is tilting. Anything else that you see going on in the picture?",
+    "Patient: No. Okay, that's fine."
+  ],
+  "patient_cue_summary": [
+    "brief but accurate scene description",
+    "intelligible speech",
+    "core events identified",
+    "limited elaboration alone is not enough for cognitive_risk"
+  ],
+  "transcript_request_id": "chatcmpl-c12f59cd-6cb5-9c56-8490-0550516dc01f",
+  "classification_request_id": "chatcmpl-59b6bd36-2cdf-9c0d-943a-0ed7e64d1bcb",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__291_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__291_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identified key actors and actions in the picture description task.",
+        "evidence": "Patient named the boy, cookie jar, stool tipping, mother at sink, running water — core elements of the scene.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion",
+        "summary": "Patient completed the task with minimal elaboration but no breakdown or confusion.",
+        "evidence": "Patient responded to prompt with concise but relevant description and did not require prompting or correction.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Speech Fluency",
+        "summary": "Speech was clear, coherent, and task-relevant without pauses, restarts, or filler words.",
+        "evidence": "No hesitations, repetitions, or circumlocutions observed in patient’s response.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provided a brief but accurate description of the picture scene, identifying all key elements without signs of retrieval difficulty, disorganization, or task breakdown. No impairment-like cues were observed.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Coherent, fluent, and self-contained response",
+      "No signs of word-finding difficulty, repetition, or examiner dependence"
+    ],
+    "alternative_explanations": [
+      "Limited elaboration may reflect task design or patient style, not cognitive impairment",
+      "Short response does not imply cognitive deficit when content is accurate and complete"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No further action required at this time",
+      "Consider routine follow-up if other domains show concern"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline observed.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio and task context.",
+      "Patient response was task-relevant and accurate despite brevity.",
+      "No impairment-like cues detected in speech or content."
+    ],
+    "quality_flags": [
+      "limited_speaking_time",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+    "speaker_turn_summary": [
+      "Examiner: Going on in the picture? The boy in the cookie jar. Mm-hmm. The little girl waiting for the cookie, or hanging it up. The mother drying dishes. Sink running over. The stool the little boy is on is tilting. Anything else that you see going on in the picture?",
+      "Patient: No. Okay, that's fine."
+    ],
+    "patient_cue_summary": [
+      "brief but accurate scene description",
+      "intelligible speech",
+      "core events identified",
+      "limited elaboration alone is not enough for cognitive_risk"
+    ]
+  },
+  "latency_ms": 14972,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/291-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/291-1.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

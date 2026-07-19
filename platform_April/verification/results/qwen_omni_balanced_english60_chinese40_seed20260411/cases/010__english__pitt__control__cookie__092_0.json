@@ -1,0 +1,121 @@
+{
+  "case_id": "english__pitt__control__cookie__092_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.95,
+  "transcript": "Okay, here's the picture. Picture is in the kitchen. Lavender, lime, and peach. Sink is overflowing with water. The boy is tipping off his stool to rise to reach the cookie jar. The little girl has her feet on the steps. The picture is falling. The boy has a cookie in his hand. Okay. Good.",
+  "patient_only_transcript": "The boy is tipping off his stool to rise to reach the cookie jar. The little girl has her feet on the steps. The picture is falling. The boy has a cookie in his hand. Okay. Good.",
+  "speaker_turn_summary": [
+    "Examiner: Okay, here's the picture. Picture is in the kitchen. Lavender, lime, and peach. Sink is overflowing with water.",
+    "Patient: The boy is tipping off his stool to rise to reach the cookie jar. The little girl has her feet on the steps. The picture is falling. The boy has a cookie in his hand. Okay. Good.",
+    "Examiner: Okay. Good."
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies key actors (boy, little girl) and actions (tipping stool, reaching for cookie jar, feet on steps, picture falling, cookie in hand).",
+    "Patient delivers a concise, task-relevant description with minimal elaboration but no signs of retrieval failure, disorganization, or examiner dependence.",
+    "Patient ends with 'Okay. Good.' — neutral, task-completing tone, no hesitation, no restarts, no filler words or circumlocution.",
+    "No evidence of word-finding pauses, semantic vagueness, or weak causal links in the description."
+  ],
+  "transcript_request_id": "chatcmpl-8cc40832-dcdd-9cde-86f2-50651ac273e3",
+  "classification_request_id": "chatcmpl-ac37b5d2-7b9f-9200-a944-1f58e9959e0b",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__092_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__092_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient correctly identifies core elements of the picture: boy tipping stool, reaching for cookie jar, girl’s feet on steps, picture falling, cookie in hand.",
+        "evidence": "Patient’s transcript explicitly names all key actors, objects, and actions in the scene without omission or confusion.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Completion and Fluency",
+        "summary": "Patient completes the picture description task with minimal hesitation, no restarts, and no need for examiner scaffolding.",
+        "evidence": "Patient delivers a coherent, sequential description in a single turn with no signs of disorganization or retrieval breakdown.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Lexical and Semantic Specificity",
+        "summary": "Patient uses specific, concrete terms (e.g., 'tipping off his stool', 'cookie jar', 'feet on the steps') rather than vague or generic language.",
+        "evidence": "No filler words, no circumlocution, no semantic vagueness — all terms are scene-specific and accurate.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient accurately and fluently describes the picture scene with no signs of cognitive impairment. All core elements are correctly identified and sequenced. No evidence of retrieval failure, disorganization, or examiner dependence. Task completion is complete and self-contained.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of all key actors and actions in the scene.",
+      "No hesitation, restarts, or filler words.",
+      "No semantic vagueness or circumlocution.",
+      "Task completed without examiner prompting or scaffolding."
+    ],
+    "alternative_explanations": [
+      "Patient may be brief by nature but still fully competent in task execution.",
+      "Task may be simple or familiar, reducing cognitive load.",
+      "Patient may be responding to a structured prompt with minimal elaboration required."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed.",
+      "Continue routine monitoring if part of longitudinal screening.",
+      "Consider task complexity or patient motivation if future performance declines."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline.",
+    "reviewer_confidence": 0.95,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible, task-relevant, and complete.",
+      "No signs of dementia-like impairment in this single clip."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is tipping off his stool to rise to reach the cookie jar. The little girl has her feet on the steps. The picture is falling. The boy has a cookie in his hand. Okay. Good.",
+    "speaker_turn_summary": [
+      "Examiner: Okay, here's the picture. Picture is in the kitchen. Lavender, lime, and peach. Sink is overflowing with water.",
+      "Patient: The boy is tipping off his stool to rise to reach the cookie jar. The little girl has her feet on the steps. The picture is falling. The boy has a cookie in his hand. Okay. Good.",
+      "Examiner: Okay. Good."
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies key actors (boy, little girl) and actions (tipping stool, reaching for cookie jar, feet on steps, picture falling, cookie in hand).",
+      "Patient delivers a concise, task-relevant description with minimal elaboration but no signs of retrieval failure, disorganization, or examiner dependence.",
+      "Patient ends with 'Okay. Good.' — neutral, task-completing tone, no hesitation, no restarts, no filler words or circumlocution.",
+      "No evidence of word-finding pauses, semantic vagueness, or weak causal links in the description."
+    ]
+  },
+  "latency_ms": 19647,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/092-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/092-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

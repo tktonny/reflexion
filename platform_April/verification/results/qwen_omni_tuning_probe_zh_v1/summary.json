@@ -1,0 +1,514 @@
+{
+  "dataset": "talkbank_mandarin_chou",
+  "manifest_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/talkbank/corpora/mandarin/chou/manifest.jsonl",
+  "results_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/results/qwen_omni_tuning_probe_zh_v1",
+  "metrics": {
+    "evaluated_cases": 4,
+    "successful_cases": 4,
+    "error_cases": 0,
+    "skipped_cases": 0,
+    "accuracy": 1.0,
+    "specificity": 1.0,
+    "confusion_matrix": {
+      "true_positive": 0,
+      "true_negative": 4,
+      "false_positive": 0,
+      "false_negative": 0
+    }
+  },
+  "cases": [
+    {
+      "case_id": "mandarin__chou__hc__022__022_market",
+      "dataset": "talkbank_mandarin_chou",
+      "split": "full",
+      "ground_truth_label": "HC",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.25,
+      "reviewer_confidence": 0.75,
+      "transcript": "这奶奶带着她孙子去捞捞金鱼。有另外一个妈妈也带她的女儿去捞。哦，这有两个小孩子在在玩玩骰子。这个背背着背包，另外一个小孩子做扒手，扒，偷偷窃他包包里的东西，嗯。",
+      "patient_only_transcript": "阿嬷带孙子捞鱼，另一个妈妈带女儿捞鱼，两个小孩在玩骰子，一个背着背包，另一个小孩偷拿背包里的东西。",
+      "speaker_turn_summary": [
+        "Examiner prompts or sets context (implied)",
+        "Patient describes scene with multiple actors and actions: grandmother with grandson, another mother with daughter, two children playing dice, one stealing from a backpack."
+      ],
+      "patient_cue_summary": [
+        "Patient identifies multiple scene elements: actors (grandmother, mother, children), actions (fishing, playing dice, stealing), objects (backpack, dice).",
+        "Use of colloquial Mandarin with discourse particles (e.g., '嗯', '哦') and generic referents ('这个', '那个') is consistent with normal spontaneous speech.",
+        "Narrative is coherent and task-relevant",
+        "no evidence of naming collapse, abandonment, or semantic vagueness beyond normal colloquial variation.",
+        "No signs of disorganization, contradiction, or severe lexical retrieval failure",
+        "patient maintains referential clarity across multiple scene components."
+      ],
+      "transcript_request_id": "chatcmpl-fa37d7df-2a24-9149-8cda-cc939b008c80",
+      "classification_request_id": "chatcmpl-6ae531d0-e1be-9538-a4c6-112a9b4ca85b",
+      "transcript_model": "qwen3-asr-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__022__022_market/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__022__022_market/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [
+          {
+            "label": "scene_description_coherence",
+            "summary": "Patient provides a multi-element, coherent description of a market scene with multiple actors, actions, and objects.",
+            "evidence": "Patient identifies grandmother with grandson, another mother with daughter, two children playing dice, and one child stealing from a backpack. All elements are clearly referenced and sequenced.",
+            "confidence": 0.85
+          },
+          {
+            "label": "lexical_retrieval_and_vocabulary",
+            "summary": "Lexical retrieval is adequate; no evidence of naming failure or semantic collapse.",
+            "evidence": "Patient uses specific nouns (金鱼, 骰子, 背包) and verbs (捞, 玩, 偷) appropriately. No circumlocution or filler-based substitution for core terms.",
+            "confidence": 0.8
+          },
+          {
+            "label": "discourse_structure",
+            "summary": "Discourse structure is topic-comment style with normal colloquial markers; not indicative of impairment.",
+            "evidence": "Use of particles like '哦' and '嗯' and generic referents like '这个' are consistent with natural Mandarin speech patterns, not cognitive impairment.",
+            "confidence": 0.9
+          }
+        ],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "zh"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.25,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient provides a coherent, multi-element description of a market scene with multiple actors and actions. Speech is intelligible and task-relevant. No persuasive impairment-like cues detected. However, due to lack of visual channel and potential examiner influence, further observation is recommended.",
+        "evidence_for_risk": [],
+        "evidence_against_risk": [
+          "Coherent scene description with multiple correct elements",
+          "No lexical retrieval failure or semantic vagueness",
+          "Normal colloquial speech patterns without impairment markers"
+        ],
+        "alternative_explanations": [
+          "Colloquial Mandarin speech with discourse particles is normal and not indicative of cognitive decline",
+          "Lack of visual channel limits full assessment",
+          "may mask subtle cues",
+          "Examiner may have prompted or guided the description"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [],
+        "risk_control_suggestions": [
+          "Follow up with a full cognitive screening battery in clinic",
+          "Observe patient in structured narrative or memory tasks",
+          "Consider repeating the scene-description task with visual cues"
+        ],
+        "visit_recommendation": "routine follow-up with formal cognitive screening",
+        "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio clip; no evidence of progressive decline or strong impairment.",
+        "reviewer_confidence": 0.75,
+        "context_notes": [
+          "Video component is unavailable",
+          "assessment based solely on audio.",
+          "Patient speech is intelligible and task-relevant",
+          "no signs of cognitive impairment detected.",
+          "Colloquial Mandarin features are normal and not diagnostic of dementia."
+        ],
+        "quality_flags": [
+          "multiple_people",
+          "face_not_visible",
+          "transcript_unavailable",
+          "speech_unintelligible"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+        "patient_only_transcript": "阿嬷带孙子捞鱼，另一个妈妈带女儿捞鱼，两个小孩在玩骰子，一个背着背包，另一个小孩偷拿背包里的东西。",
+        "speaker_turn_summary": [
+          "Examiner prompts or sets context (implied)",
+          "Patient describes scene with multiple actors and actions: grandmother with grandson, another mother with daughter, two children playing dice, one stealing from a backpack."
+        ],
+        "patient_cue_summary": [
+          "Patient identifies multiple scene elements: actors (grandmother, mother, children), actions (fishing, playing dice, stealing), objects (backpack, dice).",
+          "Use of colloquial Mandarin with discourse particles (e.g., '嗯', '哦') and generic referents ('这个', '那个') is consistent with normal spontaneous speech.",
+          "Narrative is coherent and task-relevant",
+          "no evidence of naming collapse, abandonment, or semantic vagueness beyond normal colloquial variation.",
+          "No signs of disorganization, contradiction, or severe lexical retrieval failure",
+          "patient maintains referential clarity across multiple scene components."
+        ]
+      },
+      "latency_ms": 16997,
+      "metadata": {
+        "source_language": "Mandarin",
+        "source_corpus": "Chou",
+        "source_group": "HC",
+        "source_relative_path": "HC/022/022_market.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/022/022_market.mp3?f=save",
+        "expected_group_audio_count": 120
+      }
+    },
+    {
+      "case_id": "mandarin__chou__hc__002__002_park",
+      "dataset": "talkbank_mandarin_chou",
+      "split": "full",
+      "ground_truth_label": "HC",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "healthy",
+      "risk_score": 0.1,
+      "reviewer_confidence": 0.9,
+      "transcript": "有有两个小美眉，她们在打羽毛球，打羽毛球以后很很高兴的打羽毛球。哎，那个突然靠右边这个美眉，那个有只小狗去也跟她玩，就咬了她的衣服。嗯，她自己就吓了一跳，那对对面美眉打球过来以后，她就也没有也没有接到。嗯，那相对的对面那个那个美眉看到小狗咬她，她也觉得很很好笑。哦，原来这只小狗是有一个小男生牵着它的，嗯，有个牵绳，它不小心就跑到那个球场里面去去咬咬到那个小美眉。那里另外有个阿公阿嬷，他们在那个在那个应该是在在野外，哎，在那个在在在户外啦，一个凉亭，坐在那边喝茶，喝茶在下象棋。嗯，他们看到他们在打球的小狗咬她，她看到这一幕，他们也觉得很好笑啊。嗯。那另外还有两个小朋友，哎，我不敢走，可能是一个男生一个女生吧，在荡秋千，在一个树的旁边在荡秋千，还有一个溜滑梯，溜滑梯最后这这张哦，这张是一个一张椅一张长的靠背椅啦，木头的公园的椅子啦。嗯，这个图案里面有两棵树，还有一点花，嗯，花草。",
+      "patient_only_transcript": "有两个小美眉在打羽毛球，打完后很高兴。突然右边的美眉被小狗咬了衣服，她吓了一跳，没接到对面球。对面美眉觉得好笑。小狗是小男生牵着的，跑进球场。阿公阿嬷在凉亭喝茶下象棋，也觉得好笑。还有两个小朋友在荡秋千和滑梯，旁边有长椅，上面有树和花。",
+      "speaker_turn_summary": [
+        "患者描述公园场景，包括打羽毛球的美眉、小狗闯入、阿公阿嬷观棋、儿童玩秋千滑梯、长椅图案等。",
+        "患者语句连贯，虽有语气词如‘嗯’‘啊’‘哦’，但未出现明显语义断裂或命名失败。",
+        "患者未明显依赖 examiner 提示，能独立组织多线场景描述，虽非完美但信息完整。"
+      ],
+      "patient_cue_summary": [
+        "患者能识别并描述多个角色（美眉、小狗、小男生、阿公阿嬷、儿童）和动作（打球、咬衣、荡秋千、滑梯、下棋）。",
+        "患者使用正常口语化结构，如‘突然’‘觉得很好笑’‘应该是在户外’，非典型认知障碍语言模式。",
+        "虽有重复‘嗯’‘啊’‘哦’等语气词，但未影响核心信息传递，未出现命名困难、语义坍塌或严重断句。",
+        "患者未表现出明显认知障碍特征如语义模糊、逻辑断裂、自我纠正失败、任务放弃或无法完成场景描述。"
+      ],
+      "transcript_request_id": "chatcmpl-4ebcd83b-f557-9ff7-9418-fb9435e85e68",
+      "classification_request_id": "chatcmpl-ad9ca404-8b43-9c56-b12d-b7e32dbb4c18",
+      "transcript_model": "qwen3-asr-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__002__002_park/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__002__002_park/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [
+          {
+            "label": "scene_description_coherence",
+            "summary": "患者能连贯描述公园内多组人物与活动，包括打球、小狗闯入、老人观棋、儿童游乐等，信息完整。",
+            "evidence": "患者依次描述了羽毛球比赛、小狗咬衣事件、对面美眉反应、小狗主人、凉亭老人、儿童秋千滑梯、长椅图案等，未遗漏核心元素。",
+            "confidence": 0.75
+          },
+          {
+            "label": "lexical_retrieval",
+            "summary": "患者使用具体名词（如‘美眉’‘小狗’‘凉亭’‘秋千’‘滑梯’‘长椅’‘树’‘花’）和动词（如‘咬’‘荡’‘滑’‘喝茶’‘下棋’），未出现命名困难或语义模糊。",
+            "evidence": "所有关键场景元素均被准确命名，无泛化或替代词（如‘那个东西’‘某个人’）。",
+            "confidence": 0.75
+          },
+          {
+            "label": "discourse_structure",
+            "summary": "患者采用线性叙事结构，按空间或事件顺序组织描述，虽有语气词但未影响逻辑连贯性。",
+            "evidence": "描述从打球开始，过渡到小狗事件，再扩展至凉亭老人和儿童游乐区，结构清晰，无明显跳跃或断裂。",
+            "confidence": 0.5
+          }
+        ],
+        "speaker_structure": "single_speaker",
+        "target_patient_presence": "clear",
+        "target_patient_basis": "externally_provided",
+        "detected_languages": [
+          "zh"
+        ],
+        "language_confidence": 1.0,
+        "risk_score": 0.1,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "healthy",
+        "screening_summary": "患者能清晰、连贯、完整地描述公园内多组人物与活动，使用具体名词和动词，结构清晰，情绪表达自然，无认知障碍典型语言或行为特征。符合健康对照标准。",
+        "evidence_for_risk": [],
+        "evidence_against_risk": [
+          "患者描述多个场景元素且无遗漏，信息密度高。",
+          "语言结构符合正常口语表达，无命名困难、语义模糊或逻辑断裂。",
+          "情绪反应与事件内容匹配，无异常情感淡漠或过度反应。"
+        ],
+        "alternative_explanations": [
+          "患者使用口语化表达和语气词属正常语言习惯，非认知障碍表现。",
+          "场景描述任务本身允许一定程度的非正式语言，患者完成度高，未出现任务失败或依赖提示。"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [
+          "患者语调自然，描述事件时带有轻松、好奇或略带惊讶的情绪，未表现出焦虑、沮丧或情感淡漠。",
+          "患者在描述小狗咬衣事件时使用‘吓了一跳’，在描述他人反应时使用‘觉得很好笑’，情绪表达符合情境，无异常情绪反应。"
+        ],
+        "risk_control_suggestions": [
+          "无需进一步临床评估，可继续常规随访。",
+          "建议保持当前活动参与度，鼓励社交与环境探索以维持认知功能。"
+        ],
+        "visit_recommendation": "routine_follow_up",
+        "future_risk_trend_summary": "单次评估无法预测长期认知趋势，建议定期进行认知筛查以监测变化。",
+        "reviewer_confidence": 0.9,
+        "context_notes": [
+          "视频不可用，仅依据音频内容评估，评估基于患者独立完成场景描述任务。",
+          "患者语言虽含口语化结构，但未影响信息传递，符合健康对照语言模式。",
+          "未发现任何认知障碍相关语言或行为信号，评估结果保守支持HC。"
+        ],
+        "quality_flags": [],
+        "session_usability": "usable",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+        "patient_only_transcript": "有两个小美眉在打羽毛球，打完后很高兴。突然右边的美眉被小狗咬了衣服，她吓了一跳，没接到对面球。对面美眉觉得好笑。小狗是小男生牵着的，跑进球场。阿公阿嬷在凉亭喝茶下象棋，也觉得好笑。还有两个小朋友在荡秋千和滑梯，旁边有长椅，上面有树和花。",
+        "speaker_turn_summary": [
+          "患者描述公园场景，包括打羽毛球的美眉、小狗闯入、阿公阿嬷观棋、儿童玩秋千滑梯、长椅图案等。",
+          "患者语句连贯，虽有语气词如‘嗯’‘啊’‘哦’，但未出现明显语义断裂或命名失败。",
+          "患者未明显依赖 examiner 提示，能独立组织多线场景描述，虽非完美但信息完整。"
+        ],
+        "patient_cue_summary": [
+          "患者能识别并描述多个角色（美眉、小狗、小男生、阿公阿嬷、儿童）和动作（打球、咬衣、荡秋千、滑梯、下棋）。",
+          "患者使用正常口语化结构，如‘突然’‘觉得很好笑’‘应该是在户外’，非典型认知障碍语言模式。",
+          "虽有重复‘嗯’‘啊’‘哦’等语气词，但未影响核心信息传递，未出现命名困难、语义坍塌或严重断句。",
+          "患者未表现出明显认知障碍特征如语义模糊、逻辑断裂、自我纠正失败、任务放弃或无法完成场景描述。"
+        ]
+      },
+      "latency_ms": 22350,
+      "metadata": {
+        "source_language": "Mandarin",
+        "source_corpus": "Chou",
+        "source_group": "HC",
+        "source_relative_path": "HC/002/002_park.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/002/002_park.mp3?f=save",
+        "expected_group_audio_count": 120
+      }
+    },
+    {
+      "case_id": "mandarin__chou__hc__026__026_daddy",
+      "dataset": "talkbank_mandarin_chou",
+      "split": "full",
+      "ground_truth_label": "HC",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.25,
+      "reviewer_confidence": 0.7,
+      "transcript": "我跟你说，水倒了嘛哈。然后这个人在，爸爸在在烫东西啊，然后然后小孩想要去弄那个插头。哎，有电出来，小狗狗就在叫。嗯。那我就说。猫咪在，哎。就是爸爸在烫衣服啊，小朋友跑去插头的地方要去弄插头，那只狗很聪明，看到了，发电就就汪汪叫，猫咪一一看叫，然后就去打破水。二二零一九啦。嗯。六月二十七。就是烫衣服开始。",
+      "patient_only_transcript": "我跟你说，水倒了嘛哈。然后这个人在，爸爸在在烫东西啊，然后然后小孩想要去弄那个插头。哎，有电出来，小狗狗就在叫。嗯。那我就说。猫咪在，哎。就是爸爸在烫衣服啊，小朋友跑去插头的地方要去弄插头，那只狗很聪明，看到了，发电就就汪汪叫，猫咪一一看叫，然后就去打破水。二二零一九啦。嗯。六月二十七。就是烫衣服开始。",
+      "speaker_turn_summary": [
+        "患者描述家庭场景：水倒了、爸爸烫衣服、小孩去碰插头、狗叫、猫打破水。",
+        "患者语句中包含重复、语气词（如‘嘛哈’‘嗯’‘哎’）、语序松散，但核心事件可识别。",
+        "患者未被明显打断或引导，主动叙述多个角色与动作，未出现明显语义断裂或命名失败。"
+      ],
+      "patient_cue_summary": [
+        "患者能识别并描述多个角色（爸爸、小孩、狗、猫）和动作（烫衣服、碰插头、狗叫、猫打破水）。",
+        "语句中存在语义重复、语气词、语序松散，但未导致核心信息丢失或无法重建。",
+        "患者未表现出命名困难、语义断裂、逻辑中断或严重自我修正，整体叙述可被理解为场景描述而非失语或混乱。",
+        "未出现明显认知障碍信号如持续重复、语义坍塌、角色混淆、时间线错乱或任务失败。"
+      ],
+      "transcript_request_id": "chatcmpl-62dfee3e-132b-90fe-85bc-64674fb241e7",
+      "classification_request_id": "chatcmpl-caef475c-8c80-96b1-9f86-9e6510b569ef",
+      "transcript_model": "qwen3-asr-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__026__026_daddy/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__026__026_daddy/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [
+          {
+            "label": "scene_description_coherence",
+            "summary": "患者能描述多个家庭成员与动作，虽语句松散但核心事件可识别。",
+            "evidence": "患者提及爸爸烫衣服、小孩碰插头、狗叫、猫打破水，多个角色与动作被正确命名。",
+            "confidence": 0.5
+          },
+          {
+            "label": "discourse_particles_and_repetition",
+            "summary": "语句中含语气词和重复，但未影响信息传递。",
+            "evidence": "使用‘嘛哈’‘嗯’‘哎’‘然后然后’等，属正常口语表达，未导致语义中断或命名失败。",
+            "confidence": 0.25
+          },
+          {
+            "label": "task_completion_attempt",
+            "summary": "患者尝试完成场景描述任务，未明显放弃或中断。",
+            "evidence": "患者主动叙述多个事件，虽非连贯叙事，但未出现语义坍塌或任务失败。",
+            "confidence": 0.5
+          }
+        ],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "clear",
+        "target_patient_basis": "externally_provided",
+        "detected_languages": [
+          "zh"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.25,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "患者能描述多个家庭场景元素，语句虽口语化、松散、含语气词，但未出现命名失败、语义断裂或任务放弃。符合轻度非典型表达，但无明确认知障碍证据。建议观察或补充评估。",
+        "evidence_for_risk": [],
+        "evidence_against_risk": [
+          "能识别并命名多个角色与动作",
+          "未出现语义坍塌或命名失败",
+          "叙述虽松散但未中断或放弃任务"
+        ],
+        "alternative_explanations": [
+          "口语化表达、语气词、语序松散属正常语言特征，非认知障碍证据",
+          "场景描述任务本身允许非结构化叙述，非要求逻辑连贯",
+          "录音质量或语速可能影响清晰度，但未影响核心信息传递"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [],
+        "risk_control_suggestions": [
+          "建议补充结构化认知筛查工具（如MMSE、MoCA）",
+          "观察患者在后续任务中是否持续出现语义模糊或任务中断",
+          "若患者在其他任务中表现类似，可考虑轻度认知风险再评估"
+        ],
+        "visit_recommendation": "routine follow-up with formal cognitive screening",
+        "future_risk_trend_summary": "单次评估无法预测长期认知趋势，建议纵向观察或重复评估。",
+        "reviewer_confidence": 0.7,
+        "context_notes": [
+          "患者语言表达符合非正式口语特征，未达认知障碍诊断标准。",
+          "场景描述任务中，识别多个元素即为有效完成，非要求逻辑连贯。",
+          "语句松散不等于认知障碍，需结合多模态或重复评估确认。"
+        ],
+        "quality_flags": [
+          "speech_unintelligible",
+          "transcript_unavailable",
+          "limited_speaking_time"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+        "patient_only_transcript": "我跟你说，水倒了嘛哈。然后这个人在，爸爸在在烫东西啊，然后然后小孩想要去弄那个插头。哎，有电出来，小狗狗就在叫。嗯。那我就说。猫咪在，哎。就是爸爸在烫衣服啊，小朋友跑去插头的地方要去弄插头，那只狗很聪明，看到了，发电就就汪汪叫，猫咪一一看叫，然后就去打破水。二二零一九啦。嗯。六月二十七。就是烫衣服开始。",
+        "speaker_turn_summary": [
+          "患者描述家庭场景：水倒了、爸爸烫衣服、小孩去碰插头、狗叫、猫打破水。",
+          "患者语句中包含重复、语气词（如‘嘛哈’‘嗯’‘哎’）、语序松散，但核心事件可识别。",
+          "患者未被明显打断或引导，主动叙述多个角色与动作，未出现明显语义断裂或命名失败。"
+        ],
+        "patient_cue_summary": [
+          "患者能识别并描述多个角色（爸爸、小孩、狗、猫）和动作（烫衣服、碰插头、狗叫、猫打破水）。",
+          "语句中存在语义重复、语气词、语序松散，但未导致核心信息丢失或无法重建。",
+          "患者未表现出命名困难、语义断裂、逻辑中断或严重自我修正，整体叙述可被理解为场景描述而非失语或混乱。",
+          "未出现明显认知障碍信号如持续重复、语义坍塌、角色混淆、时间线错乱或任务失败。"
+        ]
+      },
+      "latency_ms": 16308,
+      "metadata": {
+        "source_language": "Mandarin",
+        "source_corpus": "Chou",
+        "source_group": "HC",
+        "source_relative_path": "HC/026/026_Daddy.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/026/026_Daddy.mp3?f=save",
+        "expected_group_audio_count": 120
+      }
+    },
+    {
+      "case_id": "mandarin__chou__hc__064__064_market",
+      "dataset": "talkbank_mandarin_chou",
+      "split": "full",
+      "ground_truth_label": "HC",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.25,
+      "reviewer_confidence": 0.7,
+      "transcript": "这张小朋友是在玩那个捞鱼那个。妈妈说是，妈妈带来的，这个阿妈带来的，这个小朋友注意在捞，那个捞鱼。所以谁打算画那个捞鱼的那个，那个制制作的那个捞鱼的房子。啊，这个是小朋友在玩水池。玩水池玩的很高兴，他好像，就是很嗨的样子。他在这里把手要给他偷拿东西。这个就是好像是刚摔死的那个主人。啊，小朋友不懂啊，都去玩这水池啊，就这样子。",
+      "patient_only_transcript": "小朋友在玩捞鱼，妈妈带来的，阿嬷带来的，小朋友注意在捞鱼，玩水池玩得很开心，他好像很嗨的样子，他在这里把手要给他偷拿东西，这个好像是刚摔死的那个主人，小朋友不懂，都去玩这水池，就这样子。",
+      "speaker_turn_summary": [
+        "Examiner: prompts scene description task",
+        "Patient: describes multiple scene elements including children, mother, grandmother, fishing game, water pool, stealing action, and a deceased person, with colloquial fillers and vague referents"
+      ],
+      "patient_cue_summary": [
+        "Patient identifies multiple actors (小朋友, 妈妈, 阿嬷) and actions (捞鱼, 玩水池, 偷拿东西)",
+        "Uses colloquial Mandarin with fillers (啊, 那个, 这个) and vague referents, but maintains topic continuity",
+        "Narrative is fragmented and lacks causal structure, but scene elements are mostly recoverable",
+        "No clear naming collapse, contradiction, or abandonment of core task elements",
+        "Emotional tone is neutral to positive (玩得很开心, 很嗨), no signs of distress or confusion"
+      ],
+      "transcript_request_id": "chatcmpl-776681fd-1b58-95ce-9281-971b65f48bc9",
+      "classification_request_id": "chatcmpl-c9a34dc6-2439-921c-ade1-d6d7bfba3ea6",
+      "transcript_model": "qwen3-asr-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__064__064_market/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__064__064_market/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [
+          {
+            "label": "Scene Description Coherence",
+            "summary": "Patient describes multiple visible elements in the market scene including children, adults, fishing game, water pool, and a deceased person, with colloquial phrasing and vague referents.",
+            "evidence": "Patient names actors (小朋友, 妈妈, 阿嬷), actions (捞鱼, 玩水池, 偷拿东西), and objects (水池, 捞鱼的房子), despite using generic terms and fillers.",
+            "confidence": 0.5
+          },
+          {
+            "label": "Lexical Retrieval and Referential Clarity",
+            "summary": "Patient uses vague referents (那个, 这个) and fillers (啊) but does not show naming collapse or semantic failure.",
+            "evidence": "Patient refers to '那个捞鱼的房子' and '刚摔死的那个主人' without clear confusion or contradiction; scene elements remain identifiable.",
+            "confidence": 0.5
+          },
+          {
+            "label": "Narrative Organization",
+            "summary": "Narrative is fragmented and lacks causal structure, but does not abandon the task or lose referential continuity.",
+            "evidence": "Patient lists multiple scene elements in sequence without major contradiction or topic drift; examiner likely prompted the description.",
+            "confidence": 0.25
+          }
+        ],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "zh"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.25,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient provides a fragmented but generally intelligible description of a market scene with multiple actors and actions. Uses colloquial Mandarin with fillers and vague referents, but does not show naming collapse, contradiction, or abandonment of task. Emotional tone is positive. No strong impairment-like cues detected. Further observation or formal screening recommended due to limited modality and low-confidence reconstruction.",
+        "evidence_for_risk": [],
+        "evidence_against_risk": [
+          "Patient identifies multiple scene elements (children, adults, fishing game, water pool, stealing action)",
+          "Narrative remains topic-relevant despite fragmentation and colloquial phrasing",
+          "No signs of confusion, contradiction, or emotional distress",
+          "Emotional reactivity is positive and engaged"
+        ],
+        "alternative_explanations": [
+          "Colloquial Mandarin with fillers and vague referents is normal in spontaneous speech, especially in informal settings",
+          "Fragmented narrative may reflect task difficulty or recording quality rather than cognitive impairment",
+          "Patient may be a child or young adult",
+          "age cannot be inferred from audio alone"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [
+          "Positive affect: expresses enjoyment of play (玩得很开心, 很嗨)",
+          "No signs of frustration, anxiety, apathy, or emotional flattening"
+        ],
+        "risk_control_suggestions": [
+          "Follow up with a structured scene-description task in a quieter setting",
+          "Use visual cues or prompts to support narrative organization if available",
+          "Consider repeating the task with clearer examiner scaffolding"
+        ],
+        "visit_recommendation": "Routine follow-up with formal cognitive screening recommended; no urgent clinical evaluation needed based on this clip alone.",
+        "future_risk_trend_summary": "Longitudinal prediction is limited; single clip does not support dementia classification. Further observation or multi-visit assessment recommended.",
+        "reviewer_confidence": 0.7,
+        "context_notes": [
+          "Video is unavailable",
+          "assessment based solely on audio with moderate intelligibility and transcription uncertainty.",
+          "Patient speech is intelligible enough to reconstruct multiple scene elements, which is counterevidence against cognitive_risk in Chinese screening.",
+          "Colloquial phrasing and vague referents are not sufficient alone to indicate impairment in Mandarin spontaneous speech."
+        ],
+        "quality_flags": [
+          "face_not_visible",
+          "transcript_unavailable",
+          "speech_unintelligible"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+        "patient_only_transcript": "小朋友在玩捞鱼，妈妈带来的，阿嬷带来的，小朋友注意在捞鱼，玩水池玩得很开心，他好像很嗨的样子，他在这里把手要给他偷拿东西，这个好像是刚摔死的那个主人，小朋友不懂，都去玩这水池，就这样子。",
+        "speaker_turn_summary": [
+          "Examiner: prompts scene description task",
+          "Patient: describes multiple scene elements including children, mother, grandmother, fishing game, water pool, stealing action, and a deceased person, with colloquial fillers and vague referents"
+        ],
+        "patient_cue_summary": [
+          "Patient identifies multiple actors (小朋友, 妈妈, 阿嬷) and actions (捞鱼, 玩水池, 偷拿东西)",
+          "Uses colloquial Mandarin with fillers (啊, 那个, 这个) and vague referents, but maintains topic continuity",
+          "Narrative is fragmented and lacks causal structure, but scene elements are mostly recoverable",
+          "No clear naming collapse, contradiction, or abandonment of core task elements",
+          "Emotional tone is neutral to positive (玩得很开心, 很嗨), no signs of distress or confusion"
+        ]
+      },
+      "latency_ms": 18124,
+      "metadata": {
+        "source_language": "Mandarin",
+        "source_corpus": "Chou",
+        "source_group": "HC",
+        "source_relative_path": "HC/064/064_market.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/064/064_market.mp3?f=save",
+        "expected_group_audio_count": 120
+      }
+    }
+  ]
+}

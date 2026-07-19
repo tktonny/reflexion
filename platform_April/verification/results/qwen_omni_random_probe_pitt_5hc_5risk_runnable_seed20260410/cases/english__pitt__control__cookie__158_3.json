@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__control__cookie__158_3",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.7,
+  "transcript": "All the action. Well, the tool is, the stool, stool is falling over. The boy is taking cookies out of the cookie jar. The little girl is reaching for a cookie and holding her arm up. The mother is drying, is doing dishes. The water is spilling out of the sink. And the mother is standing in the water. Mother is looking out of the window. The water is coming out of the faucet. I don't know if you can get out of that.",
+  "patient_only_transcript": "The stool is falling over. The boy is taking cookies out of the cookie jar. The little girl is reaching for a cookie and holding her arm up. The mother is doing dishes. The water is spilling out of the sink. The mother is standing in the water. The mother is looking out of the window. The water is coming out of the faucet. I don't know if you can get out of that.",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets up task (implied).",
+    "Patient: describes scene with some coherence but includes uncertainty and incomplete phrasing (e.g., 'I don't know if you can get out of that')."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with multiple correct elements (stool, boy, cookies, mother, sink, water).",
+    "Includes a self-uncertainty phrase ('I don't know if you can get out of that'), suggesting possible retrieval difficulty or hesitation.",
+    "No clear word-finding pauses, repetitions, or semantic vagueness beyond the final uncertain utterance.",
+    "Narrative is mostly organized but ends with a non-task-related, possibly off-topic or incomplete statement."
+  ],
+  "transcript_request_id": "chatcmpl-dc656755-8020-95f4-bed8-ceee6686b9cd",
+  "classification_request_id": "chatcmpl-7449d341-c23f-94bd-a911-a35061388fa7",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__158_3/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__158_3/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient describes multiple elements of the picture task accurately (stool falling, boy taking cookies, mother doing dishes, water spilling).",
+        "evidence": "Patient lists key scene components in a mostly logical order, indicating basic comprehension and retrieval ability.",
+        "confidence": null
+      },
+      {
+        "label": "Uncertainty and Incomplete Closure",
+        "summary": "Patient ends with an uncertain, possibly off-topic phrase ('I don't know if you can get out of that'), suggesting possible retrieval difficulty or task fatigue.",
+        "evidence": "Final utterance is not task-relevant and expresses doubt, which may indicate mild cognitive hesitation or lack of confidence in completion.",
+        "confidence": null
+      },
+      {
+        "label": "Examiner Dependence",
+        "summary": "No clear evidence of examiner prompting or patient dependence on prompts; patient initiates and completes the description independently.",
+        "evidence": "Patient delivers a full description without explicit prompting or correction.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a mostly coherent and accurate description of the picture task, naming key elements and actions. However, the final utterance expresses uncertainty, which may indicate mild retrieval difficulty or task-related hesitation. No strong impairment signals are present, but the incomplete closure warrants cautious observation.",
+    "evidence_for_risk": [
+      "Uncertain final statement ('I don't know if you can get out of that') suggests possible retrieval or confidence deficit."
+    ],
+    "evidence_against_risk": [
+      "Accurate naming of multiple scene elements.",
+      "Logical sequencing of events.",
+      "No repetition, circumlocution, or semantic vagueness beyond the final phrase."
+    ],
+    "alternative_explanations": [
+      "The uncertain phrase may reflect natural hesitation or off-topic thinking rather than cognitive impairment.",
+      "Poor audio quality may affect clarity of final utterance.",
+      "Task may have been challenging or the patient may have been fatigued."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty at the end of the description ('I don't know if you can get out of that')."
+    ],
+    "emotional_assessment_findings": [
+      "No clear emotional reactivity, frustration, or apathy detected in speech.",
+      "Speech tone is neutral and task-oriented, with no signs of distress or disengagement."
+    ],
+    "risk_control_suggestions": [
+      "Follow up with a more structured picture description task or memory recall task.",
+      "Consider repeating the task in a quieter environment or with clearer audio.",
+      "Monitor for consistency across multiple sessions or tasks."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if symptoms persist or worsen.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further observation is recommended to assess consistency.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is mostly intelligible and task-relevant, but ends with uncertainty.",
+      "No strong impairment signals detected",
+      "classification leans toward needs_observation due to incomplete closure."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "poor_audio"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The stool is falling over. The boy is taking cookies out of the cookie jar. The little girl is reaching for a cookie and holding her arm up. The mother is doing dishes. The water is spilling out of the sink. The mother is standing in the water. The mother is looking out of the window. The water is coming out of the faucet. I don't know if you can get out of that.",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets up task (implied).",
+      "Patient: describes scene with some coherence but includes uncertainty and incomplete phrasing (e.g., 'I don't know if you can get out of that')."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with multiple correct elements (stool, boy, cookies, mother, sink, water).",
+      "Includes a self-uncertainty phrase ('I don't know if you can get out of that'), suggesting possible retrieval difficulty or hesitation.",
+      "No clear word-finding pauses, repetitions, or semantic vagueness beyond the final uncertain utterance.",
+      "Narrative is mostly organized but ends with a non-task-related, possibly off-topic or incomplete statement."
+    ]
+  },
+  "latency_ms": 23101,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/158-3.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/158-3.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

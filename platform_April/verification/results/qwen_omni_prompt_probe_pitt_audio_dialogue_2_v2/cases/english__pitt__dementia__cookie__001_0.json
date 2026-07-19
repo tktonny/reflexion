@@ -1,0 +1,77 @@
+{
+  "case_id": "english__pitt__dementia__cookie__001_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.4,
+  "classification_request_id": "chatcmpl-ec6e5301-f05f-91ee-bd4f-d7f65678c42d",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient provided a description of a picture involving a cookie jar, a child, and a mother, but the audio quality is unintelligible and the visual channel is unavailable. No clear impairment-like signals can be confidently extracted. Further observation or formal screening is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No observable speech or behavioral cues indicating cognitive impairment",
+      "No explicit self-report or caregiver concern mentioned",
+      "Audio is unintelligible and visual data is unavailable, preventing reliable assessment"
+    ],
+    "alternative_explanations": [
+      "Audio may be muffled or recorded in a noisy environment",
+      "Patient may have been distracted or hesitant, not cognitively impaired",
+      "Task may not have been fully understood or completed due to recording limitations"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the picture description task with clearer audio recording",
+      "Use visual cues or written prompts to support patient response",
+      "Consider formal cognitive screening if this is part of a longitudinal assessment"
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is not possible from a single clip with unavailable visual data and unintelligible audio.",
+    "reviewer_confidence": 0.4,
+    "context_notes": [
+      "Video portion is unavailable; only audio is present.",
+      "Patient speech is unintelligible; no reliable content can be extracted.",
+      "Task context: picture description of cookie jar scene; patient is expected to describe the scene."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "video_too_short",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 7630,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/001-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/001-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

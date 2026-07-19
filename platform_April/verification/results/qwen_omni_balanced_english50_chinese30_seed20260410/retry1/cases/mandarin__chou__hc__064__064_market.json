@@ -1,0 +1,145 @@
+{
+  "case_id": "mandarin__chou__hc__064__064_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "这张小朋友是在玩那个捞鱼那个。妈妈说是，妈妈带来的，这个阿妈带来的，这个小朋友注意在捞，那个捞鱼。所以谁打算画那个捞鱼的那个，那个制制作的那个捞鱼的房子。啊，这个是小朋友在玩水池。玩水池玩的很高兴，他好像，就是很嗨的样子。他在这里把手要给他偷拿东西。这个就是好像是刚摔死的那个主人。啊，小朋友不懂啊，都去玩这水池啊，就这样子。",
+  "patient_only_transcript": "小朋友在玩捞鱼，妈妈带来，他在捞鱼，玩水池玩得很开心，他想偷拿东西，不知道主人是谁，小朋友不懂，就玩水池。",
+  "speaker_turn_summary": [
+    "Examiner prompts or sets context.",
+    "Patient describes scene with fragmented, vague, and repetitive elements.",
+    "Patient uses low-information terms like '那个', '这个', '不知道', '不懂'.",
+    "Patient’s speech lacks causal or sequential organization despite visible scene elements."
+  ],
+  "patient_cue_summary": [
+    "Frequent use of vague pronouns and filler terms ('那个', '这个').",
+    "Repetition of '捞鱼' and '玩水池' without elaboration.",
+    "Lack of clear subject-action-object structure in descriptions.",
+    "Inconsistent attribution of roles ('妈妈带来', '主人是谁', '小朋友不懂').",
+    "Short, disconnected utterances with minimal narrative progression.",
+    "Reliance on examiner context rather than self-sustained description."
+  ],
+  "transcript_request_id": "chatcmpl-8adeef00-ea06-9b31-a128-ad59c94ad180",
+  "classification_request_id": "chatcmpl-4d20c7c2-6e36-98c8-8ec8-8eaf011b1771",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__064__064_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__064__064_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Lexical Retrieval Difficulty",
+        "summary": "Patient uses vague, repetitive, and low-information terms instead of specific nouns or verbs.",
+        "evidence": "Uses '那个', '这个', '不知道', '不懂' repeatedly; lacks precise vocabulary for objects or actions.",
+        "confidence": 0.7
+      },
+      {
+        "label": "Narrative Disorganization",
+        "summary": "Patient’s description lacks causal or sequential structure despite visible scene.",
+        "evidence": "Describes multiple elements (mother, fish, water, stealing) without connecting them logically or chronologically.",
+        "confidence": 0.65
+      },
+      {
+        "label": "Examiner Dependence",
+        "summary": "Patient’s speech appears to rely on examiner context or prompts rather than self-sustained elaboration.",
+        "evidence": "Speech is fragmented and incomplete; requires external scaffolding to describe scene.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient’s speech shows mild impairment-like features including vague vocabulary, fragmented narrative, and examiner dependence, though positive affect is present. Not sufficient for dementia classification, but warrants further clinical observation.",
+    "evidence_for_risk": [
+      "Use of vague pronouns and filler terms.",
+      "Lack of coherent narrative structure despite visible scene.",
+      "Repetitive and low-information content.",
+      "Reliance on external context for description."
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key scene elements (mother, fish, water, play).",
+      "Positive emotional tone ('玩得很开心', '很嗨的样子').",
+      "No signs of severe disorientation or memory loss.",
+      "Speech is not entirely unintelligible",
+      "some content is understandable."
+    ],
+    "alternative_explanations": [
+      "Language processing delay or developmental stage (if patient is young).",
+      "Temporary distraction or lack of task engagement.",
+      "Audio quality or recording environment limitations affecting clarity.",
+      "Examiner prompting may have influenced speech structure."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Apparent positive affect: '玩得很开心', '很嗨的样子'.",
+      "No signs of frustration, anxiety, or apathy detected in speech."
+    ],
+    "risk_control_suggestions": [
+      "Schedule follow-up with structured cognitive screening tools (e.g., MoCA, MMSE).",
+      "Observe patient in structured narrative or memory tasks with visual cues.",
+      "Consider caregiver report for functional or behavioral changes outside the clip.",
+      "Avoid over-interpreting single clip",
+      "longitudinal assessment preferred."
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and caregiver input.",
+    "future_risk_trend_summary": "Limited predictive value from single clip; longitudinal observation recommended for trend assessment.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is partially intelligible but shows mild impairment-like features.",
+      "Emotional tone is positive",
+      "does not override cognitive signal.",
+      "Examiner role is assumed to be prompting",
+      "patient is primary evaluation subject."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "小朋友在玩捞鱼，妈妈带来，他在捞鱼，玩水池玩得很开心，他想偷拿东西，不知道主人是谁，小朋友不懂，就玩水池。",
+    "speaker_turn_summary": [
+      "Examiner prompts or sets context.",
+      "Patient describes scene with fragmented, vague, and repetitive elements.",
+      "Patient uses low-information terms like '那个', '这个', '不知道', '不懂'.",
+      "Patient’s speech lacks causal or sequential organization despite visible scene elements."
+    ],
+    "patient_cue_summary": [
+      "Frequent use of vague pronouns and filler terms ('那个', '这个').",
+      "Repetition of '捞鱼' and '玩水池' without elaboration.",
+      "Lack of clear subject-action-object structure in descriptions.",
+      "Inconsistent attribution of roles ('妈妈带来', '主人是谁', '小朋友不懂').",
+      "Short, disconnected utterances with minimal narrative progression.",
+      "Reliance on examiner context rather than self-sustained description."
+    ]
+  },
+  "latency_ms": 19090,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/064/064_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/064/064_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

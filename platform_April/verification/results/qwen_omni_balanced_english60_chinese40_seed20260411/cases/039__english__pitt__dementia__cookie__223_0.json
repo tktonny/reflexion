@@ -1,0 +1,126 @@
+{
+  "case_id": "english__pitt__dementia__cookie__223_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "There's a picture. Well, little boy's handing his sister a cookie. He's swiping one for himself. And he's got the standing on the stool on two legs. And the mother's running the sink over. And she's drying a plate. I mean, how many is there any, a number that is supposed to be. Just tell me everything that you see happening there. She's standing in water. She could get her foot wet. Is that everything? Probably is. The spigot's on, so that's water. She's standing in the water on the stool. He's standing on the stool. The cookies. The path looks as though it's coming in the window, but that wouldn't have anything probably to do with the picture, so. Okay. Two cups, I guess that's about all I can see.",
+  "patient_only_transcript": "The boy is handing his sister a cookie. He's swiping one for himself. He's standing on the stool on two legs. The mother is running the sink. She's drying a plate. She's standing in water. The water is running. The spigot's on. That's about all I can see.",
+  "speaker_turn_summary": [
+    "Examiner: 'Just tell me everything that you see happening there.'",
+    "Patient: 'There's a picture. Well, little boy's handing his sister a cookie. He's swiping one for himself. And he's got the standing on the stool on two legs. And the mother's running the sink over. And she's drying a plate. I mean, how many is there any, a number that is supposed to be. She's standing in water. She could get her foot wet. Is that everything? Probably is. The spigot's on, so that's water. She's standing in the water on the stool. He's standing on the stool. The cookies. The path looks as though it's coming in the window, but that wouldn't have anything probably to do with the picture, so. Okay. Two cups, I guess that's about all I can see.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides coherent, task-relevant description of multiple scene elements: boy, sister, cookies, stool, mother, sink, water, cups.",
+    "Patient uses some filler phrases and self-corrections ('I mean, how many is there any...'), but does not show word-finding breakdown or semantic vagueness.",
+    "Patient ends with 'That's about all I can see' — indicates task completion, not failure or confusion.",
+    "No evidence of disorganization, tangential drift, or examiner dependence beyond minimal prompting.",
+    "Speech is intelligible and task-focused despite some hesitation and repetition."
+  ],
+  "transcript_request_id": "chatcmpl-d8060a89-7674-9b55-8232-9ef4fbad587c",
+  "classification_request_id": "chatcmpl-8e672369-5189-921b-a6af-30c0a0133700",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__223_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__223_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient accurately identifies multiple actors, objects, and actions in the picture description task.",
+        "evidence": "Patient names the boy, sister, cookies, stool, mother, sink, water, and cups — core elements of the scene.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Fluency",
+        "summary": "Patient completes the task with minimal examiner scaffolding, despite some hesitation and self-correction.",
+        "evidence": "Patient provides a full, sequential description without needing repeated prompts or examiner completion.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Lexical Retrieval and Vocabulary",
+        "summary": "Patient uses appropriate, concrete vocabulary for the scene without significant circumlocution or semantic loss.",
+        "evidence": "Patient says 'swiping one for himself', 'standing on the stool', 'drying a plate' — all precise and contextually accurate.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, task-relevant description of the pictured scene with accurate identification of multiple actors and actions. Minor hesitations and self-corrections are present but do not indicate cognitive impairment. No evidence of retrieval failure, disorganization, or examiner dependence beyond minimal prompting. Further observation or formal screening may be warranted due to limited modality coverage and lack of visual cues.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Task completion with accurate scene elements",
+      "Intelligible speech with minimal filler",
+      "No signs of word-finding breakdown or semantic vagueness",
+      "No examiner dependence or task abandonment"
+    ],
+    "alternative_explanations": [
+      "Mild hesitation or self-correction may reflect natural speech patterns rather than cognitive impairment.",
+      "Limited visual sampling may reduce confidence in full cognitive assessment.",
+      "Task may be challenging for some individuals without cognitive impairment."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening if clinical concern persists.",
+      "Consider repeating the picture description task with visual support if available.",
+      "Monitor for consistency across multiple sessions or tasks."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if clinical concern is present.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment required for trend evaluation.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio and task context.",
+      "Patient speech is intelligible and task-relevant despite minor hesitations.",
+      "No evidence of dementia-like impairment in this single clip."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is handing his sister a cookie. He's swiping one for himself. He's standing on the stool on two legs. The mother is running the sink. She's drying a plate. She's standing in water. The water is running. The spigot's on. That's about all I can see.",
+    "speaker_turn_summary": [
+      "Examiner: 'Just tell me everything that you see happening there.'",
+      "Patient: 'There's a picture. Well, little boy's handing his sister a cookie. He's swiping one for himself. And he's got the standing on the stool on two legs. And the mother's running the sink over. And she's drying a plate. I mean, how many is there any, a number that is supposed to be. She's standing in water. She could get her foot wet. Is that everything? Probably is. The spigot's on, so that's water. She's standing in the water on the stool. He's standing on the stool. The cookies. The path looks as though it's coming in the window, but that wouldn't have anything probably to do with the picture, so. Okay. Two cups, I guess that's about all I can see.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides coherent, task-relevant description of multiple scene elements: boy, sister, cookies, stool, mother, sink, water, cups.",
+      "Patient uses some filler phrases and self-corrections ('I mean, how many is there any...'), but does not show word-finding breakdown or semantic vagueness.",
+      "Patient ends with 'That's about all I can see' — indicates task completion, not failure or confusion.",
+      "No evidence of disorganization, tangential drift, or examiner dependence beyond minimal prompting.",
+      "Speech is intelligible and task-focused despite some hesitation and repetition."
+    ]
+  },
+  "latency_ms": 16652,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/223-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/223-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

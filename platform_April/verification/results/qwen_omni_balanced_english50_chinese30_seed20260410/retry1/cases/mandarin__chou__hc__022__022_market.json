@@ -1,0 +1,128 @@
+{
+  "case_id": "mandarin__chou__hc__022__022_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "这奶奶带着她孙子去捞捞金鱼。有另外一个妈妈也带她的女儿去捞。哦，这有两个小孩子在在玩玩骰子。这个背背着背包，另外一个小孩子做扒手，扒，偷偷窃他包包里的东西，嗯。",
+  "patient_only_transcript": "这奶奶带着她孙子去捞捞金鱼。有另外一个妈妈也带她的女儿去捞。哦，这有两个小孩子在在玩玩骰子。这个背背着背包，另外一个小孩子做扒手，扒，偷偷窃他包包里的东西，嗯。",
+  "speaker_turn_summary": [
+    "Examiner: (prompt or setup, not transcribed)",
+    "Patient: Describes scene with multiple characters and actions, but with pauses, repetitions, and fragmented phrasing."
+  ],
+  "patient_cue_summary": [
+    "Repetitive phrasing: '玩玩骰子', '背着背包', '扒，偷偷窃'",
+    "Fragmented sentence structure with pauses and fillers: '哦', '嗯'",
+    "Some semantic vagueness: '偷偷窃他包包里的东西' lacks specificity or clear agent/recipient",
+    "Limited narrative cohesion: multiple events mentioned but not clearly sequenced or causally linked",
+    "Examiner-dependent content: relies on scene description without elaboration or self-initiated detail"
+  ],
+  "transcript_request_id": "chatcmpl-f76f179e-7af2-9ada-8544-ab7a9ed51662",
+  "classification_request_id": "chatcmpl-b43023bc-bf15-93f1-a08b-5b9fba401ea5",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__022__022_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__022__022_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Speech Fragmentation",
+        "summary": "Patient uses repetitive phrases and fillers, with incomplete sentences and pauses.",
+        "evidence": "Phrases like '玩玩骰子', '背着背包', '扒，偷偷窃' show repetition and lack of syntactic completion.",
+        "confidence": 0.7
+      },
+      {
+        "label": "Narrative Disorganization",
+        "summary": "Events are listed but not clearly sequenced or causally linked.",
+        "evidence": "Multiple characters and actions mentioned without clear temporal or logical flow.",
+        "confidence": 0.65
+      },
+      {
+        "label": "Lexical Vagueness",
+        "summary": "Use of vague terms and lack of specific detail in describing actions.",
+        "evidence": "Phrases like '偷偷窃他包包里的东西' lack specificity about who, what, or how.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "externally_provided",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented, repetitive, and minimally cohesive description of a multi-character scene. Speech contains pauses, fillers, and vague phrasing, suggesting possible word-finding difficulty or reduced narrative fluency. No strong dementia-level signs, but impairment-like cues warrant further observation.",
+    "evidence_for_risk": [
+      "Repetitive phrasing and fragmented sentence structure",
+      "Use of fillers ('哦', '嗯') and incomplete clauses",
+      "Lack of clear causal or sequential organization in scene description",
+      "Reliance on external scene cues without elaboration or self-initiated detail"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple characters and actions (grandmother, child, mother, daughter, dice, backpack, pickpocket)",
+      "Speech is intelligible and not entirely incoherent",
+      "No signs of severe disorientation, confusion, or loss of context"
+    ],
+    "alternative_explanations": [
+      "Language processing delay or mild articulation difficulty unrelated to dementia",
+      "Task-related hesitation or lack of confidence in describing complex scenes",
+      "Audio quality or recording environment may affect speech clarity"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with structured narrative or memory tasks to assess consistency and fluency",
+      "Observe for repetition, word-finding pauses, or disorganization in subsequent sessions",
+      "Consider caregiver report or functional history to contextualize speech patterns"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended for further evaluation.",
+    "future_risk_trend_summary": "Longitudinal prediction limited based on single clip; follow-up assessments needed to track progression.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is partially intelligible but shows mild impairment-like features.",
+      "Scene description task may not be fully optimized for detecting early cognitive changes."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这奶奶带着她孙子去捞捞金鱼。有另外一个妈妈也带她的女儿去捞。哦，这有两个小孩子在在玩玩骰子。这个背背着背包，另外一个小孩子做扒手，扒，偷偷窃他包包里的东西，嗯。",
+    "speaker_turn_summary": [
+      "Examiner: (prompt or setup, not transcribed)",
+      "Patient: Describes scene with multiple characters and actions, but with pauses, repetitions, and fragmented phrasing."
+    ],
+    "patient_cue_summary": [
+      "Repetitive phrasing: '玩玩骰子', '背着背包', '扒，偷偷窃'",
+      "Fragmented sentence structure with pauses and fillers: '哦', '嗯'",
+      "Some semantic vagueness: '偷偷窃他包包里的东西' lacks specificity or clear agent/recipient",
+      "Limited narrative cohesion: multiple events mentioned but not clearly sequenced or causally linked",
+      "Examiner-dependent content: relies on scene description without elaboration or self-initiated detail"
+    ]
+  },
+  "latency_ms": 23614,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/022/022_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/022/022_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

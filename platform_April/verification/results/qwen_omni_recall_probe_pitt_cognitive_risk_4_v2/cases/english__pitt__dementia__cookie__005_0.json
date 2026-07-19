@@ -1,0 +1,75 @@
+{
+  "case_id": "english__pitt__dementia__cookie__005_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.6,
+  "classification_request_id": "chatcmpl-937e9989-6ada-94fc-87b6-de5e157eb0ab",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient speech is unintelligible and transcript unavailable; no reliable cognitive impairment signals can be extracted from audio alone. Visual modality is unavailable. Further observation or formal screening is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No intelligible patient speech to assess coherence or retrieval",
+      "No visual cues available to evaluate behavior or affect",
+      "Task context (cookie theft picture description) cannot be evaluated due to lack of patient response"
+    ],
+    "alternative_explanations": [
+      "Patient may be nonverbal, distracted, or not yet engaged in the task",
+      "Audio may be corrupted or masked by background noise",
+      "Examiner may have dominated the interaction, leaving no patient response to evaluate"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the picture description task with clearer audio capture or visual observation",
+      "Use alternative screening tools if patient speech remains unintelligible",
+      "Consider caregiver report or collateral history if patient cannot self-report"
+    ],
+    "visit_recommendation": "Formal cognitive screening with full multimodal assessment recommended",
+    "future_risk_trend_summary": "Longitudinal prediction not possible from single unusable clip; follow-up needed for trend assessment",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Video modality unavailable; audio is the only available channel.",
+      "Patient speech is unintelligible; no content-level inferences can be made.",
+      "Task context is picture description (cookie theft scene), but no patient response is assessable."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 6025,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/005-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/005-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

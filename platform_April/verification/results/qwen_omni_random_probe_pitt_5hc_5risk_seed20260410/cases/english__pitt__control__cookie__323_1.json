@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__control__cookie__323_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.75,
+  "transcript": "What I want you to do is take a look at this picture and tell me everything that you see happening in this picture. I want you to tell me everything that's going on here. Everything, not things that are just bad, right? Right. Just everything that's going on. There are two little kids, a boy and a girl. The boy is on a stool which is falling over, getting cookies out of a jar. The cookies are in the cabinet with the lid off, and it's in the kitchen. The mother is washing dishes at the window with a curtain on the window. Walk outside with trees and grass. Water is running over in the sink onto the floor. The mother is drying a dish and stepping in the water. There's a plate and two cups sitting on the cabinet. The mother has an apron on. Okay. Okay.",
+  "patient_only_transcript": "There are two little kids, a boy and a girl. The boy is on a stool which is falling over, getting cookies out of a jar. The cookies are in the cabinet with the lid off, and it's in the kitchen. The mother is washing dishes at the window with a curtain on the window. Walk outside with trees and grass. Water is running over in the sink onto the floor. The mother is drying a dish and stepping in the water. There's a plate and two cups sitting on the cabinet. The mother has an apron on.",
+  "speaker_turn_summary": [
+    "Examiner: Prompt to describe the picture.",
+    "Patient: Describes scene with multiple elements, but with some repetition and lack of causal linkage.",
+    "Examiner: Acknowledges patient response."
+  ],
+  "patient_cue_summary": [
+    "Patient names key scene elements (boy, girl, cookies, mother, sink, apron, cabinet, stool, window, trees, grass).",
+    "Patient’s description is largely accurate but lacks narrative cohesion — items are listed rather than sequenced or connected causally.",
+    "Patient uses “walk outside with trees and grass” as an incomplete or misaligned phrase, suggesting possible word retrieval or sequencing difficulty.",
+    "Patient does not spontaneously correct or elaborate on any point",
+    "relies on examiner’s initial prompt structure.",
+    "No clear signs of confusion or contradiction, but speech is not fluid or organized beyond basic item listing."
+  ],
+  "transcript_request_id": "chatcmpl-8a974b2a-04ae-9c88-b835-e3dc65e7a385",
+  "classification_request_id": "chatcmpl-8a0b4620-7173-9811-b67e-d6a7d5ca8932",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__323_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__323_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient lists multiple scene elements accurately but lacks causal or sequential organization.",
+        "evidence": "Patient mentions cookies, mother, sink, stool, apron, cabinet, window, trees, grass — but phrases like 'walk outside with trees and grass' appear disconnected from the kitchen scene.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient retrieves most key nouns but uses vague or incomplete phrasing (e.g., 'walk outside with trees and grass').",
+        "evidence": "Patient does not specify location of trees/grass relative to the kitchen or describe their relation to the scene; phrase appears syntactically incomplete.",
+        "confidence": 0.8
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient’s description is itemized rather than narratively structured; no clear causal or temporal flow.",
+        "evidence": "Patient lists objects and actions without linking them (e.g., 'mother is drying a dish and stepping in the water' — no explanation of why or how this connects to the boy’s action).",
+        "confidence": 0.82
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient accurately identifies most visible elements in the picture description task but demonstrates weak narrative organization, occasional syntactic incompleteness, and lack of causal linkage. These are suggestive of mild cognitive concern but not sufficient for dementia classification. Further clinical review is recommended.",
+    "evidence_for_risk": [
+      "Itemized rather than narratively structured description",
+      "Incomplete or disconnected phrasing (e.g., 'walk outside with trees and grass')",
+      "No spontaneous elaboration or correction despite rich visual context"
+    ],
+    "evidence_against_risk": [
+      "Accurate identification of key objects and roles (mother, boy, cookies, sink, apron)",
+      "No signs of confusion, contradiction, or disorientation",
+      "Speech is intelligible and task-compliant"
+    ],
+    "alternative_explanations": [
+      "Task-specific difficulty or fatigue during description",
+      "Language processing delay without cognitive impairment",
+      "Lack of narrative training or habit in describing scenes"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule formal cognitive screening (e.g., MoCA, MMSE) for further evaluation",
+      "Consider repeat picture description task with timed or structured prompts",
+      "Monitor for functional or memory complaints in daily life"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended; routine follow-up if no further concerns arise.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; risk trend cannot be determined without multi-visit data.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but organizationally sparse.",
+      "Task context: picture description of cookie-theft scene.",
+      "Examiner prompts are neutral",
+      "patient response is the primary signal."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "There are two little kids, a boy and a girl. The boy is on a stool which is falling over, getting cookies out of a jar. The cookies are in the cabinet with the lid off, and it's in the kitchen. The mother is washing dishes at the window with a curtain on the window. Walk outside with trees and grass. Water is running over in the sink onto the floor. The mother is drying a dish and stepping in the water. There's a plate and two cups sitting on the cabinet. The mother has an apron on.",
+    "speaker_turn_summary": [
+      "Examiner: Prompt to describe the picture.",
+      "Patient: Describes scene with multiple elements, but with some repetition and lack of causal linkage.",
+      "Examiner: Acknowledges patient response."
+    ],
+    "patient_cue_summary": [
+      "Patient names key scene elements (boy, girl, cookies, mother, sink, apron, cabinet, stool, window, trees, grass).",
+      "Patient’s description is largely accurate but lacks narrative cohesion — items are listed rather than sequenced or connected causally.",
+      "Patient uses “walk outside with trees and grass” as an incomplete or misaligned phrase, suggesting possible word retrieval or sequencing difficulty.",
+      "Patient does not spontaneously correct or elaborate on any point",
+      "relies on examiner’s initial prompt structure.",
+      "No clear signs of confusion or contradiction, but speech is not fluid or organized beyond basic item listing."
+    ]
+  },
+  "latency_ms": 14969,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/323-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/323-1.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

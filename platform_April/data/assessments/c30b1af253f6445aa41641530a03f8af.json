@@ -1,0 +1,110 @@
+{
+  "assessment_id": "c30b1af253f6445aa41641530a03f8af",
+  "patient_id": "patient-001",
+  "language": "en",
+  "created_at": "2026-04-07T11:16:40.518373Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Neutral to slightly pensive expression; minimal emotional fluctuation.",
+      "evidence": "Patient maintains steady eye contact with camera; facial muscles show no overt signs of distress, confusion, or affective flattening.",
+      "confidence": 0.85
+    },
+    {
+      "label": "Gaze and Attention",
+      "summary": "Consistent visual focus on camera; no signs of disengagement or wandering gaze.",
+      "evidence": "Patient’s eyes remain directed toward the camera throughout the clip, indicating sustained attention.",
+      "confidence": 0.9
+    }
+  ],
+  "body_findings": [
+    {
+      "label": "Posture and Movement",
+      "summary": "Minimal body movement; hand resting near chin/cheek in a contemplative pose.",
+      "evidence": "Patient remains seated and relatively still; no fidgeting, restlessness, or signs of motor impairment.",
+      "confidence": 0.88
+    }
+  ],
+  "voice_findings": [
+    {
+      "label": "Speech Fluency",
+      "summary": "Speech is fluent, with no pauses, repetitions, or word-finding difficulties observed.",
+      "evidence": "Patient speaks in complete sentences with natural pacing; no hesitations or disfluencies detected.",
+      "confidence": 0.92
+    },
+    {
+      "label": "Vocal Tone and Clarity",
+      "summary": "Clear articulation and consistent vocal volume; no signs of dysarthria or vocal tremor.",
+      "evidence": "Speech is easily understood; pitch and volume remain stable throughout the clip.",
+      "confidence": 0.9
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Self-Reported Activities",
+      "summary": "Patient describes work tasks and location without signs of confusion or memory lapse.",
+      "evidence": "Patient states: 'I’m in my bedroom... working on testing and integration... all by myself.' No indication of disorientation or task confusion.",
+      "confidence": 0.87
+    }
+  ],
+  "speaker_structure": "single_speaker",
+  "target_patient_presence": "clear",
+  "target_patient_basis": "visual_focus",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 0.95,
+  "risk_score": 0.15,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "The patient demonstrates coherent speech, stable attention, and appropriate emotional expression. No observable signs of cognitive impairment or functional difficulty are present in this single clip.",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [
+    "Fluent speech without disfluencies or word-finding difficulties.",
+    "Stable gaze and posture indicating sustained attention.",
+    "No signs of emotional dysregulation or affective flattening.",
+    "Self-reported activities are described clearly and contextually appropriately."
+  ],
+  "alternative_explanations": [
+    "The patient may be fatigued or relaxed, which could explain minimal movement and neutral affect.",
+    "The setting (bedroom) and casual delivery may reflect informal recording conditions rather than clinical impairment."
+  ],
+  "risk_factor_findings": [],
+  "subjective_assessment_findings": [],
+  "emotional_assessment_findings": [
+    "Neutral affect with no observable signs of anxiety, frustration, or apathy.",
+    "No emotional lability or inappropriate emotional responses detected."
+  ],
+  "risk_control_suggestions": [
+    "No immediate intervention required.",
+    "Consider follow-up if additional behavioral or cognitive concerns emerge in future assessments."
+  ],
+  "visit_recommendation": "Routine follow-up or no further action at this time.",
+  "future_risk_trend_summary": "Insufficient data to predict future cognitive decline from a single clip.",
+  "reviewer_confidence": 0.85,
+  "context_notes": [
+    "This is a single-clinic screening video; longitudinal assessment is needed for reliable cognitive evaluation.",
+    "No clinical history or diagnostic context is provided in the clip."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "d5b69e69-478b-98f1-a5b2-09e35bff4fe4",
+    "latency_ms": 22498,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 22498
+    }
+  ],
+  "fallback_message": null
+}

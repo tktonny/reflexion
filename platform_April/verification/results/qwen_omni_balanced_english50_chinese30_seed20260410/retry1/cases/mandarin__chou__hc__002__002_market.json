@@ -1,0 +1,121 @@
+{
+  "case_id": "mandarin__chou__hc__002__002_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "一一个妈妈，一个奶奶，他们带了带了孙子，还带了带带他们小孩子，妈妈带小孩子，是奶奶的孙子，一共三个人，一共加起来五个人。他们在夜市啊，应该在夜市啊，上面还有灯泡嘛，应该在夜市。他们在玩那个捞金鱼啦，捞金鱼好像就是要玩，玩得很高兴，哎。嗯，这个地方哦，他这，哎，不太对啊，应该是有有老老板在做这个生意啊。我看看，哦，冰淇淋，哎，奇怪，这不是妈妈吗？不是妈妈，妈妈在吃冰淇淋，怎么会不小心那个，她看那些金鱼啊，看看得太专心了，那个冰淇淋掉下来，掉到她她的小宝贝的头头头发上面，嗯。那么至于有有没有老板，我看不出来。还看到什么？没关系，哎，然后前面前面有椅子，还有这个捞金鱼的桶啊，或者是去那个那个勺子啊等等的。这一边就是在卖香肠了，对，卖香肠有三个小朋友，他们跟在这边跟老板在玩那个水水巴拉，是不是？哎，玩绳子了，绳子以后也就是大家来比输赢了，比输赢。哎，为什么绳子跑到上面去了？这个真的很奇怪了。嗯，那个那个下面烤香肠啊，正在烤，他这个碗啊，绳子啊，怎么会跑到上面？还有两只香肠，这个在不在那个理解啊？奇怪，哎，还有吗？还有吗？这个这个人那个，哦，对他做动作，这个这个是一个好像是小偷吧，嗯，他们玩得很高兴，他就把他的那个背包，背在背上的背包，那个东西把它，他大概偷拿吧，嗯，偷东西了，偷东西，为什么这个绳绳子在上面呢？很奇。",
+  "patient_only_transcript": "描述夜市场景，提及妈妈、奶奶、孙子、捞金鱼、冰淇淋掉落、老板、香肠摊、小朋友、绳子、小偷等元素，语句零散、重复、逻辑松散，多次自我怀疑‘不太对’‘奇怪’‘为什么绳子在上面’，依赖语境推断角色与动作，缺乏连贯叙事。",
+  "speaker_turn_summary": [
+    "examiner: 引导描述场景",
+    "patient: 描述人物关系与事件，语句断续，多次自我修正与疑问",
+    "examiner: 未明确发言，仅背景提示",
+    "patient: 持续描述场景元素，但组织混乱，缺乏因果与顺序"
+  ],
+  "patient_cue_summary": [
+    "语句零散、重复、逻辑松散",
+    "多次自我怀疑与疑问（‘不太对’‘奇怪’）",
+    "依赖语境推断角色与动作（如‘小偷’‘老板’）",
+    "缺乏连贯叙事与事件顺序",
+    "词汇使用泛化（‘那个’‘这个’‘东西’）",
+    "语义信息量低，细节模糊",
+    "部分语句中断或未完成（‘为什么绳子在上面呢？很奇。’）"
+  ],
+  "transcript_request_id": "chatcmpl-cac6f9d7-89c5-9c5d-8c36-1a326460ff86",
+  "classification_request_id": "chatcmpl-eff136e2-c668-9707-bf20-e3e2635841a6",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__002__002_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__002__002_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "uncertain",
+    "target_patient_basis": "externally_provided",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "患者在描述夜市场景时语句零散、逻辑松散、多次自我怀疑，词汇泛化，缺乏连贯叙事，虽提及多个场景元素但组织混乱，提示可能存在轻度认知加工或语言表达困难，建议进一步临床观察与评估。",
+    "evidence_for_risk": [
+      "语句断续、重复、缺乏连贯性",
+      "多次自我怀疑与疑问，显示认知不确定性",
+      "依赖语境推断角色与动作，缺乏自主组织能力",
+      "词汇泛化、语义信息量低"
+    ],
+    "evidence_against_risk": [
+      "提及多个场景元素（如妈妈、奶奶、捞金鱼、香肠摊）",
+      "语句可被部分理解，非完全失语或沉默"
+    ],
+    "alternative_explanations": [
+      "语言表达不成熟或非母语者",
+      "情绪紧张或注意力分散",
+      "任务理解偏差或未完全理解指令",
+      "录音或转录质量限制导致语义模糊"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "建议进行标准化认知筛查（如MMSE、MoCA）",
+      "观察患者在结构化任务中的语言组织与记忆提取能力",
+      "评估是否存在注意力或执行功能轻度受损",
+      "建议家属或照护者提供日常功能观察记录"
+    ],
+    "visit_recommendation": "建议进行正式认知筛查与临床评估，以明确是否存在轻度认知障碍或早期认知衰退迹象。",
+    "future_risk_trend_summary": "单次观察无法预测长期认知趋势，建议定期随访评估认知功能变化。",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "视频不可用，仅基于音频对话内容评估",
+      "患者身份与发言内容未完全分离，存在不确定性",
+      "患者语言表现提示轻度认知加工困难，但未达明确痴呆标准",
+      "建议结合多模态评估与家属报告进行综合判断"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "target_patient_uncertain",
+      "interviewer_dominant",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "描述夜市场景，提及妈妈、奶奶、孙子、捞金鱼、冰淇淋掉落、老板、香肠摊、小朋友、绳子、小偷等元素，语句零散、重复、逻辑松散，多次自我怀疑‘不太对’‘奇怪’‘为什么绳子在上面’，依赖语境推断角色与动作，缺乏连贯叙事。",
+    "speaker_turn_summary": [
+      "examiner: 引导描述场景",
+      "patient: 描述人物关系与事件，语句断续，多次自我修正与疑问",
+      "examiner: 未明确发言，仅背景提示",
+      "patient: 持续描述场景元素，但组织混乱，缺乏因果与顺序"
+    ],
+    "patient_cue_summary": [
+      "语句零散、重复、逻辑松散",
+      "多次自我怀疑与疑问（‘不太对’‘奇怪’）",
+      "依赖语境推断角色与动作（如‘小偷’‘老板’）",
+      "缺乏连贯叙事与事件顺序",
+      "词汇使用泛化（‘那个’‘这个’‘东西’）",
+      "语义信息量低，细节模糊",
+      "部分语句中断或未完成（‘为什么绳子在上面呢？很奇。’）"
+    ]
+  },
+  "latency_ms": 21208,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/002/002_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/002/002_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

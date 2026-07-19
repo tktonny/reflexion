@@ -1,0 +1,58 @@
+[
+  {
+    "label": "dementia",
+    "split": "test",
+    "url": "https://youtu.be/iJJerSu8DxE",
+    "local_path": "data/sample_videos/yt_demtalk/iJJerSu8DxE.mp4",
+    "clip_window": "0:00-1:30",
+    "gender": "female",
+    "age": "90",
+    "race": "white/caucasian",
+    "dominant_pose": "frontal",
+    "indoor_outdoor": "indoor",
+    "solo_multi_person": "solo",
+    "author": "caregiver"
+  },
+  {
+    "label": "dementia",
+    "split": "test",
+    "url": "https://youtu.be/jN8GkHIMkis",
+    "local_path": "data/sample_videos/yt_demtalk/jN8GkHIMkis.mp4",
+    "clip_window": "0:00-1:30",
+    "gender": "male",
+    "age": "39",
+    "race": "white/caucasian",
+    "dominant_pose": "angled",
+    "indoor_outdoor": "indoor",
+    "solo_multi_person": "solo",
+    "author": "research organization"
+  },
+  {
+    "label": "Normotypical",
+    "split": "train",
+    "url": "https://youtu.be/n8I4Rd5iFg4",
+    "local_path": "data/sample_videos/yt_demtalk/n8I4Rd5iFg4.mp4",
+    "clip_window": "0:00-1:30",
+    "gender": "female",
+    "age": "18",
+    "race": "sub-saharan african",
+    "dominant_pose": "frontal",
+    "indoor_outdoor": "indoor",
+    "solo_multi_person": "solo",
+    "author": "no"
+  },
+  {
+    "label": "dementia",
+    "split": "test",
+    "url": "https://www.youtube.com/shorts/4qI8djrKniM?feature=share",
+    "local_path": "data/sample_videos/yt_demtalk/4qI8djrKniM.mp4",
+    "clip_window": "0:00-0:54",
+    "gender": "male",
+    "age": "64",
+    "race": "white/caucasian",
+    "dominant_pose": "angled",
+    "indoor_outdoor": "indoor",
+    "solo_multi_person": "solo",
+    "author": "research organization"
+  }
+]

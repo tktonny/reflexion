@@ -1,0 +1,111 @@
+{
+  "case_id": "mandarin__chou__mci__164__164_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "这是一个公园呢，有两个小孩在荡秋千，它旁边一个滑梯，然后有两个在打网球，那一只狗咬到一个一个小女打羽球了，一个狗咬咬到一个女生的衣服，男生拉不住，那旁边还还有两个老人在下棋泡茶，然后在边笑。",
+  "patient_only_transcript": "这是一个公园呢，有两个小孩在荡秋千，它旁边一个滑梯，然后有两个在打网球，那一只狗咬到一个一个小女打羽球了，一个狗咬咬到一个女生的衣服，男生拉不住，那旁边还还有两个老人在下棋泡茶，然后在边笑。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes park scene with multiple elements (children on swing, slide, tennis, dog biting girl's clothes, elderly playing chess and drinking tea, laughing)"
+  ],
+  "patient_cue_summary": [
+    "Patient describes multiple scene elements but with some repetition and slight disorganization (e.g., '一个狗咬咬到一个女生的衣服')",
+    "Some phrasing is vague or redundant ('那一只狗咬到一个一个小女打羽球了' — unclear subject-verb-object structure)",
+    "No clear causal or sequential linking between events",
+    "elements are listed rather than narrated cohesively",
+    "No evidence of word-finding pauses or fillers, but structure is not tightly organized",
+    "Patient appears to attempt full description but lacks precision or syntactic control in complex sentence construction"
+  ],
+  "transcript_request_id": "chatcmpl-4144669d-1e49-91d4-afd9-330208a4b5ac",
+  "classification_request_id": "chatcmpl-03e3e6a6-4a93-9f58-ada8-9299e64c9b60",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__164__164_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__164__164_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a multi-element description of a park scene but with some disorganization, redundancy, and syntactic imprecision. While the content is largely intact and task-relevant, the lack of coherent narrative structure and occasional vagueness suggest mild cognitive concern warranting further clinical observation.",
+    "evidence_for_risk": [
+      "Disorganized event sequencing",
+      "Redundant phrasing and syntactic imprecision",
+      "Lack of causal or logical connectors between scene elements"
+    ],
+    "evidence_against_risk": [
+      "Patient successfully identifies multiple scene elements",
+      "No evidence of word-finding failure or severe disorientation",
+      "No emotional dysregulation or affective flattening observed"
+    ],
+    "alternative_explanations": [
+      "Language processing or articulation difficulty due to non-pathological factors",
+      "Task performance influenced by examiner prompting or situational context",
+      "Mild speech disfluency not necessarily indicative of cognitive decline"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow-up with formal cognitive screening battery",
+      "Observe for consistency in narrative organization across multiple sessions",
+      "Consider language or task-specific confounds in interpretation"
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation needed to assess progression or stability.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio description.",
+      "Patient appears to attempt full scene description but with reduced syntactic precision.",
+      "No clear dementia-level impairment detected",
+      "mild atypical features suggest need for further evaluation."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这是一个公园呢，有两个小孩在荡秋千，它旁边一个滑梯，然后有两个在打网球，那一只狗咬到一个一个小女打羽球了，一个狗咬咬到一个女生的衣服，男生拉不住，那旁边还还有两个老人在下棋泡茶，然后在边笑。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes park scene with multiple elements (children on swing, slide, tennis, dog biting girl's clothes, elderly playing chess and drinking tea, laughing)"
+    ],
+    "patient_cue_summary": [
+      "Patient describes multiple scene elements but with some repetition and slight disorganization (e.g., '一个狗咬咬到一个女生的衣服')",
+      "Some phrasing is vague or redundant ('那一只狗咬到一个一个小女打羽球了' — unclear subject-verb-object structure)",
+      "No clear causal or sequential linking between events",
+      "elements are listed rather than narrated cohesively",
+      "No evidence of word-finding pauses or fillers, but structure is not tightly organized",
+      "Patient appears to attempt full description but lacks precision or syntactic control in complex sentence construction"
+    ]
+  },
+  "latency_ms": 18606,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/164/164_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/164/164_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

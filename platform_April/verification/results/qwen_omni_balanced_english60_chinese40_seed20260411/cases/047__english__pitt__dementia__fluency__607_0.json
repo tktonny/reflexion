@@ -1,0 +1,141 @@
+{
+  "case_id": "english__pitt__dementia__fluency__607_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Any animals at all? Cow. Good. Can you think of another one? Horse. Mm-hmm, another one? I'll tell you, I'm just all confused. Can you think of any animals? It's not that I'm stupid. When I go home, Christ, everything will. . . With the letter F, and you can start now. Farm. There's easy words and yet, darn it, I can't. Farm, farm, plow. Well. Any word at all that begins with the letter F. Farm, farm, farm. Oh. Fat. Okay, good. Any other word you can think of? You may not tell me that's good. That's fine. Any word? Farm. Okay, good. I see. Oh, I know you. . . I mean, you're here to help me and I can't. Okay, that's fine.",
+  "patient_only_transcript": "Cow. Horse. I'm just all confused. It's not that I'm stupid. Farm. Plow. Fat. Farm. I mean, you're here to help me and I can't.",
+  "speaker_turn_summary": [
+    "Examiner: Any animals at all?",
+    "Patient: Cow.",
+    "Examiner: Good. Can you think of another one?",
+    "Patient: Horse.",
+    "Examiner: Mm-hmm, another one?",
+    "Patient: I'll tell you, I'm just all confused. It's not that I'm stupid.",
+    "Examiner: With the letter F, and you can start now.",
+    "Patient: Farm. There's easy words and yet, darn it, I can't. Farm, farm, plow.",
+    "Examiner: Any word at all that begins with the letter F?",
+    "Patient: Farm, farm, farm. Oh. Fat.",
+    "Examiner: Okay, good. Any other word you can think of?",
+    "Patient: You may not tell me that's good. That's fine. Any word? Farm. Okay, good. I see. Oh, I know you. I mean, you're here to help me and I can't. Okay, that's fine."
+  ],
+  "patient_cue_summary": [
+    "Low item productivity in animal fluency task",
+    "Repeated restarts and self-correction ('Farm, farm, farm')",
+    "Explicit expression of confusion and frustration ('I'm just all confused')",
+    "Self-reported difficulty despite examiner support ('I can't')",
+    "Task drift and semantic repetition ('plow' after 'farm')",
+    "Examiner scaffolding required to maintain task flow"
+  ],
+  "transcript_request_id": "chatcmpl-c0e417b8-2329-959d-934c-0b6f55a169e7",
+  "classification_request_id": "chatcmpl-a3e44df6-39f2-9a23-b006-ec5e04341909",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__607_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__607_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates signs of word-finding difficulty, task-related frustration, and self-reported cognitive struggle during verbal fluency tasks. While not meeting dementia-level criteria, the pattern of retrieval failure, repetition, and emotional distress suggests possible early cognitive impairment requiring further clinical evaluation.",
+    "evidence_for_risk": [
+      "Low productivity in fluency tasks with repeated restarts",
+      "Explicit self-report of confusion and inability to complete task",
+      "Need for examiner scaffolding to maintain task flow"
+    ],
+    "evidence_against_risk": [
+      "Patient remains coherent and task-relevant",
+      "No evidence of disorientation, delusions, or severe disorganization",
+      "No indication of non-English language or severe speech impairment"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive fatigue or stress during testing",
+      "Non-clinical anxiety or test-taking difficulty",
+      "Mild age-related slowing without pathological impairment"
+    ],
+    "risk_factor_findings": [
+      "Patient reports confusion and difficulty with word retrieval",
+      "Examiner indicates need for task support and scaffolding"
+    ],
+    "subjective_assessment_findings": [
+      "Patient explicitly states confusion and self-doubt ('I'm just all confused', 'It's not that I'm stupid')",
+      "Patient acknowledges examiner's supportive role and expresses inability to complete task independently"
+    ],
+    "emotional_assessment_findings": [
+      "Visible frustration and self-doubt expressed verbally",
+      "Affective tone suggests anxiety or helplessness in task context",
+      "Engagement appears intact but effortful",
+      "no apathy or flat affect"
+    ],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency task with different categories or longer time limits",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Assess for mood, anxiety, or fatigue as potential confounders"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and neuropsychological assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up with serial assessments recommended to track cognitive trajectory.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Audio-only, no visual cues available for behavioral or affective confirmation.",
+      "Patient speech is intelligible but shows clear signs of retrieval difficulty and emotional distress.",
+      "Examiner scaffolding is present, indicating task support but not full independence."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Cow. Horse. I'm just all confused. It's not that I'm stupid. Farm. Plow. Fat. Farm. I mean, you're here to help me and I can't.",
+    "speaker_turn_summary": [
+      "Examiner: Any animals at all?",
+      "Patient: Cow.",
+      "Examiner: Good. Can you think of another one?",
+      "Patient: Horse.",
+      "Examiner: Mm-hmm, another one?",
+      "Patient: I'll tell you, I'm just all confused. It's not that I'm stupid.",
+      "Examiner: With the letter F, and you can start now.",
+      "Patient: Farm. There's easy words and yet, darn it, I can't. Farm, farm, plow.",
+      "Examiner: Any word at all that begins with the letter F?",
+      "Patient: Farm, farm, farm. Oh. Fat.",
+      "Examiner: Okay, good. Any other word you can think of?",
+      "Patient: You may not tell me that's good. That's fine. Any word? Farm. Okay, good. I see. Oh, I know you. I mean, you're here to help me and I can't. Okay, that's fine."
+    ],
+    "patient_cue_summary": [
+      "Low item productivity in animal fluency task",
+      "Repeated restarts and self-correction ('Farm, farm, farm')",
+      "Explicit expression of confusion and frustration ('I'm just all confused')",
+      "Self-reported difficulty despite examiner support ('I can't')",
+      "Task drift and semantic repetition ('plow' after 'farm')",
+      "Examiner scaffolding required to maintain task flow"
+    ]
+  },
+  "latency_ms": 20759,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/607-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/607-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

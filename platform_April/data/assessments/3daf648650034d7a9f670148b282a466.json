@@ -1,0 +1,122 @@
+{
+  "assessment_id": "3daf648650034d7a9f670148b282a466",
+  "patient_id": "Tony",
+  "language": "en",
+  "created_at": "2026-04-07T11:58:25.435106Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Neutral to slightly pensive expression; minimal emotional display.",
+      "evidence": "Patient maintains steady gaze, minimal eyebrow movement, no overt signs of distress or confusion during speech.",
+      "confidence": 0.85
+    },
+    {
+      "label": "Gaze and Attention",
+      "summary": "Consistent eye contact with camera; occasional brief glances away, possibly indicating internal processing.",
+      "evidence": "Patient looks directly at camera during speech, with brief averted glances at 0:12, 0:20, and 0:45, suggesting possible cognitive load or distraction.",
+      "confidence": 0.8
+    }
+  ],
+  "body_findings": [
+    {
+      "label": "Posture and Movement",
+      "summary": "Sitting upright, minimal fidgeting; occasional hand-to-chin gesture suggesting contemplation.",
+      "evidence": "At 0:48, patient rests chin on hand; otherwise, posture remains stable and controlled.",
+      "confidence": 0.85
+    }
+  ],
+  "voice_findings": [
+    {
+      "label": "Speech Fluency",
+      "summary": "Speech is fluent, with natural pacing and no evident pauses or word-finding difficulties.",
+      "evidence": "No hesitations, repetitions, or self-corrections observed during spoken segments.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Speech Clarity",
+      "summary": "Clear articulation; no slurring or phonetic errors.",
+      "evidence": "All spoken words are intelligible and delivered with consistent volume and tone.",
+      "confidence": 0.95
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Self-Reported Routine",
+      "summary": "Patient describes daily routine including breakfast, work, and breaks; no self-reported memory or cognitive complaints.",
+      "evidence": "Patient states: 'In the morning I wake up and have my breakfast... I work on the testing... I take a break and continue in the afternoon.'",
+      "confidence": 0.95
+    },
+    {
+      "label": "Interaction with Caregiver",
+      "summary": "Caregiver enters frame and interacts with patient over a mobile device; patient appears attentive and responsive.",
+      "evidence": "At 0:50, a woman enters and shows patient a phone; patient turns head and looks at screen, then responds verbally.",
+      "confidence": 0.85
+    }
+  ],
+  "speaker_structure": "multi_speaker",
+  "target_patient_presence": "clear",
+  "target_patient_basis": "visual_focus",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 0.95,
+  "risk_score": 0.15,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "The patient demonstrates coherent speech, stable attention, and appropriate social interaction. No observable signs of cognitive impairment or emotional dysregulation are present. The clip supports a healthy cognitive profile at this time.",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [
+    "Fluent, coherent speech without pauses or errors.",
+    "Stable gaze and posture during interaction.",
+    "No self-reported or observed cognitive complaints or functional deficits.",
+    "Responsive and engaged during caregiver interaction."
+  ],
+  "alternative_explanations": [
+    "The patient may be in a non-stressful, familiar environment (bedroom), which may reduce observable cognitive load or emotional reactivity.",
+    "The clip duration is limited and may not capture episodic memory or executive function challenges that require longer or more structured tasks."
+  ],
+  "risk_factor_findings": [],
+  "subjective_assessment_findings": [
+    "Patient reports no cognitive complaints or functional difficulties.",
+    "No caregiver or interviewer-reported concerns about memory or cognition are expressed in the clip."
+  ],
+  "emotional_assessment_findings": [
+    "Patient displays neutral affect with minimal emotional reactivity.",
+    "No signs of anxiety, frustration, or apathy observed during interaction."
+  ],
+  "risk_control_suggestions": [
+    "Continue routine monitoring in naturalistic settings.",
+    "Consider formal cognitive screening if functional concerns arise in future assessments."
+  ],
+  "visit_recommendation": "Routine follow-up; no immediate clinical evaluation required.",
+  "future_risk_trend_summary": "Limited predictive value from a single short clip; longitudinal data or structured cognitive tasks are needed for meaningful risk stratification.",
+  "reviewer_confidence": 0.85,
+  "context_notes": [
+    "Multiple people present; patient is clearly the visual focus.",
+    "Speech is in English; no language mismatch detected.",
+    "No signs of dementia-like impairment observed in this clip."
+  ],
+  "quality_flags": [
+    "multiple_people"
+  ],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "3dc69aa7-5fd5-9da0-8ab8-9f31e71044c9",
+    "latency_ms": 20624,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 20624
+    }
+  ],
+  "fallback_message": null
+}

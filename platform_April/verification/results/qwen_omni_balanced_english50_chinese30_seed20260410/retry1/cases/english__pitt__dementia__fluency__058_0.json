@@ -1,0 +1,160 @@
+{
+  "case_id": "english__pitt__dementia__fluency__058_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "Are you ready? Go. Cat, dog, frogs. That's not a fish, right? Snake, alligator, beaver. Goldfish. They're not to be fish? No. They are to be fish? No, they're not. No fish. Oh. Squirrel. Okay, hang on. We'll do something. Let me get one minute again. Go. Frogs. Say no fish. Oh no, it's okay. Anything this time. Fish. Furnace, the fan. A plan he wouldn't work. I'll write it. Ford, fireplace, furniture. Flowers. Okay, that's it.",
+  "patient_only_transcript": "Cat, dog, frogs. That's not a fish, right? Snake, alligator, beaver. Goldfish. They're not to be fish? No. They are to be fish? No, they're not. No fish. Squirrel. Okay, hang on. We'll do something. Let me get one minute again. Frogs. Say no fish. Oh no, it's okay. Anything this time. Fish. Furnace, the fan. A plan he wouldn't work. I'll write it. Ford, fireplace, furniture. Flowers.",
+  "speaker_turn_summary": [
+    "Examiner: Are you ready? Go.",
+    "Patient: Cat, dog, frogs. That's not a fish, right?",
+    "Examiner: Snake, alligator, beaver.",
+    "Patient: Goldfish. They're not to be fish? No. They are to be fish? No, they're not. No fish.",
+    "Examiner: Squirrel.",
+    "Patient: Okay, hang on. We'll do something. Let me get one minute again.",
+    "Examiner: Go.",
+    "Patient: Frogs. Say no fish. Oh no, it's okay. Anything this time.",
+    "Examiner: Fish.",
+    "Patient: Furnace, the fan. A plan he wouldn't work. I'll write it. Ford, fireplace, furniture. Flowers.",
+    "Examiner: Okay, that's it."
+  ],
+  "patient_cue_summary": [
+    "Frequent pauses and self-corrections: 'They're not to be fish? No. They are to be fish? No, they're not.'",
+    "Vague or incomplete naming: 'A plan he wouldn't work. I'll write it.'",
+    "Repetition and restarts: 'Let me get one minute again.'",
+    "Low-information or disconnected content: 'Ford, fireplace, furniture. Flowers.'",
+    "Examiner dependence: multiple prompts required to continue task.",
+    "Fragmented, non-sequential output despite task structure."
+  ],
+  "transcript_request_id": "chatcmpl-70fd21ed-f51f-9de2-9d14-df0521c1acf2",
+  "classification_request_id": "chatcmpl-500e794b-2346-9e6f-a3f7-6e2742e0e816",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__058_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__058_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Verbal Fluency Task Performance",
+        "summary": "Patient generates category items with frequent pauses, self-corrections, and examiner dependence; output becomes fragmented and low-information in later responses.",
+        "evidence": "Patient: 'They're not to be fish? No. They are to be fish? No, they're not.'; 'Ford, fireplace, furniture. Flowers.'; 'A plan he wouldn't work. I'll write it.'",
+        "confidence": null
+      },
+      {
+        "label": "Task Organization and Coherence",
+        "summary": "Patient's responses lack sustained organization and logical sequencing; items are disconnected and not meaningfully linked.",
+        "evidence": "Patient: 'Furnace, the fan. A plan he wouldn't work. I'll write it. Ford, fireplace, furniture. Flowers.'",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Informativeness",
+        "summary": "Patient exhibits word-finding difficulty and uses vague or incomplete phrasing, especially in later responses, despite task structure.",
+        "evidence": "Patient: 'I'll write it.'; 'A plan he wouldn't work.'; 'Flowers. Okay, that's it.'",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient exhibits multiple mild impairment-like cues during a verbal fluency task: frequent self-corrections, fragmented output, examiner dependence, and low-information content in later responses. While some correct terms are produced, the overall performance lacks coherence, organization, and sustained informativeness. Not sufficient for dementia classification, but warrants further clinical observation.",
+    "evidence_for_risk": [
+      "Self-correction and repetition: 'They're not to be fish? No. They are to be fish? No, they're not.'",
+      "Examiner dependence: multiple prompts required to continue task.",
+      "Low-information output: 'Ford, fireplace, furniture. Flowers.'",
+      "Fragmented, disconnected content despite task structure.",
+      "Vague or incomplete phrasing: 'A plan he wouldn't work. I'll write it.'"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies some category items (e.g., 'cat', 'dog', 'goldfish', 'squirrel').",
+      "Patient completes the task with examiner support, indicating some functional capacity.",
+      "No overt confusion or disorientation observed in speech content."
+    ],
+    "alternative_explanations": [
+      "Task fatigue or anxiety may contribute to fragmented output.",
+      "Examiner prompting may have influenced response structure.",
+      "Normal variability in verbal fluency performance, especially in older adults.",
+      "Audio quality limitations may obscure full fluency assessment."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Frustration or uncertainty audible in pauses and self-corrections.",
+      "Low affective engagement: minimal emotional inflection, flat delivery in later responses.",
+      "Possible apathy or disengagement in final utterances ('Flowers. Okay, that's it.')"
+    ],
+    "risk_control_suggestions": [
+      "Schedule formal cognitive screening with validated instruments (e.g., MoCA, MMSE).",
+      "Observe patient in structured tasks with multiple trials to assess consistency.",
+      "Consider caregiver report for functional changes or memory complaints.",
+      "Avoid over-reliance on single verbal fluency task for risk stratification."
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip. Further observation or multi-visit assessment is required to determine progression risk.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is partially intelligible but shows multiple mild impairment-like cues.",
+      "Task context: verbal fluency with category generation.",
+      "Examiner prompts are neutral context",
+      "patient performance is the primary signal.",
+      "No visual cues available for emotional or behavioral assessment."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Cat, dog, frogs. That's not a fish, right? Snake, alligator, beaver. Goldfish. They're not to be fish? No. They are to be fish? No, they're not. No fish. Squirrel. Okay, hang on. We'll do something. Let me get one minute again. Frogs. Say no fish. Oh no, it's okay. Anything this time. Fish. Furnace, the fan. A plan he wouldn't work. I'll write it. Ford, fireplace, furniture. Flowers.",
+    "speaker_turn_summary": [
+      "Examiner: Are you ready? Go.",
+      "Patient: Cat, dog, frogs. That's not a fish, right?",
+      "Examiner: Snake, alligator, beaver.",
+      "Patient: Goldfish. They're not to be fish? No. They are to be fish? No, they're not. No fish.",
+      "Examiner: Squirrel.",
+      "Patient: Okay, hang on. We'll do something. Let me get one minute again.",
+      "Examiner: Go.",
+      "Patient: Frogs. Say no fish. Oh no, it's okay. Anything this time.",
+      "Examiner: Fish.",
+      "Patient: Furnace, the fan. A plan he wouldn't work. I'll write it. Ford, fireplace, furniture. Flowers.",
+      "Examiner: Okay, that's it."
+    ],
+    "patient_cue_summary": [
+      "Frequent pauses and self-corrections: 'They're not to be fish? No. They are to be fish? No, they're not.'",
+      "Vague or incomplete naming: 'A plan he wouldn't work. I'll write it.'",
+      "Repetition and restarts: 'Let me get one minute again.'",
+      "Low-information or disconnected content: 'Ford, fireplace, furniture. Flowers.'",
+      "Examiner dependence: multiple prompts required to continue task.",
+      "Fragmented, non-sequential output despite task structure."
+    ]
+  },
+  "latency_ms": 20822,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/058-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/058-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

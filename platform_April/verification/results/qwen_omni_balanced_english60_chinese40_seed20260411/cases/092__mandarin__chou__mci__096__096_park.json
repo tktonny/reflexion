@@ -1,0 +1,131 @@
+{
+  "case_id": "mandarin__chou__mci__096__096_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "在公园里面有一有两位阿公在下棋，呃，两个小朋友打羽毛球。这个他逗，那个牵着狗狗拉拉，那个叫遛狗，阿狗就就抓着他。抓着这个小朋友，啊，这几个是在荡秋千，在这是一个公园里面的情景。那当然他他们在下棋，他也在看他们在打球。打羽毛球。就这样子。他，嗯，因为他抓着他，他就没办法接球了，嗯，啊。是啊，这水开了，那水开了。两个在荡荡秋千，嗯。",
+  "patient_only_transcript": "在公园里面，有两位阿公在下棋，两个小朋友打羽毛球。这个他逗，那个牵着狗狗遛狗，阿狗就抓着他，抓着这个小朋友。这几个是在荡秋千，这是一个公园里面的情景。他也在看他们在打球。打羽毛球。就这样子。因为他抓着他，他就没办法接球了。是啊，这水开了，两个在荡秋千。",
+  "speaker_turn_summary": [
+    "Examiner: prompts scene description task",
+    "Patient: describes multiple park activities including chess, badminton, dog walking, children playing, and swinging",
+    "Examiner: possibly prompts follow-up or clarification (implied by '是啊')",
+    "Patient: uses vague pronouns ('这个', '那个'), filler particles ('嗯', '啊'), and incomplete clauses"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple scene elements: two elders playing chess, two children playing badminton, a dog being walked, children on swings",
+    "Patient uses colloquial Mandarin with discourse particles and vague referents ('这个', '那个')",
+    "Patient’s description is largely coherent and task-relevant despite some fragmented phrasing and pauses",
+    "No evidence of naming collapse, semantic confusion, or major abandonment of task",
+    "Patient does not appear to be confused about roles or actions",
+    "scene elements are correctly attributed"
+  ],
+  "transcript_request_id": "chatcmpl-e63fa313-4689-9825-a977-4c2d43db6e7f",
+  "classification_request_id": "chatcmpl-14214dd4-451f-9961-b2a2-0c3e7b091b5c",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__096__096_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__096__096_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes multiple park activities with reasonable accuracy and task relevance.",
+        "evidence": "Patient names specific actors (two elders, two children, a dog) and actions (chess, badminton, walking, swinging).",
+        "confidence": 0.5
+      },
+      {
+        "label": "discourse_particles_and_vagueness",
+        "summary": "Patient uses colloquial fillers and vague pronouns, which are common in spontaneous Mandarin speech.",
+        "evidence": "Use of '这个', '那个', '嗯', '啊', and incomplete clauses without semantic collapse.",
+        "confidence": 0.25
+      },
+      {
+        "label": "task_completion",
+        "summary": "Patient completes the scene-description task with multiple relevant elements, though not with high narrative fluency.",
+        "evidence": "Patient does not abandon the task or fail to identify core scene components despite fragmented phrasing.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a reasonably coherent, task-relevant description of a park scene with multiple actors and actions. Use of colloquial fillers and vague pronouns is consistent with normal spontaneous Mandarin speech, not impairment. No evidence of naming failure, semantic confusion, or task abandonment. Further observation or formal screening is recommended due to limited visual data and audio quality.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple scene elements and actors",
+      "No semantic collapse or major disorganization",
+      "Task is completed with relevant content despite colloquial phrasing"
+    ],
+    "alternative_explanations": [
+      "Colloquial speech patterns in Mandarin are normal and not indicative of cognitive impairment",
+      "Audio quality and lack of visual data limit confidence in assessment",
+      "Patient may be describing a complex scene with multiple simultaneous actions, which is cognitively demanding but not necessarily impaired"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening (e.g., MoCA, MMSE) in clinic setting",
+      "Observe patient in structured scene-description task with visual cues",
+      "Consider caregiver report or longitudinal tracking if symptoms persist"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no evidence of progressive decline or severe impairment in this sample.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video data is unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible and task-relevant despite colloquial phrasing.",
+      "No signs of dementia-like impairment detected in this clip",
+      "classification is conservative."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "在公园里面，有两位阿公在下棋，两个小朋友打羽毛球。这个他逗，那个牵着狗狗遛狗，阿狗就抓着他，抓着这个小朋友。这几个是在荡秋千，这是一个公园里面的情景。他也在看他们在打球。打羽毛球。就这样子。因为他抓着他，他就没办法接球了。是啊，这水开了，两个在荡秋千。",
+    "speaker_turn_summary": [
+      "Examiner: prompts scene description task",
+      "Patient: describes multiple park activities including chess, badminton, dog walking, children playing, and swinging",
+      "Examiner: possibly prompts follow-up or clarification (implied by '是啊')",
+      "Patient: uses vague pronouns ('这个', '那个'), filler particles ('嗯', '啊'), and incomplete clauses"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple scene elements: two elders playing chess, two children playing badminton, a dog being walked, children on swings",
+      "Patient uses colloquial Mandarin with discourse particles and vague referents ('这个', '那个')",
+      "Patient’s description is largely coherent and task-relevant despite some fragmented phrasing and pauses",
+      "No evidence of naming collapse, semantic confusion, or major abandonment of task",
+      "Patient does not appear to be confused about roles or actions",
+      "scene elements are correctly attributed"
+    ]
+  },
+  "latency_ms": 20056,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/096/096_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/096/096_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

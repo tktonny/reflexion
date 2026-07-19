@@ -1,0 +1,76 @@
+{
+  "case_id": "english__pitt__dementia__cookie__003_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.4,
+  "classification_request_id": "chatcmpl-c76e7a16-6502-929d-b2b6-5de06da4fc70",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__003_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__003_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The clip contains conversational audio from a screening task involving scene description (cookie jar, overflowing sink, etc.), but speech is largely unintelligible and transcript unavailable. No clear impairment-like signals are directly observable or audible. The patient’s role is probable but not isolated with high confidence. Further clinical evaluation is recommended due to insufficient data for confident classification.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No clear speech breakdown, lexical retrieval failure, or disorganized narrative observed.",
+      "No visible or audible signs of emotional dysregulation or affective flattening.",
+      "Task context is known (picture description), but patient response is not meaningfully assessable due to audio quality."
+    ],
+    "alternative_explanations": [
+      "Audio quality issues may mask potential impairment signals.",
+      "Patient may be non-native speaker or speaking with articulation difficulty unrelated to dementia.",
+      "Examiner may be dominating or prompting, reducing patient response clarity."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat screening with clearer audio recording and structured task instructions.",
+      "Use visual cues or written prompts to supplement verbal response if audio remains unreliable.",
+      "Consider formal cognitive screening battery if patient is at known risk for dementia."
+    ],
+    "visit_recommendation": "Formal cognitive screening with clinical evaluation recommended due to insufficient data for confident classification.",
+    "future_risk_trend_summary": "Longitudinal prediction is not possible from this single clip. Further observation or multi-session assessment is needed.",
+    "reviewer_confidence": 0.4,
+    "context_notes": [
+      "Video portion is unavailable; only audio is present.",
+      "Patient speech is largely unintelligible; transcript not available.",
+      "Task context: picture description (cookie jar, sink, etc.) is known but response not assessable.",
+      "Examiner speech is present but not the target of evaluation."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 7968,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/003-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/003-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

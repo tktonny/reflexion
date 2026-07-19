@@ -1,0 +1,143 @@
+{
+  "case_id": "english__pitt__dementia__sentence__154_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Use the word tree in a brief simple sentence. Well, that's not the table. I know this is a different word. I want you to use the word tree in a brief simple sentence. Make up a sentence for me using the word tree. Can you do that? Sure you can. Give me a sentence using the word tree. You don't have your hair combed. I like it that way. Okay, use the word tree in a brief simple sentence for me. Can you do that? How about the word pencil? Use the word pencil in a brief simple sentence. Use the word pencil in a brief simple sentence. What about a table? I already gave you the sentence. That wouldn't be fair. Okay, give me a sentence using the word table. Give me a brief simple sentence using the word table. Well, that would be uh.",
+  "patient_only_transcript": "Well, that's not the table. ... Well, that would be uh.",
+  "speaker_turn_summary": [
+    "Examiner: Use the word tree in a brief simple sentence.",
+    "Patient: Well, that's not the table.",
+    "Examiner: I know this is a different word. I want you to use the word tree...",
+    "Patient: You don't have your hair combed. I like it that way.",
+    "Examiner: Okay, use the word tree in a brief simple sentence for me.",
+    "Patient: ...Well, that would be uh."
+  ],
+  "patient_cue_summary": [
+    "Patient does not generate original sentence using 'tree' or 'pencil' or 'table'.",
+    "Patient responds with irrelevant or non-task-related statements ('You don't have your hair combed').",
+    "Patient provides minimal, hesitant, or incomplete responses ('Well, that would be uh.').",
+    "Patient appears to avoid or fail to complete the structured sentence-generation task.",
+    "Patient does not self-generate content beyond echo or interruption of examiner prompts."
+  ],
+  "transcript_request_id": "chatcmpl-66ac718b-dd8b-9b33-950b-fca8c709a7d6",
+  "classification_request_id": "chatcmpl-56a41902-0106-908c-aca7-80f32616b7fe",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__154_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__154_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Task Compliance Failure",
+        "summary": "Patient did not generate any sentence using the target word 'tree', 'pencil', or 'table' as instructed.",
+        "evidence": "Patient responded with 'Well, that's not the table' and 'Well, that would be uh.' — neither constitutes a sentence using the target word.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Irrelevant Response",
+        "summary": "Patient provided a non-task-related comment about hair styling.",
+        "evidence": "Patient said: 'You don't have your hair combed. I like it that way.' — unrelated to sentence generation task.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Hesitation and Incomplete Output",
+        "summary": "Patient exhibited hesitation and failed to complete sentence construction, ending with 'uh'.",
+        "evidence": "Patient's final response: 'Well, that would be uh.' — indicates incomplete or aborted attempt.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates failure to generate task-compliant sentences using specified target words. Responses are either irrelevant, incomplete, or hesitant. No evidence of fluent, self-initiated sentence construction. Task compliance is weak, suggesting possible retrieval or executive control difficulty. Further clinical evaluation recommended.",
+    "evidence_for_risk": [
+      "Failure to generate original sentences using target words",
+      "Response to prompt is non-task-relevant or incomplete",
+      "Hesitation and minimal verbal output ('Well, that would be uh.')",
+      "Repetitive or formulaic avoidance of task completion"
+    ],
+    "evidence_against_risk": [
+      "No overt confusion or disorientation",
+      "No signs of severe aphasia or mutism",
+      "Patient remains responsive to examiner prompts"
+    ],
+    "alternative_explanations": [
+      "Task misunderstanding or lack of instruction clarity",
+      "Temporary distraction or fatigue",
+      "Non-clinical response style or communication preference"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Minimal emotional expression observed",
+      "No clear signs of frustration or anxiety",
+      "No overt apathy or disengagement detected"
+    ],
+    "risk_control_suggestions": [
+      "Repeat task with simplified prompts or visual cues",
+      "Use alternative sentence-generation tasks with familiar topics",
+      "Assess for attention, motivation, or comprehension barriers before cognitive interpretation"
+    ],
+    "visit_recommendation": "Formal cognitive screening with standardized tools (e.g., MoCA, MMSE) and clinical interview recommended. Consider referral to neurology or geriatrics if symptoms persist or escalate.",
+    "future_risk_trend_summary": "Single-clip assessment limits longitudinal prediction. Repeat assessments over time are needed to determine if deficits are progressive or situational.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient appears to be responding to examiner prompts but fails to complete task.",
+      "No visual cues available to assess gaze, facial expression, or body language.",
+      "Task context is structured sentence generation",
+      "patient response is minimal and non-compliant."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, that's not the table. ... Well, that would be uh.",
+    "speaker_turn_summary": [
+      "Examiner: Use the word tree in a brief simple sentence.",
+      "Patient: Well, that's not the table.",
+      "Examiner: I know this is a different word. I want you to use the word tree...",
+      "Patient: You don't have your hair combed. I like it that way.",
+      "Examiner: Okay, use the word tree in a brief simple sentence for me.",
+      "Patient: ...Well, that would be uh."
+    ],
+    "patient_cue_summary": [
+      "Patient does not generate original sentence using 'tree' or 'pencil' or 'table'.",
+      "Patient responds with irrelevant or non-task-related statements ('You don't have your hair combed').",
+      "Patient provides minimal, hesitant, or incomplete responses ('Well, that would be uh.').",
+      "Patient appears to avoid or fail to complete the structured sentence-generation task.",
+      "Patient does not self-generate content beyond echo or interruption of examiner prompts."
+    ]
+  },
+  "latency_ms": 20206,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/154-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/154-1.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

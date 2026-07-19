@@ -1,0 +1,105 @@
+{
+  "case_id": "english__pitt__control__cookie__034_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.6,
+  "transcript": "Okay, here's the code. Ask. Okay, good. That's fine.",
+  "patient_only_transcript": "Okay, here's the code. Ask. Okay, good. That's fine.",
+  "speaker_turn_summary": [
+    "Examiner: 'Okay, here's the code. Ask.'",
+    "Patient: 'Okay, good. That's fine.'"
+  ],
+  "patient_cue_summary": [
+    "Patient response is minimal and non-descriptive",
+    "No scene description or task-relevant content provided",
+    "Response appears to acknowledge or confirm rather than describe the picture",
+    "No evidence of word-finding difficulty or disorganization, but also no evidence of task completion"
+  ],
+  "transcript_request_id": "chatcmpl-b4602c54-3b62-9b87-9832-f931584e30ad",
+  "classification_request_id": "chatcmpl-bd28765f-21e5-9b9d-ba84-b128f7acae4a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__034_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__034_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provided minimal, non-descriptive response to what appears to be a picture-description task. No clear impairment-like cues are present, but task completion and content depth are insufficient for confident healthy classification. Further observation or additional testing is warranted.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient speech is intelligible and coherent",
+      "No signs of disorganization, word-finding failure, or task abandonment",
+      "Response is not vague or fragmented",
+      "it is simply brief and non-informative"
+    ],
+    "alternative_explanations": [
+      "Patient may be unfamiliar with task or hesitant to elaborate",
+      "Examiner may have prompted for confirmation rather than description",
+      "Audio may be incomplete or truncated, limiting assessment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Administer full picture-description task with structured prompts",
+      "Include additional cognitive screening measures (e.g., MMSE, MoCA)",
+      "Observe patient behavior and verbal elaboration in subsequent interactions"
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment required for trend determination.",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient response is brief but not impaired",
+      "task context suggests picture description was expected.",
+      "No clear cognitive impairment signals present, but insufficient content for confident healthy classification."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Okay, here's the code. Ask. Okay, good. That's fine.",
+    "speaker_turn_summary": [
+      "Examiner: 'Okay, here's the code. Ask.'",
+      "Patient: 'Okay, good. That's fine.'"
+    ],
+    "patient_cue_summary": [
+      "Patient response is minimal and non-descriptive",
+      "No scene description or task-relevant content provided",
+      "Response appears to acknowledge or confirm rather than describe the picture",
+      "No evidence of word-finding difficulty or disorganization, but also no evidence of task completion"
+    ]
+  },
+  "latency_ms": 12579,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/034-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/034-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

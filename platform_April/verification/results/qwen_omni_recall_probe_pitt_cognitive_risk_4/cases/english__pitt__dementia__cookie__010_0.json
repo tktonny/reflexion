@@ -1,0 +1,73 @@
+{
+  "case_id": "english__pitt__dementia__cookie__010_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.4,
+  "classification_request_id": "chatcmpl-1186c75c-ac99-9156-b72f-794a94f47446",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The clip is audio-only with no visual component. The patient is engaged in a picture description task (cookie theft scene), but no transcript or intelligible speech content is available for analysis. No impairment-like signals can be reliably extracted. Further visual or linguistic data is required for meaningful screening.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [],
+    "alternative_explanations": [
+      "Lack of visual data prevents assessment of nonverbal cues.",
+      "Audio-only format limits ability to evaluate speech fluency, coherence, or lexical retrieval.",
+      "Task may be incomplete or not fully executed by patient."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Obtain video recording with clear visual and audio capture of patient during picture description task.",
+      "Ensure patient is given full opportunity to describe the scene without examiner interruption.",
+      "Consider repeating task with structured prompts and recording of both speech and nonverbal behavior."
+    ],
+    "visit_recommendation": "Routine follow-up with full cognitive screening including visual and audio assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is not possible from a single audio-only clip without visual or linguistic content.",
+    "reviewer_confidence": 0.4,
+    "context_notes": [
+      "Patient is likely the primary respondent in a picture description task.",
+      "No visual cues available to assess gaze, facial expression, or body language.",
+      "Audio content is not transcribed or intelligible enough for content analysis."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "face_not_visible",
+      "video_too_short",
+      "limited_visual_sampling"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 9900,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/010-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/010-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

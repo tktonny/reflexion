@@ -1,0 +1,111 @@
+{
+  "case_id": "mandarin__chou__hc__016__016_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.85,
+  "transcript": "一个妈妈带着孩子来逛夜市，逛夜市，然后她就带孩子来捞金鱼，夜市里头有捞金鱼。然后捞金鱼的时候呢，发现有一个奶奶带着孙子也来捞金鱼，还有一个小朋友，他也在捞金鱼，看起来很快乐的样子。就妈妈手里拿着冰淇淋都快融化了，所以妈妈就很急的样子。其实也没有很急啊，嗯。然后呢，这个打香肠的摊子上啊，三个小朋友，啊不是哦，两个小朋友很快乐的在在哇西巴拉，然后呢没有注意到其中有一个他后面的背包有一个有一个叫做扒手，伸进他背包里头要扒手偷他的东西，就老板也没看到，其他两个人都没有帮他看到，哎，这其他一个，嗯，都没有帮他看到，所以自己要小心哦。",
+  "patient_only_transcript": "一个妈妈带着孩子来逛夜市，逛夜市，然后她就带孩子来捞金鱼，夜市里头有捞金鱼。然后捞金鱼的时候呢，发现有一个奶奶带着孙子也来捞金鱼，还有一个小朋友，他也在捞金鱼，看起来很快乐的样子。就妈妈手里拿着冰淇淋都快融化了，所以妈妈就很急的样子。其实也没有很急啊，嗯。然后呢，这个打香肠的摊子上啊，三个小朋友，啊不是哦，两个小朋友很快乐的在在哇西巴拉，然后呢没有注意到其中有一个他后面的背包有一个有一个叫做扒手，伸进他背包里头要扒手偷他的东西，就老板也没看到，其他两个人都没有帮他看到，哎，这其他一个，嗯，都没有帮他看到，所以自己要小心哦。",
+  "speaker_turn_summary": [
+    "Patient describes a night market scene with multiple characters and actions: mother with child, grandmother with grandson, children fishing for goldfish, melting ice cream, and a pickpocket incident at a sausage stall.",
+    "Patient corrects self mid-sentence ('三个小朋友，啊不是哦'), indicating self-monitoring.",
+    "Patient uses colloquial fillers ('嗯', '啊', '哦') and topic-comment phrasing, but maintains overall scene coherence.",
+    "Patient does not show naming collapse, contradiction, or abandonment of task elements."
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple scene elements: characters (mother, child, grandmother, grandson, other children), actions (fishing for goldfish, eating sausage, pickpocketing), and objects (ice cream, backpack, stall).",
+    "Patient uses self-correction ('三个小朋友，啊不是哦'), which is normal in spontaneous speech, not indicative of impairment.",
+    "Patient maintains narrative flow despite colloquial fillers and pauses, without losing referential clarity.",
+    "No evidence of semantic vagueness, lexical retrieval failure, or disorganization beyond normal conversational speech patterns."
+  ],
+  "transcript_request_id": "chatcmpl-9acc4b4d-1401-9b01-b441-ee2133df3e0b",
+  "classification_request_id": "chatcmpl-709bde71-3ecf-9fad-91b7-e9bc153bd121",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__016__016_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__016__016_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, multi-element description of a night market scene with multiple characters and actions. Speech contains colloquial fillers and self-corrections, which are normal in spontaneous Mandarin speech. No persuasive impairment-like cues are present. Further observation or formal screening may be warranted if clinical context suggests concern.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies and names multiple actors, objects, and actions in the scene.",
+      "Narrative remains largely intact despite colloquial speech patterns and minor self-corrections.",
+      "No evidence of word-finding failure, semantic collapse, or disorganization beyond normal conversational variation."
+    ],
+    "alternative_explanations": [
+      "Colloquial speech patterns (fillers, topic-comment structure, self-corrections) are typical in spontaneous Mandarin and do not indicate cognitive impairment.",
+      "The task is a scene-description task",
+      "patient fulfills the task adequately without abandonment or major omissions.",
+      "Audio quality or recording conditions may limit full clarity, but patient speech remains reconstructable and meaningful."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Patient's tone is neutral to mildly amused, with no signs of distress, anxiety, or affective flattening.",
+      "Patient's emotional reactivity is consistent with casual storytelling, not indicative of cognitive impairment."
+    ],
+    "risk_control_suggestions": [
+      "Monitor for consistency in future scene-description tasks.",
+      "Consider formal cognitive screening if caregiver or clinician reports functional concerns.",
+      "Avoid overinterpreting colloquial speech as impairment."
+    ],
+    "visit_recommendation": "routine follow-up or formal screening if clinical concern is present.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of progressive decline or impairment in this segment.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-compliant despite colloquial style.",
+      "No evidence of cognitive impairment in this clip",
+      "classification is conservative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "一个妈妈带着孩子来逛夜市，逛夜市，然后她就带孩子来捞金鱼，夜市里头有捞金鱼。然后捞金鱼的时候呢，发现有一个奶奶带着孙子也来捞金鱼，还有一个小朋友，他也在捞金鱼，看起来很快乐的样子。就妈妈手里拿着冰淇淋都快融化了，所以妈妈就很急的样子。其实也没有很急啊，嗯。然后呢，这个打香肠的摊子上啊，三个小朋友，啊不是哦，两个小朋友很快乐的在在哇西巴拉，然后呢没有注意到其中有一个他后面的背包有一个有一个叫做扒手，伸进他背包里头要扒手偷他的东西，就老板也没看到，其他两个人都没有帮他看到，哎，这其他一个，嗯，都没有帮他看到，所以自己要小心哦。",
+    "speaker_turn_summary": [
+      "Patient describes a night market scene with multiple characters and actions: mother with child, grandmother with grandson, children fishing for goldfish, melting ice cream, and a pickpocket incident at a sausage stall.",
+      "Patient corrects self mid-sentence ('三个小朋友，啊不是哦'), indicating self-monitoring.",
+      "Patient uses colloquial fillers ('嗯', '啊', '哦') and topic-comment phrasing, but maintains overall scene coherence.",
+      "Patient does not show naming collapse, contradiction, or abandonment of task elements."
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple scene elements: characters (mother, child, grandmother, grandson, other children), actions (fishing for goldfish, eating sausage, pickpocketing), and objects (ice cream, backpack, stall).",
+      "Patient uses self-correction ('三个小朋友，啊不是哦'), which is normal in spontaneous speech, not indicative of impairment.",
+      "Patient maintains narrative flow despite colloquial fillers and pauses, without losing referential clarity.",
+      "No evidence of semantic vagueness, lexical retrieval failure, or disorganization beyond normal conversational speech patterns."
+    ]
+  },
+  "latency_ms": 16417,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/016/016_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/016/016_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

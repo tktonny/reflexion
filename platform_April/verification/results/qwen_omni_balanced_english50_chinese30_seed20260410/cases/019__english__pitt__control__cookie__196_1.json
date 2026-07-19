@@ -1,0 +1,112 @@
+{
+  "case_id": "english__pitt__control__cookie__196_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.7,
+  "transcript": "The little boy is reaching for a cookie and he's falling at the same time because the stool has tipped over. His little sister is reaching for a cookie and I think beginning to laugh because he's falling. The sink is running over and dripping water on the floor while the mother is trying to dry the dishes. The window is open and the curtains are blowing in the breeze coming in from outside. Water is running in the sink, that's why it's overflowing. I also believe that the mother is daydreaming, possibly worrying about something. That's it, that's all I see.",
+  "patient_only_transcript": "The little boy is reaching for a cookie and he's falling at the same time because the stool has tipped over. His little sister is reaching for a cookie and I think beginning to laugh because he's falling. The sink is running over and dripping water on the floor while the mother is trying to dry the dishes. The window is open and the curtains are blowing in the breeze coming in from outside. Water is running in the sink, that's why it's overflowing. I also believe that the mother is daydreaming, possibly worrying about something. That's it, that's all I see.",
+  "speaker_turn_summary": [
+    "Examiner: prompts or introduces task (implied)",
+    "Patient: describes scene with multiple elements (boy, sister, stool, sink, mother, window, curtains, water, daydreaming)",
+    "Patient: ends with 'That's it, that's all I see.'"
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with multiple named elements",
+    "Logical sequencing of events: boy falls → sister laughs → sink overflows → mother drying dishes → window open → curtains blowing",
+    "Includes interpretive inference: 'I also believe that the mother is daydreaming'",
+    "Ends with self-conclusion: 'That's it, that's all I see.' — suggests possible completion or lack of further elaboration",
+    "No obvious word-finding pauses, repetitions, or disorganization",
+    "No examiner dependence or prompting evident in patient speech"
+  ],
+  "transcript_request_id": "chatcmpl-c215a6d5-54c1-94d1-827d-8b137e8d171e",
+  "classification_request_id": "chatcmpl-f841b13e-ad26-9ac3-9ff0-79d26ebb8642",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__196_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__196_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient provides a coherent, detailed, and logically sequenced description of a multi-element scene involving a child falling, a sister laughing, an overflowing sink, a mother drying dishes, and environmental details. The description includes interpretive inference and ends with a self-concluded statement. No clear signs of cognitive impairment are evident in the speech. However, due to the absence of visual data and potential limitations in audio clarity or context, further observation is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent narrative structure",
+      "Accurate naming of multiple scene elements",
+      "No word-finding difficulty or disorganization",
+      "No examiner dependence or fragmented speech"
+    ],
+    "alternative_explanations": [
+      "The patient may be describing a familiar or rehearsed scene",
+      "The self-conclusion 'That's it, that's all I see' may reflect task completion rather than cognitive limitation",
+      "Audio quality or context may limit full assessment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a full visual cognitive screening if available",
+      "Repeat the task with different stimuli to assess consistency",
+      "Monitor for changes in narrative coherence or detail over time"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if symptoms emerge or if additional data is available",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single audio-only clip; no persuasive evidence of cognitive decline is present in this clip.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video data is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is self-contained and does not require examiner prompting.",
+      "Task context: cookie-theft picture description",
+      "patient successfully described scene elements and sequence.",
+      "No signs of cognitive impairment detected in this clip."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The little boy is reaching for a cookie and he's falling at the same time because the stool has tipped over. His little sister is reaching for a cookie and I think beginning to laugh because he's falling. The sink is running over and dripping water on the floor while the mother is trying to dry the dishes. The window is open and the curtains are blowing in the breeze coming in from outside. Water is running in the sink, that's why it's overflowing. I also believe that the mother is daydreaming, possibly worrying about something. That's it, that's all I see.",
+    "speaker_turn_summary": [
+      "Examiner: prompts or introduces task (implied)",
+      "Patient: describes scene with multiple elements (boy, sister, stool, sink, mother, window, curtains, water, daydreaming)",
+      "Patient: ends with 'That's it, that's all I see.'"
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with multiple named elements",
+      "Logical sequencing of events: boy falls → sister laughs → sink overflows → mother drying dishes → window open → curtains blowing",
+      "Includes interpretive inference: 'I also believe that the mother is daydreaming'",
+      "Ends with self-conclusion: 'That's it, that's all I see.' — suggests possible completion or lack of further elaboration",
+      "No obvious word-finding pauses, repetitions, or disorganization",
+      "No examiner dependence or prompting evident in patient speech"
+    ]
+  },
+  "latency_ms": 20316,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/196-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/196-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

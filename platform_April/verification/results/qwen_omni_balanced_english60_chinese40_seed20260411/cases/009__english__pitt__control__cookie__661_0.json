@@ -1,0 +1,136 @@
+{
+  "case_id": "english__pitt__control__cookie__661_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.9,
+  "transcript": "And tell me everything you see happening in that picture, everything that's going on there. You mean right now, I'll tell you. Yeah. The boy is stealing cookies out of the jar and he's on a stool that's falling down and the girl is laughing at him and the mother is washing dishes but she's preoccupied and the water is flowing over the sink and there's trouble galore. The wind is blowing the curtains. She is not paying any attention to her kids. And the boy, in addition to stealing, he's trying to give the girl a cookie and the whole thing is going to collapse. But aside from that, they seem to be a fairly happy family.",
+  "patient_only_transcript": "The boy is stealing cookies out of the jar and he's on a stool that's falling down and the girl is laughing at him and the mother is washing dishes but she's preoccupied and the water is flowing over the sink and there's trouble galore. The wind is blowing the curtains. She is not paying any attention to her kids. And the boy, in addition to stealing, he's trying to give the girl a cookie and the whole thing is going to collapse. But aside from that, they seem to be a fairly happy family.",
+  "speaker_turn_summary": [
+    "Examiner: 'And tell me everything you see happening in that picture...'",
+    "Patient: 'The boy is stealing cookies...'",
+    "Examiner: 'You mean right now, I'll tell you. Yeah.'",
+    "Patient: 'The boy is stealing cookies... (continues description)'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides detailed, coherent description of multiple scene elements (boy, girl, mother, cookies, stool, water, curtains, family mood).",
+    "Patient uses connected narrative structure with causal links (e.g., stool falling → trouble galore",
+    "mother preoccupied → not paying attention).",
+    "Patient includes evaluative summary ('fairly happy family') despite describing chaos, indicating intact affective and interpretive capacity.",
+    "No evidence of word-finding pauses, circumlocution, repetition, restarts, or examiner dependence in patient speech.",
+    "Patient speech is intelligible and task-relevant, covering core actors, actions, and spatial/temporal relationships in the scene."
+  ],
+  "transcript_request_id": "chatcmpl-3159db45-0151-90dd-9704-3a460852dbe1",
+  "classification_request_id": "chatcmpl-2728363e-7a8c-9ee0-804e-f7a069531444",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__661_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__661_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient accurately identifies multiple actors, actions, and environmental details from the picture description task.",
+        "evidence": "Patient names boy, girl, mother, cookies, falling stool, running water, blowing curtains, and family emotional tone.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Narrative Coherence",
+        "summary": "Patient organizes events with causal and spatial logic, linking actions to consequences (e.g., stool falling → trouble, mother distracted → not paying attention).",
+        "evidence": "Sequential description with connective phrases ('and', 'but', 'in addition to') and evaluative conclusion.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Relevance and Sustained Engagement",
+        "summary": "Patient remains focused on the picture description task without deviation, examiner prompts, or need for scaffolding.",
+        "evidence": "Patient delivers extended, self-contained response without prompting or interruption.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a detailed, coherent, and task-relevant description of a complex picture scene, accurately identifying multiple actors, actions, and environmental cues. Speech is fluent, organized, and evaluative without signs of retrieval difficulty, disorganization, or examiner dependence. No impairment-like signals are present.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "High completeness of scene description",
+      "Coherent narrative structure with causal links",
+      "No word-finding pauses, repetitions, or restarts",
+      "Task-relevant and sustained response without scaffolding",
+      "Positive affective conclusion despite chaotic content"
+    ],
+    "alternative_explanations": [
+      "Patient may be describing a familiar or well-known scene, reducing cognitive load.",
+      "Task may be within patient’s functional capacity, not indicative of impairment.",
+      "Audio quality or background noise may mask subtle cues, but patient speech remains clear and complete."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Patient displays neutral to mildly positive affect, concluding with 'fairly happy family' despite describing chaos.",
+      "No signs of distress, anxiety, apathy, or emotional flattening in speech tone or content."
+    ],
+    "risk_control_suggestions": [
+      "No immediate intervention needed.",
+      "Continue routine monitoring if part of longitudinal screening.",
+      "Consider follow-up if other domains (memory, executive function) show decline."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline present.",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment relies solely on audio.",
+      "Patient speech is intelligible and task-compliant",
+      "no impairment-like features detected.",
+      "Examiner prompts are minimal and do not interfere with patient response evaluation."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is stealing cookies out of the jar and he's on a stool that's falling down and the girl is laughing at him and the mother is washing dishes but she's preoccupied and the water is flowing over the sink and there's trouble galore. The wind is blowing the curtains. She is not paying any attention to her kids. And the boy, in addition to stealing, he's trying to give the girl a cookie and the whole thing is going to collapse. But aside from that, they seem to be a fairly happy family.",
+    "speaker_turn_summary": [
+      "Examiner: 'And tell me everything you see happening in that picture...'",
+      "Patient: 'The boy is stealing cookies...'",
+      "Examiner: 'You mean right now, I'll tell you. Yeah.'",
+      "Patient: 'The boy is stealing cookies... (continues description)'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides detailed, coherent description of multiple scene elements (boy, girl, mother, cookies, stool, water, curtains, family mood).",
+      "Patient uses connected narrative structure with causal links (e.g., stool falling → trouble galore",
+      "mother preoccupied → not paying attention).",
+      "Patient includes evaluative summary ('fairly happy family') despite describing chaos, indicating intact affective and interpretive capacity.",
+      "No evidence of word-finding pauses, circumlocution, repetition, restarts, or examiner dependence in patient speech.",
+      "Patient speech is intelligible and task-relevant, covering core actors, actions, and spatial/temporal relationships in the scene."
+    ]
+  },
+  "latency_ms": 15523,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/661-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/661-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

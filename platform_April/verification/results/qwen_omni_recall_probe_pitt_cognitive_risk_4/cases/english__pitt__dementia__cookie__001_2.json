@@ -1,0 +1,105 @@
+{
+  "case_id": "english__pitt__dementia__cookie__001_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "classification_request_id": "chatcmpl-8944592f-d411-95ec-b3fe-efd028899211",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "speech_retrieval_difficulty",
+        "summary": "Patient exhibits lexical retrieval hesitation and circumlocution when describing a picture task, including pauses, self-corrections, and inability to recall specific terms (e.g., 'I can't think of the... she's trying to wipe dishes').",
+        "evidence": "Patient repeatedly pauses, uses filler phrases ('uh', 'I don't know about the...'), and struggles to name objects or actions in the described scene, suggesting possible word-finding difficulty.",
+        "confidence": 0.7
+      },
+      {
+        "label": "narrative_incoherence",
+        "summary": "Patient's description of the picture is fragmented, lacks logical sequencing, and includes tangential or incomplete references (e.g., 'he's in a cookie jar... stool... water in the sink is overflowing'), indicating possible disorganized thought or attentional fragmentation.",
+        "evidence": "Narrative jumps between elements without clear causal or spatial relationships; some elements are described in isolation without integration into a coherent scene.",
+        "confidence": 0.65
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "task_relevance",
+        "summary": "Patient attempts to describe a picture task but struggles to maintain focus on the required content, frequently drifting or omitting key elements.",
+        "evidence": "Patient describes elements of the scene (boy, cookie jar, stool, sink) but fails to integrate them into a complete, coherent description of the picture’s narrative or context.",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates mild language retrieval and narrative organization difficulties during a picture description task, consistent with early cognitive changes but not definitive of dementia. Further observation or formal screening is recommended.",
+    "evidence_for_risk": [
+      "Lexical retrieval hesitation and circumlocution during structured task",
+      "Fragmented, disorganized narrative with incomplete scene integration"
+    ],
+    "evidence_against_risk": [
+      "No overt disorientation, memory loss, or functional impairment reported",
+      "Task completion attempted with partial success; no complete failure or incoherence"
+    ],
+    "alternative_explanations": [
+      "Task-specific difficulty or anxiety during picture description",
+      "Normal age-related variability in word retrieval or narrative fluency",
+      "Temporary cognitive load or distraction during interview"
+    ],
+    "risk_factor_findings": [
+      "Lexical retrieval difficulty during picture description task",
+      "Narrative disorganization during structured visual task"
+    ],
+    "subjective_assessment_findings": [
+      "Patient reports uncertainty about details ('I don't know about the...') and struggles to recall specific terms, suggesting possible self-awareness of cognitive difficulty or task frustration."
+    ],
+    "emotional_assessment_findings": [
+      "Mild frustration or cognitive effort evident in pauses and self-corrections; no overt emotional dysregulation or affective flattening observed."
+    ],
+    "risk_control_suggestions": [
+      "Administer formal cognitive screening (e.g., MoCA, MMSE) in next visit",
+      "Repeat picture description task with structured prompts to assess consistency",
+      "Monitor for progression in language or executive function over time"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening; consider follow-up in 3–6 months if no further symptoms emerge.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; risk remains low but warrants monitoring for progression.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component unavailable; assessment based solely on audio from structured picture description task.",
+      "Patient is likely the primary respondent; examiner prompts are neutral context.",
+      "Lexical and narrative difficulties observed are consistent with early cognitive changes but not diagnostic."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "video_too_short",
+      "limited_visual_sampling"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 10356,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/001-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/001-2.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "case_id": "english__pitt__dementia__fluency__134_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "Cat. Dog. Horse. Pig. Hen. Turkey. Say horse. Bear. Okay, all the words that you can think of. Fox. Okay, thanks.",
+  "patient_only_transcript": "Cat. Dog. Horse. Pig. Hen. Turkey. Say horse. Bear. Okay, all the words that you can think of. Fox. Okay, thanks.",
+  "speaker_turn_summary": [
+    "Examiner: 'Say horse.'",
+    "Patient: 'Cat. Dog. Horse. Pig. Hen. Turkey. Say horse. Bear.'",
+    "Examiner: 'Okay, all the words that you can think of.'",
+    "Patient: 'Fox. Okay, thanks.'"
+  ],
+  "patient_cue_summary": [
+    "Minimal lexical output with repeated or redundant items ('Say horse' repeated)",
+    "Short, fragmented responses with no elaboration or narrative",
+    "Lack of semantic depth or contextual connection beyond basic animal names",
+    "Examiner-dependent continuation required to proceed with task",
+    "No evidence of spontaneous elaboration or coherent scene description"
+  ],
+  "transcript_request_id": "chatcmpl-8cdb2734-a01b-92b8-b37f-35f677947c6c",
+  "classification_request_id": "chatcmpl-212050f9-32cc-921b-934b-bda4884f20cd",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__134_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__134_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Verbal Fluency Output",
+        "summary": "Patient generated a list of animal names with minimal elaboration or narrative structure.",
+        "evidence": "Patient said: 'Cat. Dog. Horse. Pig. Hen. Turkey. Say horse. Bear. Okay, all the words that you can think of. Fox. Okay, thanks.'",
+        "confidence": 0.8
+      },
+      {
+        "label": "Task Completion Style",
+        "summary": "Patient responded to prompts with short, fragmented answers and required examiner direction to continue.",
+        "evidence": "Patient repeated 'Say horse' and responded with 'Fox. Okay, thanks.' after examiner prompt.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Lexical Retrieval",
+        "summary": "Patient retrieved common animal nouns but did not expand or organize them meaningfully.",
+        "evidence": "List included 'Cat, Dog, Horse, Pig, Hen, Turkey, Bear, Fox' — all common but not elaborated or contextualized.",
+        "confidence": 0.8
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provided minimal, fragmented verbal fluency responses with no elaboration or narrative structure. Task completion was examiner-dependent and lacked depth or coherence. No clear evidence of dementia, but impairment-like signals suggest need for further clinical evaluation.",
+    "evidence_for_risk": [
+      "Fragmented, repetitive lexical output",
+      "Lack of spontaneous elaboration or contextual connection",
+      "Examiner-dependent task progression"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly named several common animal nouns",
+      "No signs of severe disorientation or confusion",
+      "Task was completed with minimal prompting"
+    ],
+    "alternative_explanations": [
+      "Low verbal fluency due to task unfamiliarity or anxiety",
+      "Temporary cognitive load or fatigue during screening",
+      "Language or communication style differences not indicative of impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency task with different categories or longer time limits",
+      "Include additional screening measures (e.g., memory recall, orientation)",
+      "Observe for consistency across multiple sessions or tasks"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended; routine follow-up if no further concerns arise.",
+    "future_risk_trend_summary": "Longitudinal prediction not possible from single clip; further assessment needed to determine trend.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is sparse and examiner-dependent",
+      "not sufficient for healthy classification.",
+      "Verbal fluency task was partially completed but lacked depth or coherence."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Cat. Dog. Horse. Pig. Hen. Turkey. Say horse. Bear. Okay, all the words that you can think of. Fox. Okay, thanks.",
+    "speaker_turn_summary": [
+      "Examiner: 'Say horse.'",
+      "Patient: 'Cat. Dog. Horse. Pig. Hen. Turkey. Say horse. Bear.'",
+      "Examiner: 'Okay, all the words that you can think of.'",
+      "Patient: 'Fox. Okay, thanks.'"
+    ],
+    "patient_cue_summary": [
+      "Minimal lexical output with repeated or redundant items ('Say horse' repeated)",
+      "Short, fragmented responses with no elaboration or narrative",
+      "Lack of semantic depth or contextual connection beyond basic animal names",
+      "Examiner-dependent continuation required to proceed with task",
+      "No evidence of spontaneous elaboration or coherent scene description"
+    ]
+  },
+  "latency_ms": 12491,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/134-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/134-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

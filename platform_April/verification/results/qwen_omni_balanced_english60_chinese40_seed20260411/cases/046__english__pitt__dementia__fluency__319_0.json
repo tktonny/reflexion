@@ -1,0 +1,158 @@
+{
+  "case_id": "english__pitt__dementia__fluency__319_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "That's fine. Okay, animals as you can think of and you can start now. Pigs, chickens, horses, cows, mules, um, horses, that's a mule though. Um, what was it called? Chickens, um, pigs, that's the same thing though. Hmm, many horses and cows and mules and chickens and all that kind of stuff we got home and I can't think of that. Hmm. Uh, butter. We use in the kitchen. Flour and stuff in the kitchen. Eggs plentiful in the kitchen. Okay, good. Now I'm going to change directions. Now. Did I get any? You did and you can start now. Fanny, um, food. Um, I can't think of them than that. Baking food, to bake. Hmm. Food. As many words beginning with the letter F as you can. F. I don't think I know many that I have. I know that's food and um. No, a horse ain't no food. I can't think of nothing else. I can't think of them with an F. I could find one but you still don't.",
+  "patient_only_transcript": "Pigs, chickens, horses, cows, mules... horses, that's a mule though... chickens... pigs, that's the same thing... many horses and cows and mules and chickens... I can't think of that... butter, flour, eggs... food... I can't think of them with an F... I know that's food... a horse ain't no food... I can't think of nothing else... I could find one but you still don't.",
+  "speaker_turn_summary": [
+    "Examiner: 'Okay, animals as you can think of and you can start now.'",
+    "Patient: 'Pigs, chickens, horses, cows, mules...'",
+    "Examiner: 'Okay, good. Now I'm going to change directions. Now.'",
+    "Patient: 'Fanny, um, food... I can't think of them than that... Baking food, to bake... Hmm. Food.'",
+    "Examiner: 'As many words beginning with the letter F as you can.'",
+    "Patient: 'F. I don't think I know many that I have... I know that's food... No, a horse ain't no food... I can't think of nothing else... I can't think of them with an F... I could find one but you still don't.'"
+  ],
+  "patient_cue_summary": [
+    "Low productivity in animal fluency task with repetition and self-correction ('that's the same thing', 'that's a mule though')",
+    "Semantic drift and category confusion ('horses' listed twice, 'mule' misclassified)",
+    "Task breakdown in F-word fluency: inability to generate multiple F-words despite prompting, reliance on 'food' as only example",
+    "Frequent hesitation markers ('um', 'hmm', 'I can't think of...') and self-admission of inability ('I can't think of nothing else')",
+    "Examiner scaffolding required to maintain task flow, indicating retrieval difficulty"
+  ],
+  "transcript_request_id": "chatcmpl-21ad7143-4d86-97ef-986b-1a4ca9f43635",
+  "classification_request_id": "chatcmpl-1d57b52c-c91d-98ef-86bb-e6387241c5d3",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__319_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__319_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "Vocal Hesitation and Filler Use",
+        "summary": "Frequent use of 'um', 'hmm', and 'I can't think of...' indicates retrieval difficulty and cognitive effort.",
+        "evidence": "Patient repeatedly uses hesitation markers during fluency tasks, especially when generating F-words.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task-Related Uncertainty",
+        "summary": "Patient explicitly states inability to retrieve words and acknowledges task failure.",
+        "evidence": "Patient says 'I can't think of that', 'I can't think of nothing else', and 'I could find one but you still don't'.",
+        "confidence": 0.5
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "Animal Fluency Task Breakdown",
+        "summary": "Patient lists animals but repeats 'horses' and misclassifies 'mule', indicating semantic confusion and retrieval difficulty.",
+        "evidence": "Patient says 'horses, that's a mule though' and 'pigs, that's the same thing though'.",
+        "confidence": 0.5
+      },
+      {
+        "label": "F-Word Fluency Failure",
+        "summary": "Patient fails to generate multiple F-words despite prompting, relying only on 'food' and admitting inability.",
+        "evidence": "Patient says 'I don't think I know many that I have... I know that's food... I can't think of them with an F'.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates signs of word-finding difficulty and task breakdown during verbal fluency tasks, including repetition, semantic confusion, and inability to generate multiple F-words despite prompting. While patient remains coherent and task-relevant, the pattern of retrieval failure and self-reported difficulty supports a low-level cognitive risk. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Low item productivity in animal fluency task with repetition and self-correction",
+      "Failure to generate multiple F-words despite explicit instruction and prior success",
+      "Self-reported inability to retrieve words ('I can't think of...') and task-related uncertainty"
+    ],
+    "evidence_against_risk": [
+      "Patient remains coherent and task-relevant throughout",
+      "No signs of severe disorientation, incoherence, or loss of narrative structure",
+      "No evidence of emotional dysregulation or apathy"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive fatigue or distraction during testing",
+      "Language or dialectal variation affecting fluency performance",
+      "Task-specific difficulty or unfamiliarity with the F-word fluency paradigm"
+    ],
+    "risk_factor_findings": [
+      "Reported difficulty retrieving category-specific items under fluency task",
+      "Repeated self-correction and semantic confusion during task execution",
+      "Inability to generate multiple words beginning with 'F' despite prompting and prior success with animals"
+    ],
+    "subjective_assessment_findings": [
+      "Patient explicitly states difficulty retrieving words ('I can't think of that', 'I can't think of nothing else')",
+      "Patient acknowledges task failure ('I could find one but you still don't')",
+      "Patient exhibits task-related frustration and uncertainty ('hmm', 'um', 'I don't think I know many')"
+    ],
+    "emotional_assessment_findings": [
+      "Mild frustration and uncertainty evident in vocal tone and pauses ('hmm', 'um', 'I can't think of...')",
+      "No signs of agitation, apathy, or emotional flattening",
+      "patient remains engaged despite difficulty",
+      "Vocal hesitations suggest cognitive effort rather than disengagement or emotional distress"
+    ],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency tasks with different categories to assess consistency",
+      "Administer brief memory and orientation screening to contextualize fluency findings",
+      "Consider patient’s prior cognitive history or caregiver report if available"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening battery recommended",
+    "future_risk_trend_summary": "Longitudinal prediction limited from single clip; follow-up assessment recommended to monitor for progressive decline",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and transcript reconstruction",
+      "Patient speech is intelligible but shows clear fluency breakdown under structured task conditions",
+      "Examiner prompts are neutral context",
+      "patient’s own responses are the primary evidence for risk assessment"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Pigs, chickens, horses, cows, mules... horses, that's a mule though... chickens... pigs, that's the same thing... many horses and cows and mules and chickens... I can't think of that... butter, flour, eggs... food... I can't think of them with an F... I know that's food... a horse ain't no food... I can't think of nothing else... I could find one but you still don't.",
+    "speaker_turn_summary": [
+      "Examiner: 'Okay, animals as you can think of and you can start now.'",
+      "Patient: 'Pigs, chickens, horses, cows, mules...'",
+      "Examiner: 'Okay, good. Now I'm going to change directions. Now.'",
+      "Patient: 'Fanny, um, food... I can't think of them than that... Baking food, to bake... Hmm. Food.'",
+      "Examiner: 'As many words beginning with the letter F as you can.'",
+      "Patient: 'F. I don't think I know many that I have... I know that's food... No, a horse ain't no food... I can't think of nothing else... I can't think of them with an F... I could find one but you still don't.'"
+    ],
+    "patient_cue_summary": [
+      "Low productivity in animal fluency task with repetition and self-correction ('that's the same thing', 'that's a mule though')",
+      "Semantic drift and category confusion ('horses' listed twice, 'mule' misclassified)",
+      "Task breakdown in F-word fluency: inability to generate multiple F-words despite prompting, reliance on 'food' as only example",
+      "Frequent hesitation markers ('um', 'hmm', 'I can't think of...') and self-admission of inability ('I can't think of nothing else')",
+      "Examiner scaffolding required to maintain task flow, indicating retrieval difficulty"
+    ]
+  },
+  "latency_ms": 21345,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/319-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/319-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

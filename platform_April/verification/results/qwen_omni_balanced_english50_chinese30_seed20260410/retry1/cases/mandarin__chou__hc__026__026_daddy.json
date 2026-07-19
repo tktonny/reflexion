@@ -1,0 +1,132 @@
+{
+  "case_id": "mandarin__chou__hc__026__026_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "我跟你说，水倒了嘛哈。然后这个人在，爸爸在在烫东西啊，然后然后小孩想要去弄那个插头。哎，有电出来，小狗狗就在叫。嗯。那我就说。猫咪在，哎。就是爸爸在烫衣服啊，小朋友跑去插头的地方要去弄插头，那只狗很聪明，看到了，发电就就汪汪叫，猫咪一一看叫，然后就去打破水。二二零一九啦。嗯。六月二十七。就是烫衣服开始。",
+  "patient_only_transcript": "我跟你说，水倒了嘛哈。然后这个人在，爸爸在在烫东西啊，然后然后小孩想要去弄那个插头。哎，有电出来，小狗狗就在叫。嗯。那我就说。猫咪在，哎。就是爸爸在烫衣服啊，小朋友跑去插头的地方要去弄插头，那只狗很聪明，看到了，发电就就汪汪叫，猫咪一一看叫，然后就去打破水。二二零一九啦。嗯。六月二十七。就是烫衣服开始。",
+  "speaker_turn_summary": [
+    "Patient: Describes a scene involving water spill, father ironing, child reaching for plug, dog barking, cat reacting.",
+    "Examiner: Likely prompts or acknowledges, but no clear examiner speech is distinguishable in audio."
+  ],
+  "patient_cue_summary": [
+    "Use of fillers and pauses: '嘛哈', '嗯', '哎', '就就', '然后然后'.",
+    "Repetitive phrasing: '爸爸在在烫东西', '跑去插头的地方要去弄插头'.",
+    "Fragmented narrative: Jumps between events without clear causal or temporal sequencing.",
+    "Vague or low-information terms: '那个插头', '发电', '打破水' — lacks specificity or precise vocabulary.",
+    "Examiner-dependent structure: Narrative appears to follow a prompted scenario rather than self-initiated description.",
+    "Partial coherence: Mentions multiple elements (dog, cat, child, father, plug, water) but fails to link them logically or sustain a unified description."
+  ],
+  "transcript_request_id": "chatcmpl-12167d37-6e31-90a7-9c71-20c93f77d6f2",
+  "classification_request_id": "chatcmpl-e922f415-1895-9ac6-9719-ce63237dc127",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__026__026_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__026__026_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "narrative coherence",
+        "summary": "Patient's description is fragmented, repetitive, and lacks logical sequencing of events.",
+        "evidence": "Patient describes multiple elements (child, dog, cat, plug, water) but fails to connect them causally or temporally. Uses fillers and repetitions.",
+        "confidence": null
+      },
+      {
+        "label": "lexical retrieval",
+        "summary": "Patient uses vague or generic terms instead of precise vocabulary.",
+        "evidence": "Uses '那个插头', '发电', '打破水' — lacks specific nouns or verbs to describe actions clearly.",
+        "confidence": null
+      },
+      {
+        "label": "task engagement",
+        "summary": "Patient appears to follow a prompted scenario but does not self-organize or sustain a coherent narrative.",
+        "evidence": "Narrative structure suggests reliance on examiner context; patient does not initiate or expand description independently.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented, examiner-dependent description of a multi-element scene. While key objects are named, the narrative lacks coherence, precise vocabulary, and logical sequencing. These features suggest mild cognitive impairment-like signals warranting further clinical review.",
+    "evidence_for_risk": [
+      "Fragmented narrative with weak causal links",
+      "Use of vague terms and fillers",
+      "Repetitive phrasing and pauses",
+      "Examiner-dependent structure"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple scene elements (dog, cat, child, plug, water)",
+      "No signs of severe disorientation or incoherence"
+    ],
+    "alternative_explanations": [
+      "Language processing delay or fatigue",
+      "Non-native speaker or dialectal variation",
+      "Audio quality limitations obscuring full fluency"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the task with clearer prompts or visual aids",
+      "Assess with formal cognitive screening tools (e.g., MoCA, MMSE)",
+      "Consider caregiver report for functional context"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up evaluation recommended.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment needed to determine progression.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is partially intelligible but shows impairment-like features.",
+      "Examiner role is unclear",
+      "patient appears to be the primary respondent."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "我跟你说，水倒了嘛哈。然后这个人在，爸爸在在烫东西啊，然后然后小孩想要去弄那个插头。哎，有电出来，小狗狗就在叫。嗯。那我就说。猫咪在，哎。就是爸爸在烫衣服啊，小朋友跑去插头的地方要去弄插头，那只狗很聪明，看到了，发电就就汪汪叫，猫咪一一看叫，然后就去打破水。二二零一九啦。嗯。六月二十七。就是烫衣服开始。",
+    "speaker_turn_summary": [
+      "Patient: Describes a scene involving water spill, father ironing, child reaching for plug, dog barking, cat reacting.",
+      "Examiner: Likely prompts or acknowledges, but no clear examiner speech is distinguishable in audio."
+    ],
+    "patient_cue_summary": [
+      "Use of fillers and pauses: '嘛哈', '嗯', '哎', '就就', '然后然后'.",
+      "Repetitive phrasing: '爸爸在在烫东西', '跑去插头的地方要去弄插头'.",
+      "Fragmented narrative: Jumps between events without clear causal or temporal sequencing.",
+      "Vague or low-information terms: '那个插头', '发电', '打破水' — lacks specificity or precise vocabulary.",
+      "Examiner-dependent structure: Narrative appears to follow a prompted scenario rather than self-initiated description.",
+      "Partial coherence: Mentions multiple elements (dog, cat, child, father, plug, water) but fails to link them logically or sustain a unified description."
+    ]
+  },
+  "latency_ms": 19994,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/026/026_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/026/026_Daddy.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

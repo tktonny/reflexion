@@ -1,0 +1,93 @@
+{
+  "assessment_id": "43b88316ab724cbdada1d19165c9a576",
+  "patient_id": "test_002",
+  "language": "en",
+  "created_at": "2026-04-06T14:14:57.074607Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Patient displays consistent smiling and engaged facial expressions during interaction.",
+      "evidence": "Patient is seen smiling and maintaining eye contact with mirror/reflection during conversation, indicating social engagement.",
+      "confidence": 0.8
+    }
+  ],
+  "body_findings": [],
+  "voice_findings": [
+    {
+      "label": "Speech Clarity",
+      "summary": "Speech is clear and articulate with no signs of dysarthria or phonological errors.",
+      "evidence": "Patient's speech is intelligible and fluent during the interaction, with appropriate pacing and prosody.",
+      "confidence": 0.9
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Cognitive Content",
+      "summary": "Patient expresses uncertainty about destination ('I don't know where'), but responds appropriately to suggestions and shows willingness to explore.",
+      "evidence": "Patient says, 'I like to go somewhere, but I don't know where,' then considers suggestions and agrees to try one day, indicating intact comprehension and decision-making.",
+      "confidence": 0.8
+    }
+  ],
+  "speaker_structure": "multi_speaker",
+  "target_patient_presence": "probable",
+  "target_patient_basis": "speaking_time",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 1.0,
+  "risk_score": 0.15,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "Patient demonstrates clear speech, appropriate emotional expression, and coherent response to prompts. Self-reported uncertainty about destination is not accompanied by signs of disorientation, confusion, or impaired judgment. No evidence of cognitive impairment in this clip.",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [
+    "Clear speech and fluent interaction",
+    "Positive affect and social engagement",
+    "Appropriate response to suggestions and planning"
+  ],
+  "alternative_explanations": [
+    "The uncertainty expressed may reflect a casual or hypothetical statement rather than a cognitive deficit.",
+    "The patient may be engaging in a role-play or scripted scenario for the video."
+  ],
+  "risk_factor_findings": [
+    "Self-reported uncertainty about destination"
+  ],
+  "subjective_assessment_findings": [
+    "Patient reports not knowing where to go, suggesting possible navigational or planning uncertainty."
+  ],
+  "emotional_assessment_findings": [
+    "Patient displays positive affect, smiling and engaging during conversation, indicating emotional stability and social motivation."
+  ],
+  "risk_control_suggestions": [
+    "Monitor for consistency in real-world navigation and decision-making over time.",
+    "Consider follow-up if similar uncertainty arises in unscripted contexts."
+  ],
+  "visit_recommendation": "Routine follow-up or no further action required at this time.",
+  "future_risk_trend_summary": "Insufficient data to predict future cognitive decline from a single clip.",
+  "reviewer_confidence": 0.85,
+  "context_notes": [
+    "Patient is likely participating in a scripted or guided interaction, which may influence behavior and speech patterns.",
+    "No signs of disorientation, memory loss, or executive dysfunction observed in this clip."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "3dead221-57df-9514-baf7-c1b241576bbf",
+    "latency_ms": 16179,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 16179
+    }
+  ],
+  "fallback_message": null
+}

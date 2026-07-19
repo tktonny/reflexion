@@ -1,0 +1,93 @@
+{
+  "case_id": "english__pitt__dementia__cookie__010_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.7,
+  "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing.",
+  "patient_cue_summary": [
+    "coherent scene description",
+    "specific content words",
+    "main events linked logically",
+    "little examiner dependence"
+  ],
+  "classification_request_id": "chatcmpl-4fc542e5-1055-9e0f-8eee-fb63874e5a05",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, detailed description of the pictured scene, including key elements such as the boy reaching into the cookie jar, the stool tipping, the mother washing dishes, and the sink overflowing. Speech is intelligible and organized, with minimal examiner dependence. No clear signs of cognitive impairment are evident in the audio. However, due to lack of visual data and potential limitations in audio clarity, further observation is recommended.",
+    "evidence_for_risk": [
+      "Patient accurately describes multiple elements of the scene",
+      "Speech is organized and logically sequenced",
+      "No signs of word-finding difficulty or disorganization"
+    ],
+    "evidence_against_risk": [
+      "No self-reported concerns or caregiver statements",
+      "No emotional dysregulation or affective flattening observed",
+      "No examiner prompts required to elicit basic scene description"
+    ],
+    "alternative_explanations": [
+      "Audio quality may limit full assessment of speech nuances",
+      "Lack of visual data prevents confirmation of nonverbal cues",
+      "Single clip limits longitudinal inference"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a full neuropsychological screening if clinical concern persists",
+      "Repeat the picture description task with clearer audio or visual recording",
+      "Monitor for functional changes in daily activities or memory complaints"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if symptoms emerge or caregiver concerns are raised",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further data required for trend assessment",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video data unavailable; assessment based solely on audio",
+      "Patient speech is intelligible and task-relevant",
+      "No strong impairment signals detected in available audio"
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing.",
+    "patient_cue_summary": [
+      "coherent scene description",
+      "specific content words",
+      "main events linked logically",
+      "little examiner dependence"
+    ]
+  },
+  "latency_ms": 11664,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/010-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/010-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

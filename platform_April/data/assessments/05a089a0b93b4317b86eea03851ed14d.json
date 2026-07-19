@@ -1,0 +1,105 @@
+{
+  "assessment_id": "05a089a0b93b4317b86eea03851ed14d",
+  "patient_id": "patient-002",
+  "language": "en",
+  "created_at": "2026-04-13T02:32:13.749831Z",
+  "visual_findings": [
+    {
+      "label": "Facial expression",
+      "summary": "Neutral to slightly tired expression; minimal emotional reactivity observed.",
+      "evidence": "Patient maintains steady gaze toward camera; no visible signs of distress, confusion, or agitation.",
+      "confidence": 0.8
+    },
+    {
+      "label": "Gaze and attention",
+      "summary": "Consistent eye contact with camera; no signs of disengagement or wandering attention.",
+      "evidence": "Patient looks directly at the camera throughout the clip; head position stable.",
+      "confidence": 0.85
+    }
+  ],
+  "body_findings": [
+    {
+      "label": "Posture and movement",
+      "summary": "Patient is seated or reclining with minimal movement; no signs of restlessness or motor impairment.",
+      "evidence": "Patient remains relatively still; hand rests near face but no fidgeting or repetitive motion observed.",
+      "confidence": 0.75
+    }
+  ],
+  "voice_findings": [
+    {
+      "label": "Speech clarity",
+      "summary": "Speech is clear and intelligible; no signs of slurring, hesitations, or disorganized syntax.",
+      "evidence": "Patient says: 'Hello, my name is Tony.' — speech is fluent, with normal pacing and articulation.",
+      "confidence": 0.9
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Self-introduction",
+      "summary": "Patient provides name and greeting in a coherent, self-directed manner.",
+      "evidence": "Patient states: 'Hello, my name is Tony.' — no signs of confusion, repetition, or memory lapse.",
+      "confidence": 0.9
+    }
+  ],
+  "speaker_structure": "single_speaker",
+  "target_patient_presence": "clear",
+  "target_patient_basis": "visual_focus",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 0.95,
+  "risk_score": 0.15,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "The patient demonstrates clear speech, consistent attention, and neutral affect. No observable signs of cognitive impairment or emotional dysregulation are present in this single clip. The low-light setting limits visual detail but does not obscure key behavioral cues.",
+  "evidence_for_risk": [],
+  "evidence_against_risk": [
+    "Coherent self-introduction",
+    "Stable gaze and posture",
+    "Clear, fluent speech without disfluency or memory lapse"
+  ],
+  "alternative_explanations": [
+    "Low-light conditions may limit visual assessment depth",
+    "Single clip provides limited longitudinal or contextual data"
+  ],
+  "risk_factor_findings": [],
+  "subjective_assessment_findings": [],
+  "emotional_assessment_findings": [
+    "Neutral affect",
+    "No visible signs of distress or anxiety"
+  ],
+  "risk_control_suggestions": [
+    "Consider follow-up in better lighting or with structured cognitive tasks",
+    "Monitor for functional changes over time if clinical concern persists"
+  ],
+  "visit_recommendation": "Routine follow-up or no further action required based on this clip alone.",
+  "future_risk_trend_summary": "Insufficient data to predict future cognitive decline from a single clip.",
+  "reviewer_confidence": 0.8,
+  "context_notes": [
+    "Clip is short and limited to self-introduction; no complex cognitive tasks performed.",
+    "Low-light conditions may affect visual detail but do not obscure key behavioral cues."
+  ],
+  "quality_flags": [
+    "low_light"
+  ],
+  "session_usability": "usable_with_caveats",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "ac6f5e75-dead-947e-9c7b-4314cd4f531d",
+    "latency_ms": 22463,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 22463
+    }
+  ],
+  "fallback_message": null
+}

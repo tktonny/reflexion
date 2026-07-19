@@ -1,0 +1,31 @@
+{
+  "case_id": "english__pitt__control__cookie__002_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/talkbank/corpora/english/pitt/Control/cookie/002-0.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__002_0/omni_input.mp4",
+  "assessment": {
+    "provider_trace": [
+      {
+        "provider": "qwen_omni",
+        "attempt_order": 1,
+        "status": "failed",
+        "failure_reason": "unusable_result",
+        "latency_ms": 11447
+      }
+    ]
+  },
+  "latency_ms": 11528,
+  "error": "unusable_result: All providers failed to produce a usable assessment",
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/002-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/002-0.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

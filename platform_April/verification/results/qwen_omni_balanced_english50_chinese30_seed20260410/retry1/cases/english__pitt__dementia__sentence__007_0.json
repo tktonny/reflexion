@@ -1,0 +1,141 @@
+{
+  "case_id": "english__pitt__dementia__sentence__007_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "We write with a pencil. Tree. A tree grows right outside my window. Now I'm going to give you two words and I want you to use both those words in one brief simple sentence and you don't need to worry about the order. Child, hospital. I took the child to the hospital. Cold, winter. We had a very cold winter last year. Now then. Three words and I want you to use all three words in one brief sentence and you don't need to worry about the order. Chair, doctor, sit. I sat in the chair. Chair, doctor, and sit. I sat in the chair while my mother went in to see the doctor. Bureau, open, drawer. The drawer is open in the bureau.",
+  "patient_only_transcript": "I took the child to the hospital. We had a very cold winter last year. I sat in the chair while my mother went in to see the doctor. The drawer is open in the bureau.",
+  "speaker_turn_summary": [
+    "Examiner: 'We write with a pencil. Tree. A tree grows right outside my window.'",
+    "Examiner: 'Now I'm going to give you two words... Child, hospital.'",
+    "Patient: 'I took the child to the hospital.'",
+    "Examiner: 'Cold, winter.'",
+    "Patient: 'We had a very cold winter last year.'",
+    "Examiner: 'Three words... Chair, doctor, sit.'",
+    "Patient: 'I sat in the chair. Chair, doctor, and sit. I sat in the chair while my mother went in to see the doctor.'",
+    "Examiner: 'Bureau, open, drawer.'",
+    "Patient: 'The drawer is open in the bureau.'"
+  ],
+  "patient_cue_summary": [
+    "Correctly uses all required words in each task",
+    "Repeats phrases during multi-word sentence construction",
+    "Provides brief, factual responses without elaboration or narrative",
+    "Requires examiner to prompt for sentence structure but completes tasks",
+    "No evidence of semantic confusion or word-finding failure"
+  ],
+  "transcript_request_id": "chatcmpl-0d290de0-c183-91b7-a3db-8f1717be593b",
+  "classification_request_id": "chatcmpl-dfd21f0a-9847-93be-a7fd-24bfdd938914",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__007_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__007_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "sentence_retrieval_task_response",
+        "summary": "Patient responds to word-combination tasks with simple, mostly correct sentences, but shows mild disorganization and repetition in multi-word sentence construction.",
+        "evidence": "Patient uses required words in sentences (e.g., 'I took the child to the hospital', 'I sat in the chair while my mother went in to see the doctor'), but repeats phrases ('chair, doctor, and sit'), and requires examiner to prompt for multi-word sentence structure. Responses are grammatically simple and contextually appropriate but lack elaboration or narrative flow.",
+        "confidence": 0.8
+      },
+      {
+        "label": "lexical_retrieval_and_organizational_effort",
+        "summary": "Patient retrieves and uses target vocabulary correctly but shows slight hesitation and rephrasing, suggesting mild effort in sentence construction.",
+        "evidence": "Patient says 'I sat in the chair' then adds 'chair, doctor, and sit' before constructing a full sentence with contextual elaboration ('while my mother went in to see the doctor'). This indicates some effort to organize multiple concepts, but not fully fluent or spontaneous.",
+        "confidence": 0.7
+      },
+      {
+        "label": "task_adherence_and_informativeness",
+        "summary": "Patient completes all tasks with minimal deviation, but responses are brief and lack elaboration or spontaneous detail beyond required words.",
+        "evidence": "Patient correctly uses all required words in each task, but responses are formulaic and lack additional descriptive or narrative content. For example, 'The drawer is open in the bureau' is a direct factual statement without elaboration or contextual integration.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient completes structured language tasks with correct vocabulary and basic sentence construction, but shows mild signs of effortful retrieval, repetition, and limited elaboration. No overt dementia-level impairment is evident, but the pattern suggests possible early cognitive change warranting further observation.",
+    "evidence_for_risk": [
+      "Repetition of phrases ('chair, doctor, and sit')",
+      "Need for examiner to prompt multi-word sentence structure",
+      "Brief, formulaic responses lacking elaboration or narrative flow",
+      "Mild disorganization in sentence construction despite correct word usage"
+    ],
+    "evidence_against_risk": [
+      "Correct use of all required vocabulary",
+      "No evidence of word-finding failure or semantic confusion",
+      "Responses are grammatically simple but coherent and task-compliant",
+      "No signs of agitation, apathy, or emotional flattening"
+    ],
+    "alternative_explanations": [
+      "Mild task fatigue or test-taking hesitation",
+      "Language processing style or cognitive style favoring concise responses",
+      "Non-clinical factors such as background noise or recording quality affecting fluency"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Monitor for functional changes in daily activities or memory complaints",
+      "Consider repeat assessment in 3–6 months if no clinical concern is present"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up evaluation recommended",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment needed to determine progression or stability",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Audio-only, no visual cues available",
+      "Patient is the primary respondent in structured language tasks",
+      "Examiner prompts are neutral context",
+      "patient responses are the focus",
+      "No evidence of severe impairment or dementia-level deficits"
+    ],
+    "quality_flags": [],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "I took the child to the hospital. We had a very cold winter last year. I sat in the chair while my mother went in to see the doctor. The drawer is open in the bureau.",
+    "speaker_turn_summary": [
+      "Examiner: 'We write with a pencil. Tree. A tree grows right outside my window.'",
+      "Examiner: 'Now I'm going to give you two words... Child, hospital.'",
+      "Patient: 'I took the child to the hospital.'",
+      "Examiner: 'Cold, winter.'",
+      "Patient: 'We had a very cold winter last year.'",
+      "Examiner: 'Three words... Chair, doctor, sit.'",
+      "Patient: 'I sat in the chair. Chair, doctor, and sit. I sat in the chair while my mother went in to see the doctor.'",
+      "Examiner: 'Bureau, open, drawer.'",
+      "Patient: 'The drawer is open in the bureau.'"
+    ],
+    "patient_cue_summary": [
+      "Correctly uses all required words in each task",
+      "Repeats phrases during multi-word sentence construction",
+      "Provides brief, factual responses without elaboration or narrative",
+      "Requires examiner to prompt for sentence structure but completes tasks",
+      "No evidence of semantic confusion or word-finding failure"
+    ]
+  },
+  "latency_ms": 19042,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/007-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/007-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "case_id": "english__pitt__dementia__fluency__360_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.75,
+  "transcript": "And you can begin now. Dog, cat, bird. Did you say? No fish. What was it? Just name all the animals that you can think of. Dog, cat, mule. Oh God, I know. All the animals that you can think of. Horse. Oh God. You're doing fine. All the animals that you can think of. I feel so tight. The pressure. Yeah. Okay, you can begin now. Five, four, fish, fumes, van, lake, farm, fence. Photo, no, that's pH. Film, feather. Okay, here's the first one. Page one.",
+  "patient_only_transcript": "Dog, cat, mule, horse. I feel so tight. Pressure. Five, four, fish, fumes, van, lake, farm, fence. Photo, no, that's pH. Film, feather.",
+  "speaker_turn_summary": [
+    "Examiner: 'And you can begin now. Dog, cat, bird. Did you say? No fish. What was it? Just name all the animals that you can think of.'",
+    "Patient: 'Dog, cat, mule. Oh God, I know.'",
+    "Examiner: 'All the animals that you can think of. Horse. Oh God. You're doing fine. All the animals that you can think of. I feel so tight. The pressure. Yeah. Okay, you can begin now.'",
+    "Patient: 'Five, four, fish, fumes, van, lake, farm, fence. Photo, no, that's pH. Film, feather.'",
+    "Examiner: 'Okay, here's the first one. Page one.'"
+  ],
+  "patient_cue_summary": [
+    "Low productivity in animal fluency task: only 4-5 animal-related items before switching to unrelated terms.",
+    "Self-reported distress: 'I feel so tight. The pressure.'",
+    "Task drift: shifts from animals to unrelated words like 'fumes', 'van', 'pH', 'film', 'feather'.",
+    "Repetition and hesitation: 'Oh God, I know.'",
+    "'Oh God.'",
+    "long pauses before responses.",
+    "Inconsistent task adherence: begins with animals, then drifts into non-animal, non-sequential terms.",
+    "Examiner scaffolding required: patient does not self-initiate or sustain fluency without prompting."
+  ],
+  "transcript_request_id": "chatcmpl-8bd3ee02-6e76-9962-a400-b2594d43b3b2",
+  "classification_request_id": "chatcmpl-2d38ad36-10a0-970f-b280-16d5ff64cf4e",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__360_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__360_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "Speech hesitations and pauses",
+        "summary": "Frequent pauses, fillers, and self-corrections during task performance.",
+        "evidence": "Patient says 'Oh God, I know.' and 'Oh God.' with long pauses; uses 'um' and 'uh' implicitly in speech rhythm.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Task-related distress",
+        "summary": "Patient explicitly reports feeling 'tight' and 'under pressure'.",
+        "evidence": "Patient says: 'I feel so tight. The pressure.' during task.",
+        "confidence": 0.95
+      },
+      {
+        "label": "Fluency breakdown",
+        "summary": "Low item productivity and semantic drift away from target category (animals).",
+        "evidence": "Patient names only 4-5 animal-related items before shifting to unrelated terms like 'fumes', 'van', 'pH', 'film', 'feather'.",
+        "confidence": 0.8
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "Fluency task performance",
+        "summary": "Patient struggles to sustain fluency in animal category; drifts into unrelated semantic domains.",
+        "evidence": "Patient begins with 'dog, cat, mule, horse' — then shifts to 'five, four, fish, fumes, van, lake, farm, fence, photo, pH, film, feather'.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Task initiation and completion",
+        "summary": "Patient does not self-initiate or complete the task without examiner prompting.",
+        "evidence": "Patient only begins after repeated examiner prompts; does not complete fluency task independently.",
+        "confidence": 0.8
+      },
+      {
+        "label": "Self-awareness and emotional response",
+        "summary": "Patient acknowledges difficulty and emotional strain during task.",
+        "evidence": "Patient says: 'I feel so tight. The pressure.' — indicating awareness of cognitive strain.",
+        "confidence": 0.9
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient exhibits signs of cognitive fluency breakdown during verbal task, including low productivity, semantic drift, and self-reported distress. Task performance is inconsistent and requires examiner scaffolding. No dementia-level impairment is evident, but impairment-like signals are present and warrant further clinical observation.",
+    "evidence_for_risk": [
+      "Low item count and semantic drift in fluency task",
+      "Self-reported cognitive pressure and distress",
+      "Frequent pauses and hesitation during speech",
+      "Examiner dependence for task continuation"
+    ],
+    "evidence_against_risk": [
+      "Patient remains coherent and intelligible throughout",
+      "No overt disorientation or memory loss evident",
+      "Task is completed with some relevant content (e.g., 'dog', 'cat', 'horse')",
+      "No evidence of severe aphasia or disorganized speech"
+    ],
+    "alternative_explanations": [
+      "Task-related anxiety or performance pressure may explain fluency breakdown",
+      "Temporary cognitive fatigue or environmental stressor may be contributing",
+      "Language or cultural factors may influence response style, though no evidence of non-native use"
+    ],
+    "risk_factor_findings": [
+      "Self-reported cognitive pressure and distress during task",
+      "Task non-adherence and category drift in fluency task"
+    ],
+    "subjective_assessment_findings": [
+      "Patient reports feeling 'tight' and 'under pressure' during task",
+      "Patient exhibits hesitation and self-awareness of difficulty"
+    ],
+    "emotional_assessment_findings": [
+      "Visible anxiety and frustration during task performance",
+      "Self-reported emotional distress: 'I feel so tight. The pressure.'",
+      "Reduced task engagement and sustained effort"
+    ],
+    "risk_control_suggestions": [
+      "Repeat verbal fluency task under different conditions to assess consistency",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE) for objective assessment",
+      "Observe patient’s performance in other domains (memory, attention, executive function)",
+      "Consider referral to neuropsychology if symptoms persist or worsen"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up evaluation recommended. Routine follow-up may be insufficient without objective assessment.",
+    "future_risk_trend_summary": "Single-clip assessment limits longitudinal prediction. Further observation or multi-visit data is needed to determine progression risk.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient is clearly identifiable as the primary respondent in the interaction.",
+      "Task context is verbal fluency with examiner prompting",
+      "patient performance is the focus.",
+      "No evidence of dementia-level impairment, but impairment-like signals are present and warrant caution."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Dog, cat, mule, horse. I feel so tight. Pressure. Five, four, fish, fumes, van, lake, farm, fence. Photo, no, that's pH. Film, feather.",
+    "speaker_turn_summary": [
+      "Examiner: 'And you can begin now. Dog, cat, bird. Did you say? No fish. What was it? Just name all the animals that you can think of.'",
+      "Patient: 'Dog, cat, mule. Oh God, I know.'",
+      "Examiner: 'All the animals that you can think of. Horse. Oh God. You're doing fine. All the animals that you can think of. I feel so tight. The pressure. Yeah. Okay, you can begin now.'",
+      "Patient: 'Five, four, fish, fumes, van, lake, farm, fence. Photo, no, that's pH. Film, feather.'",
+      "Examiner: 'Okay, here's the first one. Page one.'"
+    ],
+    "patient_cue_summary": [
+      "Low productivity in animal fluency task: only 4-5 animal-related items before switching to unrelated terms.",
+      "Self-reported distress: 'I feel so tight. The pressure.'",
+      "Task drift: shifts from animals to unrelated words like 'fumes', 'van', 'pH', 'film', 'feather'.",
+      "Repetition and hesitation: 'Oh God, I know.'",
+      "'Oh God.'",
+      "long pauses before responses.",
+      "Inconsistent task adherence: begins with animals, then drifts into non-animal, non-sequential terms.",
+      "Examiner scaffolding required: patient does not self-initiate or sustain fluency without prompting."
+    ]
+  },
+  "latency_ms": 30759,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/360-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/360-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

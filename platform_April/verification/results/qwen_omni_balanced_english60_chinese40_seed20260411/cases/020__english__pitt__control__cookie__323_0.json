@@ -1,0 +1,126 @@
+{
+  "case_id": "english__pitt__control__cookie__323_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.85,
+  "transcript": "Good. And here's the picture. First of all, the sink is overflowing. Mother is washing dishes, or an adult is washing dishes. There are two children in the cookie jar. One is on a stool, and the stool is overturning. The little girl is reaching for a cookie from the little boy as the stool falls over. There is a window and bushes and path outside the window, and a glimpse of another window in another part of the house. There are curtains with tiebacks. There are dishes. There's dish towels. There are dish towels. No, maybe there are only one. There's only one dish towel. I thought I saw two dish towels. Two cups, a plate, cabinets, apron, grass and trees, floor, counter space. Okay, did I miss?",
+  "patient_only_transcript": "The sink is overflowing. Mother is washing dishes, or an adult is washing dishes. There are two children in the cookie jar. One is on a stool, and the stool is overturning. The little girl is reaching for a cookie from the little boy as the stool falls over. There is a window and bushes and path outside the window, and a glimpse of another window in another part of the house. There are curtains with tiebacks. There are dishes. There's dish towels. There are dish towels. No, maybe there are only one. There's only one dish towel. I thought I saw two dish towels. Two cups, a plate, cabinets, apron, grass and trees, floor, counter space. Okay, did I miss?",
+  "speaker_turn_summary": [
+    "Examiner: 'Good. And here's the picture.'",
+    "Patient: 'First of all, the sink is overflowing...'",
+    "Examiner: (implied prompt or silence)",
+    "Patient: 'Okay, did I miss?'"
+  ],
+  "patient_cue_summary": [
+    "Accurate identification of multiple scene elements: sink, mother/adult, children, cookie jar, stool overturning, window, curtains, dishes, towels, cups, plate, cabinets, apron, grass, trees, floor, counter space.",
+    "Self-correction regarding dish towels: 'There are dish towels. No, maybe there are only one. There's only one dish towel. I thought I saw two.'",
+    "Ends with question 'Okay, did I miss?' indicating possible uncertainty or seeking confirmation, not task failure.",
+    "Speech is fluent, coherent, and task-relevant throughout",
+    "no word-finding pauses, circumlocution, or abandonment of task.",
+    "No evidence of disorganization, tangentiality, or failure to cover core scene elements."
+  ],
+  "transcript_request_id": "chatcmpl-e4208b93-4050-97e8-92c9-6d8b356d0df4",
+  "classification_request_id": "chatcmpl-dec46bbc-0d07-90f7-b87a-2744d11b5167",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__323_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__323_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately described multiple key elements of the picture including actors, actions, objects, and spatial details.",
+        "evidence": "Mentioned sink overflowing, mother/adult washing dishes, two children in cookie jar, stool overturning, girl reaching for cookie, window, bushes, path, another window, curtains, dishes, towels, cups, plate, cabinets, apron, grass, trees, floor, counter space.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Self-Correction on Dish Towels",
+        "summary": "Patient corrected self regarding number of dish towels, indicating awareness of potential error.",
+        "evidence": "Said 'There are dish towels. No, maybe there are only one. There's only one dish towel. I thought I saw two dish towels.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Engagement",
+        "summary": "Patient completed the task with full engagement, ending with a question to confirm completeness.",
+        "evidence": "Ended with 'Okay, did I miss?' indicating active participation and desire for completeness.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a detailed, coherent, and largely accurate description of a complex picture scene, including multiple actors, actions, and objects. Minor self-correction about dish towels indicates mild uncertainty but not impairment. No signs of retrieval failure, disorganization, or task breakdown. Speech is fluent and task-relevant.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of core scene elements",
+      "Coherent narrative structure",
+      "No word-finding pauses or circumlocution",
+      "No abandonment or restarts of task",
+      "Self-correction is minor and does not disrupt task completion"
+    ],
+    "alternative_explanations": [
+      "Mild uncertainty about dish towels may reflect attention to detail or memory retrieval variability, not cognitive impairment.",
+      "Question 'Did I miss?' may reflect conscientiousness or seeking validation, not task failure."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed.",
+      "Consider follow-up if other domains show decline or if patient reports subjective concerns."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible, task-relevant, and coherent.",
+      "No impairment-like cues detected despite minor self-correction."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The sink is overflowing. Mother is washing dishes, or an adult is washing dishes. There are two children in the cookie jar. One is on a stool, and the stool is overturning. The little girl is reaching for a cookie from the little boy as the stool falls over. There is a window and bushes and path outside the window, and a glimpse of another window in another part of the house. There are curtains with tiebacks. There are dishes. There's dish towels. There are dish towels. No, maybe there are only one. There's only one dish towel. I thought I saw two dish towels. Two cups, a plate, cabinets, apron, grass and trees, floor, counter space. Okay, did I miss?",
+    "speaker_turn_summary": [
+      "Examiner: 'Good. And here's the picture.'",
+      "Patient: 'First of all, the sink is overflowing...'",
+      "Examiner: (implied prompt or silence)",
+      "Patient: 'Okay, did I miss?'"
+    ],
+    "patient_cue_summary": [
+      "Accurate identification of multiple scene elements: sink, mother/adult, children, cookie jar, stool overturning, window, curtains, dishes, towels, cups, plate, cabinets, apron, grass, trees, floor, counter space.",
+      "Self-correction regarding dish towels: 'There are dish towels. No, maybe there are only one. There's only one dish towel. I thought I saw two.'",
+      "Ends with question 'Okay, did I miss?' indicating possible uncertainty or seeking confirmation, not task failure.",
+      "Speech is fluent, coherent, and task-relevant throughout",
+      "no word-finding pauses, circumlocution, or abandonment of task.",
+      "No evidence of disorganization, tangentiality, or failure to cover core scene elements."
+    ]
+  },
+  "latency_ms": 20090,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/323-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/323-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

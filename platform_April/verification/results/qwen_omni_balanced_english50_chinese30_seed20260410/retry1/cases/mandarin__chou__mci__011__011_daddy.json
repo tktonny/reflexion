@@ -1,0 +1,115 @@
+{
+  "case_id": "mandarin__chou__mci__011__011_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "去玩那个插座，对不对？那个狗要叫的时候，不许弄，不能玩。嗯。它这个猫。它这个猫，这个要掉下来了。它看到了哦，就哇哇大叫，就这样子了。嗯，嗯。哦，可能就是说他在玩那个插座的时候，灯电断了，所以就哇。他在玩那个插座，那个狗要叫它不要玩，它这边呢，东西那个台灯掉下来，它没有电了，它就哇啊啊。",
+  "patient_only_transcript": "他在玩那个插座的时候，灯电断了，所以就哇。他在玩那个插座，那个狗要叫他不要玩，他这边呢，东西那个台灯掉下来，它没有电了，他就哇啊啊。他看到后就哇哇大叫，猫要掉下来了，他看到后就哇哇大叫。",
+  "speaker_turn_summary": [
+    "Examiner: 问及插座和狗、猫的互动场景。",
+    "Patient: 描述玩插座导致断电，台灯掉落，猫要掉下来，看到后大叫。",
+    "Examiner: 可能引导或确认描述内容。",
+    "Patient: 重复‘哇啊啊’，语义组织松散，事件连接弱。"
+  ],
+  "patient_cue_summary": [
+    "语义组织松散，事件连接弱，缺乏因果逻辑。",
+    "重复‘哇啊啊’，表达情绪但无实质信息扩展。",
+    "描述中使用‘那个’‘它’等模糊代词，缺乏具体名词指代。",
+    "部分语句结构不完整，如‘它没有电了，他就哇啊啊’，缺乏主谓宾完整结构。",
+    "依赖上下文理解，未主动补充细节，需依赖 examiner 引导。"
+  ],
+  "transcript_request_id": "chatcmpl-cc840f24-1fe1-9bca-9d06-4c024c8fb077",
+  "classification_request_id": "chatcmpl-3873eeef-475b-9518-b5e2-0b0a2215c6fa",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__011__011_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__011__011_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "患者在描述场景时语义组织松散，事件连接弱，重复表达情绪反应，缺乏完整主谓宾结构和具体名词指代，提示可能存在轻度语言组织或检索困难，建议进一步临床观察。",
+    "evidence_for_risk": [
+      "语义组织松散，事件连接弱。",
+      "重复表达情绪反应，无实质信息扩展。",
+      "使用模糊代词，缺乏具体名词指代。",
+      "语句结构不完整，依赖上下文理解。"
+    ],
+    "evidence_against_risk": [
+      "患者能识别基本场景元素（插座、狗、猫、台灯、断电）。",
+      "语言内容基本可理解，未出现严重失语或完全无意义语句。"
+    ],
+    "alternative_explanations": [
+      "可能为语言表达习惯或情绪反应主导，非认知障碍。",
+      "录音质量差或语速快导致部分语句理解困难。",
+      "患者可能在配合测试，未完全展开描述。"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "情绪反应强烈（哇哇大叫），但未体现情绪调节或认知控制能力。",
+      "表达重复、无信息增量，可能反映语言检索或组织困难。"
+    ],
+    "risk_control_suggestions": [
+      "建议进行标准化认知筛查（如MMSE、MoCA）。",
+      "建议观察患者在结构化任务中的语言组织与信息完整性。",
+      "建议结合家属或照护者报告评估日常功能表现。"
+    ],
+    "visit_recommendation": "prompt clinical evaluation",
+    "future_risk_trend_summary": "单次观察无法预测长期认知趋势，建议定期随访评估认知功能变化。",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "视频不可用，仅依赖音频内容评估。",
+      "患者语言表现提示轻度组织或检索困难，但未达明确认知障碍标准。",
+      "需结合多模态评估与临床访谈进一步确认。"
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable",
+      "face_not_visible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "他在玩那个插座的时候，灯电断了，所以就哇。他在玩那个插座，那个狗要叫他不要玩，他这边呢，东西那个台灯掉下来，它没有电了，他就哇啊啊。他看到后就哇哇大叫，猫要掉下来了，他看到后就哇哇大叫。",
+    "speaker_turn_summary": [
+      "Examiner: 问及插座和狗、猫的互动场景。",
+      "Patient: 描述玩插座导致断电，台灯掉落，猫要掉下来，看到后大叫。",
+      "Examiner: 可能引导或确认描述内容。",
+      "Patient: 重复‘哇啊啊’，语义组织松散，事件连接弱。"
+    ],
+    "patient_cue_summary": [
+      "语义组织松散，事件连接弱，缺乏因果逻辑。",
+      "重复‘哇啊啊’，表达情绪但无实质信息扩展。",
+      "描述中使用‘那个’‘它’等模糊代词，缺乏具体名词指代。",
+      "部分语句结构不完整，如‘它没有电了，他就哇啊啊’，缺乏主谓宾完整结构。",
+      "依赖上下文理解，未主动补充细节，需依赖 examiner 引导。"
+    ]
+  },
+  "latency_ms": 20763,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/011/011_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/011/011_Daddy.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

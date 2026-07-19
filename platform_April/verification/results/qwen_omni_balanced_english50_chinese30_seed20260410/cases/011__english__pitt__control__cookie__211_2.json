@@ -1,0 +1,113 @@
+{
+  "case_id": "english__pitt__control__cookie__211_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.7,
+  "transcript": "A little girl is reaching for her brother to give her a cookie. The stool is falling over. The boy has taken the lid off the cookie jar, has a cookie in his left hand, is reaching with his right hand for one. The mother is drying the dishes. The water is flowing, running, and flowing out of the sink. Um, mother is frowning. There's nothing going on outside. This is bushes, bushes. The door is open. The girl looks like she's laughing. Why are you standing in the water? Okay, that's it. That's fine.",
+  "patient_only_transcript": "A little girl is reaching for her brother to give her a cookie. The stool is falling over. The boy has taken the lid off the cookie jar, has a cookie in his left hand, is reaching with his right hand for one. The mother is drying the dishes. The water is flowing, running, and flowing out of the sink. Um, mother is frowning. There's nothing going on outside. This is bushes, bushes. The door is open. The girl looks like she's laughing. Why are you standing in the water? Okay, that's it. That's fine.",
+  "speaker_turn_summary": [
+    "Examiner: prompts or introduces task (implied by context)",
+    "Patient: describes scene with some hesitation and filler ('Um'), repeats 'bushes, bushes', ends abruptly with 'That's it. That's fine.'"
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with correct keywords (cookie, mother, sink, stool, brother, girl)",
+    "Use of filler 'Um' indicating possible retrieval hesitation",
+    "Repetition of 'bushes, bushes' suggesting possible word-finding difficulty or distraction",
+    "Abrupt ending ('That's it. That's fine.') indicating possible task completion without full elaboration or examiner prompting",
+    "No clear signs of disorganization or semantic confusion, but minimal elaboration beyond basic scene elements"
+  ],
+  "transcript_request_id": "chatcmpl-60f841c5-435a-9a43-b158-253340f2c950",
+  "classification_request_id": "chatcmpl-016a4aab-2514-9978-ae96-a557eac8c902",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__211_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__211_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a generally coherent but minimally elaborated description of a picture-based scene, with minor hesitations and repetitions. No strong impairment cues are present, but the response lacks depth and initiative, suggesting possible need for further observation or more structured assessment.",
+    "evidence_for_risk": [
+      "Patient correctly identifies key scene elements (cookie, mother, sink, stool, brother, girl)",
+      "Patient uses some filler and repetition ('bushes, bushes'), indicating possible mild retrieval difficulty"
+    ],
+    "evidence_against_risk": [
+      "No disorganization, semantic confusion, or abandonment of task",
+      "Response is task-relevant and mostly accurate",
+      "No signs of emotional dysregulation or affective flattening"
+    ],
+    "alternative_explanations": [
+      "Response may reflect task fatigue, lack of engagement, or limited verbal elaboration rather than cognitive impairment",
+      "Examiner may have prompted or guided the response, reducing patient initiative"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Patient appears neutral or slightly amused (e.g., 'The girl looks like she's laughing')",
+      "No clear signs of frustration, anxiety, or apathy"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with more structured picture description or narrative tasks",
+      "Consider repeating the task with different stimuli or in a quieter setting",
+      "Monitor for consistency across multiple sessions or tasks"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Limited predictive value from single clip; longitudinal assessment recommended for trend evaluation",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and task context",
+      "Patient speech is intelligible but minimally elaborated",
+      "not diagnostic of impairment",
+      "Task context: picture description of cookie-theft scene",
+      "patient performed adequately but with minimal initiative"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "A little girl is reaching for her brother to give her a cookie. The stool is falling over. The boy has taken the lid off the cookie jar, has a cookie in his left hand, is reaching with his right hand for one. The mother is drying the dishes. The water is flowing, running, and flowing out of the sink. Um, mother is frowning. There's nothing going on outside. This is bushes, bushes. The door is open. The girl looks like she's laughing. Why are you standing in the water? Okay, that's it. That's fine.",
+    "speaker_turn_summary": [
+      "Examiner: prompts or introduces task (implied by context)",
+      "Patient: describes scene with some hesitation and filler ('Um'), repeats 'bushes, bushes', ends abruptly with 'That's it. That's fine.'"
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with correct keywords (cookie, mother, sink, stool, brother, girl)",
+      "Use of filler 'Um' indicating possible retrieval hesitation",
+      "Repetition of 'bushes, bushes' suggesting possible word-finding difficulty or distraction",
+      "Abrupt ending ('That's it. That's fine.') indicating possible task completion without full elaboration or examiner prompting",
+      "No clear signs of disorganization or semantic confusion, but minimal elaboration beyond basic scene elements"
+    ]
+  },
+  "latency_ms": 20354,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/211-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/211-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "case_id": "mandarin__chou__mci__148__148_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.7,
+  "transcript": "这应该是在公园的凉亭里面在在下棋，喝茶。这样讲可以吗？还有小朋友在荡秋千。难道他们是在打网球？但是这个人带了一只狗来咬咬他，咬咬一他的咬住他的衣服。嗯，他们是在打羽毛球。然后呢？我不知道要怎么讲。这应该是在公园吧。哎，这个人好像在在指什么，什么东西掉了吗？我不知道。",
+  "patient_only_transcript": "这应该是在公园的凉亭里面在下棋，喝茶。这样讲可以吗？还有小朋友在荡秋千。难道他们是在打网球？但是这个人带了一只狗来咬咬他，咬住他的衣服。嗯，他们是在打羽毛球。然后呢？我不知道要怎么讲。这应该是在公园吧。哎，这个人好像在指什么，什么东西掉了吗？我不知道。",
+  "speaker_turn_summary": [
+    "Examiner: prompts patient to describe scene",
+    "Patient: attempts scene description with multiple elements (park, pavilion, chess, tea, children swinging, dog, badminton, dropped item)",
+    "Patient: shows hesitation, uncertainty, and self-correction during description",
+    "Patient: ends with repeated uncertainty and inability to complete narrative"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple scene elements (park, pavilion, children, dog, badminton, dropped item) despite hesitation",
+    "Patient uses vague terms ('这个', '那个', '不知道') and self-corrections, but does not abandon task",
+    "Patient shows mild disorganization in sequencing and repeated uncertainty, but maintains task relevance",
+    "Patient does not exhibit naming collapse, semantic poverty, or major contradiction",
+    "Patient’s speech is intelligible enough to reconstruct core scene, though incomplete and hesitant"
+  ],
+  "transcript_request_id": "chatcmpl-8f4e19b5-e3aa-9bf1-bd46-bddb933eeef6",
+  "classification_request_id": "chatcmpl-c63f0a92-1e1c-921b-b2ae-0dbb58aaf0a7",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__148__148_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__148__148_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Attempt",
+        "summary": "Patient attempts to describe a park scene with multiple actors and actions, including children, a dog, and sports activities, but shows hesitation and uncertainty.",
+        "evidence": "Patient lists multiple scene elements (park, pavilion, children swinging, dog, badminton, dropped item) but frequently pauses, uses vague pronouns, and ends with repeated uncertainty.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Relevance and Coherence",
+        "summary": "Patient remains task-relevant and attempts to organize scene elements, though with disorganized sequencing and incomplete narrative.",
+        "evidence": "Patient does not abandon the task or lose referential clarity; attempts to connect multiple actors and actions despite pauses and self-corrections.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Lexical Retrieval and Hesitation",
+        "summary": "Patient uses fillers and vague terms ('这个', '不知道') but does not exhibit naming failure or semantic poverty.",
+        "evidence": "Patient’s speech contains discourse particles and generic referents, but core vocabulary remains intact and task-relevant.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient attempts to describe a complex park scene with multiple actors and actions, showing mild hesitation, vague terminology, and self-correction, but maintains task relevance and identifies multiple scene elements. No strong impairment-like cues are present. Further observation or formal screening is recommended.",
+    "evidence_for_risk": [
+      "Patient shows hesitation and uncertainty in completing the description",
+      "Patient uses vague pronouns and fillers, but does not exhibit naming collapse or semantic poverty"
+    ],
+    "evidence_against_risk": [
+      "Patient identifies multiple relevant scene elements (park, pavilion, children, dog, badminton, dropped item)",
+      "Patient remains task-relevant and does not abandon the task or lose referential clarity",
+      "Patient’s speech is intelligible and reconstructable despite pauses and self-corrections"
+    ],
+    "alternative_explanations": [
+      "Normal colloquial Mandarin with discourse particles and vague referents in spontaneous speech",
+      "Mild anxiety or self-doubt during a description task, not indicative of cognitive impairment",
+      "Poor audio quality may contribute to perceived hesitation or uncertainty"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty and difficulty in completing the description",
+      "Patient seeks confirmation ('这样讲可以吗？') indicating possible self-doubt or lack of confidence"
+    ],
+    "emotional_assessment_findings": [
+      "Patient exhibits mild frustration or hesitation, but no signs of anxiety, apathy, or emotional flattening",
+      "Patient’s tone remains calm and cooperative despite uncertainty"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with a structured scene-description task or visual memory task",
+      "Consider repeating the task with clearer prompts or visual aids",
+      "Monitor for consistency across multiple sessions or tasks"
+    ],
+    "visit_recommendation": "Formal cognitive screening or routine follow-up is appropriate.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further observation or multi-session assessment is needed for trend analysis.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment is based solely on audio and transcript reconstruction.",
+      "Patient is likely the primary respondent in a dialogue-style screening task.",
+      "Patient’s speech is intelligible and task-relevant despite hesitation and vagueness.",
+      "No strong impairment-like cues are present",
+      "risk is low and conservative."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这应该是在公园的凉亭里面在下棋，喝茶。这样讲可以吗？还有小朋友在荡秋千。难道他们是在打网球？但是这个人带了一只狗来咬咬他，咬住他的衣服。嗯，他们是在打羽毛球。然后呢？我不知道要怎么讲。这应该是在公园吧。哎，这个人好像在指什么，什么东西掉了吗？我不知道。",
+    "speaker_turn_summary": [
+      "Examiner: prompts patient to describe scene",
+      "Patient: attempts scene description with multiple elements (park, pavilion, chess, tea, children swinging, dog, badminton, dropped item)",
+      "Patient: shows hesitation, uncertainty, and self-correction during description",
+      "Patient: ends with repeated uncertainty and inability to complete narrative"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple scene elements (park, pavilion, children, dog, badminton, dropped item) despite hesitation",
+      "Patient uses vague terms ('这个', '那个', '不知道') and self-corrections, but does not abandon task",
+      "Patient shows mild disorganization in sequencing and repeated uncertainty, but maintains task relevance",
+      "Patient does not exhibit naming collapse, semantic poverty, or major contradiction",
+      "Patient’s speech is intelligible enough to reconstruct core scene, though incomplete and hesitant"
+    ]
+  },
+  "latency_ms": 16332,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/148/148_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/148/148_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

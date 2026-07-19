@@ -1,0 +1,124 @@
+{
+  "case_id": "english__pitt__control__cookie__021_4",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.8,
+  "transcript": "Good. Tell me all the things you see going on. All right, little girl's reaching for the cookie, cookie that the boy's reaching for the cookie to give to her, while the stool is being tipped. The mother is drying the dish while the water is running out of the spigot. Let's see, action, action, action, action. No birds, peace. That's all I can see. Okay, that's fine.",
+  "patient_only_transcript": "All right, little girl's reaching for the cookie, cookie that the boy's reaching for the cookie to give to her, while the stool is being tipped. The mother is drying the dish while the water is running out of the spigot. Let's see, action, action, action, action. No birds, peace. That's all I can see.",
+  "speaker_turn_summary": [
+    "Examiner: 'Tell me all the things you see going on.'",
+    "Patient: 'All right, little girl's reaching for the cookie, cookie that the boy's reaching for the cookie to give to her, while the stool is being tipped. The mother is drying the dish while the water is running out of the spigot. Let's see, action, action, action, action. No birds, peace. That's all I can see.'"
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies multiple actors (girl, boy, mother) and actions (reaching, tipping stool, drying dish, running water).",
+    "Patient uses repetitive filler phrases ('action, action, action, action') and ends with 'That's all I can see.' — indicating possible task completion or mild uncertainty.",
+    "Speech is intelligible but lacks elaboration or narrative cohesion",
+    "no clear word-finding pauses, restarts, or semantic vagueness detected.",
+    "No evidence of examiner dependence or task failure — patient completes the description with minimal prompting."
+  ],
+  "transcript_request_id": "chatcmpl-8d9ccfcf-6b7b-9698-9591-04874dd9dc32",
+  "classification_request_id": "chatcmpl-0d9684e3-dfcd-926c-b34d-ada33ecb4ae0",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__021_4/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__021_4/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient identifies core actors and actions in the picture description task.",
+        "evidence": "Patient names girl, boy, mother; describes reaching, tipping stool, water running, dish drying — all relevant to the cookie-theft picture task.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Task Completion and Fluency",
+        "summary": "Patient completes the task with minimal hesitation but uses repetitive fillers and ends with 'That's all I can see.'",
+        "evidence": "Speech is coherent and task-relevant; no restarts or word-finding failures detected. Repetitive 'action' phrases may indicate mild disengagement or lack of elaboration, not impairment.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Lexical and Narrative Cohesion",
+        "summary": "Patient’s description is syntactically fragmented but semantically complete; no evidence of semantic confusion or tangential drift.",
+        "evidence": "Patient correctly links events (boy reaching for cookie to give to girl, stool tipping, mother at sink) without contradiction or omission of key elements.",
+        "confidence": 0.8
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, accurate, and task-relevant description of the picture scene with minimal elaboration and repetitive fillers. No clear signs of cognitive impairment are observed. Further observation or follow-up may be warranted due to limited elaboration and lack of narrative cohesion, but not sufficient for cognitive_risk classification.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple actors and actions in the scene.",
+      "No word-finding pauses, semantic vagueness, or task failure.",
+      "Speech is intelligible and task-compliant without examiner scaffolding."
+    ],
+    "alternative_explanations": [
+      "Limited elaboration may reflect task fatigue, mild disengagement, or non-verbose speaking style rather than cognitive impairment.",
+      "Repetitive fillers may be a speech habit or a response to task structure, not retrieval difficulty."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule follow-up to assess task elaboration and narrative coherence over multiple sessions.",
+      "Consider administering a more structured or timed picture description task to evaluate fluency and retrieval under pressure.",
+      "Monitor for consistency in performance across different visual or verbal tasks."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if symptoms persist or worsen.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no persuasive evidence of cognitive decline is present.",
+    "reviewer_confidence": 0.8,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment is based solely on audio and task context.",
+      "Patient’s speech is intelligible and task-relevant",
+      "no impairment-like cues detected.",
+      "Repetitive fillers and minimal elaboration are not sufficient for cognitive_risk classification in English picture-description tasks."
+    ],
+    "quality_flags": [
+      "limited_visual_sampling",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "All right, little girl's reaching for the cookie, cookie that the boy's reaching for the cookie to give to her, while the stool is being tipped. The mother is drying the dish while the water is running out of the spigot. Let's see, action, action, action, action. No birds, peace. That's all I can see.",
+    "speaker_turn_summary": [
+      "Examiner: 'Tell me all the things you see going on.'",
+      "Patient: 'All right, little girl's reaching for the cookie, cookie that the boy's reaching for the cookie to give to her, while the stool is being tipped. The mother is drying the dish while the water is running out of the spigot. Let's see, action, action, action, action. No birds, peace. That's all I can see.'"
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies multiple actors (girl, boy, mother) and actions (reaching, tipping stool, drying dish, running water).",
+      "Patient uses repetitive filler phrases ('action, action, action, action') and ends with 'That's all I can see.' — indicating possible task completion or mild uncertainty.",
+      "Speech is intelligible but lacks elaboration or narrative cohesion",
+      "no clear word-finding pauses, restarts, or semantic vagueness detected.",
+      "No evidence of examiner dependence or task failure — patient completes the description with minimal prompting."
+    ]
+  },
+  "latency_ms": 20579,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/021-4.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/021-4.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

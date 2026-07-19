@@ -1,0 +1,144 @@
+{
+  "case_id": "english__pitt__dementia__cookie__213_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "But it's not real clear, so do what you can. You see anything going on? Yeah, I see the woman's in a kitchen. Oh, and there's a little girl here talking, and a little boy, I'm assuming, this side here. And this is a high chair here, or some kind of a chair. Oh, there's another. They're talking about this girl again. She's not. I can't see too funny what she's doing. No? Let me try this. Oh yes. Where was she at? This girl? Okay, let's see down. I really can't see what she's doing. How about, you see what's going on over there? That's awfully hard for me to distinguish. Okay.",
+  "patient_only_transcript": "I can't see too funny what she's doing. I really can't see what she's doing. That's awfully hard for me to distinguish.",
+  "speaker_turn_summary": [
+    "Examiner: 'But it's not real clear, so do what you can. You see anything going on?'",
+    "Patient: 'Yeah, I see the woman's in a kitchen. Oh, and there's a little girl here talking, and a little boy, I'm assuming, this side here. And this is a high chair here, or some kind of a chair.'",
+    "Examiner: 'They're talking about this girl again. She's not. Let me try this. Where was she at? This girl? Okay, let's see down. How about, you see what's going on over there?'",
+    "Patient: 'I can't see too funny what she's doing. I really can't see what she's doing. That's awfully hard for me to distinguish.'"
+  ],
+  "patient_cue_summary": [
+    "Repeated inability to perceive or describe specific actions in the scene",
+    "Vague, low-information phrasing: 'too funny what she's doing', 'awfully hard to distinguish'",
+    "Lack of coherent scene description despite examiner prompting",
+    "Reliance on examiner to reorient task ('How about, you see what's going on over there?')",
+    "No evidence of retrieving or organizing key elements (e.g., cookie, theft, sequence of events)"
+  ],
+  "transcript_request_id": "chatcmpl-ba72040e-351b-96ef-ab6c-ae723cf73977",
+  "classification_request_id": "chatcmpl-4970ceb2-69a7-9ea7-80fb-d6e18628a09a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__213_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__213_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Deficiency",
+        "summary": "Patient repeatedly fails to describe specific actions or details in the picture, despite examiner prompting.",
+        "evidence": "Patient says: 'I can't see too funny what she's doing. I really can't see what she's doing. That's awfully hard for me to distinguish.'",
+        "confidence": null
+      },
+      {
+        "label": "Task Engagement Limitation",
+        "summary": "Patient does not independently generate a coherent or informative description of the scene, relying on examiner rephrasing.",
+        "evidence": "Patient responds to examiner prompts with vague, non-descriptive statements rather than elaborating on visual elements.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical and Semantic Vagueness",
+        "summary": "Patient uses imprecise, non-specific language ('too funny', 'awfully hard') instead of concrete scene details.",
+        "evidence": "Patient avoids naming specific actions, objects, or relationships in the scene, even when prompted.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates difficulty perceiving and describing visual details in a structured picture description task, despite examiner prompting. Speech is vague, repetitive, and lacks coherent scene organization. No dementia-level impairment is evident, but signs of mild cognitive difficulty in visual processing and verbal retrieval are present. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Repeated inability to describe specific actions in the scene",
+      "Use of vague, non-informative language",
+      "Reliance on examiner to reorient task",
+      "Absence of coherent narrative or event sequencing"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies general setting ('kitchen', 'high chair')",
+      "No overt disorientation or confusion",
+      "No signs of severe aphasia or mutism"
+    ],
+    "alternative_explanations": [
+      "Visual or perceptual difficulty unrelated to cognition",
+      "Task unfamiliarity or anxiety affecting performance",
+      "Low-quality audio or recording conditions affecting clarity"
+    ],
+    "risk_factor_findings": [
+      "Patient reports difficulty distinguishing visual details in a structured picture description task"
+    ],
+    "subjective_assessment_findings": [
+      "Patient explicitly states visual perception and interpretation difficulties"
+    ],
+    "emotional_assessment_findings": [
+      "Frustration or effortful processing indicated by phrases like 'awfully hard for me to distinguish'",
+      "No overt emotional reactivity or affective flattening, but task engagement appears strained"
+    ],
+    "risk_control_suggestions": [
+      "Repeat picture description task with clearer visual stimuli",
+      "Use structured prompts to elicit more detailed scene descriptions",
+      "Consider supplemental cognitive screening tools (e.g., MMSE, MoCA)",
+      "Schedule follow-up to assess consistency of performance"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up evaluation recommended",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; performance may vary with task familiarity or environmental factors",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio and task context",
+      "Patient is likely the primary respondent in a structured picture description task",
+      "Examiner prompts are neutral context",
+      "patient's own speech is the primary source of evidence",
+      "Patient's speech is intelligible but lacks task-relevant detail and coherence"
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "I can't see too funny what she's doing. I really can't see what she's doing. That's awfully hard for me to distinguish.",
+    "speaker_turn_summary": [
+      "Examiner: 'But it's not real clear, so do what you can. You see anything going on?'",
+      "Patient: 'Yeah, I see the woman's in a kitchen. Oh, and there's a little girl here talking, and a little boy, I'm assuming, this side here. And this is a high chair here, or some kind of a chair.'",
+      "Examiner: 'They're talking about this girl again. She's not. Let me try this. Where was she at? This girl? Okay, let's see down. How about, you see what's going on over there?'",
+      "Patient: 'I can't see too funny what she's doing. I really can't see what she's doing. That's awfully hard for me to distinguish.'"
+    ],
+    "patient_cue_summary": [
+      "Repeated inability to perceive or describe specific actions in the scene",
+      "Vague, low-information phrasing: 'too funny what she's doing', 'awfully hard to distinguish'",
+      "Lack of coherent scene description despite examiner prompting",
+      "Reliance on examiner to reorient task ('How about, you see what's going on over there?')",
+      "No evidence of retrieving or organizing key elements (e.g., cookie, theft, sequence of events)"
+    ]
+  },
+  "latency_ms": 24435,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/213-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/213-1.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

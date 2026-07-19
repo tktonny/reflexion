@@ -1,0 +1,140 @@
+{
+  "case_id": "mandarin__chou__hc__022__022_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "爸爸在烫衣服，烫衣服，他，他手，他的，他的北臂，他的北臂要去拔插头吧，拔插头，我怕触电，这个，这狗在旁边看到在叫。嗯，猫，猫把，把那个水瓶推倒，洒，洒在满地。嗯，哦，他爸，他爸看，看到这个小孩去插，他望的也是很紧张的。这狗在，在警告这个小孩子吧。嗯，哦，这，这是日，日历啊，嗯，二十七号，六月二十七号。",
+  "patient_only_transcript": "爸爸在烫衣服，他手要去拔插头，我怕触电。狗在旁边叫，猫把水瓶推倒了，水洒了一地。他爸看到小孩去插电，很紧张，狗在警告小孩。这是日历，六月二十七号。",
+  "speaker_turn_summary": [
+    "Patient describes scene: father ironing, child reaching for plug, dog barking, cat knocking over water bottle, father’s reaction, date mention.",
+    "Examiner likely prompts or acknowledges, but no clear examiner speech is isolated or dominant in the audio."
+  ],
+  "patient_cue_summary": [
+    "Uses vague terms like '他手' (his hand) and '他的北臂' (his north arm) — likely misnaming or word-finding difficulty.",
+    "Repeats '烫衣服' (ironing clothes) and '拔插头' (pulling plug) — possible circumlocution or retrieval struggle.",
+    "Describes events in a fragmented, non-sequential way with pauses and filler '嗯' (um).",
+    "Mentions '日历' (calendar) and '六月二十七号' (June 27th) — specific date recall, but contextually disconnected from scene.",
+    "Narrative lacks causal coherence: events are listed but not logically connected or prioritized.",
+    "Relies on examiner to infer context — e.g., '狗在警告小孩' (dog is warning the child) — inferred from context, not clearly stated as observation."
+  ],
+  "transcript_request_id": "chatcmpl-cf1d197d-854f-975a-985a-92e1adf339b0",
+  "classification_request_id": "chatcmpl-10eec265-e9c2-9657-b756-cf3cba4e1b7e",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__022__022_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__022__022_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Word-finding difficulty",
+        "summary": "Patient uses vague or incorrect anatomical terms ('他的北臂' — likely misnaming '手臂' as '北臂'), suggesting lexical retrieval challenge.",
+        "evidence": "Patient says '他的北臂要去拔插头吧' — '北臂' is not a standard term for arm; likely misstatement or word retrieval failure.",
+        "confidence": null
+      },
+      {
+        "label": "Fragmented narrative",
+        "summary": "Patient describes multiple events in a non-sequential, disconnected manner with pauses and fillers, suggesting weak narrative organization.",
+        "evidence": "Speech includes '嗯' (um) pauses, repetition of '烫衣服', and abrupt topic shifts (e.g., from dog to cat to date).",
+        "confidence": null
+      },
+      {
+        "label": "Examiner dependence",
+        "summary": "Patient’s description relies on inferred context (e.g., '狗在警告小孩') — may indicate difficulty self-organizing or sustaining coherent description.",
+        "evidence": "Patient does not explicitly state the dog’s action as warning — it is inferred from context, suggesting incomplete or incomplete self-expression.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented, non-sequential description of a domestic scene with vague terminology and pauses. While some specific details (e.g., date, objects) are recalled, narrative coherence and lexical retrieval appear impaired. No strong dementia-level signs, but mild impairment-like cues suggest need for further clinical observation.",
+    "evidence_for_risk": [
+      "Vague or incorrect word usage ('北臂')",
+      "Fragmented, non-sequential narrative with fillers",
+      "Reliance on inferred context rather than self-contained description"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies objects (dog, cat, plug, water bottle, date)",
+      "No overt confusion or disorientation in scene description",
+      "No signs of severe aphasia or disorganized speech"
+    ],
+    "alternative_explanations": [
+      "Language processing delay or mild articulation difficulty unrelated to dementia",
+      "Fatigue, distraction, or lack of task familiarity leading to fragmented response",
+      "Cultural or dialectal variation in speech patterns"
+    ],
+    "risk_factor_findings": [
+      "Reported caregiver concern about child’s safety near electrical outlet",
+      "Possible word-finding difficulty and semantic vagueness in scene description",
+      "Fragmented narrative structure with pauses and filler words"
+    ],
+    "subjective_assessment_findings": [
+      "Patient reports concern about child touching plug — may reflect caregiver role or safety awareness",
+      "Patient mentions date (June 27) — may indicate episodic memory retrieval, but contextually disconnected"
+    ],
+    "emotional_assessment_findings": [
+      "No clear emotional reactivity or affective flattening observed — speech tone is neutral and matter-of-fact",
+      "No signs of anxiety, frustration, or apathy — but also no emotional engagement with described events"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening (e.g., MoCA, MMSE)",
+      "Observe patient’s narrative coherence and word retrieval in structured tasks",
+      "Assess functional safety awareness in home environment if caregiver concern is present"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and safety assessment if caregiver concern persists.",
+    "future_risk_trend_summary": "Single-clip assessment limits longitudinal prediction. Mild impairment-like cues suggest monitoring is warranted, but not sufficient for dementia classification.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable — assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is partially intelligible but shows multiple mild impairment-like cues.",
+      "Examiner role is not clearly dominant — patient is primary respondent in task.",
+      "Date recall is present but contextually disconnected — may reflect episodic memory retrieval or unrelated mention."
+    ],
+    "quality_flags": [
+      "speech_unintelligible",
+      "transcript_unavailable",
+      "limited_speaking_time"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "爸爸在烫衣服，他手要去拔插头，我怕触电。狗在旁边叫，猫把水瓶推倒了，水洒了一地。他爸看到小孩去插电，很紧张，狗在警告小孩。这是日历，六月二十七号。",
+    "speaker_turn_summary": [
+      "Patient describes scene: father ironing, child reaching for plug, dog barking, cat knocking over water bottle, father’s reaction, date mention.",
+      "Examiner likely prompts or acknowledges, but no clear examiner speech is isolated or dominant in the audio."
+    ],
+    "patient_cue_summary": [
+      "Uses vague terms like '他手' (his hand) and '他的北臂' (his north arm) — likely misnaming or word-finding difficulty.",
+      "Repeats '烫衣服' (ironing clothes) and '拔插头' (pulling plug) — possible circumlocution or retrieval struggle.",
+      "Describes events in a fragmented, non-sequential way with pauses and filler '嗯' (um).",
+      "Mentions '日历' (calendar) and '六月二十七号' (June 27th) — specific date recall, but contextually disconnected from scene.",
+      "Narrative lacks causal coherence: events are listed but not logically connected or prioritized.",
+      "Relies on examiner to infer context — e.g., '狗在警告小孩' (dog is warning the child) — inferred from context, not clearly stated as observation."
+    ]
+  },
+  "latency_ms": 20109,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/022/022_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/022/022_Daddy.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

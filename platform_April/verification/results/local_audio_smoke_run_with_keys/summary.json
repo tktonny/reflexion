@@ -1,0 +1,33 @@
+{
+  "dataset": "local_audio_smoke",
+  "manifest_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/local_audio_smoke/manifest.jsonl",
+  "results_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/results/local_audio_smoke_run_with_keys",
+  "metrics": {
+    "evaluated_cases": 1,
+    "successful_cases": 0,
+    "error_cases": 1,
+    "skipped_cases": 0,
+    "confusion_matrix": {
+      "true_positive": 0,
+      "true_negative": 0,
+      "false_positive": 0,
+      "false_negative": 0
+    }
+  },
+  "cases": [
+    {
+      "case_id": "local-audio-5556666",
+      "dataset": "local_audio_smoke",
+      "split": "smoke",
+      "ground_truth_label": "HC",
+      "transcript_model": "qwen3-asr-flash",
+      "classifier_model": "qwen3.5-plus",
+      "latency_ms": 62724,
+      "error": "invalid_provider_output: audio_only returned an invalid assessment payload",
+      "metadata": {
+        "source": "local_repo_audio",
+        "note": "single-case local audio smoke test"
+      }
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "case_id": "mandarin__chou__hc__005__005_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "在夜市里面，妈妈带，妈妈，奶奶，妈妈带着小朋友去逛夜市。一个，有几个孩子在玩那个捞鱼的。哎呦，妈妈手上拿了一坨冰淇淋，还有几个小朋友在玩那个，在那个香肠摊上面玩那个西瓜拉。哦，还有一个，一个碰个小偷去偷人家东西。把人家背，后背包拉开去偷人家东西。奶奶带着，奶奶，妈妈。就玩那个捞鱼的游戏。好，这个是夜市。好。",
+  "patient_only_transcript": "在夜市里面，妈妈带，妈妈，奶奶，妈妈带着小朋友去逛夜市。一个，有几个孩子在玩那个捞鱼的。哎呦，妈妈手上拿了一坨冰淇淋，还有几个小朋友在玩那个，在那个香肠摊上面玩那个西瓜拉。哦，还有一个，一个碰个小偷去偷人家东西。把人家背，后背包拉开去偷人家东西。奶奶带着，奶奶，妈妈。就玩那个捞鱼的游戏。好，这个是夜市。好。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes night market scene with multiple characters and events, but with fragmented phrasing, repetition, and incomplete sequencing."
+  ],
+  "patient_cue_summary": [
+    "Repetition of '妈妈' and '奶奶' without clear narrative progression",
+    "Fragmented sentence structure: '一个，有几个孩子...' with incomplete clauses",
+    "Vague or non-specific terms: '那个西瓜拉' (unclear what '西瓜拉' refers to)",
+    "Inconsistent event sequencing: jumps between children playing, mother with ice cream, thief, then back to game",
+    "Minimal self-correction or elaboration",
+    "relies on examiner to infer context",
+    "Use of filler '哎呦' and '哦' indicating possible retrieval hesitation or disorganization"
+  ],
+  "transcript_request_id": "chatcmpl-d9e639de-c4de-98f7-8abb-8a5d26a4a775",
+  "classification_request_id": "chatcmpl-f17f5f8b-0f4c-946c-b9c6-ca1b5cdcd545",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__005__005_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__005__005_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient describes a night market scene with multiple characters and activities but exhibits fragmented, repetitive, and disorganized speech. While key scene elements are named, the narrative lacks coherent sequencing, specific detail, and self-sustained elaboration. Examiner dependence and vague terminology suggest possible mild retrieval or organizational difficulty. Not sufficient for dementia classification, but warrants further clinical observation.",
+    "evidence_for_risk": [
+      "Repetitive phrasing without narrative development",
+      "Vague or unclear object references ('西瓜拉')",
+      "Disorganized event sequencing",
+      "Use of fillers and incomplete clauses"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple scene elements (mother, children, ice cream, thief, game)",
+      "Speech is intelligible enough to reconstruct basic content",
+      "No overt confusion or disorientation in scene description"
+    ],
+    "alternative_explanations": [
+      "Language processing fatigue or mild distraction during task",
+      "Non-native or informal speech style in casual setting",
+      "Examiner prompting may have influenced structure"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery",
+      "Observe patient in structured narrative or memory tasks",
+      "Assess for functional impact in daily activities"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction not possible from single clip; risk remains low but warrants monitoring for progression.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is partially coherent but shows mild impairment-like features.",
+      "Examiner role is inferred",
+      "patient is primary subject for evaluation."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "在夜市里面，妈妈带，妈妈，奶奶，妈妈带着小朋友去逛夜市。一个，有几个孩子在玩那个捞鱼的。哎呦，妈妈手上拿了一坨冰淇淋，还有几个小朋友在玩那个，在那个香肠摊上面玩那个西瓜拉。哦，还有一个，一个碰个小偷去偷人家东西。把人家背，后背包拉开去偷人家东西。奶奶带着，奶奶，妈妈。就玩那个捞鱼的游戏。好，这个是夜市。好。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes night market scene with multiple characters and events, but with fragmented phrasing, repetition, and incomplete sequencing."
+    ],
+    "patient_cue_summary": [
+      "Repetition of '妈妈' and '奶奶' without clear narrative progression",
+      "Fragmented sentence structure: '一个，有几个孩子...' with incomplete clauses",
+      "Vague or non-specific terms: '那个西瓜拉' (unclear what '西瓜拉' refers to)",
+      "Inconsistent event sequencing: jumps between children playing, mother with ice cream, thief, then back to game",
+      "Minimal self-correction or elaboration",
+      "relies on examiner to infer context",
+      "Use of filler '哎呦' and '哦' indicating possible retrieval hesitation or disorganization"
+    ]
+  },
+  "latency_ms": 14034,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/005/005_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/005/005_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

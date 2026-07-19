@@ -1,0 +1,123 @@
+{
+  "case_id": "mandarin__chou__mci__037__037_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "现在现在那个他那个应应该是两个那个老先生，在那个在那个公园，在公园里面，那个那个那个。在玩那个象棋，玩那个象棋。然后后面在这边，然后那个小孩子在打羽毛球，打过打过去的时候，那个后面有后面好像有牵狗咬咬他。嗯。这边这边在那个荡秋千。",
+  "patient_only_transcript": "现在现在那个他那个应应该是两个那个老先生，在那个在那个公园，在公园里面，那个那个那个。在玩那个象棋，玩那个象棋。然后后面在这边，然后那个小孩子在打羽毛球，打过打过去的时候，那个后面有后面好像有牵狗咬咬他。嗯。这边这边在那个荡秋千。",
+  "speaker_turn_summary": [
+    "Patient describes a park scene with multiple actors: two old men playing chess, a child playing badminton, a dog biting someone, and someone swinging on a swing.",
+    "Patient uses repeated particles ('那个', '嗯'), generic referents, and incomplete clauses, but maintains topic continuity and identifies multiple scene elements."
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple actors and actions in the scene (old men, child, dog, swing) despite fragmented phrasing.",
+    "Use of '那个' and '嗯' is consistent with colloquial Mandarin, not necessarily impairment.",
+    "Narrative is not abandoned or collapsed",
+    "patient attempts to describe sequential and spatial elements.",
+    "No evidence of naming collapse, contradiction, or severe disorganization beyond normal discourse fragmentation."
+  ],
+  "transcript_request_id": "chatcmpl-6c4524bb-7e7e-9bb9-a023-8ed2057887b5",
+  "classification_request_id": "chatcmpl-ea858576-dd49-9490-8b5e-df0e0685303a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__037__037_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__037__037_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient attempts to describe a multi-actor park scene with multiple actions, identifying at least four distinct elements (chess players, child with badminton, dog biting, swing user).",
+        "evidence": "Patient lists actors and actions in sequence: '两个老先生在玩象棋', '小孩子在打羽毛球', '牵狗咬他', '荡秋千'.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Lexical and Structural Fragmentation",
+        "summary": "Patient uses repeated particles ('那个', '嗯') and incomplete clauses, but does not lose referential clarity or abandon the task.",
+        "evidence": "Phrases like '那个那个那个' and '后面好像有牵狗咬咬他' show hesitation but not collapse; scene remains identifiable.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion Attempt",
+        "summary": "Patient attempts to describe spatial and temporal relationships in the scene, despite fragmented delivery.",
+        "evidence": "Patient references '后面' (behind), '这边' (this side), and '打过去的时候' (when hitting over), indicating spatial-temporal awareness.",
+        "confidence": 0.25
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented but identifiable description of a multi-actor park scene, using colloquial Mandarin with repeated particles and incomplete clauses. No evidence of naming collapse, contradiction, or abandonment. Task is partially completed with multiple scene elements correctly identified. Not sufficient for dementia classification, but warrants observation due to speech fragmentation and low signal-to-noise.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient identifies multiple actors and actions in the scene.",
+      "Narrative remains coherent despite fragmented phrasing.",
+      "No evidence of semantic collapse or disorganization beyond normal colloquial speech patterns."
+    ],
+    "alternative_explanations": [
+      "Speech fragmentation may reflect recording quality or natural colloquial Mandarin rather than cognitive impairment.",
+      "Patient may be describing a complex scene with multiple simultaneous events, which is cognitively demanding even for healthy individuals."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the scene-description task with clearer visual cues or prompts.",
+      "Use structured narrative tasks with fixed prompts to reduce ambiguity.",
+      "Consider follow-up with formal cognitive screening if other symptoms emerge."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if symptoms persist or worsen.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no strong evidence of cognitive decline.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible enough to reconstruct scene elements, but fragmented.",
+      "Colloquial Mandarin features (repetition, particles, generic referents) are not sufficient for cognitive_risk classification without stronger impairment cues."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "现在现在那个他那个应应该是两个那个老先生，在那个在那个公园，在公园里面，那个那个那个。在玩那个象棋，玩那个象棋。然后后面在这边，然后那个小孩子在打羽毛球，打过打过去的时候，那个后面有后面好像有牵狗咬咬他。嗯。这边这边在那个荡秋千。",
+    "speaker_turn_summary": [
+      "Patient describes a park scene with multiple actors: two old men playing chess, a child playing badminton, a dog biting someone, and someone swinging on a swing.",
+      "Patient uses repeated particles ('那个', '嗯'), generic referents, and incomplete clauses, but maintains topic continuity and identifies multiple scene elements."
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple actors and actions in the scene (old men, child, dog, swing) despite fragmented phrasing.",
+      "Use of '那个' and '嗯' is consistent with colloquial Mandarin, not necessarily impairment.",
+      "Narrative is not abandoned or collapsed",
+      "patient attempts to describe sequential and spatial elements.",
+      "No evidence of naming collapse, contradiction, or severe disorganization beyond normal discourse fragmentation."
+    ]
+  },
+  "latency_ms": 15057,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/037/037_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/037/037_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

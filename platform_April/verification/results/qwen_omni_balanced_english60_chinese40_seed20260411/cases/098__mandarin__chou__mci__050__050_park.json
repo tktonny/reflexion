@@ -1,0 +1,127 @@
+{
+  "case_id": "mandarin__chou__mci__050__050_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "阿公跟阿嬷在公园的凉亭上下围棋，啊，一边下围棋一边在泡茶。他们呢一边泡着一边下围棋，也看看到两个小孩在打羽毛球。这个时候有一个男生带了一只狗在旁边溜达，然后这个狗呢去咬这个小女孩的衣服。啊，在在远的后面有两个小女生在玩荡秋千。我这两个这这两个在凉亭里面下棋的觉得呃这个小孩子在运动，就一直看这样子。",
+  "patient_only_transcript": "阿公跟阿嬷在公园的凉亭上下围棋，一边下围棋一边在泡茶。他们一边泡着一边下围棋，也看到两个小孩在打羽毛球。这个时候有一个男生带了一只狗在旁边溜达，然后这个狗去咬这个小女孩的衣服。在远的后面有两个小女生在玩荡秋千。我这两个在凉亭里面下棋的觉得这个小孩子在运动，就一直看这样子。",
+  "speaker_turn_summary": [
+    "患者描述公园凉亭场景，包含多个同时发生的动作和人物：下棋、泡茶、打羽毛球、狗咬衣服、荡秋千。",
+    "患者使用了多个“这个”“那个”“一边...一边...”等结构，但整体语义可辨识。",
+    "患者未表现出明显语义断裂、命名失败或叙事崩塌，但语句结构松散，有重复和填充词（如“啊”“嗯”）。",
+    "患者未被明显打断或需要多次提示，但未主动补充细节或进行因果连接。"
+  ],
+  "patient_cue_summary": [
+    "患者能识别并描述多个场景元素（下棋、泡茶、羽毛球、狗、小女孩、荡秋千），说明基本场景理解能力保留。",
+    "语句结构松散，使用“一边...一边...”“这个...那个...”等常见口语结构，未见严重命名困难或语义塌陷。",
+    "存在轻微填充词和语句重复，但未导致叙事中断或核心信息丢失，不构成强认知风险信号。",
+    "未出现明显自我修正、语义矛盾、逻辑断裂或任务偏离，符合普通口语描述水平。",
+    "患者未主动追问或要求澄清，但未表现出回避或认知回避倾向。"
+  ],
+  "transcript_request_id": "chatcmpl-e39636e5-e67d-9164-9d0c-4f697e38ffdd",
+  "classification_request_id": "chatcmpl-a75cd2a3-88cb-97c7-9e01-76a49c07d0b7",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__050__050_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__050__050_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "场景描述完整性",
+        "summary": "患者能识别并描述多个同时发生的场景元素，包括人物、动作和空间关系。",
+        "evidence": "患者提及阿公阿嬷下棋、泡茶、小孩打羽毛球、狗咬衣服、女生荡秋千，共涉及5个主要动作和3组人物。",
+        "confidence": 0.5
+      },
+      {
+        "label": "语句结构与连贯性",
+        "summary": "语句结构松散，使用口语化连接词和重复结构，但未出现语义断裂或叙事崩塌。",
+        "evidence": "使用‘一边...一边...’‘这个...那个...’等结构，语义可辨识，无明显逻辑跳跃或自我修正。",
+        "confidence": 0.5
+      },
+      {
+        "label": "语义清晰度与任务完成度",
+        "summary": "患者完成场景描述任务，语义信息量充足，未出现命名失败或核心元素缺失。",
+        "evidence": "患者能准确描述多个角色行为，如‘狗咬小女孩衣服’‘女生在荡秋千’，说明基本语义提取能力保留。",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "患者在描述公园场景时能识别并描述多个同时发生的动作和人物，语义完整，结构松散但未出现认知障碍典型信号。语句中存在口语化填充词和重复结构，符合普通口语表达水平，不构成强认知风险。建议进一步观察或补充多模态评估。",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "患者能完整描述多个场景元素，无命名失败或语义塌陷。",
+      "语句结构虽松散，但语义连贯，未出现逻辑断裂或叙事崩塌。",
+      "无明显情绪异常、回避、焦虑或认知回避表现。"
+    ],
+    "alternative_explanations": [
+      "语句松散和填充词可能源于口语表达习惯或非正式语境，非认知障碍特有。",
+      "任务为场景描述，非记忆或执行功能测试，不能仅凭语句结构推断认知风险。",
+      "音频质量或语速可能影响语义清晰度，但未达不可辨识程度。"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "建议补充多模态评估，如视觉追踪、记忆任务或执行功能测试。",
+      "可考虑重复任务或增加提示，观察患者是否能更结构化描述。",
+      "建议结合家属或照护者报告，评估日常功能是否受影响。"
+    ],
+    "visit_recommendation": "建议进行正式认知筛查或临床评估，以排除轻度认知障碍或早期退行性改变。",
+    "future_risk_trend_summary": "单次音频评估无法预测长期认知趋势，建议定期随访观察认知功能变化。",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "视频不可用，仅依赖音频描述，评估受限于语义完整性而非视觉行为。",
+      "患者语句结构松散但语义完整，符合普通口语表达，不构成强认知风险信号。",
+      "任务为场景描述，非标准认知测试，需谨慎解读语句结构差异。"
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "阿公跟阿嬷在公园的凉亭上下围棋，一边下围棋一边在泡茶。他们一边泡着一边下围棋，也看到两个小孩在打羽毛球。这个时候有一个男生带了一只狗在旁边溜达，然后这个狗去咬这个小女孩的衣服。在远的后面有两个小女生在玩荡秋千。我这两个在凉亭里面下棋的觉得这个小孩子在运动，就一直看这样子。",
+    "speaker_turn_summary": [
+      "患者描述公园凉亭场景，包含多个同时发生的动作和人物：下棋、泡茶、打羽毛球、狗咬衣服、荡秋千。",
+      "患者使用了多个“这个”“那个”“一边...一边...”等结构，但整体语义可辨识。",
+      "患者未表现出明显语义断裂、命名失败或叙事崩塌，但语句结构松散，有重复和填充词（如“啊”“嗯”）。",
+      "患者未被明显打断或需要多次提示，但未主动补充细节或进行因果连接。"
+    ],
+    "patient_cue_summary": [
+      "患者能识别并描述多个场景元素（下棋、泡茶、羽毛球、狗、小女孩、荡秋千），说明基本场景理解能力保留。",
+      "语句结构松散，使用“一边...一边...”“这个...那个...”等常见口语结构，未见严重命名困难或语义塌陷。",
+      "存在轻微填充词和语句重复，但未导致叙事中断或核心信息丢失，不构成强认知风险信号。",
+      "未出现明显自我修正、语义矛盾、逻辑断裂或任务偏离，符合普通口语描述水平。",
+      "患者未主动追问或要求澄清，但未表现出回避或认知回避倾向。"
+    ]
+  },
+  "latency_ms": 23510,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/050/050_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/050/050_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

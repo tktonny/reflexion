@@ -1,0 +1,132 @@
+{
+  "case_id": "english__pitt__dementia__cookie__610_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "I'd like for you to look at this picture and tell me what you see going on there. What's happening in that picture? They're baking. What else is going on? Making a mess of the place. Oh. By not putting, by not, no neatness. Do you see anything else happening there? Yes, there's a few accidents. The little boy is standing on a chair which is crooked. The lady has water running out of her sink and towel in her hand, which is dangerous. Cookies are coming down, the cookie jar is coming down. And the place is very pretty. Okay, good.",
+  "patient_only_transcript": "Yes, there's a few accidents. The little boy is standing on a chair which is crooked. The lady has water running out of her sink and towel in her hand, which is dangerous. Cookies are coming down, the cookie jar is coming down. And the place is very pretty.",
+  "speaker_turn_summary": [
+    "Examiner: I'd like for you to look at this picture and tell me what you see going on there. What's happening in that picture?",
+    "Patient: They're baking. What else is going on? Making a mess of the place. Oh. By not putting, by not, no neatness.",
+    "Examiner: Do you see anything else happening there?",
+    "Patient: Yes, there's a few accidents. The little boy is standing on a chair which is crooked. The lady has water running out of her sink and towel in her hand, which is dangerous. Cookies are coming down, the cookie jar is coming down. And the place is very pretty. Okay, good."
+  ],
+  "patient_cue_summary": [
+    "Patient repeats 'making a mess of the place' and 'no neatness' without elaboration",
+    "Patient describes scene elements but with weak causal or sequential linkage",
+    "Patient uses vague phrasing like 'cookies are coming down, the cookie jar is coming down' without clear spatial or temporal context",
+    "Patient ends with 'Okay, good' — possibly indicating task completion but lacking depth or coherence",
+    "Patient shows some retrieval of scene elements but lacks organized narrative structure or detail"
+  ],
+  "transcript_request_id": "chatcmpl-0b1972b5-7ef0-9e26-bf33-4ccc27b157c5",
+  "classification_request_id": "chatcmpl-d6fbdebd-affb-96d6-9727-2b58586fc5a6",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__610_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__610_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient identifies key elements (boy on chair, sink running, cookie jar falling) but lacks logical sequencing or causal explanation.",
+        "evidence": "Patient lists events without connecting them causally or temporally; e.g., 'cookies are coming down, the cookie jar is coming down' lacks spatial or mechanical context.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses general terms ('mess', 'pretty') and vague phrasing ('coming down') instead of precise descriptors.",
+        "evidence": "Patient says 'the place is very pretty' — an evaluative statement not grounded in visual detail; 'cookies are coming down' lacks agent or mechanism.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient’s response is fragmented and lacks a structured description of the scene’s dynamics or relationships between elements.",
+        "evidence": "Patient begins with 'Yes, there's a few accidents' but does not elaborate on how or why; transitions between elements are abrupt.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient identifies some visible elements of the picture but demonstrates weak narrative organization, vague phrasing, and lack of causal or spatial detail. These cues are suggestive of mild cognitive impairment and warrant further clinical review.",
+    "evidence_for_risk": [
+      "Fragmented, disconnected description of scene events",
+      "Use of vague, evaluative, or non-specific language",
+      "Lack of causal or sequential linkage between described elements"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key objects (boy, cookie jar, sink, towel)",
+      "Patient completes the task without significant interruption or silence"
+    ],
+    "alternative_explanations": [
+      "Patient may be describing the scene from memory or imagination rather than visual perception",
+      "Patient may be responding to examiner prompts with minimal elaboration due to task design or social cues",
+      "Patient may be experiencing mild fatigue or distraction, not cognitive impairment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule formal cognitive screening with validated tools (e.g., MoCA, MMSE)",
+      "Observe patient’s performance across multiple tasks for consistency",
+      "Consider caregiver report or collateral history for functional changes"
+    ],
+    "visit_recommendation": "Formal cognitive screening and clinical evaluation recommended",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up assessments needed to track progression or stability",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio and transcript.",
+      "Patient speech is intelligible but organizationally weak",
+      "not sufficient for healthy classification.",
+      "Examiner prompts are present but do not dominate patient response",
+      "patient is the primary evaluator subject."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Yes, there's a few accidents. The little boy is standing on a chair which is crooked. The lady has water running out of her sink and towel in her hand, which is dangerous. Cookies are coming down, the cookie jar is coming down. And the place is very pretty.",
+    "speaker_turn_summary": [
+      "Examiner: I'd like for you to look at this picture and tell me what you see going on there. What's happening in that picture?",
+      "Patient: They're baking. What else is going on? Making a mess of the place. Oh. By not putting, by not, no neatness.",
+      "Examiner: Do you see anything else happening there?",
+      "Patient: Yes, there's a few accidents. The little boy is standing on a chair which is crooked. The lady has water running out of her sink and towel in her hand, which is dangerous. Cookies are coming down, the cookie jar is coming down. And the place is very pretty. Okay, good."
+    ],
+    "patient_cue_summary": [
+      "Patient repeats 'making a mess of the place' and 'no neatness' without elaboration",
+      "Patient describes scene elements but with weak causal or sequential linkage",
+      "Patient uses vague phrasing like 'cookies are coming down, the cookie jar is coming down' without clear spatial or temporal context",
+      "Patient ends with 'Okay, good' — possibly indicating task completion but lacking depth or coherence",
+      "Patient shows some retrieval of scene elements but lacks organized narrative structure or detail"
+    ]
+  },
+  "latency_ms": 32625,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/610-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/610-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "case_id": "english__pitt__control__cookie__245_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "All the action you see going on in that picture. Well, the mother is washing dishes and she hasn't turned the water off and the water is spilling out from the sink onto the floor and she's standing in a puddle of water. And the boy is standing on a stool, a high stool, and he is robbing the cookie jar and at the same time his sister is asking him for a cookie and in the process his stool is starting to tip over. And I get that to mean points of. Looks like that boy's in for a bad fall. Going to be in for a bad fall.",
+  "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing.",
+  "speaker_turn_summary": [
+    "Examiner: All the action you see going on in that picture.",
+    "Patient: Well, the mother is washing dishes and she hasn't turned the water off and the water is spilling out from the sink onto the floor and she's standing in a puddle of water. And the boy is standing on a stool, a high stool, and he is robbing the cookie jar and at the same time his sister is asking him for a cookie and in the process his stool is starting to tip over. And I get that to mean points of. Looks like that boy's in for a bad fall. Going to be in for a bad fall."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with specific content words",
+    "Main events linked logically",
+    "Little examiner dependence",
+    "Minor hesitation and repetition at end ('points of...')",
+    "No evidence of word-finding failure or semantic vagueness"
+  ],
+  "transcript_request_id": "chatcmpl-2ea29702-2385-9ba8-bc71-60a7f14a6c5e",
+  "classification_request_id": "chatcmpl-2e47b40b-82a6-97d8-a129-e59c2364ec1b",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__245_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__245_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient accurately and sequentially describes multiple elements of the picture: mother washing dishes, water spilling, boy on stool, cookie jar, sister asking for cookie, stool tipping.",
+        "evidence": "Patient's transcript includes specific, connected events without omission or confusion.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval",
+        "summary": "Patient uses precise vocabulary (e.g., 'robbing the cookie jar', 'overflowing sink', 'tipping over') without circumlocution or filler dependence.",
+        "evidence": "No evidence of word-finding difficulty; terms are concrete and task-relevant.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the scene description with clear causal and temporal links between events.",
+        "evidence": "Events are described in a logical order with causal connections (e.g., boy on stool → stealing cookie → stool tipping).",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "The patient provides a coherent, detailed, and logically organized description of the pictured scene, accurately identifying key elements such as the mother, the boy, the cookie jar, the tipping stool, and the overflowing sink. Although there is a minor hesitation and repetition at the end ('points of...'), it does not impair overall comprehension or task performance. No signs of cognitive impairment are evident in the patient's speech.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent narrative structure",
+      "Accurate identification of multiple scene elements",
+      "No word-finding pauses or semantic vagueness",
+      "Minimal examiner dependence"
+    ],
+    "alternative_explanations": [
+      "Minor speech hesitation may reflect natural conversational rhythm rather than cognitive impairment",
+      "The repetition 'points of' may be a filler or incomplete thought, not indicative of retrieval failure"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed",
+      "Continue routine monitoring if part of longitudinal screening"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no persuasive evidence of cognitive decline is present.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-relevant despite minor hesitation.",
+      "No signs of dementia-like impairment detected in this clip."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing.",
+    "speaker_turn_summary": [
+      "Examiner: All the action you see going on in that picture.",
+      "Patient: Well, the mother is washing dishes and she hasn't turned the water off and the water is spilling out from the sink onto the floor and she's standing in a puddle of water. And the boy is standing on a stool, a high stool, and he is robbing the cookie jar and at the same time his sister is asking him for a cookie and in the process his stool is starting to tip over. And I get that to mean points of. Looks like that boy's in for a bad fall. Going to be in for a bad fall."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with specific content words",
+      "Main events linked logically",
+      "Little examiner dependence",
+      "Minor hesitation and repetition at end ('points of...')",
+      "No evidence of word-finding failure or semantic vagueness"
+    ]
+  },
+  "latency_ms": 20884,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/245-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/245-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "dataset": "local_audio_smoke",
+  "manifest_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/local_audio_smoke/manifest.jsonl",
+  "results_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/results/local_audio_smoke_run",
+  "metrics": {
+    "evaluated_cases": 1,
+    "successful_cases": 0,
+    "error_cases": 1,
+    "skipped_cases": 0,
+    "confusion_matrix": {
+      "true_positive": 0,
+      "true_negative": 0,
+      "false_positive": 0,
+      "false_negative": 0
+    }
+  },
+  "cases": [
+    {
+      "case_id": "local-audio-5556666",
+      "dataset": "local_audio_smoke",
+      "split": "smoke",
+      "ground_truth_label": "HC",
+      "transcript_model": "qwen3-asr-flash",
+      "classifier_model": "qwen3.5-plus",
+      "latency_ms": 601,
+      "error": "provider_unavailable: audio_only returned 401: {\"error\":{\"message\":\"Incorrect API key provided. For details, see: https://help.aliyun.com/zh/model-studio/error-code#apikey-error\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_api_key\"},\"request_id\":\"dd59c155-cf85-9a16-93d9-24eace8fa3d4\"}",
+      "metadata": {
+        "source": "local_repo_audio",
+        "note": "single-case local audio smoke test"
+      }
+    }
+  ]
+}

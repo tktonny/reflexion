@@ -1,0 +1,360 @@
+{
+  "dataset": "talkbank_english_pitt",
+  "manifest_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/talkbank/corpora/english/pitt/manifest.jsonl",
+  "results_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/results/qwen_omni_recall_probe_pitt_cognitive_risk_4_v2",
+  "metrics": {
+    "evaluated_cases": 4,
+    "successful_cases": 4,
+    "error_cases": 0,
+    "skipped_cases": 0,
+    "accuracy": 0.25,
+    "precision": 1.0,
+    "recall": 0.25,
+    "f1": 0.4,
+    "confusion_matrix": {
+      "true_positive": 1,
+      "true_negative": 0,
+      "false_positive": 0,
+      "false_negative": 3
+    }
+  },
+  "cases": [
+    {
+      "case_id": "english__pitt__dementia__cookie__001_2",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "predicted_label": "cognitive_risk",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.35,
+      "reviewer_confidence": 0.65,
+      "classification_request_id": "chatcmpl-1638094a-2d32-985d-9d9f-5d9de861a688",
+      "transcript_model": "qwen3-omni-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [
+          {
+            "label": "lexical_retrieval_difficulty",
+            "summary": "Patient exhibits circumlocution and filler terms while describing a picture task.",
+            "evidence": "Patient uses phrases like 'it's hard to tell anymore', 'I don't know about the this hickey here', and 'I can't think of the' while attempting to describe a scene involving a boy, cookie jar, stool, and sink.",
+            "confidence": 0.7
+          },
+          {
+            "label": "narrative_disorganization",
+            "summary": "Patient's description lacks coherent sequencing and causal linkage between scene elements.",
+            "evidence": "Patient describes the boy in the cookie jar, the stool falling, and the sink overflowing, but fails to connect these events logically or prioritize them in a structured narrative.",
+            "confidence": 0.65
+          },
+          {
+            "label": "examiner_dependence",
+            "summary": "Patient appears to rely on examiner prompts and provides minimal self-initiated detail.",
+            "evidence": "Patient responds to interviewer prompts with fragmented, incomplete, or vague statements rather than independently constructing a full description of the picture.",
+            "confidence": 0.7
+          }
+        ],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.35,
+        "risk_label": "cognitive_risk",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient demonstrates mild impairment-like features during a picture description task, including lexical retrieval difficulty, narrative disorganization, and examiner dependence. These are suggestive of early cognitive change but not conclusive. Further clinical evaluation is recommended.",
+        "evidence_for_risk": [
+          "Circumlocution and filler terms during task description",
+          "Lack of coherent narrative structure",
+          "Reliance on examiner prompts for task completion"
+        ],
+        "evidence_against_risk": [
+          "Patient correctly identifies some scene elements (boy, cookie jar, sink, stool)",
+          "No overt confusion or disorientation in task context",
+          "Affect remains neutral and engaged"
+        ],
+        "alternative_explanations": [
+          "Task difficulty or unfamiliarity with picture description format",
+          "Temporary cognitive load or distraction during recording",
+          "Non-clinical speech hesitancy or articulation style"
+        ],
+        "risk_factor_findings": [
+          "reported difficulty with scene description task",
+          "lexical retrieval hesitation",
+          "narrative disorganization"
+        ],
+        "subjective_assessment_findings": [
+          "Patient expresses uncertainty about scene elements (e.g., 'hard to tell', 'can't think of the')",
+          "Patient appears to require examiner prompting to continue description"
+        ],
+        "emotional_assessment_findings": [
+          "neutral affect with mild hesitation",
+          "no signs of distress, frustration, or apathy"
+        ],
+        "risk_control_suggestions": [
+          "Repeat picture description task with structured prompts",
+          "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+          "Obtain collateral history from caregiver or family member"
+        ],
+        "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and caregiver input.",
+        "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up assessments recommended to track progression.",
+        "reviewer_confidence": 0.65,
+        "context_notes": [
+          "Video component is unavailable; assessment based solely on audio from dialogue-style screening task.",
+          "Patient is likely the main respondent in a structured picture description task.",
+          "Findings are conservative and do not constitute diagnosis."
+        ],
+        "quality_flags": [
+          "transcript_unavailable",
+          "video_too_short",
+          "limited_visual_sampling"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+      },
+      "latency_ms": 24372,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/001-2.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/001-2.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    },
+    {
+      "case_id": "english__pitt__dementia__cookie__005_0",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.2,
+      "reviewer_confidence": 0.6,
+      "classification_request_id": "chatcmpl-937e9989-6ada-94fc-87b6-de5e157eb0ab",
+      "transcript_model": "qwen3-omni-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__005_0/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.2,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient speech is unintelligible and transcript unavailable; no reliable cognitive impairment signals can be extracted from audio alone. Visual modality is unavailable. Further observation or formal screening is recommended.",
+        "evidence_for_risk": [],
+        "evidence_against_risk": [
+          "No intelligible patient speech to assess coherence or retrieval",
+          "No visual cues available to evaluate behavior or affect",
+          "Task context (cookie theft picture description) cannot be evaluated due to lack of patient response"
+        ],
+        "alternative_explanations": [
+          "Patient may be nonverbal, distracted, or not yet engaged in the task",
+          "Audio may be corrupted or masked by background noise",
+          "Examiner may have dominated the interaction, leaving no patient response to evaluate"
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [],
+        "risk_control_suggestions": [
+          "Repeat the picture description task with clearer audio capture or visual observation",
+          "Use alternative screening tools if patient speech remains unintelligible",
+          "Consider caregiver report or collateral history if patient cannot self-report"
+        ],
+        "visit_recommendation": "Formal cognitive screening with full multimodal assessment recommended",
+        "future_risk_trend_summary": "Longitudinal prediction not possible from single unusable clip; follow-up needed for trend assessment",
+        "reviewer_confidence": 0.6,
+        "context_notes": [
+          "Video modality unavailable; audio is the only available channel.",
+          "Patient speech is unintelligible; no content-level inferences can be made.",
+          "Task context is picture description (cookie theft scene), but no patient response is assessable."
+        ],
+        "quality_flags": [
+          "transcript_unavailable",
+          "speech_unintelligible"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+      },
+      "latency_ms": 6025,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/005-0.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/005-0.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    },
+    {
+      "case_id": "english__pitt__dementia__cookie__007_1",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.3,
+      "reviewer_confidence": 0.6,
+      "classification_request_id": "chatcmpl-40802cb2-d63d-9ed7-b12d-78b2794aa9c6",
+      "transcript_model": "qwen3-omni-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__007_1/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__007_1/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.3,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient speech is partially intelligible but lacks sufficient detail, coherence, or narrative structure to confidently assess for cognitive impairment. Task context (cookie theft picture description) is not fully addressed in the available audio. No clear impairment-like cues are reliably observable. Further observation or formal screening is recommended.",
+        "evidence_for_risk": [],
+        "evidence_against_risk": [
+          "Patient speech is partially intelligible but not fully informative or organized.",
+          "No clear word-finding pauses, repetition, or disorganization is reliably discernible.",
+          "Patient does not appear to be severely impaired or disoriented in the available audio."
+        ],
+        "alternative_explanations": [
+          "Audio quality or recording conditions may limit clarity of patient speech.",
+          "Patient may be responding to prompts or may be in a non-optimal state for task performance.",
+          "Task may not have been fully completed or elaborated due to time or audio constraints."
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [],
+        "risk_control_suggestions": [
+          "Repeat the picture description task with clearer audio capture or in a quieter setting.",
+          "Use a standardized cognitive screening tool (e.g., MoCA, MMSE) in a follow-up visit.",
+          "Consider caregiver report or collateral history to supplement clinical judgment."
+        ],
+        "visit_recommendation": "Formal cognitive screening in a controlled clinical setting is recommended.",
+        "future_risk_trend_summary": "Longitudinal prediction is not possible from a single clip with limited audio quality and incomplete task performance.",
+        "reviewer_confidence": 0.6,
+        "context_notes": [
+          "Video component is unavailable; assessment is based solely on audio.",
+          "Patient speech is partially intelligible but lacks sufficient detail for confident impairment classification.",
+          "Task context is cookie theft picture description; patient response is incomplete and not fully coherent."
+        ],
+        "quality_flags": [
+          "face_not_visible",
+          "video_too_short",
+          "transcript_unavailable",
+          "speech_unintelligible"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+      },
+      "latency_ms": 6335,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/007-1.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/007-1.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    },
+    {
+      "case_id": "english__pitt__dementia__cookie__010_0",
+      "dataset": "talkbank_english_pitt",
+      "split": "full",
+      "ground_truth_label": "cognitive_risk",
+      "predicted_label": "HC",
+      "predicted_screening_classification": "needs_observation",
+      "risk_score": 0.3,
+      "reviewer_confidence": 0.4,
+      "classification_request_id": "chatcmpl-b73b9c0b-e4fa-9a58-b015-656bd7e99043",
+      "transcript_model": "qwen3-omni-flash",
+      "classifier_model": "qwen3-omni-flash",
+      "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+      "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+      "assessment": {
+        "visual_findings": [],
+        "body_findings": [],
+        "voice_findings": [],
+        "content_findings": [],
+        "speaker_structure": "multi_speaker",
+        "target_patient_presence": "probable",
+        "target_patient_basis": "interaction_role",
+        "detected_languages": [
+          "en"
+        ],
+        "language_confidence": 0.95,
+        "risk_score": 0.3,
+        "risk_label": "HC",
+        "risk_tier": "low",
+        "screening_classification": "needs_observation",
+        "screening_summary": "Patient speech is largely unintelligible and lacks sufficient structure or content to support a confident cognitive risk assessment. No clear impairment-like cues are observable or audible. Further observation or clearer audio is needed.",
+        "evidence_for_risk": [],
+        "evidence_against_risk": [
+          "Speech is unintelligible and lacks meaningful content for cognitive screening.",
+          "No observable or audible signs of disorganization, word-finding difficulty, or narrative breakdown were discernible.",
+          "Patient did not provide sufficient response to the picture-description task to evaluate cognitive performance."
+        ],
+        "alternative_explanations": [
+          "Audio quality issues may be obscuring potential cognitive cues.",
+          "Patient may be hesitant, distracted, or not fully engaged in the task.",
+          "Examiner may have interrupted or prompted, limiting patient response length or clarity."
+        ],
+        "risk_factor_findings": [],
+        "subjective_assessment_findings": [],
+        "emotional_assessment_findings": [],
+        "risk_control_suggestions": [
+          "Repeat the task with clearer audio or in a quieter environment.",
+          "Use alternative screening tools if audio remains unintelligible.",
+          "Consider caregiver report or collateral history if patient speech remains non-informative."
+        ],
+        "visit_recommendation": "Routine follow-up with audio quality improvement or alternative screening modality.",
+        "future_risk_trend_summary": "Longitudinal prediction is not possible from this single clip due to insufficient data.",
+        "reviewer_confidence": 0.4,
+        "context_notes": [
+          "Video portion is unavailable; only audio is present and unintelligible.",
+          "Patient speech is not sufficiently structured or informative for cognitive screening.",
+          "Task context: picture description of cookie theft scene; patient did not provide usable response."
+        ],
+        "quality_flags": [
+          "video_too_short",
+          "transcript_unavailable",
+          "speech_unintelligible"
+        ],
+        "session_usability": "usable_with_caveats",
+        "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+      },
+      "latency_ms": 13144,
+      "metadata": {
+        "source_language": "English",
+        "source_corpus": "Pitt",
+        "source_group": "Dementia",
+        "source_relative_path": "Dementia/cookie/010-0.mp3",
+        "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/010-0.mp3?f=save",
+        "expected_group_audio_count": 1043
+      }
+    }
+  ]
+}

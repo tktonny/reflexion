@@ -1,0 +1,134 @@
+{
+  "case_id": "english__lu__dementia__f30",
+  "dataset": "talkbank_english_lu",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.7,
+  "transcript": "And just tell me everything that's going on. What? Could you just tell me what's going on in this picture? You probably got it first. Jonah, you can also speak out loud what you're saying. Six times. Oh, he pushed it to the side. Yes, I put it for him. What about Steven? Thank you. Jonah made it. You sort of cut up. She has to take it all. That's the big thing to do. Oh, cookie jar, yeah. Is that it? All right.",
+  "patient_only_transcript": "Oh, cookie jar, yeah. Is that it? All right.",
+  "speaker_turn_summary": [
+    "Examiner: 'And just tell me everything that's going on. What? Could you just tell me what's going on in this picture?'",
+    "Examiner: 'Jonah, you can also speak out loud what you're saying.'",
+    "Patient: 'Oh, cookie jar, yeah. Is that it? All right.'",
+    "Examiner: 'You probably got it first. Jonah made it. You sort of cut up. She has to take it all. That's the big thing to do.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides minimal, task-relevant response: 'Oh, cookie jar, yeah. Is that it? All right.'",
+    "Response is brief, lacks elaboration or scene description beyond identifying 'cookie jar'.",
+    "No evidence of word-finding pauses, circumlocution, repetition, or restarts in patient speech.",
+    "Patient does not appear to require examiner scaffolding or rescue for core task completion.",
+    "Response is coherent and directly addresses the prompt, though limited in scope."
+  ],
+  "transcript_request_id": "chatcmpl-6f0d3fbf-7e09-9289-b174-da728766e09d",
+  "classification_request_id": "chatcmpl-e321f587-2f06-904a-a111-10a6f778b621",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__dementia__f30/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__lu__dementia__f30/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Task Response",
+        "summary": "Patient identifies 'cookie jar' and confirms task completion with minimal elaboration.",
+        "evidence": "Patient says: 'Oh, cookie jar, yeah. Is that it? All right.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Speech Coherence",
+        "summary": "Speech is grammatically complete, contextually relevant, and does not show breakdown.",
+        "evidence": "No pauses, restarts, or filler words observed in patient utterance.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Coverage",
+        "summary": "Patient does not describe scene elements beyond identifying the cookie jar.",
+        "evidence": "Patient does not mention actors, actions, or spatial relationships beyond 'cookie jar'.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a brief but task-relevant response identifying 'cookie jar' and confirms task completion. No clear impairment-like cues are present in speech. Limited elaboration is not sufficient for cognitive_risk in this context. Further observation or formal screening is recommended due to sparse content and lack of visual modality.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient speech is intelligible and task-relevant",
+      "No word-finding pauses, circumlocution, or restarts",
+      "Response is coherent and does not require examiner rescue",
+      "No emotional dysregulation or affective flattening observed"
+    ],
+    "alternative_explanations": [
+      "Limited elaboration may reflect task design or patient style rather than impairment",
+      "Brief response may be due to audio context or examiner prompting rather than cognitive deficit",
+      "Absence of visual modality prevents full assessment of nonverbal cues"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a structured picture description task with more visual detail",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE) if clinical concern persists",
+      "Consider repeating the task with prompting or scaffolding to assess task persistence"
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio clip; no persuasive evidence of cognitive decline is present.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video modality is unavailable",
+      "assessment is based solely on audio.",
+      "Patient response is brief but task-compliant",
+      "not sufficient for cognitive_risk classification.",
+      "Examiner dominates dialogue",
+      "patient response is minimal but coherent.",
+      "No impairment-like cues detected in speech content or structure."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "interviewer_dominant",
+      "overlapping_speech",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Oh, cookie jar, yeah. Is that it? All right.",
+    "speaker_turn_summary": [
+      "Examiner: 'And just tell me everything that's going on. What? Could you just tell me what's going on in this picture?'",
+      "Examiner: 'Jonah, you can also speak out loud what you're saying.'",
+      "Patient: 'Oh, cookie jar, yeah. Is that it? All right.'",
+      "Examiner: 'You probably got it first. Jonah made it. You sort of cut up. She has to take it all. That's the big thing to do.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides minimal, task-relevant response: 'Oh, cookie jar, yeah. Is that it? All right.'",
+      "Response is brief, lacks elaboration or scene description beyond identifying 'cookie jar'.",
+      "No evidence of word-finding pauses, circumlocution, repetition, or restarts in patient speech.",
+      "Patient does not appear to require examiner scaffolding or rescue for core task completion.",
+      "Response is coherent and directly addresses the prompt, though limited in scope."
+    ]
+  },
+  "latency_ms": 23904,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Lu",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/F30.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Lu/Dementia//F30.mp3?f=save",
+    "expected_group_audio_count": 28,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

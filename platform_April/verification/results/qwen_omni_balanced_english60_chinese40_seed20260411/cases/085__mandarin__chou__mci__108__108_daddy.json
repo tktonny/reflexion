@@ -1,0 +1,131 @@
+{
+  "case_id": "mandarin__chou__mci__108__108_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "他在他没有，他被电触到的，这是狗，这是猫。就这样。嗯，这张。日历二十七号，六月二十七。哎，还有一个论字，是不是？哦，是不是论？还有吗？没有了，没有了。花瓶倒了。就这样。",
+  "patient_only_transcript": "他被电触到的，这是狗，这是猫。就这样。嗯，这张。日历二十七号，六月二十七。哎，还有一个论字，是不是？哦，是不是论？还有吗？没有了，没有了。花瓶倒了。就这样。",
+  "speaker_turn_summary": [
+    "Patient: 描述场景元素（狗、猫、日历日期、论字、花瓶倒了）",
+    "Examiner: Not clearly audible or identifiable in this audio-only segment"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple discrete scene elements (dog, cat, date, character '论', fallen vase)",
+    "Patient uses vague or incomplete phrasing ('这个/那个' not explicitly present, but '就这样' suggests closure or lack of elaboration)",
+    "Patient exhibits short, fragmented utterances with minimal connective structure",
+    "Patient does not demonstrate sustained narrative or causal linkage between elements",
+    "Patient does not show clear naming collapse or semantic confusion, but lacks elaboration or detail",
+    "Patient ends with '就这样' indicating possible task abandonment or lack of further content"
+  ],
+  "transcript_request_id": "chatcmpl-dd4dd54a-173b-9c8f-88c6-5ff30ffdaf2c",
+  "classification_request_id": "chatcmpl-d05048aa-2504-9920-99c3-36363b960c21",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__108__108_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__108__108_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_element_identification",
+        "summary": "Patient identifies multiple discrete objects and events in the scene (dog, cat, date, fallen vase).",
+        "evidence": "Patient says: '这是狗，这是猫。...日历二十七号...花瓶倒了。'",
+        "confidence": 0.85
+      },
+      {
+        "label": "narrative_coherence",
+        "summary": "Patient does not construct a coherent or connected narrative; utterances are fragmented and lack causal or sequential structure.",
+        "evidence": "Patient lists items separately with minimal connective language; ends with '就这样' suggesting closure without elaboration.",
+        "confidence": 0.75
+      },
+      {
+        "label": "lexical_retrieval_and_elaboration",
+        "summary": "Patient does not elaborate on scene elements or provide contextual details; responses are brief and lack depth.",
+        "evidence": "Patient does not expand on '论字' or '花瓶倒了' beyond naming; no additional description or inference provided.",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient identifies multiple scene elements but does not construct a coherent narrative or provide elaboration. Speech is fragmented and ends abruptly. No clear signs of naming collapse, contradiction, or severe disorganization. Evidence is insufficient for dementia classification but warrants further observation.",
+    "evidence_for_risk": [
+      "Fragmented utterances with minimal connective structure",
+      "Lack of elaboration or contextual detail despite multiple scene elements identified",
+      "Abrupt termination with '就这样' suggesting possible task abandonment or lack of further content"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple relevant scene elements (dog, cat, date, fallen vase)",
+      "No evidence of semantic confusion, contradiction, or naming collapse",
+      "Speech remains intelligible and task-relevant despite being brief"
+    ],
+    "alternative_explanations": [
+      "Patient may be responding to a prompt with minimal elaboration due to task design or fatigue",
+      "Audio quality or recording context may limit full narrative construction",
+      "Patient may be intentionally concise or non-verbose in response to examiner cues"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a more structured scene-description task with prompting",
+      "Observe for consistency across multiple sessions or tasks",
+      "Consider additional cognitive screening tools if further concerns arise"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio clip; further observation required to assess for emerging impairment.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but lacks narrative depth and connective structure.",
+      "No clear signs of dementia-like impairment",
+      "classification remains conservative."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "他被电触到的，这是狗，这是猫。就这样。嗯，这张。日历二十七号，六月二十七。哎，还有一个论字，是不是？哦，是不是论？还有吗？没有了，没有了。花瓶倒了。就这样。",
+    "speaker_turn_summary": [
+      "Patient: 描述场景元素（狗、猫、日历日期、论字、花瓶倒了）",
+      "Examiner: Not clearly audible or identifiable in this audio-only segment"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple discrete scene elements (dog, cat, date, character '论', fallen vase)",
+      "Patient uses vague or incomplete phrasing ('这个/那个' not explicitly present, but '就这样' suggests closure or lack of elaboration)",
+      "Patient exhibits short, fragmented utterances with minimal connective structure",
+      "Patient does not demonstrate sustained narrative or causal linkage between elements",
+      "Patient does not show clear naming collapse or semantic confusion, but lacks elaboration or detail",
+      "Patient ends with '就这样' indicating possible task abandonment or lack of further content"
+    ]
+  },
+  "latency_ms": 22367,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/108/108_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/108/108_Daddy.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

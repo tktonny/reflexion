@@ -1,0 +1,107 @@
+{
+  "case_id": "mandarin__chou__mci__019__019_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.85,
+  "transcript": "在公园里面，有小朋友跟老人在一起游乐。老人呢，就在下下棋，下得很开心，赢赢棋的人赢得很开心，输棋的闷闷不乐。那两个人在打球，打羽毛球，互不相下。那有中间一个小朋友牵着狗狗在遛狗，那这个狗狗不识相，跑到场地里面去咬住小妹妹。他旁边有小朋友在荡秋千，荡得好高兴，就这样。",
+  "patient_only_transcript": "在公园里面，有小朋友跟老人在一起游乐。老人呢，就在下下棋，下得很开心，赢赢棋的人赢得很开心，输棋的闷闷不乐。那两个人在打球，打羽毛球，互不相下。那有中间一个小朋友牵着狗狗在遛狗，那这个狗狗不识相，跑到场地里面去咬住小妹妹。他旁边有小朋友在荡秋千，荡得好高兴，就这样。",
+  "speaker_turn_summary": [
+    "患者描述公园场景，包含老人下棋、两人打羽毛球、小朋友牵狗、狗咬小妹妹、小朋友荡秋千等多个元素。",
+    "患者语句结构完整，语义连贯，能识别多个角色与动作，无明显中断或遗忘。",
+    "患者使用口语化表达如‘赢赢棋’‘不识相’‘就这样’，但未出现命名困难、语义塌缩或逻辑断裂。"
+  ],
+  "patient_cue_summary": [
+    "患者能完整描述多组并行场景，说明基本叙事能力保留。",
+    "使用重复词如‘赢赢棋’、‘就这样’，属口语习惯，非认知障碍典型表现。",
+    "未出现语义模糊、指代不清、内容缺失或自我修正等认知风险信号。",
+    "虽语速略慢、句式简单，但信息密度高，符合健康老年人自然表达特征。"
+  ],
+  "transcript_request_id": "chatcmpl-e3518f30-d57f-99ed-bcea-4552d8584d01",
+  "classification_request_id": "chatcmpl-83f228db-81dd-9d42-9228-40dc30cda143",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__019__019_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__019__019_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "患者能完整描述公园内多组并行活动，包括老人下棋、羽毛球对打、遛狗、儿童荡秋千等，语义清晰、结构完整，无明显认知障碍信号。口语化表达如重复词、句尾语气词属正常语言习惯，不构成风险证据。建议结合多维度评估或后续观察。",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "患者能准确识别并描述多个场景元素与角色关系。",
+      "语句连贯，无中断、重复、自我修正或语义塌缩。",
+      "未出现命名困难、指代不清、逻辑断裂或内容缺失等认知风险特征。"
+    ],
+    "alternative_explanations": [
+      "口语化表达和句式简化属自然语言特征，非认知障碍特有。",
+      "场景描述任务本身允许非正式、非文学性表达，不影响评估有效性。",
+      "音频质量或背景噪音可能影响部分细节，但不影响整体语义完整性。"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "患者语调平稳，无明显情绪波动或焦虑、沮丧表现。",
+      "描述中未体现对场景中负面事件（如狗咬人）的过度反应或回避。",
+      "整体语境中情绪表达中性，符合日常观察性描述特征。"
+    ],
+    "risk_control_suggestions": [
+      "建议在后续评估中增加任务复杂度或时间压力，以更敏感识别潜在认知变化。",
+      "可结合标准化认知筛查工具（如MMSE、MoCA）进行交叉验证。",
+      "若患者在其他情境中出现语义模糊或任务中断，应重新评估风险等级。"
+    ],
+    "visit_recommendation": "建议进行常规随访观察，必要时安排正式认知筛查。",
+    "future_risk_trend_summary": "单次评估无法预测长期认知趋势，建议纵向跟踪观察。",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "视频不可用，仅依据音频内容评估，评估基于患者描述能力而非视觉行为。",
+      "患者语句结构完整，信息密度高，符合健康老年人表达特征。",
+      "口语化表达不构成认知风险，需结合多模态证据综合判断。"
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "在公园里面，有小朋友跟老人在一起游乐。老人呢，就在下下棋，下得很开心，赢赢棋的人赢得很开心，输棋的闷闷不乐。那两个人在打球，打羽毛球，互不相下。那有中间一个小朋友牵着狗狗在遛狗，那这个狗狗不识相，跑到场地里面去咬住小妹妹。他旁边有小朋友在荡秋千，荡得好高兴，就这样。",
+    "speaker_turn_summary": [
+      "患者描述公园场景，包含老人下棋、两人打羽毛球、小朋友牵狗、狗咬小妹妹、小朋友荡秋千等多个元素。",
+      "患者语句结构完整，语义连贯，能识别多个角色与动作，无明显中断或遗忘。",
+      "患者使用口语化表达如‘赢赢棋’‘不识相’‘就这样’，但未出现命名困难、语义塌缩或逻辑断裂。"
+    ],
+    "patient_cue_summary": [
+      "患者能完整描述多组并行场景，说明基本叙事能力保留。",
+      "使用重复词如‘赢赢棋’、‘就这样’，属口语习惯，非认知障碍典型表现。",
+      "未出现语义模糊、指代不清、内容缺失或自我修正等认知风险信号。",
+      "虽语速略慢、句式简单，但信息密度高，符合健康老年人自然表达特征。"
+    ]
+  },
+  "latency_ms": 14529,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/019/019_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/019/019_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

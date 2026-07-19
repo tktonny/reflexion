@@ -1,0 +1,114 @@
+{
+  "assessment_id": "e6dca4e0e5454994b720fbbb1407c8d5",
+  "patient_id": "patient-001",
+  "language": "en",
+  "created_at": "2026-04-07T05:37:34.252563Z",
+  "visual_findings": [
+    {
+      "label": "Facial Expression",
+      "summary": "Patient exhibits smiling and engaged facial expressions during interaction.",
+      "evidence": "Patient is seen smiling and maintaining eye contact with mirror/reflection during conversation, suggesting social engagement.",
+      "confidence": 0.7
+    },
+    {
+      "label": "Posture and Movement",
+      "summary": "Patient stands upright and remains relatively stationary during the clip.",
+      "evidence": "No signs of unsteady gait, tremor, or significant motor impairment observed.",
+      "confidence": 0.8
+    }
+  ],
+  "body_findings": [],
+  "voice_findings": [
+    {
+      "label": "Speech Clarity",
+      "summary": "Speech is clear and intelligible with no signs of dysarthria or aphasia.",
+      "evidence": "Patient’s speech is fluent and grammatically structured, with appropriate prosody and pacing.",
+      "confidence": 0.9
+    },
+    {
+      "label": "Cognitive Content",
+      "summary": "Patient expresses a desire to explore new places but reports uncertainty about destination.",
+      "evidence": "Patient says: 'I like to go somewhere but I don't know where.'",
+      "confidence": 0.8
+    }
+  ],
+  "content_findings": [
+    {
+      "label": "Self-Reported Uncertainty",
+      "summary": "Patient reports not knowing where to go, which may reflect navigational or planning uncertainty.",
+      "evidence": "Patient explicitly states: 'I like to go somewhere but I don't know where.'",
+      "confidence": 0.8
+    },
+    {
+      "label": "Engagement with Suggestion",
+      "summary": "Patient responds positively to suggestion of exploring new places and considers bringing a friend.",
+      "evidence": "Patient says: 'Maybe I should try one day' and 'Should I get a friend along?'",
+      "confidence": 0.85
+    }
+  ],
+  "speaker_structure": "multi_speaker",
+  "target_patient_presence": "probable",
+  "target_patient_basis": "speaking_time",
+  "detected_languages": [
+    "en"
+  ],
+  "language_confidence": 0.95,
+  "risk_score": 0.15,
+  "risk_label": "HC",
+  "risk_tier": "low",
+  "screening_classification": "healthy",
+  "screening_summary": "Patient demonstrates clear speech, appropriate affect, and engaged behavior during interaction. Self-reported uncertainty about destination is noted but does not indicate significant cognitive impairment. No signs of disorientation, memory loss, or functional decline are observed.",
+  "evidence_for_risk": [
+    "Self-reported uncertainty about destination"
+  ],
+  "evidence_against_risk": [
+    "Clear speech and fluent conversation",
+    "Positive affect and social engagement",
+    "No signs of disorientation or motor impairment"
+  ],
+  "alternative_explanations": [
+    "The uncertainty may reflect situational indecision or preference for spontaneity rather than cognitive deficit.",
+    "The patient may be engaging in a role-play or scripted interaction, which limits clinical inference."
+  ],
+  "risk_factor_findings": [
+    "Self-reported uncertainty about destination"
+  ],
+  "subjective_assessment_findings": [
+    "Patient reports not knowing where to go, which may reflect mild navigational or planning uncertainty."
+  ],
+  "emotional_assessment_findings": [
+    "Patient displays positive affect, smiling and engaged during interaction, suggesting emotional well-being."
+  ],
+  "risk_control_suggestions": [
+    "Monitor for persistence or escalation of navigational or planning uncertainty in future interactions.",
+    "Consider brief follow-up to assess consistency of behavior across contexts."
+  ],
+  "visit_recommendation": "Routine follow-up in 6–12 months; no immediate clinical evaluation required.",
+  "future_risk_trend_summary": "Limited predictive value from single clip; longitudinal observation recommended if concerns persist.",
+  "reviewer_confidence": 0.75,
+  "context_notes": [
+    "Patient is likely the individual speaking, but speaker attribution is not 100% certain.",
+    "Clip is short and lacks comprehensive cognitive assessment; findings are screening-grade only.",
+    "No evidence of dementia or cognitive impairment in this single clip."
+  ],
+  "quality_flags": [],
+  "session_usability": "usable",
+  "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+  "provider_meta": {
+    "final_provider": "qwen_omni",
+    "model_name": "qwen3-omni-flash",
+    "request_id": "b1cd8463-f9a0-9270-b302-81b6c5eebe7b",
+    "latency_ms": 31884,
+    "raw_status": "ok"
+  },
+  "provider_trace": [
+    {
+      "provider": "qwen_omni",
+      "attempt_order": 1,
+      "status": "success",
+      "failure_reason": null,
+      "latency_ms": 31884
+    }
+  ],
+  "fallback_message": null
+}

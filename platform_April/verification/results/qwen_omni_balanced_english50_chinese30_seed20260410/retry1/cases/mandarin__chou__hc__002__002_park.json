@@ -1,0 +1,128 @@
+{
+  "case_id": "mandarin__chou__hc__002__002_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "有有两个小美眉，她们在打羽毛球，打羽毛球以后很很高兴的打羽毛球。哎，那个突然靠右边这个美眉，那个有只小狗去也跟她玩，就咬了她的衣服。嗯。她自己就吓了一跳，那对对面美眉打球过来以后，她就也没有也没有接到。嗯，那相对的对面那个那个美眉看到小狗咬她，她也觉得很很好笑。哦，原来这只小狗是有一个小小男生牵着它的，嗯，一个牵绳，他不小心就跑到那个球场里面去去咬咬到那个小美眉。那里另外有个阿公阿嬷，他们在那个在那个应该是在在野外，哎，在那个在在在户外啦，一个凉亭，坐在那边喝茶，喝茶在下象棋。嗯。他们看到他们在打球的小狗咬她，她看到这一幕，他们也觉得很好笑啊。嗯。那另外还有两个小朋友，哎，我不敢走，可能是一个男生一个女生吧，在荡秋千，在一个树的旁边在荡秋千，还有一个溜滑梯，溜滑梯最后这这张哦，这张是一个一张椅一张长的靠背椅啦，木头的公园的椅子啦。嗯。这个图案里面有两棵树，还一点花，嗯，花草。",
+  "patient_only_transcript": "有两个小美眉在打羽毛球，打完后很高兴，突然右边的小美眉被一只小狗咬了衣服，她吓了一跳，对面的美眉打球过来她没接到。对面的美眉看到小狗咬她觉得很好笑。小狗是被一个小男生牵着的，不小心跑进球场。旁边有阿公阿嬷在凉亭喝茶下象棋，看到这一幕也觉得好笑。还有两个小朋友在荡秋千和滑梯，旁边有木头长椅，上面有树和花草。",
+  "speaker_turn_summary": [
+    "患者描述公园场景，包括打球的美眉、小狗、阿公阿嬷、荡秋千的小朋友、滑梯和长椅。",
+    "患者语句连贯但信息密度较低，部分语句重复或冗余（如‘打羽毛球以后很很高兴的打羽毛球’）。",
+    "患者未表现出明显语义断裂或词句中断，但缺乏细节深度和事件因果连接。"
+  ],
+  "patient_cue_summary": [
+    "重复性语句（如‘打羽毛球以后很很高兴的打羽毛球’）",
+    "语义泛化（如‘小美眉’‘小朋友’未明确指代）",
+    "事件描述松散，缺乏因果或时间顺序组织（如‘小狗咬衣服’后未说明后续反应或处理）",
+    "依赖外部观察者反应（如‘对面美眉觉得很好笑’）而非自主描述事件结果",
+    "部分语句结构不完整或语义模糊（如‘我不敢走’‘可能是一个男生一个女生’）"
+  ],
+  "transcript_request_id": "chatcmpl-8d5a58df-9179-992b-8fff-9a96dfd1bcff",
+  "classification_request_id": "chatcmpl-9ae4dbd2-fff7-93cd-a84b-83190bb43277",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__002__002_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__002__002_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "语义组织松散",
+        "summary": "患者描述场景时事件顺序和因果关系不清晰，缺乏结构化叙事。",
+        "evidence": "患者描述多个独立事件（打球、小狗咬衣、阿公阿嬷下棋、荡秋千），但未建立事件间的逻辑或时间关联。",
+        "confidence": null
+      },
+      {
+        "label": "词汇重复与泛化",
+        "summary": "患者使用重复或泛化词汇（如‘小美眉’‘小朋友’‘那个’），缺乏具体指代或细节。",
+        "evidence": "多次使用‘小美眉’‘那个’‘可能’等模糊指代，未明确区分人物或动作主体。",
+        "confidence": null
+      },
+      {
+        "label": "语句冗余与结构松散",
+        "summary": "语句存在重复和冗余（如‘打羽毛球以后很很高兴的打羽毛球’），结构松散，缺乏主干信息。",
+        "evidence": "语句中存在明显重复和语义重叠，如‘打羽毛球以后很很高兴的打羽毛球’。",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "speaking_time",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "患者能描述公园场景中的多个元素，但语义组织松散、词汇泛化、语句冗余，缺乏事件间的因果或时间逻辑，提示可能存在轻度认知加工效率下降或语言组织困难，建议进一步观察或标准化筛查。",
+    "evidence_for_risk": [
+      "语义组织松散，事件描述缺乏逻辑连接",
+      "词汇泛化和模糊指代，缺乏具体细节",
+      "语句重复和冗余，结构松散"
+    ],
+    "evidence_against_risk": [
+      "患者语句可理解，未出现明显语义断裂或词句中断",
+      "能识别并描述多个场景元素，如打球、小狗、凉亭、秋千等"
+    ],
+    "alternative_explanations": [
+      "语言表达习惯或非母语表达方式导致语句松散",
+      "任务要求为自由描述，非结构化表达本身不构成认知风险",
+      "语境中可能包含儿童或非专业表达者，非典型认知障碍表现"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "建议进行标准化认知筛查（如MMSE、MoCA）以确认认知功能状态",
+      "建议在结构化任务中观察语言组织与信息提取能力",
+      "建议结合家属或照护者报告，评估日常功能是否受影响"
+    ],
+    "visit_recommendation": "建议进行正式认知筛查并安排随访观察，不建议立即诊断或干预。",
+    "future_risk_trend_summary": "单次观察无法预测长期认知趋势，建议定期随访评估认知功能变化。",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "视频不可用，仅依据音频内容评估，评估受限于语言表达质量。",
+      "患者语句虽可理解，但缺乏结构化、细节化和逻辑连贯性，提示轻度认知加工效率下降可能。",
+      "未发现明显情绪或行为异常，评估聚焦于语言内容与组织能力。"
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "有两个小美眉在打羽毛球，打完后很高兴，突然右边的小美眉被一只小狗咬了衣服，她吓了一跳，对面的美眉打球过来她没接到。对面的美眉看到小狗咬她觉得很好笑。小狗是被一个小男生牵着的，不小心跑进球场。旁边有阿公阿嬷在凉亭喝茶下象棋，看到这一幕也觉得好笑。还有两个小朋友在荡秋千和滑梯，旁边有木头长椅，上面有树和花草。",
+    "speaker_turn_summary": [
+      "患者描述公园场景，包括打球的美眉、小狗、阿公阿嬷、荡秋千的小朋友、滑梯和长椅。",
+      "患者语句连贯但信息密度较低，部分语句重复或冗余（如‘打羽毛球以后很很高兴的打羽毛球’）。",
+      "患者未表现出明显语义断裂或词句中断，但缺乏细节深度和事件因果连接。"
+    ],
+    "patient_cue_summary": [
+      "重复性语句（如‘打羽毛球以后很很高兴的打羽毛球’）",
+      "语义泛化（如‘小美眉’‘小朋友’未明确指代）",
+      "事件描述松散，缺乏因果或时间顺序组织（如‘小狗咬衣服’后未说明后续反应或处理）",
+      "依赖外部观察者反应（如‘对面美眉觉得很好笑’）而非自主描述事件结果",
+      "部分语句结构不完整或语义模糊（如‘我不敢走’‘可能是一个男生一个女生’）"
+    ]
+  },
+  "latency_ms": 22666,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/002/002_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/002/002_park.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

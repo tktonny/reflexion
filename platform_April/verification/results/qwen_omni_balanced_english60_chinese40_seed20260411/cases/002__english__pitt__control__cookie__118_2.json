@@ -1,0 +1,118 @@
+{
+  "case_id": "english__pitt__control__cookie__118_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.95,
+  "transcript": "There's the picture. The water's running over. The mother's drying dishes. The boy is stealing cookies, and the girl has taken one. And the boy is going to fall off the stool. And the water is running. And the window's open. And the grass is growing. Okay. That's all the action. Okay, good. Curtain.",
+  "patient_only_transcript": "The water's running over. The mother's drying dishes. The boy is stealing cookies, and the girl has taken one. And the boy is going to fall off the stool. And the water is running. And the window's open. And the grass is growing. Okay. That's all the action.",
+  "speaker_turn_summary": [
+    "Examiner: 'There's the picture.'",
+    "Patient: 'The water's running over. The mother's drying dishes. The boy is stealing cookies, and the girl has taken one. And the boy is going to fall off the stool. And the water is running. And the window's open. And the grass is growing. Okay. That's all the action.'",
+    "Examiner: 'Okay, good. Curtain.'"
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies multiple core actors and actions in the scene: mother, boy, girl, cookies, stool, water, window, grass.",
+    "Speech is coherent, grammatically complete, and task-relevant without pauses, restarts, or filler words.",
+    "Patient concludes with 'That's all the action,' indicating task completion without examiner prompting for elaboration.",
+    "No evidence of word-finding difficulty, semantic vagueness, or disorganization.",
+    "No examiner scaffolding or rescue required to complete the task."
+  ],
+  "transcript_request_id": "chatcmpl-066d31c4-06f4-958e-8833-9330ec910b63",
+  "classification_request_id": "chatcmpl-f345decc-767f-9310-8a53-a8e2537cfb77",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__118_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__118_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient accurately describes multiple key elements of the picture: mother drying dishes, boy stealing cookies, girl taking one, boy falling off stool, running water, open window, growing grass.",
+        "evidence": "Patient's transcript includes all major actors and actions in the scene without omission or confusion.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Completion and Fluency",
+        "summary": "Patient completes the picture description task in a single, fluent, grammatically correct utterance without hesitation or correction.",
+        "evidence": "No pauses, fillers, or restarts; speech is self-contained and ends with a clear completion cue ('That's all the action').",
+        "confidence": 0.75
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific, concrete nouns and verbs (e.g., 'stealing cookies', 'fall off the stool', 'grass is growing') without generic or vague language.",
+        "evidence": "All descriptors are scene-specific and contextually accurate, indicating intact lexical retrieval.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a complete, accurate, and fluent description of the pictured scene without signs of cognitive impairment. All core elements are correctly identified and sequenced. No evidence of retrieval difficulty, disorganization, or task breakdown.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Fluent, grammatically correct speech without pauses or restarts",
+      "Task completion without examiner prompting or scaffolding",
+      "No semantic vagueness or circumlocution"
+    ],
+    "alternative_explanations": [],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Routine follow-up as part of standard cognitive screening protocol.",
+      "No further clinical evaluation indicated based on this clip alone."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline in this assessment.",
+    "reviewer_confidence": 0.95,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible, task-relevant, and complete.",
+      "No impairment-like cues detected in speech or content."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The water's running over. The mother's drying dishes. The boy is stealing cookies, and the girl has taken one. And the boy is going to fall off the stool. And the water is running. And the window's open. And the grass is growing. Okay. That's all the action.",
+    "speaker_turn_summary": [
+      "Examiner: 'There's the picture.'",
+      "Patient: 'The water's running over. The mother's drying dishes. The boy is stealing cookies, and the girl has taken one. And the boy is going to fall off the stool. And the water is running. And the window's open. And the grass is growing. Okay. That's all the action.'",
+      "Examiner: 'Okay, good. Curtain.'"
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies multiple core actors and actions in the scene: mother, boy, girl, cookies, stool, water, window, grass.",
+      "Speech is coherent, grammatically complete, and task-relevant without pauses, restarts, or filler words.",
+      "Patient concludes with 'That's all the action,' indicating task completion without examiner prompting for elaboration.",
+      "No evidence of word-finding difficulty, semantic vagueness, or disorganization.",
+      "No examiner scaffolding or rescue required to complete the task."
+    ]
+  },
+  "latency_ms": 12358,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/118-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/118-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

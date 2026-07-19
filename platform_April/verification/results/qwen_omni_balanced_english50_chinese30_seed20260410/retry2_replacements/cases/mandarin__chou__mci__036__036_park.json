@@ -1,0 +1,137 @@
+{
+  "case_id": "mandarin__chou__mci__036__036_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "这个是在打羽毛球啊，两个打羽毛球啊。嗯嗯，啊这个是在干嘛？这个，这两个是在干嘛？在喝酒，是不是喝酒？喝酒啊，打羽毛球。嗯，啊这个怎么在狗在追他？那狗在追他，这个人牵个狗，狗啊在追他哈。嗯，啊他两个在打羽毛球，这个人牵个狗，牵个狗啊，狗在追他，啊两个在打羽毛球。在荡秋千，那个荡秋千，在打羽毛球，这个狗在追他，在荡秋千。",
+  "patient_only_transcript": "这个是在打羽毛球啊，两个打羽毛球啊。嗯嗯，啊这个是在干嘛？这个，这两个是在干嘛？在喝酒，是不是喝酒？喝酒啊，打羽毛球。嗯，啊这个怎么在狗在追他？那狗在追他，这个人牵个狗，狗啊在追他哈。嗯，啊他两个在打羽毛球，这个人牵个狗，牵个狗啊，狗在追他，啊两个在打羽毛球。在荡秋千，那个荡秋千，在打羽毛球，这个狗在追他，在荡秋千。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or asks about scene content.",
+    "Patient: describes multiple unrelated or loosely connected activities (badminton, drinking, dog chasing, swing).",
+    "Patient: repeats phrases, uses filler words ('啊', '嗯'), and shows disorganized sequencing."
+  ],
+  "patient_cue_summary": [
+    "Repetitive phrasing: '两个在打羽毛球' repeated multiple times.",
+    "Disorganized event sequencing: mixes badminton, drinking, dog chasing, and swing without clear causal or temporal links.",
+    "Use of fillers and hesitations: '啊', '嗯', '是不是喝酒？' indicating possible retrieval difficulty or uncertainty.",
+    "Lack of specific detail: describes actions without clear actors or spatial relationships beyond '狗在追他'.",
+    "Examiner dependence: patient appears to respond to prompts rather than initiate coherent narrative.",
+    "Semantic vagueness: '这个是在干嘛？' repeated, suggesting difficulty in task engagement or focus."
+  ],
+  "transcript_request_id": "chatcmpl-ada6bf9a-81ec-9a5c-9bd4-9a6c60c2bfaf",
+  "classification_request_id": "chatcmpl-7ab94ad5-e565-92a2-ab50-0806f687a023",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__036__036_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__036__036_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Disorganized Scene Description",
+        "summary": "Patient describes multiple unrelated activities without clear sequence or causal links.",
+        "evidence": "Patient says '打羽毛球', '喝酒', '狗在追他', '荡秋千' in disconnected order, repeating '两个在打羽毛球' multiple times.",
+        "confidence": null
+      },
+      {
+        "label": "Use of Fillers and Repetition",
+        "summary": "Patient frequently uses fillers ('啊', '嗯') and repeats phrases, suggesting possible retrieval difficulty.",
+        "evidence": "Phrases like '啊这个是在干嘛？' and '两个在打羽毛球' are repeated with hesitation.",
+        "confidence": null
+      },
+      {
+        "label": "Examiner-Dependent Response",
+        "summary": "Patient appears to respond to prompts rather than generate a coherent narrative independently.",
+        "evidence": "Patient asks '这个是在干嘛？' and '是不是喝酒？' indicating reliance on examiner cues.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient speech shows signs of mild disorganization, repetition, and semantic vagueness during a picture-description task. While some scene elements are correctly named, the narrative lacks coherence, causal structure, and sustained informativeness. Examiner dependence and filler usage suggest possible word-finding or attentional difficulties. Not sufficient for dementia classification, but warrants further clinical review.",
+    "evidence_for_risk": [
+      "Repetitive phrasing and lack of narrative progression.",
+      "Use of fillers and hesitations indicating possible retrieval difficulty.",
+      "Disorganized event sequencing without clear causal or spatial links.",
+      "Examiner-dependent responses rather than self-initiated coherent description."
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies multiple visible elements (badminton, dog, swing, drinking).",
+      "Speech is not entirely unintelligible",
+      "basic scene elements are recognizable.",
+      "No explicit memory complaint or caregiver concern reported in audio."
+    ],
+    "alternative_explanations": [
+      "Possible fatigue, distraction, or mild anxiety affecting task performance.",
+      "Language processing or attentional load may be higher in multi-scene description task.",
+      "May be a non-clinical response to a complex visual prompt without cognitive impairment."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE) in clinic setting.",
+      "Observe patient during structured tasks with increasing complexity.",
+      "Consider caregiver report or collateral history to contextualize speech patterns."
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation or multi-session assessment recommended.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is partially intelligible but shows impairment-like features.",
+      "Examiner prompts are not counted as patient content",
+      "patient response is disorganized and repetitive.",
+      "No facial or body cues available for emotional or behavioral assessment."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这个是在打羽毛球啊，两个打羽毛球啊。嗯嗯，啊这个是在干嘛？这个，这两个是在干嘛？在喝酒，是不是喝酒？喝酒啊，打羽毛球。嗯，啊这个怎么在狗在追他？那狗在追他，这个人牵个狗，狗啊在追他哈。嗯，啊他两个在打羽毛球，这个人牵个狗，牵个狗啊，狗在追他，啊两个在打羽毛球。在荡秋千，那个荡秋千，在打羽毛球，这个狗在追他，在荡秋千。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or asks about scene content.",
+      "Patient: describes multiple unrelated or loosely connected activities (badminton, drinking, dog chasing, swing).",
+      "Patient: repeats phrases, uses filler words ('啊', '嗯'), and shows disorganized sequencing."
+    ],
+    "patient_cue_summary": [
+      "Repetitive phrasing: '两个在打羽毛球' repeated multiple times.",
+      "Disorganized event sequencing: mixes badminton, drinking, dog chasing, and swing without clear causal or temporal links.",
+      "Use of fillers and hesitations: '啊', '嗯', '是不是喝酒？' indicating possible retrieval difficulty or uncertainty.",
+      "Lack of specific detail: describes actions without clear actors or spatial relationships beyond '狗在追他'.",
+      "Examiner dependence: patient appears to respond to prompts rather than initiate coherent narrative.",
+      "Semantic vagueness: '这个是在干嘛？' repeated, suggesting difficulty in task engagement or focus."
+    ]
+  },
+  "latency_ms": 19864,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/036/036_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/036/036_park.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "case_id": "english__pitt__dementia__cookie__023_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Everything that's happening in that picture. Well, I see the mother. What's she doing? Pouring the faucet down on the floor. She got, yeah, she got that little one on the floor. She's wiping the dishes and the little boy is going to break his neck trying to get to that cookie jar. And the little girl is yelling for more. They're heading into a disaster. Okay. Anything else? Well, the little boy is going to break his neck there if he doesn't want to. No, I expected a whole lot more than I didn't see. Okay, that's fine.",
+  "patient_only_transcript": "Everything that's happening in that picture. Well, I see the mother. What's she doing? Pouring the faucet down on the floor. She got, yeah, she got that little one on the floor. She's wiping the dishes and the little boy is going to break his neck trying to get to that cookie jar. And the little girl is yelling for more. They're heading into a disaster. Okay. Anything else? Well, the little boy is going to break his neck there if he doesn't want to. No, I expected a whole lot more than I didn't see. Okay, that's fine.",
+  "speaker_turn_summary": [
+    "Examiner: 'Everything that's happening in that picture.'",
+    "Patient: 'Well, I see the mother. What's she doing? Pouring the faucet down on the floor. She got, yeah, she got that little one on the floor. She's wiping the dishes and the little boy is going to break his neck trying to get to that cookie jar. And the little girl is yelling for more. They're heading into a disaster.'",
+    "Examiner: 'Anything else?'",
+    "Patient: 'Well, the little boy is going to break his neck there if he doesn't want to. No, I expected a whole lot more than I didn't see. Okay, that's fine.'"
+  ],
+  "patient_cue_summary": [
+    "Patient describes scene with some specific elements (mother, cookie jar, boy, girl, sink, dishes) but with fragmented phrasing and repetition ('she got, yeah, she got')",
+    "Patient uses vague or imprecise language ('pouring the faucet down on the floor' instead of 'running water from the faucet')",
+    "Patient shows disorganized sequencing: jumps from describing mother to boy to girl without clear causal or spatial linkage",
+    "Patient exhibits examiner dependence: repeats 'the little boy is going to break his neck' after examiner prompt, suggesting lack of spontaneous elaboration",
+    "Patient ends with self-correcting or uncertain statement ('No, I expected a whole lot more than I didn't see'), indicating possible retrieval difficulty or lack of confidence in description"
+  ],
+  "transcript_request_id": "chatcmpl-b9d9d195-b080-9bf2-86e9-ae1fa87e5661",
+  "classification_request_id": "chatcmpl-759d4316-9a56-9602-b137-7afbc9b6c588",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__023_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__023_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient describes multiple elements of the picture but with fragmented, repetitive, and disorganized phrasing, suggesting possible retrieval or sequencing difficulty.",
+        "evidence": "Patient mentions mother, cookie jar, boy, girl, sink, dishes, but phrases are incomplete ('she got, yeah, she got'), and events are not logically connected.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Precision",
+        "summary": "Patient uses imprecise or vague terms (e.g., 'pouring the faucet down on the floor') instead of accurate scene descriptors, indicating possible word-finding difficulty.",
+        "evidence": "Patient says 'pouring the faucet down on the floor' instead of 'water running from the faucet into the sink' or similar.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Organization and Task Completion",
+        "summary": "Patient does not fully complete the task with a structured, causal narrative; instead, provides a list of disconnected observations with examiner prompting.",
+        "evidence": "Patient repeats 'the little boy is going to break his neck' after examiner prompt and ends with 'I expected a whole lot more than I didn't see', indicating incomplete or uncertain task performance.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a partially coherent description of the picture with some correct scene elements but exhibits fragmented phrasing, imprecise language, examiner dependence, and disorganized sequencing. These cues suggest possible mild cognitive impairment and warrant further clinical review.",
+    "evidence_for_risk": [
+      "Fragmented and repetitive phrasing",
+      "Vague or imprecise terminology",
+      "Examiner dependence for task completion",
+      "Disorganized narrative structure"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key scene elements (mother, cookie jar, boy, girl, sink)",
+      "No signs of severe disorientation or incoherence",
+      "No emotional dysregulation or apathy observed"
+    ],
+    "alternative_explanations": [
+      "Task fatigue or lack of familiarity with picture-description tasks",
+      "Temporary cognitive load or distraction during task",
+      "Non-native English fluency or speech disfluency unrelated to dementia"
+    ],
+    "risk_factor_findings": [
+      "Examiner-dependent description completion",
+      "Vague or imprecise language use",
+      "Fragmented and disorganized narrative structure"
+    ],
+    "subjective_assessment_findings": [
+      "Patient expresses uncertainty about task completion ('I expected a whole lot more than I didn't see')",
+      "Patient appears to rely on examiner prompts to continue description"
+    ],
+    "emotional_assessment_findings": [
+      "Neutral affect with no signs of distress, anxiety, or apathy",
+      "No observable emotional reactivity or flattening"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Observe patient performance across multiple tasks for consistency",
+      "Consider caregiver report or collateral history for functional decline"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation or multi-visit assessment is needed to determine progression.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible but shows mild impairment-like features in organization and lexical precision.",
+      "Task context: cookie-theft picture description",
+      "patient is expected to describe scene coherently and completely."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Everything that's happening in that picture. Well, I see the mother. What's she doing? Pouring the faucet down on the floor. She got, yeah, she got that little one on the floor. She's wiping the dishes and the little boy is going to break his neck trying to get to that cookie jar. And the little girl is yelling for more. They're heading into a disaster. Okay. Anything else? Well, the little boy is going to break his neck there if he doesn't want to. No, I expected a whole lot more than I didn't see. Okay, that's fine.",
+    "speaker_turn_summary": [
+      "Examiner: 'Everything that's happening in that picture.'",
+      "Patient: 'Well, I see the mother. What's she doing? Pouring the faucet down on the floor. She got, yeah, she got that little one on the floor. She's wiping the dishes and the little boy is going to break his neck trying to get to that cookie jar. And the little girl is yelling for more. They're heading into a disaster.'",
+      "Examiner: 'Anything else?'",
+      "Patient: 'Well, the little boy is going to break his neck there if he doesn't want to. No, I expected a whole lot more than I didn't see. Okay, that's fine.'"
+    ],
+    "patient_cue_summary": [
+      "Patient describes scene with some specific elements (mother, cookie jar, boy, girl, sink, dishes) but with fragmented phrasing and repetition ('she got, yeah, she got')",
+      "Patient uses vague or imprecise language ('pouring the faucet down on the floor' instead of 'running water from the faucet')",
+      "Patient shows disorganized sequencing: jumps from describing mother to boy to girl without clear causal or spatial linkage",
+      "Patient exhibits examiner dependence: repeats 'the little boy is going to break his neck' after examiner prompt, suggesting lack of spontaneous elaboration",
+      "Patient ends with self-correcting or uncertain statement ('No, I expected a whole lot more than I didn't see'), indicating possible retrieval difficulty or lack of confidence in description"
+    ]
+  },
+  "latency_ms": 17953,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/023-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/023-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

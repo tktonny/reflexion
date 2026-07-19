@@ -1,0 +1,121 @@
+{
+  "case_id": "english__pitt__control__cookie__054_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "A boy with a cookie in his one hand and his hand in the cookie jar, standing on a stool which is tipping over. Little girl's got her hand up for one, and I don't know what the hand means to the mouth. Does it mean she wants to eat? The kitchen sink is running over, the water running out on the floor. The mother is drying the dishes, frowning but not turning off the faucet. Two cups on the counter, plate. Mother standing in the middle of the room. Curtains at the windows. Lid's fallen off the cookie jar. Cupboards half open. That's it, okay?",
+  "patient_only_transcript": "A boy with a cookie in his one hand and his hand in the cookie jar, standing on a stool which is tipping over. Little girl's got her hand up for one, and I don't know what the hand means to the mouth. Does it mean she wants to eat? The kitchen sink is running over, the water running out on the floor. The mother is drying the dishes, frowning but not turning off the faucet. Two cups on the counter, plate. Mother standing in the middle of the room. Curtains at the windows. Lid's fallen off the cookie jar. Cupboards half open. That's it, okay?",
+  "speaker_turn_summary": [
+    "Examiner: Prompt for picture description task.",
+    "Patient: Describes scene with multiple elements, includes uncertainty ('I don't know what the hand means to the mouth'), ends with 'That's it, okay?'"
+  ],
+  "patient_cue_summary": [
+    "Describes multiple scene elements accurately (boy, cookie, stool, mother, sink, cups, lid, cupboards).",
+    "Includes self-questioning ('I don't know what the hand means to the mouth') indicating mild uncertainty or hesitation.",
+    "Ends with 'That's it, okay?' suggesting possible task completion or examiner cue dependence.",
+    "No clear word-finding breakdown, repetition, or disorganization",
+    "speech is coherent and task-relevant."
+  ],
+  "transcript_request_id": "chatcmpl-0956b95d-0f10-95d5-9637-690c32e8c848",
+  "classification_request_id": "chatcmpl-9ed5b15b-3789-93ae-a470-72858951a2c1",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__054_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__054_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identifies multiple key elements of the picture scene including actors, objects, and actions.",
+        "evidence": "Described boy with cookie, stool tipping, mother at sink, running water, fallen lid, half-open cupboards, etc.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Uncertainty",
+        "summary": "Patient ends with 'That's it, okay?' suggesting possible task completion or seeking confirmation, and expresses uncertainty about gesture meaning.",
+        "evidence": "Includes 'I don't know what the hand means to the mouth' and 'That's it, okay?'",
+        "confidence": 0.25
+      },
+      {
+        "label": "Speech Coherence and Fluency",
+        "summary": "Speech is coherent, task-relevant, and does not show signs of breakdown such as repetition, restarts, or disorganization.",
+        "evidence": "No pauses, fillers, or self-corrections indicating retrieval difficulty; narrative flows logically.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, task-relevant description of a picture scene with multiple accurate elements. Mild uncertainty and a concluding phrase suggesting possible examiner dependence are noted, but no clear impairment-like breakdowns in retrieval, fluency, or organization are present. Further observation or formal screening is recommended due to limited modality and potential task completion ambiguity.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient accurately identifies multiple actors and objects in the scene.",
+      "Speech is intelligible and task-focused, despite mild uncertainty.",
+      "No signs of word-finding failure, disorganization, or examiner dependence requiring scaffolding."
+    ],
+    "alternative_explanations": [
+      "Mild uncertainty may reflect task fatigue, hesitation, or natural speech variation rather than cognitive impairment.",
+      "Concluding phrase 'That's it, okay?' may indicate completion or seeking confirmation, not cognitive breakdown."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule follow-up for full cognitive screening battery.",
+      "Consider repeating the picture description task with structured prompts.",
+      "Monitor for consistency across multiple sessions or tasks."
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further observation needed to assess trend.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but includes mild uncertainty and possible task completion cue.",
+      "No strong impairment-like cues detected",
+      "classification remains conservative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "A boy with a cookie in his one hand and his hand in the cookie jar, standing on a stool which is tipping over. Little girl's got her hand up for one, and I don't know what the hand means to the mouth. Does it mean she wants to eat? The kitchen sink is running over, the water running out on the floor. The mother is drying the dishes, frowning but not turning off the faucet. Two cups on the counter, plate. Mother standing in the middle of the room. Curtains at the windows. Lid's fallen off the cookie jar. Cupboards half open. That's it, okay?",
+    "speaker_turn_summary": [
+      "Examiner: Prompt for picture description task.",
+      "Patient: Describes scene with multiple elements, includes uncertainty ('I don't know what the hand means to the mouth'), ends with 'That's it, okay?'"
+    ],
+    "patient_cue_summary": [
+      "Describes multiple scene elements accurately (boy, cookie, stool, mother, sink, cups, lid, cupboards).",
+      "Includes self-questioning ('I don't know what the hand means to the mouth') indicating mild uncertainty or hesitation.",
+      "Ends with 'That's it, okay?' suggesting possible task completion or examiner cue dependence.",
+      "No clear word-finding breakdown, repetition, or disorganization",
+      "speech is coherent and task-relevant."
+    ]
+  },
+  "latency_ms": 18395,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/054-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/054-0.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

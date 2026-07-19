@@ -1,0 +1,129 @@
+{
+  "case_id": "english__pitt__control__cookie__113_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.7,
+  "transcript": "There it is. The little girl is asking for a cookie. Little boy is handing her a cookie and taking a cookie and falling off the chair. Mother's washing dishes. The water's running. It's falling on the floor and she's standing in it. Oh, the wind is blowing. The curtains are ruffled. And mother's smiling. She must be deaf not to see what's going on behind her, too. It's summertime. Flowers and plants are in bloom outside. That's all I see. Okay, great.",
+  "patient_only_transcript": "The little girl is asking for a cookie. Little boy is handing her a cookie and taking a cookie and falling off the chair. Mother's washing dishes. The water's running. It's falling on the floor and she's standing in it. Oh, the wind is blowing. The curtains are ruffled. And mother's smiling. She must be deaf not to see what's going on behind her, too. It's summertime. Flowers and plants are in bloom outside. That's all I see. Okay, great.",
+  "speaker_turn_summary": [
+    "Examiner: 'There it is.'",
+    "Patient: 'The little girl is asking for a cookie. Little boy is handing her a cookie and taking a cookie and falling off the chair. Mother's washing dishes. The water's running. It's falling on the floor and she's standing in it. Oh, the wind is blowing. The curtains are ruffled. And mother's smiling. She must be deaf not to see what's going on behind her, too. It's summertime. Flowers and plants are in bloom outside. That's all I see. Okay, great.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides a coherent, sequential description of multiple scene elements including actors, actions, and environmental details.",
+    "Patient includes evaluative commentary ('She must be deaf...') which may reflect interpretation or distraction but does not indicate retrieval failure.",
+    "Patient ends with 'That's all I see. Okay, great.' — suggesting task completion or acceptance of prompt, not confusion or breakdown.",
+    "No evidence of word-finding pauses, circumlocution, repetition, or disorganization in patient speech.",
+    "Patient speech is intelligible and task-relevant, though brief and not elaborative — not sufficient alone for cognitive_risk."
+  ],
+  "transcript_request_id": "chatcmpl-f701ce8e-44e6-9ea5-a50b-53cfea2555e3",
+  "classification_request_id": "chatcmpl-f342fcad-20ce-9600-9166-7cfb04e6f7b8",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__113_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__113_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description",
+        "summary": "Patient accurately describes multiple actors, actions, and environmental details from the picture scene.",
+        "evidence": "Patient states: 'The little girl is asking for a cookie. Little boy is handing her a cookie and taking a cookie and falling off the chair. Mother's washing dishes. The water's running. It's falling on the floor and she's standing in it. Oh, the wind is blowing. The curtains are ruffled. And mother's smiling. She must be deaf not to see what's going on behind her, too. It's summertime. Flowers and plants are in bloom outside. That's all I see. Okay, great.'",
+        "confidence": 0.85
+      },
+      {
+        "label": "Task Completion",
+        "summary": "Patient appears to complete the task with a clear closing statement.",
+        "evidence": "Patient ends with 'That's all I see. Okay, great.' — indicating task closure or acceptance.",
+        "confidence": 0.8
+      },
+      {
+        "label": "Evaluative Commentary",
+        "summary": "Patient adds interpretive or humorous commentary ('She must be deaf...'), which may reflect engagement or distraction.",
+        "evidence": "Patient says: 'She must be deaf not to see what's going on behind her, too.' — not indicative of cognitive deficit.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a coherent, task-relevant description of a picture scene involving multiple actors and actions. Speech is intelligible and complete, with no clear signs of retrieval failure, disorganization, or task breakdown. Mild evaluative commentary is present but not indicative of impairment. Video is unavailable; assessment is based solely on audio. Further observation or formal screening is recommended due to limited modality coverage and lack of visual cues.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Coherent, sequential description of multiple scene elements",
+      "Intelligible speech with no pauses, restarts, or fillers",
+      "Task completion indicated by 'That's all I see. Okay, great.'",
+      "No signs of word-finding difficulty, disorganization, or examiner dependence"
+    ],
+    "alternative_explanations": [
+      "Patient may be brief but accurate, which is not indicative of cognitive impairment in structured tasks",
+      "Evaluative commentary may reflect engagement or humor, not confusion or deficit",
+      "Audio-only limitation prevents full assessment",
+      "visual cues may reveal additional context"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule follow-up with full visual and cognitive assessment",
+      "Administer formal screening tools (e.g., MoCA, MMSE) if not already done",
+      "Consider repeating the picture-description task with visual support to confirm consistency"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio-only clip; no persuasive evidence of cognitive decline present.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-relevant, but brief.",
+      "No visual cues to assess facial expression, gaze, or gesture.",
+      "Examiner prompts are minimal and do not dominate the clip.",
+      "Patient may be describing a picture scene as part of a structured task."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The little girl is asking for a cookie. Little boy is handing her a cookie and taking a cookie and falling off the chair. Mother's washing dishes. The water's running. It's falling on the floor and she's standing in it. Oh, the wind is blowing. The curtains are ruffled. And mother's smiling. She must be deaf not to see what's going on behind her, too. It's summertime. Flowers and plants are in bloom outside. That's all I see. Okay, great.",
+    "speaker_turn_summary": [
+      "Examiner: 'There it is.'",
+      "Patient: 'The little girl is asking for a cookie. Little boy is handing her a cookie and taking a cookie and falling off the chair. Mother's washing dishes. The water's running. It's falling on the floor and she's standing in it. Oh, the wind is blowing. The curtains are ruffled. And mother's smiling. She must be deaf not to see what's going on behind her, too. It's summertime. Flowers and plants are in bloom outside. That's all I see. Okay, great.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides a coherent, sequential description of multiple scene elements including actors, actions, and environmental details.",
+      "Patient includes evaluative commentary ('She must be deaf...') which may reflect interpretation or distraction but does not indicate retrieval failure.",
+      "Patient ends with 'That's all I see. Okay, great.' — suggesting task completion or acceptance of prompt, not confusion or breakdown.",
+      "No evidence of word-finding pauses, circumlocution, repetition, or disorganization in patient speech.",
+      "Patient speech is intelligible and task-relevant, though brief and not elaborative — not sufficient alone for cognitive_risk."
+    ]
+  },
+  "latency_ms": 25438,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/113-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/113-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

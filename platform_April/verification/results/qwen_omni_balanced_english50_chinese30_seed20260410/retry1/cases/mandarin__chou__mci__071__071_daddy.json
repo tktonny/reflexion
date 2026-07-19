@@ -1,0 +1,142 @@
+{
+  "case_id": "mandarin__chou__mci__071__071_daddy",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "这小孩，这是狗，小，这个在烫衣服，那小孩子在玩插头，这个吓到了。狗汪汪叫。那猫咪在干嘛？猫咪也吓到了吧？电，可能触电了还是怎么样？有没有？这他在玩这个嘛，插头，触电了，所以所以那个狗来阻止他。那他也吓到了，那个烫衣服。结果瓶子花瓶打翻了。后来我就不会形容了，那后来就不会形容了。",
+  "patient_only_transcript": "这小孩，这是狗，小，这个在烫衣服，那小孩子在玩插头，这个吓到了。狗汪汪叫。那猫咪在干嘛？猫咪也吓到了吧？电，可能触电了还是怎么样？有没有？这他在玩这个嘛，插头，触电了，所以所以那个狗来阻止他。那他也吓到了，那个烫衣服。结果瓶子花瓶打翻了。后来我就不会形容了，那后来就不会形容了。",
+  "speaker_turn_summary": [
+    "Patient describes a scene with multiple elements: child, dog, ironing, plug, cat, broken vase.",
+    "Patient shows hesitation and repetition: '所以所以', '后来我就不会形容了'.",
+    "Patient's description is fragmented and lacks causal or sequential coherence.",
+    "Examiner likely prompted or listened without interrupting",
+    "no clear examiner speech identified."
+  ],
+  "patient_cue_summary": [
+    "Repetition of '所以所以' indicating possible retrieval or organizational difficulty.",
+    "Self-termination of sentence: '后来我就不会形容了' — suggests inability to continue or recall details.",
+    "Vague phrasing: '可能触电了还是怎么样？有没有？' — indicates uncertainty and lack of confident assertion.",
+    "Disorganized event sequencing: mentions dog barking, cat, plug, ironing, vase — but no clear causal or temporal structure.",
+    "Lexical retrieval appears intact for basic objects (dog, plug, vase, cat) but lacks elaboration or detail.",
+    "No clear evidence of memory loss or disorientation — but narrative control and coherence are weak."
+  ],
+  "transcript_request_id": "chatcmpl-f561e478-b13c-936a-9d80-c8057aa4c41d",
+  "classification_request_id": "chatcmpl-6e31c209-554b-9f08-bf76-76af774497ed",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__071__071_daddy/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__071__071_daddy/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "narrative coherence",
+        "summary": "Patient describes multiple scene elements but lacks logical sequencing or causal links between events.",
+        "evidence": "Patient mentions child, dog, plug, cat, ironing, vase — but does not connect them causally or temporally.",
+        "confidence": null
+      },
+      {
+        "label": "lexical retrieval and elaboration",
+        "summary": "Patient retrieves basic object names but fails to elaborate or sustain description.",
+        "evidence": "Uses '插头', '狗', '花瓶' — correct but minimal; ends with '不会形容了'.",
+        "confidence": null
+      },
+      {
+        "label": "repetition and self-termination",
+        "summary": "Patient repeats '所以所以' and self-terminates with '不会形容了', indicating possible cognitive fatigue or retrieval difficulty.",
+        "evidence": "Repetition of '所以所以' and explicit statement '后来我就不会形容了'.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates mild impairment-like cues including fragmented narrative, self-termination of description, and repetition. Basic object naming is intact, but coherence and elaboration are weak. No strong dementia indicators, but further clinical review is warranted.",
+    "evidence_for_risk": [
+      "Self-reported inability to continue description",
+      "Repetitive phrasing and lack of narrative structure",
+      "Vague and uncertain phrasing ('可能触电了还是怎么样？')"
+    ],
+    "evidence_against_risk": [
+      "Correct identification of basic scene elements (dog, plug, vase, cat)",
+      "No signs of severe disorientation or memory loss",
+      "No emotional dysregulation or affective flattening observed"
+    ],
+    "alternative_explanations": [
+      "Possible fatigue or anxiety during task performance",
+      "Temporary cognitive load or distraction during description",
+      "Language processing delay or mild expressive difficulty unrelated to dementia"
+    ],
+    "risk_factor_findings": [
+      "Self-reported inability to describe scene further ('不会形容了')",
+      "Repetitive and fragmented phrasing suggesting possible word-finding or narrative control difficulty"
+    ],
+    "subjective_assessment_findings": [
+      "Patient reports difficulty continuing description, indicating possible frustration or cognitive load"
+    ],
+    "emotional_assessment_findings": [
+      "No clear emotional reactivity or affective flattening observed — speech is neutral with pauses and hesitation"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Observe patient in structured narrative tasks with prompting",
+      "Consider caregiver report for functional or memory concerns"
+    ],
+    "visit_recommendation": "prompt clinical evaluation with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment needed to determine progression or stability.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable — assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible but shows mild impairment-like features in narrative control and elaboration.",
+      "Examiner role is not clearly identified — patient is the primary subject of evaluation."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "这小孩，这是狗，小，这个在烫衣服，那小孩子在玩插头，这个吓到了。狗汪汪叫。那猫咪在干嘛？猫咪也吓到了吧？电，可能触电了还是怎么样？有没有？这他在玩这个嘛，插头，触电了，所以所以那个狗来阻止他。那他也吓到了，那个烫衣服。结果瓶子花瓶打翻了。后来我就不会形容了，那后来就不会形容了。",
+    "speaker_turn_summary": [
+      "Patient describes a scene with multiple elements: child, dog, ironing, plug, cat, broken vase.",
+      "Patient shows hesitation and repetition: '所以所以', '后来我就不会形容了'.",
+      "Patient's description is fragmented and lacks causal or sequential coherence.",
+      "Examiner likely prompted or listened without interrupting",
+      "no clear examiner speech identified."
+    ],
+    "patient_cue_summary": [
+      "Repetition of '所以所以' indicating possible retrieval or organizational difficulty.",
+      "Self-termination of sentence: '后来我就不会形容了' — suggests inability to continue or recall details.",
+      "Vague phrasing: '可能触电了还是怎么样？有没有？' — indicates uncertainty and lack of confident assertion.",
+      "Disorganized event sequencing: mentions dog barking, cat, plug, ironing, vase — but no clear causal or temporal structure.",
+      "Lexical retrieval appears intact for basic objects (dog, plug, vase, cat) but lacks elaboration or detail.",
+      "No clear evidence of memory loss or disorientation — but narrative control and coherence are weak."
+    ]
+  },
+  "latency_ms": 27015,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/071/071_Daddy.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/071/071_Daddy.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

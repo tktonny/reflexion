@@ -1,0 +1,76 @@
+{
+  "case_id": "english__pitt__dementia__cookie__010_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.4,
+  "classification_request_id": "chatcmpl-b73b9c0b-e4fa-9a58-b015-656bd7e99043",
+  "transcript_model": "qwen3-omni-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__010_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient speech is largely unintelligible and lacks sufficient structure or content to support a confident cognitive risk assessment. No clear impairment-like cues are observable or audible. Further observation or clearer audio is needed.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Speech is unintelligible and lacks meaningful content for cognitive screening.",
+      "No observable or audible signs of disorganization, word-finding difficulty, or narrative breakdown were discernible.",
+      "Patient did not provide sufficient response to the picture-description task to evaluate cognitive performance."
+    ],
+    "alternative_explanations": [
+      "Audio quality issues may be obscuring potential cognitive cues.",
+      "Patient may be hesitant, distracted, or not fully engaged in the task.",
+      "Examiner may have interrupted or prompted, limiting patient response length or clarity."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the task with clearer audio or in a quieter environment.",
+      "Use alternative screening tools if audio remains unintelligible.",
+      "Consider caregiver report or collateral history if patient speech remains non-informative."
+    ],
+    "visit_recommendation": "Routine follow-up with audio quality improvement or alternative screening modality.",
+    "future_risk_trend_summary": "Longitudinal prediction is not possible from this single clip due to insufficient data.",
+    "reviewer_confidence": 0.4,
+    "context_notes": [
+      "Video portion is unavailable; only audio is present and unintelligible.",
+      "Patient speech is not sufficiently structured or informative for cognitive screening.",
+      "Task context: picture description of cookie theft scene; patient did not provide usable response."
+    ],
+    "quality_flags": [
+      "video_too_short",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision."
+  },
+  "latency_ms": 13144,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/010-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/010-0.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

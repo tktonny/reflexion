@@ -1,0 +1,130 @@
+{
+  "case_id": "mandarin__chou__hc__018__018_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "在一个很很很繁华的夜市里面，有各种的小吃跟呃鱼玩乐。有阿爸带着小孩去去捕捉鱼，以后呃另外一个妈妈带带小女孩也去去做那个捉鱼的。呃去捞金鱼，然后妈妈一不小心她的下那个。她的帮小朋友买的小那个冰棒呃冰淇淋滴到了小女孩的头上。在另外一个她的姐姐很高兴的在旁边抓的金鱼很那个。在另外一边有一有有两个小朋友。呃妈妈带着小孩去买呃去玩那个掷骰子游戏。为得到的那个香肠的掷骰子游戏，可是他在呃他玩得很高兴的时候，他没有注意到他的背后有一位有一个小偷正在偷他的东西，所以他他的儿子看见了很生气的警告他妈妈说有小偷。这样的一个在夜市上的发生的事情，这是那个烤香肠，嗯，用掷骰子来得到香肠。嗯。",
+  "patient_only_transcript": "在一個很繁華的夜市，有小吃和魚玩樂。阿爸帶小孩捉魚，另一個媽媽帶小女孩撈金魚，冰淇淋滴到小女孩頭上。姐姐在旁邊抓金魚。另外有兩個小朋友，媽媽帶小孩玩掷骰子遊戲，想得到香腸，但沒注意背後有小偷，兒子警告媽媽有小偷。這是烤香腸，用掷骰子得到。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes night market scene with multiple events, characters, and outcomes, but with pauses, repetitions, and fragmented phrasing."
+  ],
+  "patient_cue_summary": [
+    "Use of filler words and pauses (e.g., '呃', '那个')",
+    "Repetitive phrasing ('去去捕捉鱼', '带带小女孩')",
+    "Fragmented sentence structure and incomplete clauses",
+    "Some event sequencing is present but lacks causal or temporal cohesion",
+    "Reliance on examiner context to complete scene description (e.g., '掷骰子游戏' without full explanation)",
+    "Mild circumlocution and vague references ('那个', '那个东西')"
+  ],
+  "transcript_request_id": "chatcmpl-12573bc2-5f42-9ce8-8737-f4095160f72d",
+  "classification_request_id": "chatcmpl-e3a4ce8a-3bd5-95de-a869-ae9b5bb75b96",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__018__018_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__018__018_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient attempts to describe a complex scene but with fragmented structure, pauses, and repetitions, suggesting possible retrieval or sequencing difficulty.",
+        "evidence": "Patient describes multiple characters and events but with disjointed phrasing, filler words, and incomplete clauses (e.g., '去去捕捉鱼', '那个...那个东西').",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval",
+        "summary": "Patient uses general terms and filler words instead of specific nouns or verbs, indicating possible word-finding difficulty.",
+        "evidence": "Use of '那个' and '呃' frequently; vague references like '那个游戏' without full specification.",
+        "confidence": null
+      },
+      {
+        "label": "Task Completion",
+        "summary": "Patient partially completes the scene description but lacks full coherence or causal linkage between events, suggesting possible attention or executive function challenge.",
+        "evidence": "Patient mentions multiple events but fails to clearly connect cause-effect or sequence (e.g., '玩得很高兴的时候，他没有注意到背后有小偷').",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a partially coherent description of a complex scene but with fragmented phrasing, filler words, and incomplete clauses. While some scene elements are correctly identified, the narrative lacks full cohesion and causal linkage, suggesting possible mild cognitive impairment. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Fragmented sentence structure and frequent pauses",
+      "Use of vague terms and fillers instead of specific vocabulary",
+      "Partial task completion with weak narrative organization"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key scene elements (e.g., night market, children, games, thief)",
+      "No overt confusion or disorientation in scene description",
+      "Speech is intelligible despite structural weaknesses"
+    ],
+    "alternative_explanations": [
+      "Language processing delay or mild articulation difficulty unrelated to dementia",
+      "Task performance influenced by examiner prompting or situational stress",
+      "Normal variation in narrative style for non-native or casual speech"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Schedule formal cognitive screening (e.g., MoCA, MMSE)",
+      "Observe patient in structured narrative tasks with time limits and prompting",
+      "Assess for functional impact in daily activities and memory complaints"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and functional assessment.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further observation and repeated assessments are needed to determine progression.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but shows mild impairment-like features.",
+      "Examiner role is inferred from context",
+      "patient is the primary subject of evaluation."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "在一個很繁華的夜市，有小吃和魚玩樂。阿爸帶小孩捉魚，另一個媽媽帶小女孩撈金魚，冰淇淋滴到小女孩頭上。姐姐在旁邊抓金魚。另外有兩個小朋友，媽媽帶小孩玩掷骰子遊戲，想得到香腸，但沒注意背後有小偷，兒子警告媽媽有小偷。這是烤香腸，用掷骰子得到。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes night market scene with multiple events, characters, and outcomes, but with pauses, repetitions, and fragmented phrasing."
+    ],
+    "patient_cue_summary": [
+      "Use of filler words and pauses (e.g., '呃', '那个')",
+      "Repetitive phrasing ('去去捕捉鱼', '带带小女孩')",
+      "Fragmented sentence structure and incomplete clauses",
+      "Some event sequencing is present but lacks causal or temporal cohesion",
+      "Reliance on examiner context to complete scene description (e.g., '掷骰子游戏' without full explanation)",
+      "Mild circumlocution and vague references ('那个', '那个东西')"
+    ]
+  },
+  "latency_ms": 21474,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/018/018_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/018/018_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

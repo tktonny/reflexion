@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__control__cookie__068_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "Oh yes. Well, the mother is washing her dishes and the water is running over in the sink. And the little boy's getting in the cookie jar and he's about to tip over the chair and he seems to be doing everything. Burned out or in some kind of a.",
+  "patient_only_transcript": "The mother is washing her dishes and the water is running over in the sink. And the little boy's getting in the cookie jar and he's about to tip over the chair and he seems to be doing everything. Burned out or in some kind of a.",
+  "speaker_turn_summary": [
+    "Patient describes scene: mother washing dishes, water running, boy reaching for cookies, chair tipping, boy doing everything.",
+    "Patient trails off mid-sentence: 'Burned out or in some kind of a.'"
+  ],
+  "patient_cue_summary": [
+    "Accurately identifies core actors and actions in the scene.",
+    "Completes most of the task description with minimal elaboration.",
+    "Ends with an incomplete, fragmented phrase suggesting possible word-finding difficulty or cognitive pause.",
+    "No clear repetition, restart, or examiner scaffolding observed in the audio.",
+    "Speech is intelligible but ends abruptly without full sentence completion."
+  ],
+  "transcript_request_id": "chatcmpl-a7f9fcda-576b-9719-9785-b15c894d2aa1",
+  "classification_request_id": "chatcmpl-c8b19433-6e1f-90eb-9ea7-0641eaba1f34",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__068_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__068_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Completeness",
+        "summary": "Patient accurately identifies key elements of the picture: mother at sink, water running, boy reaching for cookies, chair tipping.",
+        "evidence": "Patient states: 'The mother is washing her dishes and the water is running over in the sink. And the little boy's getting in the cookie jar and he's about to tip over the chair and he seems to be doing everything.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion and Fluency",
+        "summary": "Patient begins to describe the scene but ends with an incomplete, trailing phrase suggesting possible cognitive pause or word-finding difficulty.",
+        "evidence": "Patient ends with: 'Burned out or in some kind of a.' — no full sentence completion, no elaboration, no restart or correction.",
+        "confidence": 0.25
+      },
+      {
+        "label": "Examiner Dependence",
+        "summary": "No evidence of examiner prompting or scaffolding required; patient initiated and completed the description independently.",
+        "evidence": "Patient speaks without prompting or interruption; no examiner voice detected in the patient-only segment.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a brief but accurate description of the picture scene, identifying key actors and actions. Ends with an incomplete phrase, which may reflect mild cognitive hesitation or fatigue, but no clear impairment signals such as repetition, disorganization, or examiner dependence are present. Further observation or follow-up is recommended due to incomplete task completion.",
+    "evidence_for_risk": [
+      "Incomplete sentence ending: 'Burned out or in some kind of a.'"
+    ],
+    "evidence_against_risk": [
+      "Accurate identification of all core scene elements.",
+      "No repetition, restart, or examiner scaffolding.",
+      "Intelligible, coherent, and task-relevant speech."
+    ],
+    "alternative_explanations": [
+      "Patient may be fatigued, distracted, or emotionally affected by the scene content.",
+      "Incomplete sentence may reflect natural conversational pause or hesitation, not cognitive impairment.",
+      "Poor audio quality may obscure additional cues."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a structured picture description task with prompting if needed.",
+      "Consider administering a brief cognitive screening battery if clinical concern persists.",
+      "Monitor for consistency across multiple sessions or tasks."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if symptoms persist or escalate.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further assessment is needed to determine clinical significance.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but ends abruptly without full sentence completion.",
+      "No evidence of examiner scaffolding or task failure",
+      "patient completed most of the task independently.",
+      "Incomplete phrase may reflect fatigue or emotional response, not necessarily cognitive impairment."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The mother is washing her dishes and the water is running over in the sink. And the little boy's getting in the cookie jar and he's about to tip over the chair and he seems to be doing everything. Burned out or in some kind of a.",
+    "speaker_turn_summary": [
+      "Patient describes scene: mother washing dishes, water running, boy reaching for cookies, chair tipping, boy doing everything.",
+      "Patient trails off mid-sentence: 'Burned out or in some kind of a.'"
+    ],
+    "patient_cue_summary": [
+      "Accurately identifies core actors and actions in the scene.",
+      "Completes most of the task description with minimal elaboration.",
+      "Ends with an incomplete, fragmented phrase suggesting possible word-finding difficulty or cognitive pause.",
+      "No clear repetition, restart, or examiner scaffolding observed in the audio.",
+      "Speech is intelligible but ends abruptly without full sentence completion."
+    ]
+  },
+  "latency_ms": 13447,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/068-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/068-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

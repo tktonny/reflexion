@@ -1,0 +1,116 @@
+{
+  "case_id": "english__pitt__control__cookie__150_1",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.85,
+  "transcript": "Okay, what action do you see going on in this picture? You mean starting from say left to right or whatever? However you like. Ah, the brother or the boy is reaching into the cookie jar and the sister could be laughing or cautioning him and the stool is tipping over and oh mom is standing in a puddle washing, drying dishes and the sink is overflowing and the perspective, which means the path is coming right in the house and what else do you want? Any action you see? Well, the mom is drying the dishes, getting her feet wet and the sister is reaching for the cookie that's in the brother's hand, the kid's hand. Okay, is that it? Yep.",
+  "patient_only_transcript": "The boy is reaching into the cookie jar and the sister could be laughing or cautioning him and the stool is tipping over and mom is standing in a puddle washing, drying dishes and the sink is overflowing and the perspective, which means the path is coming right in the house and the mom is drying the dishes, getting her feet wet and the sister is reaching for the cookie that's in the brother's hand, the kid's hand. That's all.",
+  "speaker_turn_summary": [
+    "Examiner: 'Okay, what action do you see going on in this picture?'",
+    "Patient: 'Ah, the brother or the boy is reaching into the cookie jar and the sister could be laughing or cautioning him and the stool is tipping over and oh mom is standing in a puddle washing, drying dishes and the sink is overflowing and the perspective, which means the path is coming right in the house and what else do you want?'",
+    "Examiner: 'Any action you see?'",
+    "Patient: 'Well, the mom is drying the dishes, getting her feet wet and the sister is reaching for the cookie that's in the brother's hand, the kid's hand.'",
+    "Examiner: 'Okay, is that it?'",
+    "Patient: 'Yep.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides coherent, task-relevant description of multiple scene elements including actors, actions, and spatial relationships.",
+    "Speech is intelligible and contains minimal filler or hesitation, though slightly repetitive in phrasing ('the kid's hand').",
+    "No clear word-finding pauses, semantic vagueness, or disorganization",
+    "patient completes the task without examiner scaffolding beyond initial prompt.",
+    "No evidence of tangential drift, contradiction, or failure to cover core task elements.",
+    "Patient ends with a brief confirmation ('Yep'), indicating task completion."
+  ],
+  "transcript_request_id": "chatcmpl-5e6b7d07-d583-9af2-a412-1c3d58397078",
+  "classification_request_id": "chatcmpl-505ec58c-fb53-9b33-bc9b-185676fe5196",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__150_1/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__150_1/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, accurate, and complete description of the pictured scene, naming multiple actors, actions, and spatial details without significant breakdowns in fluency, retrieval, or task control. Speech is intelligible and task-relevant. No persuasive impairment-like cues are present.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Task completion without examiner scaffolding",
+      "Intelligible speech with minimal hesitation",
+      "Accurate identification of core scene elements",
+      "No semantic vagueness or disorganization"
+    ],
+    "alternative_explanations": [
+      "Patient may be brief but not impaired",
+      "task completion is sufficient for healthy classification in structured picture-description tasks.",
+      "Examiner prompts may have been necessary to initiate response, but patient did not require repeated prompting or correction."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No further cognitive screening needed based on this clip alone.",
+      "Routine follow-up is appropriate if other clinical concerns arise."
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline in this interaction.",
+    "reviewer_confidence": 0.85,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio.",
+      "Patient speech is intelligible and task-compliant",
+      "no impairment-like cues detected.",
+      "Examiner prompts are neutral context",
+      "patient response is self-contained and complete."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching into the cookie jar and the sister could be laughing or cautioning him and the stool is tipping over and mom is standing in a puddle washing, drying dishes and the sink is overflowing and the perspective, which means the path is coming right in the house and the mom is drying the dishes, getting her feet wet and the sister is reaching for the cookie that's in the brother's hand, the kid's hand. That's all.",
+    "speaker_turn_summary": [
+      "Examiner: 'Okay, what action do you see going on in this picture?'",
+      "Patient: 'Ah, the brother or the boy is reaching into the cookie jar and the sister could be laughing or cautioning him and the stool is tipping over and oh mom is standing in a puddle washing, drying dishes and the sink is overflowing and the perspective, which means the path is coming right in the house and what else do you want?'",
+      "Examiner: 'Any action you see?'",
+      "Patient: 'Well, the mom is drying the dishes, getting her feet wet and the sister is reaching for the cookie that's in the brother's hand, the kid's hand.'",
+      "Examiner: 'Okay, is that it?'",
+      "Patient: 'Yep.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides coherent, task-relevant description of multiple scene elements including actors, actions, and spatial relationships.",
+      "Speech is intelligible and contains minimal filler or hesitation, though slightly repetitive in phrasing ('the kid's hand').",
+      "No clear word-finding pauses, semantic vagueness, or disorganization",
+      "patient completes the task without examiner scaffolding beyond initial prompt.",
+      "No evidence of tangential drift, contradiction, or failure to cover core task elements.",
+      "Patient ends with a brief confirmation ('Yep'), indicating task completion."
+    ]
+  },
+  "latency_ms": 16229,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/150-1.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/150-1.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

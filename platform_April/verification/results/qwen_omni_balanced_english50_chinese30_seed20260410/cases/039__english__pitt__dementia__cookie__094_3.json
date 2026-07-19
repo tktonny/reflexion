@@ -1,0 +1,129 @@
+{
+  "case_id": "english__pitt__dementia__cookie__094_3",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "Um, mother, son, and daughter. The water's spilling out of the sink. She's drying the dishes. The kids are into the cookie jar. Am I going too fast? Don't worry. How many you got? Go ahead. How many you need? Tell me all the things that you see going on in the picture. Oh. You got the water running over. And the little boy's gonna fall because it's already swam. What thing he's standing on? Stool. Okay. Is that all? That's fine.",
+  "patient_only_transcript": "Mother, son, and daughter. The water's spilling out of the sink. She's drying the dishes. The kids are into the cookie jar. You got the water running over. The little boy's gonna fall because it's already swam. What thing he's standing on? Stool.",
+  "speaker_turn_summary": [
+    "Patient: Describes scene elements (mother, son, daughter, sink, dishes, cookie jar).",
+    "Examiner: Asks for more details, prompts continuation, acknowledges completion.",
+    "Patient: Repeats 'stool' after examiner prompt, shows hesitation and vagueness in causal link ('swam' instead of 'slipped')."
+  ],
+  "patient_cue_summary": [
+    "Uses basic scene nouns but lacks detailed causal or sequential organization.",
+    "Shows word-finding hesitation ('what thing he's standing on?').",
+    "Uses inaccurate or non-standard word ('swam' for 'slipped').",
+    "Relies on examiner prompting to complete description.",
+    "Incomplete narrative with fragmented connections between events."
+  ],
+  "transcript_request_id": "chatcmpl-b74c022c-d376-97a1-8a8e-c5cf38e7a70c",
+  "classification_request_id": "chatcmpl-f181d0f3-4b9d-9d03-b229-e4141acda05f",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__094_3/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__094_3/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient names key elements but fails to link them causally or sequentially.",
+        "evidence": "Patient says 'the little boy's gonna fall because it's already swam' — uses inaccurate verb and lacks clear causal logic.",
+        "confidence": null
+      },
+      {
+        "label": "Lexical Retrieval and Word Choice",
+        "summary": "Patient uses vague or imprecise terms ('what thing he's standing on?') and non-standard vocabulary ('swam').",
+        "evidence": "Patient substitutes 'swam' for 'slipped' and asks for clarification on 'what thing'.",
+        "confidence": null
+      },
+      {
+        "label": "Task Completion and Examiner Dependence",
+        "summary": "Patient requires prompting to continue and does not independently complete the full description.",
+        "evidence": "Patient pauses, asks for clarification, and relies on examiner to prompt 'how many you need?' and 'is that all?' to proceed.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates mild impairment-like cues in scene description: vague word choice, inaccurate verbs, fragmented causal links, and reliance on examiner prompting. Task completion is incomplete and organization is weak. Not sufficient for dementia classification, but warrants further clinical review.",
+    "evidence_for_risk": [
+      "Inaccurate word use ('swam' instead of 'slipped')",
+      "Vague phrasing ('what thing he's standing on?')",
+      "Fragmented narrative with examiner dependence"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key scene elements (mother, sink, cookie jar, stool)",
+      "Patient completes basic task structure with examiner support"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive load or distraction during task",
+      "Language processing delay or mild articulation difficulty",
+      "Task unfamiliarity or anxiety affecting fluency"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat picture description task with structured prompts",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Obtain collateral history from caregiver or family member"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up with clinician for further evaluation.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; repeated assessments recommended to track progression.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is partially intelligible but shows mild impairment-like features.",
+      "Task context: cookie-theft picture description",
+      "patient should describe scene coherently and completely."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Mother, son, and daughter. The water's spilling out of the sink. She's drying the dishes. The kids are into the cookie jar. You got the water running over. The little boy's gonna fall because it's already swam. What thing he's standing on? Stool.",
+    "speaker_turn_summary": [
+      "Patient: Describes scene elements (mother, son, daughter, sink, dishes, cookie jar).",
+      "Examiner: Asks for more details, prompts continuation, acknowledges completion.",
+      "Patient: Repeats 'stool' after examiner prompt, shows hesitation and vagueness in causal link ('swam' instead of 'slipped')."
+    ],
+    "patient_cue_summary": [
+      "Uses basic scene nouns but lacks detailed causal or sequential organization.",
+      "Shows word-finding hesitation ('what thing he's standing on?').",
+      "Uses inaccurate or non-standard word ('swam' for 'slipped').",
+      "Relies on examiner prompting to complete description.",
+      "Incomplete narrative with fragmented connections between events."
+    ]
+  },
+  "latency_ms": 21057,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/094-3.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/094-3.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260410
+  }
+}

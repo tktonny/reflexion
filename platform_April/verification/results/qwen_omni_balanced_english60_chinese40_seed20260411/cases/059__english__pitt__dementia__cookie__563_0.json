@@ -1,0 +1,133 @@
+{
+  "case_id": "english__pitt__dementia__cookie__563_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.95,
+  "transcript": "One more thing, then we're done with this testing, and I'm sure you're glad to hear that. Oh, I don't mind this. What I want you to do is take a look at this picture. I want you to tell me everything that you see happening in that picture. I want you to tell me everything that's going on in there. The lady's a lousy dishwasher because her glass is all over the floor. I never do that to you. No. And the boy is falling off of a stool, stealing a cookie from the cookie jar. And what else? And he's going to get hurt when the chair tips over. And what else? The little girl is asking for a cookie. The mother is doing dishes, and the water is running out of the sink all over the floor. Lousy dishwasher. Right, that's good. All righty, we're all done.",
+  "patient_only_transcript": "The lady's a lousy dishwasher because her glass is all over the floor. I never do that to you. No. And the boy is falling off of a stool, stealing a cookie from the cookie jar. And what else? And he's going to get hurt when the chair tips over. And what else? The little girl is asking for a cookie. The mother is doing dishes, and the water is running out of the sink all over the floor. Lousy dishwasher.",
+  "speaker_turn_summary": [
+    "Examiner: 'One more thing, then we're done with this testing... take a look at this picture... tell me everything that you see happening in that picture.'",
+    "Patient: 'The lady's a lousy dishwasher because her glass is all over the floor. I never do that to you. No.'",
+    "Examiner: 'And what else?'",
+    "Patient: 'And the boy is falling off of a stool, stealing a cookie from the cookie jar. And what else? And he's going to get hurt when the chair tips over. And what else?'",
+    "Patient: 'The little girl is asking for a cookie. The mother is doing dishes, and the water is running out of the sink all over the floor. Lousy dishwasher.'",
+    "Examiner: 'Right, that's good. All righty, we're all done.'"
+  ],
+  "patient_cue_summary": [
+    "Patient provides coherent, task-relevant description of multiple scene elements: mother, boy, girl, cookie jar, water running, stool tipping, dishwasher comment.",
+    "Patient uses examiner prompts ('And what else?') to continue description, indicating task compliance and sustained engagement.",
+    "Patient includes evaluative comment ('lousy dishwasher') and personal reference ('I never do that to you'), suggesting affective and social context, not impairment.",
+    "Speech is fluent, grammatically complete, and semantically accurate with no signs of word-finding failure, repetition, restart, or disorganization.",
+    "No evidence of task breakdown, confusion, or failure to cover core picture elements despite prompting."
+  ],
+  "transcript_request_id": "chatcmpl-14838bbf-5a9e-998a-ba2b-8f627a4aa351",
+  "classification_request_id": "chatcmpl-56f72312-9d77-9237-abb5-297b718b0057",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__563_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__563_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identifies multiple actors, actions, and objects in the picture, including the boy stealing cookies, the stool tipping, the mother washing dishes, and water running over the floor.",
+        "evidence": "Patient explicitly names the boy, girl, mother, cookie jar, water, stool, and dishwasher context, demonstrating comprehension and recall of picture content.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Compliance and Fluency",
+        "summary": "Patient follows task instructions, responds to prompts, and provides a sustained, coherent description without hesitation, restarts, or examiner dependence beyond natural prompting.",
+        "evidence": "Patient continues description after 'And what else?' prompts, maintains narrative flow, and concludes with a self-contained summary.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Affective and Social Content",
+        "summary": "Patient includes evaluative and interpersonal commentary, suggesting intact social cognition and emotional engagement, not cognitive impairment.",
+        "evidence": "Patient says 'I never do that to you' and 'lousy dishwasher' — indicating social judgment and humor, not confusion or disconnection.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, accurate, and socially engaged description of the pictured scene, fully complying with the task. No signs of cognitive impairment are evident in speech, content, or affect. The response is fluent, task-relevant, and includes evaluative commentary without breakdown or disorganization.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Fluent, grammatically complete speech",
+      "No word-finding pauses, restarts, or disorganization",
+      "Engagement with examiner prompts without dependence",
+      "Inclusion of evaluative and social content indicating intact cognition"
+    ],
+    "alternative_explanations": [
+      "Patient may be naturally expressive or humorous, not cognitively impaired",
+      "Task may be well-suited to patient’s verbal abilities",
+      "No baseline or longitudinal data to support cognitive decline"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Patient displays light humor and social engagement through evaluative remarks ('lousy dishwasher', 'I never do that to you').",
+      "Patient tone is calm, cooperative, and responsive to examiner prompts without signs of frustration, anxiety, or apathy."
+    ],
+    "risk_control_suggestions": [
+      "No immediate intervention required",
+      "Continue routine monitoring if other clinical concerns arise",
+      "Consider repeating the task in a different context if further assessment is needed"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no evidence of cognitive decline in this interaction.",
+    "reviewer_confidence": 0.95,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio and transcript.",
+      "Patient speech is intelligible, task-compliant, and content-rich.",
+      "No impairment-like cues detected despite examiner prompting and multi-part response."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The lady's a lousy dishwasher because her glass is all over the floor. I never do that to you. No. And the boy is falling off of a stool, stealing a cookie from the cookie jar. And what else? And he's going to get hurt when the chair tips over. And what else? The little girl is asking for a cookie. The mother is doing dishes, and the water is running out of the sink all over the floor. Lousy dishwasher.",
+    "speaker_turn_summary": [
+      "Examiner: 'One more thing, then we're done with this testing... take a look at this picture... tell me everything that you see happening in that picture.'",
+      "Patient: 'The lady's a lousy dishwasher because her glass is all over the floor. I never do that to you. No.'",
+      "Examiner: 'And what else?'",
+      "Patient: 'And the boy is falling off of a stool, stealing a cookie from the cookie jar. And what else? And he's going to get hurt when the chair tips over. And what else?'",
+      "Patient: 'The little girl is asking for a cookie. The mother is doing dishes, and the water is running out of the sink all over the floor. Lousy dishwasher.'",
+      "Examiner: 'Right, that's good. All righty, we're all done.'"
+    ],
+    "patient_cue_summary": [
+      "Patient provides coherent, task-relevant description of multiple scene elements: mother, boy, girl, cookie jar, water running, stool tipping, dishwasher comment.",
+      "Patient uses examiner prompts ('And what else?') to continue description, indicating task compliance and sustained engagement.",
+      "Patient includes evaluative comment ('lousy dishwasher') and personal reference ('I never do that to you'), suggesting affective and social context, not impairment.",
+      "Speech is fluent, grammatically complete, and semantically accurate with no signs of word-finding failure, repetition, restart, or disorganization.",
+      "No evidence of task breakdown, confusion, or failure to cover core picture elements despite prompting."
+    ]
+  },
+  "latency_ms": 22177,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/563-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/563-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

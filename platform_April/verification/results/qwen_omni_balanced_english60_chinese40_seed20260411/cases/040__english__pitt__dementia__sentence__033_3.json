@@ -1,0 +1,128 @@
+{
+  "case_id": "english__pitt__dementia__sentence__033_3",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.2,
+  "reviewer_confidence": 0.7,
+  "transcript": "Pencil. Pencil and paper are used for writing. Tree. Trees grew high in the meadow. I may give you two words and ask you to use both of them in the sentence. Child, hospital. I took the child to the hospital. Cold, winter. This has been a cold winter. I will give you three words and you use all three in the sentence. Chair, doctor, sit. The doctor asked me to sit in the chair. Bureau, open, drawer. There was an open drawer in that bureau.",
+  "patient_only_transcript": "The child went to the hospital. It is a cold winter day. The doctor sat in the chair. The bureau drawer is open.",
+  "speaker_turn_summary": [
+    "Examiner: Prompt for sentence construction with given words.",
+    "Patient: Constructs sentences using provided word pairs and triplets.",
+    "Examiner: Gives next word set.",
+    "Patient: Responds with structured sentences."
+  ],
+  "patient_cue_summary": [
+    "Task-compliant sentence generation with provided word sets.",
+    "Stable fluency and syntactic completion across multiple prompts.",
+    "No evidence of retrieval failure, hesitation, or semantic vagueness.",
+    "Self-generated content beyond mere echo of prompt words.",
+    "Consistent use of subject-action-object structure in responses."
+  ],
+  "transcript_request_id": "chatcmpl-5a3ed450-c198-918f-96c8-909dfa3f2b41",
+  "classification_request_id": "chatcmpl-a10447d4-6915-98e3-bab4-25de0937f261",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__033_3/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__033_3/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Sentence Construction Task Completion",
+        "summary": "Patient generated grammatically correct sentences using provided word pairs and triplets without hesitation or error.",
+        "evidence": "Responses: 'I took the child to the hospital.', 'This has been a cold winter.', 'The doctor asked me to sit in the chair.', 'There was an open drawer in that bureau.'",
+        "confidence": 0.85
+      },
+      {
+        "label": "Task Relevance and Coherence",
+        "summary": "Patient maintained task relevance and constructed coherent, contextually appropriate sentences for each prompt.",
+        "evidence": "Each response directly incorporated the required words into a meaningful sentence with clear subject-action-object structure.",
+        "confidence": 0.8
+      },
+      {
+        "label": "Fluency and Retrieval",
+        "summary": "No signs of word-finding difficulty, circumlocution, or semantic vagueness observed in patient responses.",
+        "evidence": "Responses were direct, complete, and did not require examiner scaffolding or correction.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.2,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient completed structured sentence construction tasks using provided word sets with coherent, grammatically correct, and task-relevant responses. No observable signs of retrieval difficulty, hesitation, or disorganization. Speech is intelligible and task-compliant. However, due to lack of visual data and potential audio quality limitations, further observation is recommended.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Consistent sentence construction across multiple prompts.",
+      "No pauses, fillers, or restarts indicating retrieval difficulty.",
+      "Responses are self-generated and not merely echoic.",
+      "No signs of emotional dysregulation or affective flattening.",
+      "Task completion is complete and accurate."
+    ],
+    "alternative_explanations": [
+      "Audio quality or background noise may limit full confidence in speech analysis.",
+      "Absence of visual cues prevents assessment of nonverbal indicators of cognitive impairment.",
+      "Patient may be performing at baseline level without impairment, but further testing is warranted due to modality limitations."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery if available.",
+      "Consider repeat assessment with visual and audio data combined.",
+      "Monitor for changes in task performance over time."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio-only clip; no persuasive evidence of cognitive decline observed.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Patient speech is intelligible and task-compliant, but visual data is unavailable.",
+      "Examiner prompts are clearly separated from patient responses.",
+      "No signs of dementia-like impairment observed in available audio content."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The child went to the hospital. It is a cold winter day. The doctor sat in the chair. The bureau drawer is open.",
+    "speaker_turn_summary": [
+      "Examiner: Prompt for sentence construction with given words.",
+      "Patient: Constructs sentences using provided word pairs and triplets.",
+      "Examiner: Gives next word set.",
+      "Patient: Responds with structured sentences."
+    ],
+    "patient_cue_summary": [
+      "Task-compliant sentence generation with provided word sets.",
+      "Stable fluency and syntactic completion across multiple prompts.",
+      "No evidence of retrieval failure, hesitation, or semantic vagueness.",
+      "Self-generated content beyond mere echo of prompt words.",
+      "Consistent use of subject-action-object structure in responses."
+    ]
+  },
+  "latency_ms": 18531,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/033-3.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/033-3.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

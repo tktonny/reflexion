@@ -1,0 +1,120 @@
+{
+  "case_id": "english__pitt__dementia__sentence__001_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.6,
+  "transcript": "The first word is pencil. I wrote with my pencil. The next word is tree. The tree. The tree is beautiful. Now I've got two words, okay? I want you to put both words into a brief sentence. Don't worry about the word order. You can use them in any order, but use both words in one sentence. Child, hospital. The child was taken to the hospital. The next two words are cold, winter. Can't think of any right now.",
+  "patient_only_transcript": "I wrote with my pencil. The tree is beautiful. The child was taken to the hospital. Can't think of any right now.",
+  "speaker_turn_summary": [
+    "Examiner: Introduces task and prompts with words 'pencil', 'tree', 'child hospital', 'cold winter'.",
+    "Patient: Responds with 'I wrote with my pencil.', 'The tree is beautiful.', 'The child was taken to the hospital.', 'Can't think of any right now.'"
+  ],
+  "patient_cue_summary": [
+    "Task-compliant sentence generation for 'child hospital' prompt.",
+    "Partial or incomplete response for 'cold winter' prompt with explicit admission of inability to generate sentence.",
+    "Fluent, grammatically correct responses for earlier prompts.",
+    "Hesitation and self-admission of cognitive difficulty on later prompt."
+  ],
+  "transcript_request_id": "chatcmpl-76c6aba4-439a-9213-9011-7ec828d8c6e5",
+  "classification_request_id": "chatcmpl-054f0540-dab7-966c-8667-fabd3d490c11",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__001_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__sentence__001_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Sentence Construction Task Response",
+        "summary": "Patient generated coherent, grammatically correct sentences for 'pencil' and 'child hospital' prompts, but failed to generate a sentence for 'cold winter' and explicitly stated inability to do so.",
+        "evidence": "Patient responded with 'I wrote with my pencil.' and 'The child was taken to the hospital.' for earlier prompts. For 'cold winter', patient said 'Can't think of any right now.'",
+        "confidence": 0.5
+      },
+      {
+        "label": "Task Completion Consistency",
+        "summary": "Patient completed some tasks successfully but showed task-specific retrieval difficulty on the final prompt.",
+        "evidence": "Successful sentence generation for two prompts, failure on third with explicit admission of inability.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.3,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient successfully completed two sentence construction tasks but explicitly admitted inability to generate a sentence for the 'cold winter' prompt. This suggests possible word-finding or retrieval difficulty under task pressure, warranting further clinical observation but not sufficient for dementia classification.",
+    "evidence_for_risk": [
+      "Explicit admission of inability to generate sentence for 'cold winter' prompt.",
+      "Partial task completion with successful responses for earlier prompts, indicating preserved baseline function but possible retrieval breakdown under demand."
+    ],
+    "evidence_against_risk": [
+      "Fluent, grammatically correct responses for earlier prompts.",
+      "No signs of disorganized speech, tangentiality, or semantic confusion.",
+      "No evidence of severe memory loss or global language breakdown."
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive load or task fatigue may have contributed to failure on final prompt.",
+      "Task-specific difficulty rather than global cognitive impairment.",
+      "Normal variability in performance under structured language tasks."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient explicitly states inability to generate sentence for 'cold winter' prompt."
+    ],
+    "emotional_assessment_findings": [
+      "Mild frustration or uncertainty expressed when unable to complete task."
+    ],
+    "risk_control_suggestions": [
+      "Follow up with additional language or memory screening tasks.",
+      "Consider cognitive load or fatigue as potential confounders.",
+      "Monitor for consistency across multiple sessions or tasks."
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended for further evaluation.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; repeated testing recommended to assess consistency.",
+    "reviewer_confidence": 0.6,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient clearly identified as target subject through interaction role.",
+      "Task context is structured sentence construction",
+      "patient completed some tasks successfully."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "I wrote with my pencil. The tree is beautiful. The child was taken to the hospital. Can't think of any right now.",
+    "speaker_turn_summary": [
+      "Examiner: Introduces task and prompts with words 'pencil', 'tree', 'child hospital', 'cold winter'.",
+      "Patient: Responds with 'I wrote with my pencil.', 'The tree is beautiful.', 'The child was taken to the hospital.', 'Can't think of any right now.'"
+    ],
+    "patient_cue_summary": [
+      "Task-compliant sentence generation for 'child hospital' prompt.",
+      "Partial or incomplete response for 'cold winter' prompt with explicit admission of inability to generate sentence.",
+      "Fluent, grammatically correct responses for earlier prompts.",
+      "Hesitation and self-admission of cognitive difficulty on later prompt."
+    ]
+  },
+  "latency_ms": 15020,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/sentence/001-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/sentence/001-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

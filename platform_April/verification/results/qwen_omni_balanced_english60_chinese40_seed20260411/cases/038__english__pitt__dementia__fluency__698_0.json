@@ -1,0 +1,160 @@
+{
+  "case_id": "english__pitt__dementia__fluency__698_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "You can start now. Name some animals for me. Can you name some? There's horses and cows and. . . A mule and a horse is the same thing. Can you think of any other animals? Anything else that's an animal? I'm stumped. Any animal at all that you can think of, any animal at all. There's cows, there's horses, there's mules, and there's goats and all kind of animals. Okay, good. Now begins with the letter F and you can start now. Can you say some words that begin with the letter F? Not too many. Can you think of any? Say any word at all you can think of that begins with the letter F. Any word at all that begins with the letter F. A person's name? Any, it has to be any word at all except for proper names and places and no derivatives. Any word at all that you can think of that begins with the letter F. Frank. Okay. Any other words? We used to have a neighbor named Frank, Frank Santor.",
+  "patient_only_transcript": "Horses, cows, mule, goat — all kinds of animals. Frank. We used to have a neighbor named Frank.",
+  "speaker_turn_summary": [
+    "Examiner: Name some animals.",
+    "Patient: Horses, cows, mule, goat — all kinds of animals.",
+    "Examiner: Any animal at all? Think of any other animals.",
+    "Patient: I’m stumped.",
+    "Examiner: Now, words beginning with F.",
+    "Patient: Frank. We used to have a neighbor named Frank.",
+    "Examiner: Any other words?",
+    "Patient: (no further response)"
+  ],
+  "patient_cue_summary": [
+    "Low productivity in animal fluency task — only lists 4 specific animals before generalizing.",
+    "Explicit admission of being 'stumped' after initial prompt.",
+    "Inability to generate additional animals beyond initial list despite prompting.",
+    "Inability to generate any word beginning with 'F' except a proper name, which is disallowed.",
+    "Reliance on personal memory (neighbor named Frank) rather than lexical retrieval.",
+    "No spontaneous elaboration or category maintenance after initial response.",
+    "No evidence of semantic drift or tangentiality — but also no sustained fluency or retrieval effort."
+  ],
+  "transcript_request_id": "chatcmpl-12d34c9c-f1a5-9e5a-92eb-857326b1bfa4",
+  "classification_request_id": "chatcmpl-83c1b802-4539-9a9e-8664-48a85a41cb37",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__698_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__fluency__698_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "Speech fluency",
+        "summary": "Speech is slow, with pauses and minimal elaboration. Patient struggles to generate additional items beyond initial examples.",
+        "evidence": "Patient provides only 4 specific animals before generalizing, then admits being 'stumped'. Later, only offers a proper name for 'F' task, which is rejected by examiner.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Lexical retrieval",
+        "summary": "Patient demonstrates difficulty retrieving words beyond basic examples, especially under phonemic fluency constraint.",
+        "evidence": "Fails to generate any non-proper noun starting with 'F' despite repeated prompts. Relies on personal memory instead of lexical access.",
+        "confidence": 0.5
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "Animal fluency task",
+        "summary": "Patient names 4 animals (horse, cow, mule, goat) and generalizes to 'all kinds of animals' but does not expand further despite prompting.",
+        "evidence": "Patient provides minimal output, then admits inability to think of more. No category maintenance or elaboration.",
+        "confidence": 0.5
+      },
+      {
+        "label": "Phonemic fluency task (F)",
+        "summary": "Patient fails to generate any valid non-proper noun beginning with 'F' despite multiple prompts. Offers 'Frank' which is rejected.",
+        "evidence": "Patient offers only a proper name, which is explicitly disallowed. No other attempts or substitutions.",
+        "confidence": 0.5
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates limited fluency in both semantic and phonemic tasks, with explicit admission of being 'stumped' and failure to generate additional valid items. No signs of agitation or apathy, but lexical retrieval is impaired under constraint. Further clinical evaluation is warranted.",
+    "evidence_for_risk": [
+      "Low item productivity in animal fluency task.",
+      "Failure to generate any valid non-proper noun for 'F' task.",
+      "Reliance on personal memory instead of lexical retrieval.",
+      "Explicit self-report of being 'stumped'."
+    ],
+    "evidence_against_risk": [
+      "Patient is coherent and task-relevant.",
+      "No signs of disorientation, confusion, or semantic incoherence.",
+      "No evidence of severe memory loss or global cognitive failure."
+    ],
+    "alternative_explanations": [
+      "Mild cognitive fatigue or test anxiety may be contributing to retrieval difficulty.",
+      "Patient may have limited vocabulary or educational background affecting fluency performance.",
+      "Task may be culturally or linguistically unfamiliar, though patient is speaking English."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [
+      "Patient reports being 'stumped' during animal fluency task.",
+      "Patient acknowledges difficulty generating words beginning with 'F' after multiple prompts."
+    ],
+    "emotional_assessment_findings": [
+      "Patient exhibits mild frustration or resignation when unable to generate more items.",
+      "No signs of agitation, anxiety, or apathy — but also no active engagement or initiative."
+    ],
+    "risk_control_suggestions": [
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE) in follow-up.",
+      "Consider neuropsychological evaluation if symptoms persist or worsen.",
+      "Assess for depression or anxiety that may affect fluency performance."
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip. Further observation and repeated testing are recommended to track progression.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio.",
+      "Patient is clearly identifiable as the target subject in the dialogue.",
+      "Task context is structured verbal fluency",
+      "patient's performance is below expected for age and education level in English-speaking populations.",
+      "No evidence of dementia-level impairment, but impairment-like signals are present and warrant further investigation."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "poor_audio",
+      "transcript_unavailable"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Horses, cows, mule, goat — all kinds of animals. Frank. We used to have a neighbor named Frank.",
+    "speaker_turn_summary": [
+      "Examiner: Name some animals.",
+      "Patient: Horses, cows, mule, goat — all kinds of animals.",
+      "Examiner: Any animal at all? Think of any other animals.",
+      "Patient: I’m stumped.",
+      "Examiner: Now, words beginning with F.",
+      "Patient: Frank. We used to have a neighbor named Frank.",
+      "Examiner: Any other words?",
+      "Patient: (no further response)"
+    ],
+    "patient_cue_summary": [
+      "Low productivity in animal fluency task — only lists 4 specific animals before generalizing.",
+      "Explicit admission of being 'stumped' after initial prompt.",
+      "Inability to generate additional animals beyond initial list despite prompting.",
+      "Inability to generate any word beginning with 'F' except a proper name, which is disallowed.",
+      "Reliance on personal memory (neighbor named Frank) rather than lexical retrieval.",
+      "No spontaneous elaboration or category maintenance after initial response.",
+      "No evidence of semantic drift or tangentiality — but also no sustained fluency or retrieval effort."
+    ]
+  },
+  "latency_ms": 17442,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/fluency/698-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/fluency/698-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

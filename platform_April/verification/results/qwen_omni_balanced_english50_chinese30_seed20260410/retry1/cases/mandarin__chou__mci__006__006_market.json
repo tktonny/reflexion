@@ -1,0 +1,132 @@
+{
+  "case_id": "mandarin__chou__mci__006__006_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "奶奶带小孩子在捞鱼，那个妈妈也在看着，冰淇淋一直滴在这个小孩子的头上。这可能是在一个夜市，很多电灯。捞小鱼，这个我也去捞过。这个小偷扒手，神经病那个人，那个在玩骰子。烤香肠，那在赌博，这个小偷偷钱。啊，再捞了一条鱼，这个不好捞啊，网子会破。",
+  "patient_only_transcript": "奶奶带小孩子在捞鱼，那个妈妈也在看着，冰淇淋一直滴在这个小孩子的头上。这可能是在一个夜市，很多电灯。捞小鱼，这个我也去捞过。这个小偷扒手，神经病那个人，那个在玩骰子。烤香肠，那在赌博，这个小偷偷钱。啊，再捞了一条鱼，这个不好捞啊，网子会破。",
+  "speaker_turn_summary": [
+    "Patient describes a scene with multiple elements: grandmother, child, ice cream dripping, night market, lights, fishing, thief, dice, sausage, gambling, stealing, fishing again, broken net.",
+    "Examiner likely prompts or listens without speaking visibly in audio."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with multiple elements, but lacks precise lexical retrieval in some parts (e.g., '神经病那个人', '那个在玩骰子').",
+    "Some phrases are vague or circumlocutory (e.g., '这个我也去捞过', '那个在玩骰子').",
+    "Narrative is loosely connected",
+    "events are listed rather than causally or temporally sequenced.",
+    "No clear word-finding pauses or restarts, but some low-information phrasing and repetition of '捞鱼' and '这个'.",
+    "No evidence of disorientation or confusion, but speech is not highly informative or detailed beyond surface-level observation."
+  ],
+  "transcript_request_id": "chatcmpl-0c7e2576-9ce2-9496-a9f4-16d395e48084",
+  "classification_request_id": "chatcmpl-3d9871df-8167-9e39-9f2a-7a70cf8504c8",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__006__006_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__006__006_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes a complex scene with multiple actors and actions, but lacks precise vocabulary and causal sequencing.",
+        "evidence": "Patient lists elements (grandmother, child, ice cream, night market, thief, dice, sausage, gambling, fishing, broken net) without clear logical or temporal connections.",
+        "confidence": 0.7
+      },
+      {
+        "label": "lexical_retrieval_effort",
+        "summary": "Patient uses some vague or circumlocutory terms instead of specific nouns or verbs in parts of the description.",
+        "evidence": "Phrases like '神经病那个人' and '那个在玩骰子' suggest reliance on pronouns or vague descriptors rather than precise lexical retrieval.",
+        "confidence": 0.65
+      },
+      {
+        "label": "narrative_organization",
+        "summary": "Patient’s description is episodic and list-like, with weak causal or temporal structure.",
+        "evidence": "Events are presented as disconnected observations rather than a flowing narrative or task-compliant description.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a surface-level description of a complex scene with multiple elements, but lacks precise vocabulary, causal sequencing, and narrative coherence. Speech is intelligible but not highly informative or detailed. No clear signs of dementia, but mild impairment-like cues suggest need for further clinical review.",
+    "evidence_for_risk": [
+      "Vague or circumlocutory phrasing in key parts of the description",
+      "List-like, disconnected narrative structure",
+      "Reliance on general terms rather than specific lexical retrieval"
+    ],
+    "evidence_against_risk": [
+      "No word-finding pauses, restarts, or abandonment",
+      "Patient correctly identifies multiple scene elements",
+      "No signs of disorientation or confusion"
+    ],
+    "alternative_explanations": [
+      "Language or cultural phrasing may account for vague terms",
+      "Task may be unfamiliar or poorly framed, leading to sparse response",
+      "Patient may be distracted or not fully engaged in the task"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the task with clearer prompts or visual aids",
+      "Assess for word-finding difficulty using standardized naming tasks",
+      "Consider follow-up with formal cognitive screening tools"
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further observation or multi-session assessment is recommended.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible but lacks depth and precision in narrative structure.",
+      "Examiner role is inferred from context",
+      "no direct examiner speech detected in audio."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "奶奶带小孩子在捞鱼，那个妈妈也在看着，冰淇淋一直滴在这个小孩子的头上。这可能是在一个夜市，很多电灯。捞小鱼，这个我也去捞过。这个小偷扒手，神经病那个人，那个在玩骰子。烤香肠，那在赌博，这个小偷偷钱。啊，再捞了一条鱼，这个不好捞啊，网子会破。",
+    "speaker_turn_summary": [
+      "Patient describes a scene with multiple elements: grandmother, child, ice cream dripping, night market, lights, fishing, thief, dice, sausage, gambling, stealing, fishing again, broken net.",
+      "Examiner likely prompts or listens without speaking visibly in audio."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with multiple elements, but lacks precise lexical retrieval in some parts (e.g., '神经病那个人', '那个在玩骰子').",
+      "Some phrases are vague or circumlocutory (e.g., '这个我也去捞过', '那个在玩骰子').",
+      "Narrative is loosely connected",
+      "events are listed rather than causally or temporally sequenced.",
+      "No clear word-finding pauses or restarts, but some low-information phrasing and repetition of '捞鱼' and '这个'.",
+      "No evidence of disorientation or confusion, but speech is not highly informative or detailed beyond surface-level observation."
+    ]
+  },
+  "latency_ms": 16453,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/006/006_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/006/006_market.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}

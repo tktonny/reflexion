@@ -1,0 +1,146 @@
+{
+  "case_id": "english__pitt__dementia__cookie__001_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.7,
+  "transcript": "You see going on in the picture, tell me all the action. Okay? There's a young boy going in a cookie jar, and there's a girl, a young girl. And I'm saying he's a boy because it's hard to tell anymore. He's in a cookie jar, and there's a stool that he is on, and it already is starting to fall over, and so is the water in the sink. It's overflowing in the sink. Okay, anything else? I don't know about this hickey here, whether that's more than one I said. Like the wife, or I mean the mother, is near the girl, and she's, she has, I can't think of the, she has the, she's trying to wipe dishes. Okay. And stop the water from going out. Okay. Okay, good.",
+  "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing. I can't think of the word for what she's doing — she's trying to wipe dishes and stop the water from going out. I don't know if the mother is near the girl or if that's more than one person. It's hard to tell anymore.",
+  "speaker_turn_summary": [
+    "Examiner: 'You see going on in the picture, tell me all the action. Okay?'",
+    "Patient: 'There's a young boy going in a cookie jar, and there's a girl, a young girl. And I'm saying he's a boy because it's hard to tell anymore. He's in a cookie jar, and there's a stool that he is on, and it already is starting to fall over, and so is the water in the sink. It's overflowing in the sink.'",
+    "Examiner: 'Okay, anything else?'",
+    "Patient: 'I don't know about this hickey here, whether that's more than one I said. Like the wife, or I mean the mother, is near the girl, and she's, she has, I can't think of the, she has the, she's trying to wipe dishes. Okay. And stop the water from going out.'",
+    "Examiner: 'Okay. Okay, good.'"
+  ],
+  "patient_cue_summary": [
+    "Word-finding pauses and circumlocution ('I can't think of the', 'she has the')",
+    "Vague or uncertain labeling ('I don't know if the mother is near the girl or if that's more than one person')",
+    "Fragmented or incomplete sentence structures ('she's trying to wipe dishes. Okay. And stop the water from going out.')",
+    "Repetition and self-correction ('the wife, or I mean the mother')",
+    "Examiner dependence — relies on examiner prompts to continue description",
+    "Partial coherence — mentions key scene elements but lacks smooth narrative organization or causal linkage"
+  ],
+  "transcript_request_id": "chatcmpl-a3522a5c-7bce-9165-b110-61ad8d286b51",
+  "classification_request_id": "chatcmpl-a789c989-a559-9061-a506-4589f6dda40d",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__001_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Word-finding difficulty",
+        "summary": "Patient frequently pauses, uses circumlocutions, and expresses inability to recall specific words or terms.",
+        "evidence": "Patient says 'I can't think of the', 'she has the', 'I don't know if that's more than one I said'.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative disorganization",
+        "summary": "Patient's description is fragmented, lacks smooth causal linkage, and includes self-corrections and restarts.",
+        "evidence": "Patient says 'she's trying to wipe dishes. Okay. And stop the water from going out.' — incomplete and disconnected.",
+        "confidence": null
+      },
+      {
+        "label": "Examiner dependence",
+        "summary": "Patient relies on examiner prompts to continue description and does not independently complete the task.",
+        "evidence": "Patient responds to 'anything else?' with uncertainty and incomplete phrases, requiring examiner to acknowledge completion.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient demonstrates mild impairment-like cues including word-finding difficulty, fragmented narrative, and examiner dependence during a picture description task. While key scene elements are correctly identified, the description lacks coherence, smooth organization, and lexical precision. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Repeated word-finding pauses and circumlocutions",
+      "Fragmented and disorganized description structure",
+      "Reliance on examiner prompts to continue or complete the task"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key objects and actions (cookie jar, stool, sink, mother, dishes)",
+      "No signs of severe confusion or disorientation",
+      "Patient remains engaged and responsive to prompts"
+    ],
+    "alternative_explanations": [
+      "Temporary cognitive load or fatigue during task",
+      "Language processing delay or mild aphasia not yet diagnostic",
+      "Task-specific difficulty or unfamiliarity with picture description format"
+    ],
+    "risk_factor_findings": [
+      "Unclear role assignment in scene (mother vs. wife, multiple people)",
+      "Difficulty retrieving specific vocabulary or naming actions",
+      "Fragmented, incomplete, and disorganized description despite task prompt"
+    ],
+    "subjective_assessment_findings": [
+      "Patient reports difficulty recalling or naming specific elements in the scene",
+      "Patient expresses uncertainty about relationships and roles in the picture"
+    ],
+    "emotional_assessment_findings": [
+      "Low emotional reactivity — neutral tone, no signs of frustration or anxiety",
+      "No signs of apathy or disengagement — continues to respond to prompts"
+    ],
+    "risk_control_suggestions": [
+      "Repeat picture description task with structured prompts",
+      "Administer formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Obtain collateral history from caregiver or family member"
+    ],
+    "visit_recommendation": "Prompt clinical evaluation with formal cognitive screening and caregiver input.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up assessments recommended to track progression or stability.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio and transcript.",
+      "Patient speech is partially intelligible but shows multiple mild impairment-like cues.",
+      "Task context: picture description of cookie-theft scene",
+      "patient should describe all visible actions coherently."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "interviewer_dominant",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching into the cookie jar, the stool is tipping, the mother is washing dishes, and the sink is overflowing. I can't think of the word for what she's doing — she's trying to wipe dishes and stop the water from going out. I don't know if the mother is near the girl or if that's more than one person. It's hard to tell anymore.",
+    "speaker_turn_summary": [
+      "Examiner: 'You see going on in the picture, tell me all the action. Okay?'",
+      "Patient: 'There's a young boy going in a cookie jar, and there's a girl, a young girl. And I'm saying he's a boy because it's hard to tell anymore. He's in a cookie jar, and there's a stool that he is on, and it already is starting to fall over, and so is the water in the sink. It's overflowing in the sink.'",
+      "Examiner: 'Okay, anything else?'",
+      "Patient: 'I don't know about this hickey here, whether that's more than one I said. Like the wife, or I mean the mother, is near the girl, and she's, she has, I can't think of the, she has the, she's trying to wipe dishes. Okay. And stop the water from going out.'",
+      "Examiner: 'Okay. Okay, good.'"
+    ],
+    "patient_cue_summary": [
+      "Word-finding pauses and circumlocution ('I can't think of the', 'she has the')",
+      "Vague or uncertain labeling ('I don't know if the mother is near the girl or if that's more than one person')",
+      "Fragmented or incomplete sentence structures ('she's trying to wipe dishes. Okay. And stop the water from going out.')",
+      "Repetition and self-correction ('the wife, or I mean the mother')",
+      "Examiner dependence — relies on examiner prompts to continue description",
+      "Partial coherence — mentions key scene elements but lacks smooth narrative organization or causal linkage"
+    ]
+  },
+  "latency_ms": 23067,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/001-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/001-2.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

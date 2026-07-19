@@ -1,0 +1,128 @@
+{
+  "case_id": "mandarin__chou__mci__088__088_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.65,
+  "transcript": "哦，这趟车啊，哦，小朋友在捞鱼，捞得很高兴啊。哎，那他们在玩什么？玩玩玩十八啦。嗯，对啊，他们两三个在玩十八，哎，这个好像这个那不知道拿什么东西，手伸进去，拿他的皮包。他们捞鱼捞得很高兴啊。嗯，嗯。",
+  "patient_only_transcript": "哦，这趟车啊，哦，小朋友在捞鱼，捞得很高兴啊。哎，那他们在玩什么？玩玩玩十八啦。嗯，对啊，他们两三个在玩十八，哎，这个好像这个那不知道拿什么东西，手伸进去，拿他的皮包。他们捞鱼捞得很高兴啊。嗯，嗯。",
+  "speaker_turn_summary": [
+    "Examiner: 问他们在玩什么？",
+    "Patient: 回答小朋友在捞鱼，玩十八，不知道拿什么，手伸进去拿皮包，捞鱼很高兴。"
+  ],
+  "patient_cue_summary": [
+    "Patient identifies multiple scene elements: children, fishing, playing 'eighteen', unclear object, hand reaching into bag.",
+    "Patient uses repeated particles (哦、嗯、啦) and vague terms (这个、那个、不知道) but maintains topic continuity.",
+    "Patient’s description is partially coherent but lacks precise object naming and causal structure",
+    "some phrases are fragmented or self-uncertain.",
+    "No clear abandonment, contradiction, or naming collapse",
+    "patient attempts to describe multiple actors and actions despite lexical vagueness."
+  ],
+  "transcript_request_id": "chatcmpl-3c609cea-7acc-9232-b315-1b506ea0062e",
+  "classification_request_id": "chatcmpl-c799788a-8584-93d0-8d91-e1324f9ea7b3",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__088__088_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__mci__088__088_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "scene_description_coherence",
+        "summary": "Patient describes multiple actors and actions in the market scene, though with vague referents and fragmented phrasing.",
+        "evidence": "Patient mentions children fishing, playing 'eighteen', reaching into a bag, and expressing enjoyment — all relevant scene elements.",
+        "confidence": 0.7
+      },
+      {
+        "label": "lexical_vagueness",
+        "summary": "Patient uses generic terms (这个、那个) and filler particles, but does not fail to retrieve core vocabulary.",
+        "evidence": "Phrases like '不知道拿什么东西' and '这个好像这个那' indicate uncertainty, not naming failure.",
+        "confidence": 0.65
+      },
+      {
+        "label": "narrative_organisation",
+        "summary": "Patient’s description is not fully structured but maintains topic continuity and identifies multiple relevant events.",
+        "evidence": "Patient sequentially references fishing, game-playing, and object interaction without major contradiction or abandonment.",
+        "confidence": 0.7
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a partially coherent, emotionally positive description of a market scene with multiple actors and actions. While speech contains vague referents and fillers, core scene elements are identified without abandonment or naming collapse. No strong impairment cues are present. Further observation or formal screening is recommended due to audio quality and partial lexical vagueness.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient identifies multiple relevant scene elements (children, fishing, game, bag, joy).",
+      "Narrative remains topic-connected despite fragmented phrasing.",
+      "No contradiction, abandonment, or semantic collapse detected.",
+      "Emotional tone is positive and engaged, not apathetic or anxious."
+    ],
+    "alternative_explanations": [
+      "Audio quality and speech intelligibility may limit confidence in lexical retrieval.",
+      "Colloquial Mandarin features (fillers, vague pronouns) are common in spontaneous speech and not necessarily indicative of impairment.",
+      "Patient may be describing a complex scene with multiple simultaneous actions, which is cognitively demanding even for healthy individuals."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [
+      "Patient expresses positive affect through phrases like '捞得很高兴啊' and '很高兴啊'."
+    ],
+    "risk_control_suggestions": [
+      "Repeat the scene-description task with clearer audio or visual cues.",
+      "Use structured prompts to elicit more precise object and action naming.",
+      "Consider follow-up with formal cognitive screening tools if symptoms persist or worsen."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening recommended.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; further observation or multi-visit assessment is needed for trend evaluation.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment relies solely on audio.",
+      "Patient speech is intelligible enough to reconstruct multiple scene elements, supporting HC classification.",
+      "Vague phrasing and fillers are consistent with normal colloquial Mandarin, not necessarily cognitive impairment."
+    ],
+    "quality_flags": [
+      "poor_audio",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "哦，这趟车啊，哦，小朋友在捞鱼，捞得很高兴啊。哎，那他们在玩什么？玩玩玩十八啦。嗯，对啊，他们两三个在玩十八，哎，这个好像这个那不知道拿什么东西，手伸进去，拿他的皮包。他们捞鱼捞得很高兴啊。嗯，嗯。",
+    "speaker_turn_summary": [
+      "Examiner: 问他们在玩什么？",
+      "Patient: 回答小朋友在捞鱼，玩十八，不知道拿什么，手伸进去拿皮包，捞鱼很高兴。"
+    ],
+    "patient_cue_summary": [
+      "Patient identifies multiple scene elements: children, fishing, playing 'eighteen', unclear object, hand reaching into bag.",
+      "Patient uses repeated particles (哦、嗯、啦) and vague terms (这个、那个、不知道) but maintains topic continuity.",
+      "Patient’s description is partially coherent but lacks precise object naming and causal structure",
+      "some phrases are fragmented or self-uncertain.",
+      "No clear abandonment, contradiction, or naming collapse",
+      "patient attempts to describe multiple actors and actions despite lexical vagueness."
+    ]
+  },
+  "latency_ms": 19198,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "MCI",
+    "source_relative_path": "MCI/088/088_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/MCI/088/088_market.mp3?f=save",
+    "expected_group_audio_count": 141,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "case_id": "english__pitt__dementia__cookie__157_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "cognitive_risk",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.35,
+  "reviewer_confidence": 0.65,
+  "transcript": "Kid trying to get in the cookie jar and he missed the thing and he's still going out for him and his sister or whoever it is has caught him at it and he's gonna have to do the dishes because his mother can't let him go scot free and of course the water pouring out of the sink onto the floor already she didn't even take the plug out. Okay, anything else? Well, there's other problems here. This isn't the first time this man has done this. He's been doing it all week. Mother doesn't find out until he's big enough to walk. Okay.",
+  "patient_only_transcript": "Kid trying to get in the cookie jar and he missed the thing and he's still going out for him and his sister or whoever it is has caught him at it and he's gonna have to do the dishes because his mother can't let him go scot free and of course the water pouring out of the sink onto the floor already she didn't even take the plug out. Well, there's other problems here. This isn't the first time this man has done this. He's been doing it all week. Mother doesn't find out until he's big enough to walk.",
+  "speaker_turn_summary": [
+    "Examiner: 'Okay, anything else?'",
+    "Patient: Describes cookie jar incident, sink overflow, mother's reaction, and repeated behavior.",
+    "Examiner: 'Okay.'"
+  ],
+  "patient_cue_summary": [
+    "Uses vague terms like 'the thing', 'whoever it is', 'this man' instead of specific roles or objects.",
+    "Repeats or rephrases concepts without adding new detail (e.g., 'he's been doing it all week').",
+    "Narrative is loosely connected",
+    "causal links are weak (e.g., 'mother doesn't find out until he's big enough to walk' is disconnected from prior events).",
+    "Some content is coherent (cookie jar, sink, mother), but organization is fragmented and lacks clear sequencing.",
+    "Relies on examiner prompting ('Okay, anything else?') to continue the description."
+  ],
+  "transcript_request_id": "chatcmpl-922db4b1-5a52-92bc-a0a0-a37a487c8482",
+  "classification_request_id": "chatcmpl-e34f3ef5-572c-92bd-a2cf-48a1ee687ff8",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__157_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__157_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Narrative Coherence",
+        "summary": "Patient describes a multi-event scene but with weak causal and temporal organization.",
+        "evidence": "Patient mentions cookie jar, sink overflow, mother’s reaction, and repeated behavior, but lacks clear sequencing or logical connectors.",
+        "confidence": 0.7
+      },
+      {
+        "label": "Lexical Precision",
+        "summary": "Uses vague referents ('the thing', 'this man', 'whoever it is') instead of specific nouns or roles.",
+        "evidence": "Patient avoids naming the child, sister, or mother explicitly in key moments, relying on pronouns or generics.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Examiner Dependence",
+        "summary": "Patient appears to require prompting to continue the description and does not self-initiate elaboration.",
+        "evidence": "Patient pauses after examiner prompt 'Anything else?' and resumes with additional details, suggesting task dependence.",
+        "confidence": 0.65
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.35,
+    "risk_label": "cognitive_risk",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a partially coherent description of a picture-based scenario but exhibits signs of mild lexical vagueness, weak narrative organization, and examiner dependence. These cues are suggestive of early cognitive change but not definitive. Further clinical evaluation is recommended.",
+    "evidence_for_risk": [
+      "Vague referential language",
+      "Fragmented narrative structure",
+      "Reliance on examiner prompting"
+    ],
+    "evidence_against_risk": [
+      "Patient correctly identifies key scene elements (cookie jar, sink, mother)",
+      "No overt confusion or disorientation in content",
+      "Speech is intelligible and not fragmented beyond normal conversational variation"
+    ],
+    "alternative_explanations": [
+      "Normal conversational speech with informal phrasing",
+      "Task-specific disorganization due to picture description format",
+      "Possible fatigue or distraction during recording"
+    ],
+    "risk_factor_findings": [
+      "Repeated behavioral incidents mentioned without clear temporal or causal structure",
+      "Vague referential language and lack of specific role identification"
+    ],
+    "subjective_assessment_findings": [
+      "Patient describes a familiar scenario but with disorganized sequencing and low lexical precision",
+      "No explicit memory complaint or caregiver concern reported in audio"
+    ],
+    "emotional_assessment_findings": [
+      "No clear emotional reactivity, frustration, or affective flattening audible",
+      "Speech tone is neutral and conversational, not anxious or apathetic"
+    ],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery (e.g., MoCA, MMSE)",
+      "Obtain collateral history from caregiver or family member",
+      "Repeat picture description task with structured prompts to assess consistency"
+    ],
+    "visit_recommendation": "Formal cognitive screening and follow-up with clinician",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; repeated assessments recommended to track cognitive trajectory.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible but shows mild impairment-like features.",
+      "Task context is picture description (cookie-theft scene)",
+      "patient response is partially task-relevant but disorganized."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "poor_audio",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Kid trying to get in the cookie jar and he missed the thing and he's still going out for him and his sister or whoever it is has caught him at it and he's gonna have to do the dishes because his mother can't let him go scot free and of course the water pouring out of the sink onto the floor already she didn't even take the plug out. Well, there's other problems here. This isn't the first time this man has done this. He's been doing it all week. Mother doesn't find out until he's big enough to walk.",
+    "speaker_turn_summary": [
+      "Examiner: 'Okay, anything else?'",
+      "Patient: Describes cookie jar incident, sink overflow, mother's reaction, and repeated behavior.",
+      "Examiner: 'Okay.'"
+    ],
+    "patient_cue_summary": [
+      "Uses vague terms like 'the thing', 'whoever it is', 'this man' instead of specific roles or objects.",
+      "Repeats or rephrases concepts without adding new detail (e.g., 'he's been doing it all week').",
+      "Narrative is loosely connected",
+      "causal links are weak (e.g., 'mother doesn't find out until he's big enough to walk' is disconnected from prior events).",
+      "Some content is coherent (cookie jar, sink, mother), but organization is fragmented and lacks clear sequencing.",
+      "Relies on examiner prompting ('Okay, anything else?') to continue the description."
+    ]
+  },
+  "latency_ms": 23013,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/157-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/157-2.mp3?f=save",
+    "expected_group_audio_count": 1043
+  }
+}

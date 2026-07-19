@@ -1,0 +1,130 @@
+{
+  "case_id": "english__pitt__control__cookie__612_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.15,
+  "reviewer_confidence": 0.92,
+  "transcript": "I want you to tell me everything that you see going on in this picture, everything that you see happening here. Go ahead. Well, for one thing, the boy is stealing cookies, and the girl is asking for cookie, and the boy is standing on a stool which is tipping over, and the lady's drying a plate, and the water is running in the sink and overflowing on the floor and getting her feet wet. And the window is open. And I don't know that there's anything special going on outside the window. It seems to me that that's essentially the things that are going on in this picture. And the girl is picking her nose. The boy is handing her a cookie. Really those are the only activities I see. Okay.",
+  "patient_only_transcript": "Well, for one thing, the boy is stealing cookies, and the girl is asking for cookie, and the boy is standing on a stool which is tipping over, and the lady's drying a plate, and the water is running in the sink and overflowing on the floor and getting her feet wet. And the window is open. And I don't know that there's anything special going on outside the window. It seems to me that that's essentially the things that are going on in this picture. And the girl is picking her nose. The boy is handing her a cookie. Really those are the only activities I see.",
+  "speaker_turn_summary": [
+    "Examiner: I want you to tell me everything that you see going on in this picture...",
+    "Patient: Well, for one thing, the boy is stealing cookies...",
+    "Examiner: Okay."
+  ],
+  "patient_cue_summary": [
+    "Coherent scene description with specific content words (boy, cookies, stool, sink, feet wet, window, nose picking, cookie handing)",
+    "Logical sequencing of events with causal links (stool tipping → water overflowing → feet wet)",
+    "Minor hesitation and self-correction in phrasing ('asking for cookie' vs 'asking for a cookie')",
+    "No evidence of word-finding failure, repetition, abandonment, or examiner dependence beyond natural conversational pacing",
+    "No semantic vagueness or low-information content",
+    "all elements are task-relevant and scene-specific"
+  ],
+  "transcript_request_id": "chatcmpl-1e5a7427-53bb-9a21-b526-a662f58229d5",
+  "classification_request_id": "chatcmpl-e73677c1-5314-967e-8c6f-0b57e18d26b4",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__612_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__612_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient provides a detailed, sequential, and causally linked description of the picture content, including multiple characters, actions, and environmental details.",
+        "evidence": "Patient describes boy stealing cookies, stool tipping, sink overflowing, mother drying plate, window open, girl picking nose, boy handing cookie — all scene elements are accurately identified and connected.",
+        "confidence": 0.9
+      },
+      {
+        "label": "Lexical Retrieval and Specificity",
+        "summary": "Patient uses specific, concrete nouns and verbs appropriate to the picture task, with no evidence of circumlocution or semantic vagueness.",
+        "evidence": "Terms like 'stealing cookies', 'stool tipping', 'overflowing on the floor', 'picking her nose' demonstrate precise lexical retrieval and scene-specific vocabulary.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Narrative Organization",
+        "summary": "Patient organizes the description in a logical, event-based sequence without fragmentation or disorganization.",
+        "evidence": "Patient begins with main action (boy stealing cookies), then describes consequences (stool tipping → water overflow → feet wet), then adds secondary details (window, nose picking, cookie handing) without losing coherence.",
+        "confidence": 0.88
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.15,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a coherent, detailed, and logically organized description of the pictured scene, accurately identifying all major elements and their relationships. No evidence of word-finding difficulty, disorganization, examiner dependence, or semantic vagueness. Patient speech is intelligible and task-relevant.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "No signs of retrieval failure or circumlocution",
+      "No disorganization or fragmentation in narrative",
+      "No examiner dependence or abandonment of task",
+      "All key scene elements are accurately described with specific language"
+    ],
+    "alternative_explanations": [
+      "Patient may be describing a familiar or well-known picture, reducing cognitive load",
+      "Patient may be naturally verbose or detail-oriented, not indicative of impairment",
+      "Audio quality may be slightly degraded, but patient speech remains clear and complete"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed",
+      "Continue routine cognitive screening as part of standard protocol",
+      "Monitor for changes in future assessments if longitudinal data is available"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip; no persuasive evidence of cognitive decline is present in this assessment.",
+    "reviewer_confidence": 0.92,
+    "context_notes": [
+      "Video component is unavailable",
+      "assessment is based solely on audio of patient's response to picture description task.",
+      "Patient speech is intelligible, task-relevant, and coherent",
+      "no impairment-like cues detected.",
+      "Examiner prompt is neutral context",
+      "patient response is self-sufficient and complete."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, for one thing, the boy is stealing cookies, and the girl is asking for cookie, and the boy is standing on a stool which is tipping over, and the lady's drying a plate, and the water is running in the sink and overflowing on the floor and getting her feet wet. And the window is open. And I don't know that there's anything special going on outside the window. It seems to me that that's essentially the things that are going on in this picture. And the girl is picking her nose. The boy is handing her a cookie. Really those are the only activities I see.",
+    "speaker_turn_summary": [
+      "Examiner: I want you to tell me everything that you see going on in this picture...",
+      "Patient: Well, for one thing, the boy is stealing cookies...",
+      "Examiner: Okay."
+    ],
+    "patient_cue_summary": [
+      "Coherent scene description with specific content words (boy, cookies, stool, sink, feet wet, window, nose picking, cookie handing)",
+      "Logical sequencing of events with causal links (stool tipping → water overflowing → feet wet)",
+      "Minor hesitation and self-correction in phrasing ('asking for cookie' vs 'asking for a cookie')",
+      "No evidence of word-finding failure, repetition, abandonment, or examiner dependence beyond natural conversational pacing",
+      "No semantic vagueness or low-information content",
+      "all elements are task-relevant and scene-specific"
+    ]
+  },
+  "latency_ms": 28064,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/612-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/612-0.mp3?f=save",
+    "expected_group_audio_count": 247
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "case_id": "english__pitt__dementia__cookie__234_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "cognitive_risk",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "You see happening in that picture? What's happening? Well, the kid is robbing the cookie jar, and the mother is washing dishes and forgetting that her water is running on the floor. And his stool's about to dump him. See here? Uh huh. He's about to go. I think that's just about all I can see that you might be looking for. He's about to drop off that stool too. Okay.",
+  "patient_only_transcript": "The kid is robbing the cookie jar, and the mother is washing dishes and forgetting that her water is running on the floor. And his stool's about to dump him. He's about to go. I think that's just about all I can see that you might be looking for. He's about to drop off that stool too.",
+  "speaker_turn_summary": [
+    "Examiner: You see happening in that picture? What's happening?",
+    "Patient: Well, the kid is robbing the cookie jar, and the mother is washing dishes and forgetting that her water is running on the floor. And his stool's about to dump him. See here? Uh huh. He's about to go. I think that's just about all I can see that you might be looking for. He's about to drop off that stool too. Okay."
+  ],
+  "patient_cue_summary": [
+    "Patient accurately identifies core actors (kid, mother) and actions (robbing cookie jar, washing dishes, water running, stool tipping).",
+    "Speech is intelligible and task-relevant, with minimal hesitation or filler.",
+    "Response is concise but complete for the picture-description task",
+    "no clear breakdown in retrieval, organization, or task control.",
+    "No evidence of word-finding pauses, circumlocution, repetition, or examiner dependence beyond natural conversational flow.",
+    "No signs of semantic vagueness or omission of key scene elements."
+  ],
+  "transcript_request_id": "chatcmpl-22f1bb6d-0d67-9c1f-ba3c-64ae649d80e8",
+  "classification_request_id": "chatcmpl-5b1ff39f-15ab-94ea-9e48-1c9fc62fb86f",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__234_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__dementia__cookie__234_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient correctly identifies key actors and actions in the picture description task.",
+        "evidence": "Patient states: 'The kid is robbing the cookie jar, and the mother is washing dishes and forgetting that her water is running on the floor. And his stool's about to dump him.'",
+        "confidence": 0.9
+      },
+      {
+        "label": "Task Relevance and Coherence",
+        "summary": "Response is directly relevant to the picture-description task and maintains logical sequence of events.",
+        "evidence": "Patient connects multiple elements (kid, mother, water, stool) without tangential drift or confusion.",
+        "confidence": 0.85
+      },
+      {
+        "label": "Speech Fluency and Retrieval",
+        "summary": "Speech is fluent, with no signs of word-finding difficulty, repetition, or restarts.",
+        "evidence": "Patient delivers response in a single continuous turn with minimal hesitation or fillers.",
+        "confidence": 0.8
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a brief but accurate and coherent description of the pictured scene, identifying key actors and actions without signs of retrieval failure, disorganization, or examiner dependence. Speech is intelligible and task-relevant. No persuasive impairment-like cues are present. Further observation or formal screening is recommended due to limited data and audio quality concerns.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "Intelligible, task-relevant speech",
+      "No word-finding pauses or semantic vagueness",
+      "No examiner dependence or task abandonment"
+    ],
+    "alternative_explanations": [
+      "Short response may reflect task efficiency or limited elaboration, not impairment",
+      "Audio quality or recording context may limit confidence in full assessment"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening battery",
+      "Repeat picture-description task with clearer audio or visual support",
+      "Monitor for consistency across multiple sessions"
+    ],
+    "visit_recommendation": "formal screening",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; further assessment needed for trend evaluation.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video component unavailable",
+      "assessment based solely on audio.",
+      "Patient speech is intelligible and task-compliant despite brevity.",
+      "No convergence of impairment-like cues detected in this clip."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The kid is robbing the cookie jar, and the mother is washing dishes and forgetting that her water is running on the floor. And his stool's about to dump him. He's about to go. I think that's just about all I can see that you might be looking for. He's about to drop off that stool too.",
+    "speaker_turn_summary": [
+      "Examiner: You see happening in that picture? What's happening?",
+      "Patient: Well, the kid is robbing the cookie jar, and the mother is washing dishes and forgetting that her water is running on the floor. And his stool's about to dump him. See here? Uh huh. He's about to go. I think that's just about all I can see that you might be looking for. He's about to drop off that stool too. Okay."
+    ],
+    "patient_cue_summary": [
+      "Patient accurately identifies core actors (kid, mother) and actions (robbing cookie jar, washing dishes, water running, stool tipping).",
+      "Speech is intelligible and task-relevant, with minimal hesitation or filler.",
+      "Response is concise but complete for the picture-description task",
+      "no clear breakdown in retrieval, organization, or task control.",
+      "No evidence of word-finding pauses, circumlocution, repetition, or examiner dependence beyond natural conversational flow.",
+      "No signs of semantic vagueness or omission of key scene elements."
+    ]
+  },
+  "latency_ms": 19945,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Dementia",
+    "source_relative_path": "Dementia/cookie/234-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Dementia/cookie/234-0.mp3?f=save",
+    "expected_group_audio_count": 1043,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

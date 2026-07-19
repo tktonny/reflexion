@@ -1,0 +1,106 @@
+{
+  "case_id": "english__pitt__control__cookie__267_2",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.75,
+  "transcript": "In that picture. Tell me everything that's going on in there. Mother is drying the dishes, looking out the window, not paying attention that the water is spilling all over the floor in the sink. The window is open. The children are behind mother, stealing cookies out of the cookie jar, and the boy has climbed up on the stool, which is tipping over. He's getting cookies out of the cookie jar, handing them to his sister. His shoes are untied. He's gonna fall. The cupboard door is open, the lid's off the cookie jar. Mother's feet are getting wet. She must be in outer space and she doesn't notice all this that's going on. Okay, thanks.",
+  "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+  "speaker_turn_summary": [
+    "Examiner: 'Tell me everything that's going on in there.'",
+    "Patient: 'Mother is drying the dishes, looking out the window, not paying attention that the water is spilling all over the floor in the sink. The window is open. The children are behind mother, stealing cookies out of the cookie jar, and the boy has climbed up on the stool, which is tipping over. He's getting cookies out of the cookie jar, handing them to his sister. His shoes are untied. He's gonna fall. The cupboard door is open, the lid's off the cookie jar. Mother's feet are getting wet. She must be in outer space and she doesn't notice all this that's going on. Okay, thanks.'"
+  ],
+  "patient_cue_summary": [
+    "brief but accurate scene description",
+    "intelligible speech",
+    "core events identified",
+    "limited elaboration alone is not enough for cognitive_risk"
+  ],
+  "transcript_request_id": "chatcmpl-43dada52-a9f8-9bfc-9714-72ce37500db1",
+  "classification_request_id": "chatcmpl-044a4ef4-4a64-9f54-ae91-437ad5d8edb9",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__267_2/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__267_2/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "The patient provides a coherent, task-relevant description of the pictured scene, identifying key actors, actions, and spatial relationships. No clear signs of retrieval failure, disorganization, or task breakdown are present. The session is limited by lack of visual data and potential examiner scaffolding, warranting cautious observation.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "intelligible and accurate scene description",
+      "task completion without examiner rescue",
+      "no signs of word-finding pauses or semantic vagueness",
+      "no disorganized sequencing or tangential drift"
+    ],
+    "alternative_explanations": [
+      "Examiner may have prompted or scaffolded the response",
+      "Lack of visual data limits full assessment",
+      "Patient may be reticent or brief but not impaired"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with visual task completion if possible",
+      "Consider formal cognitive screening if other symptoms emerge",
+      "Monitor for functional or memory complaints in daily life"
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if symptoms persist or escalate",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive impairment evidence present.",
+    "reviewer_confidence": 0.75,
+    "context_notes": [
+      "Video data unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible and task-compliant",
+      "no strong impairment cues detected.",
+      "Examiner prompt may have influenced response length and structure."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+    "speaker_turn_summary": [
+      "Examiner: 'Tell me everything that's going on in there.'",
+      "Patient: 'Mother is drying the dishes, looking out the window, not paying attention that the water is spilling all over the floor in the sink. The window is open. The children are behind mother, stealing cookies out of the cookie jar, and the boy has climbed up on the stool, which is tipping over. He's getting cookies out of the cookie jar, handing them to his sister. His shoes are untied. He's gonna fall. The cupboard door is open, the lid's off the cookie jar. Mother's feet are getting wet. She must be in outer space and she doesn't notice all this that's going on. Okay, thanks.'"
+    ],
+    "patient_cue_summary": [
+      "brief but accurate scene description",
+      "intelligible speech",
+      "core events identified",
+      "limited elaboration alone is not enough for cognitive_risk"
+    ]
+  },
+  "latency_ms": 19660,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/267-2.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/267-2.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

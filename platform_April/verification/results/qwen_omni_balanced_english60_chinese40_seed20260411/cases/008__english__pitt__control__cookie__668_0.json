@@ -1,0 +1,138 @@
+{
+  "case_id": "english__pitt__control__cookie__668_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "I want you to tell me everything that you see happening in that picture, everything that's going on there. Well, the boy's trying to get in the cookie jar and the stool overturns. And the little girl is expecting to hand her a cookie. The mother's sink is running over and she's standing in some of the water and she's drying a dish or wiping a dish. And you said everything is happening. Well, the water's still running in the sink. As I said, it's overflowing and she's standing in the water and that's, I guess. Looks somebody laying in the lawn out there, but I.",
+  "patient_only_transcript": "Well, the boy's trying to get in the cookie jar and the stool overturns. And the little girl is expecting to hand her a cookie. The mother's sink is running over and she's standing in some of the water and she's drying a dish or wiping a dish. And you said everything is happening. Well, the water's still running in the sink. As I said, it's overflowing and she's standing in the water and that's, I guess. Looks somebody laying in the lawn out there, but I.",
+  "speaker_turn_summary": [
+    "Examiner: I want you to tell me everything that you see happening in that picture, everything that's going on there.",
+    "Patient: Well, the boy's trying to get in the cookie jar and the stool overturns. And the little girl is expecting to hand her a cookie. The mother's sink is running over and she's standing in some of the water and she's drying a dish or wiping a dish. And you said everything is happening. Well, the water's still running in the sink. As I said, it's overflowing and she's standing in the water and that's, I guess. Looks somebody laying in the lawn out there, but I."
+  ],
+  "patient_cue_summary": [
+    "Patient provides core scene elements: boy, cookie jar, overturned stool, girl, mother, running sink, water, dish drying.",
+    "Patient uses hesitant phrasing: 'that's, I guess', 'but I.' — suggests incomplete or uncertain closure.",
+    "Patient does not fully complete the sentence about the person on the lawn — ends mid-thought.",
+    "Patient’s speech is intelligible but contains pauses, self-correction, and fragmented endings — not fully fluent or sustained.",
+    "Patient does not appear to be prompted or interrupted mid-response — response is self-contained but incomplete."
+  ],
+  "transcript_request_id": "chatcmpl-dfea26cd-357f-921f-9b0b-4b640fbc0175",
+  "classification_request_id": "chatcmpl-d9ff76bb-f764-9ac7-bd28-fe34cb6bcb75",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__668_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__668_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [
+      {
+        "label": "speech_fluency",
+        "summary": "Speech is intelligible but contains pauses, fragmented endings, and incomplete sentences.",
+        "evidence": "Patient ends mid-sentence ('but I.') and uses 'that's, I guess' — suggests uncertainty or incomplete retrieval.",
+        "confidence": 0.7
+      },
+      {
+        "label": "task_completion",
+        "summary": "Patient describes most core elements of the picture but fails to complete the full description or resolve the final observation.",
+        "evidence": "Patient mentions boy, girl, mother, sink, water, dish — but does not fully describe the person on the lawn or conclude the response.",
+        "confidence": 0.65
+      }
+    ],
+    "content_findings": [
+      {
+        "label": "scene_description_accuracy",
+        "summary": "Patient accurately identifies key actors and actions in the picture: boy reaching for cookies, stool overturns, mother at sink, water running.",
+        "evidence": "Patient correctly names the boy, girl, mother, cookie jar, overturned stool, running sink, and dish-wiping action.",
+        "confidence": 0.85
+      },
+      {
+        "label": "narrative_coherence",
+        "summary": "Narrative is mostly coherent but ends abruptly with hesitation and incomplete thought.",
+        "evidence": "Patient structures the description logically but fails to complete the final observation about the person on the lawn.",
+        "confidence": 0.6
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a mostly accurate and coherent description of the picture, identifying key actors and actions. However, the response ends abruptly with hesitation and incomplete thought, suggesting possible mild retrieval or task completion difficulty. No strong impairment-like cues are present. Further observation or follow-up is recommended.",
+    "evidence_for_risk": [
+      "Patient’s speech is intelligible and task-relevant.",
+      "Patient identifies most core elements of the scene.",
+      "Response ends with hesitation and incomplete sentence — suggests mild uncertainty or retrieval difficulty."
+    ],
+    "evidence_against_risk": [
+      "No word-finding pauses, circumlocution, or semantic vagueness.",
+      "No disorganized sequencing or failure to connect events.",
+      "No examiner dependence or repeated prompting required.",
+      "No signs of apathy, frustration, or emotional flattening."
+    ],
+    "alternative_explanations": [
+      "Incomplete response may reflect task fatigue, mild distraction, or natural conversational hesitation rather than cognitive impairment.",
+      "Poor audio quality may obscure finer speech cues.",
+      "Patient may have been interrupted or cut off by recording end."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a second picture description task to assess consistency.",
+      "Consider administering a formal cognitive screening battery if symptoms persist or worsen.",
+      "Monitor for task completion fluency and retrieval accuracy in future sessions."
+    ],
+    "visit_recommendation": "routine follow-up with formal cognitive screening if symptoms persist or if patient reports memory or functional concerns.",
+    "future_risk_trend_summary": "Limited predictive value from single clip; longitudinal assessment required for meaningful risk stratification.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video is unavailable",
+      "assessment based solely on audio.",
+      "Patient’s speech is intelligible but ends abruptly — may reflect task completion difficulty rather than dementia.",
+      "No strong impairment-like cues present",
+      "classification is conservative."
+    ],
+    "quality_flags": [
+      "multiple_people",
+      "poor_audio",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "Well, the boy's trying to get in the cookie jar and the stool overturns. And the little girl is expecting to hand her a cookie. The mother's sink is running over and she's standing in some of the water and she's drying a dish or wiping a dish. And you said everything is happening. Well, the water's still running in the sink. As I said, it's overflowing and she's standing in the water and that's, I guess. Looks somebody laying in the lawn out there, but I.",
+    "speaker_turn_summary": [
+      "Examiner: I want you to tell me everything that you see happening in that picture, everything that's going on there.",
+      "Patient: Well, the boy's trying to get in the cookie jar and the stool overturns. And the little girl is expecting to hand her a cookie. The mother's sink is running over and she's standing in some of the water and she's drying a dish or wiping a dish. And you said everything is happening. Well, the water's still running in the sink. As I said, it's overflowing and she's standing in the water and that's, I guess. Looks somebody laying in the lawn out there, but I."
+    ],
+    "patient_cue_summary": [
+      "Patient provides core scene elements: boy, cookie jar, overturned stool, girl, mother, running sink, water, dish drying.",
+      "Patient uses hesitant phrasing: 'that's, I guess', 'but I.' — suggests incomplete or uncertain closure.",
+      "Patient does not fully complete the sentence about the person on the lawn — ends mid-thought.",
+      "Patient’s speech is intelligible but contains pauses, self-correction, and fragmented endings — not fully fluent or sustained.",
+      "Patient does not appear to be prompted or interrupted mid-response — response is self-contained but incomplete."
+    ]
+  },
+  "latency_ms": 24827,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/668-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/668-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

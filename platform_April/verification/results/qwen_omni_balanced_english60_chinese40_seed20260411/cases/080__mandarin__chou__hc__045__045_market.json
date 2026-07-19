@@ -1,0 +1,119 @@
+{
+  "case_id": "mandarin__chou__hc__045__045_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "哦，这个这个这个阿北开了一个那个烤香肠，就是骰骰子，赢的话可以吃香肠的摊位，就小朋友很开心的在那里玩，结果谁知道有一个小朋友后面来了一个扒手，去扒那个小朋友背包里面的钱。然后旁边有一个可以捞小鱼，小鱼的，哎，这个叫什么？哎，小孩子玩的，玩的那个玩，哎哎哎叫什么？哎，算游乐设施好了。然后结果有一个妈妈看着小朋友在那边捞鱼，结果她因为买了一个冰淇淋，拿在手上，结果那个冰淇淋都融化了，都滴到那个小朋友的头上。然后，哎，有一个奶奶也陪着她的孙子在很开心的在捞鱼，然后还有一个妹妹也在那里捞鱼。",
+  "patient_only_transcript": "哦，这个这个这个阿北开了一个那个烤香肠，就是骰骰子，赢的话可以吃香肠的摊位，就小朋友很开心的在那里玩，结果谁知道有一个小朋友后面来了一个扒手，去扒那个小朋友背包里面的钱。然后旁边有一个可以捞小鱼，小鱼的，哎，这个叫什么？哎，小孩子玩的，玩的那个玩，哎哎哎叫什么？哎，算游乐设施好了。然后结果有一个妈妈看着小朋友在那边捞鱼，结果她因为买了一个冰淇淋，拿在手上，结果那个冰淇淋都融化了，都滴到那个小朋友的头上。然后，哎，有一个奶奶也陪着她的孙子在很开心的在捞鱼，然后还有一个妹妹也在那里捞鱼。",
+  "speaker_turn_summary": [
+    "Patient describes a market scene with multiple characters and actions: a sausage stall, dice game, pickpocket, fish-catching booth, melting ice cream, grandmother with grandson, and a sister fishing."
+  ],
+  "patient_cue_summary": [
+    "Patient uses multiple discourse particles (哦, 哎) and vague referents (这个, 那个, 哪个) but maintains coherent scene description.",
+    "Patient identifies multiple actors (小朋友, 妈妈, 奶奶, 妹妹), actions (玩, 捡鱼, 吃香肠, 被偷, 冰淇淋融化), and locations (摊位, 旁边).",
+    "Patient exhibits mild circumlocution and hesitation (哎, 这个叫什么? 哎, 算游乐设施好了) but does not abandon task or lose referential clarity.",
+    "Patient’s narrative is sequential and contextually grounded despite colloquial fillers and repetitions, consistent with normal spontaneous Mandarin speech in a descriptive task."
+  ],
+  "transcript_request_id": "chatcmpl-cfa8c5ac-69ce-94e4-a300-a95ae6327b6d",
+  "classification_request_id": "chatcmpl-966fa6a8-850e-9f24-96f6-96f893ff2a0a",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__045__045_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__045__045_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient describes a complex market scene with multiple characters, actions, and objects in a mostly coherent, sequential manner.",
+        "evidence": "Patient names at least 6 distinct actors (children, mother, grandmother, sister), 3 distinct activities (dice game, pickpocketing, fish-catching), and 2 environmental elements (sausage stall, ice cream melting).",
+        "confidence": 0.5
+      },
+      {
+        "label": "Lexical Retrieval and Naming",
+        "summary": "Patient experiences mild naming hesitation for the fish-catching booth, using circumlocution ('哎, 这个叫什么? 哎, 算游乐设施好了').",
+        "evidence": "Patient pauses and uses filler phrases to describe an object, but does not fail to identify it or lose the referent. The description remains functional and contextually clear.",
+        "confidence": 0.25
+      },
+      {
+        "label": "Discourse Particles and Repetitions",
+        "summary": "Patient uses multiple discourse particles and repeated pronouns ('这个这个这个'), which are common in spontaneous Mandarin but do not impair comprehension.",
+        "evidence": "Repetitions and fillers are typical of natural speech, not indicative of cognitive impairment. Patient continues the narrative without breakdown.",
+        "confidence": 0.25
+      }
+    ],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "speaking_time",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a moderately detailed, mostly coherent description of a complex market scene with multiple actors and actions. Mild circumlocution and discourse particles are present but do not indicate impairment. Further observation or formal screening is recommended due to limited visual and audio quality, but no persuasive dementia-like cues are present.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies multiple scene elements, actors, and actions.",
+      "Narrative remains sequential and contextually grounded despite colloquial speech patterns.",
+      "No evidence of word-finding collapse, abandonment, or semantic vagueness beyond normal spontaneous speech."
+    ],
+    "alternative_explanations": [
+      "Colloquial Mandarin speech with fillers and repetitions is normal in spontaneous description tasks.",
+      "Mild naming hesitation may reflect momentary retrieval difficulty, not cognitive impairment.",
+      "Audio quality and lack of visual cues limit confidence in final classification."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with a formal cognitive screening tool (e.g., MoCA, MMSE) in a controlled setting.",
+      "Observe patient’s performance in structured scene-description tasks with visual support.",
+      "Consider repeating the task with clearer audio or visual cues to reduce ambiguity."
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening recommended.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on a single clip with audio-only and no visual data. Further observation is needed to assess for emerging cognitive changes.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Patient speech is intelligible and task-relevant despite colloquial style and minor hesitation.",
+      "No evidence of dementia-like impairment in this single clip",
+      "classification is conservative due to modality limitations.",
+      "Chinese spontaneous speech patterns (fillers, repetitions, vague referents) are not diagnostic of cognitive decline when overall coherence is preserved."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "哦，这个这个这个阿北开了一个那个烤香肠，就是骰骰子，赢的话可以吃香肠的摊位，就小朋友很开心的在那里玩，结果谁知道有一个小朋友后面来了一个扒手，去扒那个小朋友背包里面的钱。然后旁边有一个可以捞小鱼，小鱼的，哎，这个叫什么？哎，小孩子玩的，玩的那个玩，哎哎哎叫什么？哎，算游乐设施好了。然后结果有一个妈妈看着小朋友在那边捞鱼，结果她因为买了一个冰淇淋，拿在手上，结果那个冰淇淋都融化了，都滴到那个小朋友的头上。然后，哎，有一个奶奶也陪着她的孙子在很开心的在捞鱼，然后还有一个妹妹也在那里捞鱼。",
+    "speaker_turn_summary": [
+      "Patient describes a market scene with multiple characters and actions: a sausage stall, dice game, pickpocket, fish-catching booth, melting ice cream, grandmother with grandson, and a sister fishing."
+    ],
+    "patient_cue_summary": [
+      "Patient uses multiple discourse particles (哦, 哎) and vague referents (这个, 那个, 哪个) but maintains coherent scene description.",
+      "Patient identifies multiple actors (小朋友, 妈妈, 奶奶, 妹妹), actions (玩, 捡鱼, 吃香肠, 被偷, 冰淇淋融化), and locations (摊位, 旁边).",
+      "Patient exhibits mild circumlocution and hesitation (哎, 这个叫什么? 哎, 算游乐设施好了) but does not abandon task or lose referential clarity.",
+      "Patient’s narrative is sequential and contextually grounded despite colloquial fillers and repetitions, consistent with normal spontaneous Mandarin speech in a descriptive task."
+    ]
+  },
+  "latency_ms": 16776,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/045/045_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/045/045_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "case_id": "mandarin__chou__hc__026__026_market",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.25,
+  "reviewer_confidence": 0.7,
+  "transcript": "哦，这就是夜市里面，夜市里面那个在玩的那个，一次就是拿一个下面铺的那个很薄的纸啊，让他们去捞鱼的，小朋友都很喜欢玩，一次多少钱就是捞，捞到你的，就是捞破了你的那个很薄的纸破了。他另外一边是在玩那个撒那个撒那个叫什么纸。哦，后面小偷就偷他的东西，他都不知道，他还玩得很高兴。骰子啊，在撒骰子。他们都玩得很高兴，那个那个，呃，等于是做生意的这个老板也很高兴看他们在撒，后面就小偷就从他的背包里面背东西，所以我们这个时候应该要把背包背到前面。他们在在捞鱼的时候，大概这个妈妈也看了发呆了，所以她的手上的冰淇淋都流下来了。",
+  "patient_only_transcript": "哦，这就是夜市里面，夜市里面那个在玩的那个，一次就是拿一个下面铺的那个很薄的纸啊，让他们去捞鱼的，小朋友都很喜欢玩，一次多少钱就是捞，捞到你的，就是捞破了你的那个很薄的纸破了。他另外一边是在玩那个撒那个撒那个叫什么纸。哦，后面小偷就偷他的东西，他都不知道，他还玩得很高兴。骰子啊，在撒骰子。他们都玩得很高兴，那个那个，呃，等于是做生意的这个老板也很高兴看他们在撒，后面就小偷就从他的背包里面背东西，所以我们这个时候应该要把背包背到前面。他们在在捞鱼的时候，大概这个妈妈也看了发呆了，所以她的手上的冰淇淋都流下来了。",
+  "speaker_turn_summary": [
+    "Patient describes night market scene with multiple activities: fishing game, dice game, thief stealing, mother distracted by ice cream."
+  ],
+  "patient_cue_summary": [
+    "Patient uses colloquial Mandarin with discourse particles (哦, 啊, 嗯) and generic referents (这个, 那个), but maintains coherent scene description.",
+    "Patient identifies multiple actors (children, thief, mother, vendor) and actions (fishing, dice-rolling, stealing, distraction) without major abandonment or contradiction.",
+    "Patient’s speech is intelligible and task-relevant, though slightly disorganized in sequencing and contains some hesitation markers, which are consistent with normal spontaneous speech in Chinese."
+  ],
+  "transcript_request_id": "chatcmpl-51879feb-9f1b-9047-bf4a-b98c8cdefc13",
+  "classification_request_id": "chatcmpl-4df66aee-bb2e-9f5a-8722-f24200fe2112",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__026__026_market/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__026__026_market/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [],
+    "speaker_structure": "single_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "speaking_time",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.25,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a reasonably coherent, though colloquially phrased, description of a night market scene with multiple simultaneous activities. Speech is intelligible and task-relevant, with no clear signs of naming collapse, disorganization, or abandonment. Discourse particles and vague referents are consistent with normal spontaneous Mandarin speech. No persuasive impairment-like cues are present. Further observation or formal screening is recommended due to limited visual data and moderate speech disorganization.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Patient successfully identifies multiple scene elements and actors without major omission or contradiction.",
+      "Speech is intelligible and task-focused despite colloquial phrasing and hesitation markers.",
+      "No evidence of word-finding failure, semantic vagueness, or narrative collapse."
+    ],
+    "alternative_explanations": [
+      "Colloquial speech patterns and discourse particles are normal in spontaneous Mandarin, especially in informal settings like market descriptions.",
+      "Disorganization may reflect natural storytelling rather than cognitive impairment.",
+      "Lack of visual data limits confidence in full assessment",
+      "audio-only may not capture full cognitive profile."
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Follow up with formal cognitive screening tools (e.g., MoCA, MMSE) in clinic setting.",
+      "Observe patient’s performance in structured scene-description tasks with visual support.",
+      "Consider caregiver report or longitudinal tracking if symptoms persist or worsen."
+    ],
+    "visit_recommendation": "Routine follow-up with formal cognitive screening recommended.",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single audio clip; no evidence of progressive decline or strong impairment.",
+    "reviewer_confidence": 0.7,
+    "context_notes": [
+      "Video data unavailable",
+      "assessment based solely on audio description.",
+      "Patient speech is intelligible and task-relevant despite colloquial style and minor disorganization.",
+      "No signs of dementia-like impairment detected in this clip",
+      "classification remains conservative."
+    ],
+    "quality_flags": [
+      "face_not_visible",
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "哦，这就是夜市里面，夜市里面那个在玩的那个，一次就是拿一个下面铺的那个很薄的纸啊，让他们去捞鱼的，小朋友都很喜欢玩，一次多少钱就是捞，捞到你的，就是捞破了你的那个很薄的纸破了。他另外一边是在玩那个撒那个撒那个叫什么纸。哦，后面小偷就偷他的东西，他都不知道，他还玩得很高兴。骰子啊，在撒骰子。他们都玩得很高兴，那个那个，呃，等于是做生意的这个老板也很高兴看他们在撒，后面就小偷就从他的背包里面背东西，所以我们这个时候应该要把背包背到前面。他们在在捞鱼的时候，大概这个妈妈也看了发呆了，所以她的手上的冰淇淋都流下来了。",
+    "speaker_turn_summary": [
+      "Patient describes night market scene with multiple activities: fishing game, dice game, thief stealing, mother distracted by ice cream."
+    ],
+    "patient_cue_summary": [
+      "Patient uses colloquial Mandarin with discourse particles (哦, 啊, 嗯) and generic referents (这个, 那个), but maintains coherent scene description.",
+      "Patient identifies multiple actors (children, thief, mother, vendor) and actions (fishing, dice-rolling, stealing, distraction) without major abandonment or contradiction.",
+      "Patient’s speech is intelligible and task-relevant, though slightly disorganized in sequencing and contains some hesitation markers, which are consistent with normal spontaneous speech in Chinese."
+    ]
+  },
+  "latency_ms": 19965,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/026/026_market.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/026/026_market.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260411
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "case_id": "english__pitt__control__cookie__139_0",
+  "dataset": "talkbank_english_pitt",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "healthy",
+  "risk_score": 0.1,
+  "reviewer_confidence": 0.9,
+  "transcript": "And that's the picture. All right, I see the little boy taking cookies out of the cookie jar and handing them to a little girl. He is falling over on the stool. She is telling him to be quiet. Mother is drying the dishes and the water is spilling out of the sink. The window is open, it looks like. She is drying a dish. She is standing in a puddle of water. That's all that I see. Action, I mean, you want something unusual out of picture. Do you want cabinets, dishes, two cups, the dish? No, that's not necessary. What you see happening, things that are going on in the kitchen. I don't see anything outside. Okay.",
+  "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+  "speaker_turn_summary": [
+    "Examiner: 'And that's the picture. All right, I see the little boy taking cookies out of the cookie jar and handing them to a little girl. He is falling over on the stool. She is telling him to be quiet. Mother is drying the dishes and the water is spilling out of the sink. The window is open, it looks like. She is drying a dish. She is standing in a puddle of water. That's all that I see. Action, I mean, you want something unusual out of picture. Do you want cabinets, dishes, two cups, the dish? No, that's not necessary. What you see happening, things that are going on in the kitchen. I don't see anything outside. Okay.'",
+    "Patient: 'The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.'"
+  ],
+  "patient_cue_summary": [
+    "brief but accurate scene description",
+    "intelligible speech",
+    "core events identified",
+    "limited elaboration alone is not enough for cognitive_risk"
+  ],
+  "transcript_request_id": "chatcmpl-ecdf3b77-7e14-9fd4-8209-d2a7fec34cc2",
+  "classification_request_id": "chatcmpl-5fc31280-d76a-95b2-a668-673e5a68f153",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__139_0/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/english__pitt__control__cookie__139_0/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Accuracy",
+        "summary": "Patient accurately identifies key actors (boy, mother, girl), actions (taking cookies, falling, drying dishes, water spilling), and spatial details (stool tipping, puddle, open window).",
+        "evidence": "Patient states: 'The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.'",
+        "confidence": 0.75
+      },
+      {
+        "label": "Task Completion",
+        "summary": "Patient completes the picture description task by naming relevant elements without examiner prompting beyond initial instruction.",
+        "evidence": "Patient self-initiated description without needing further scaffolding or correction.",
+        "confidence": 0.75
+      },
+      {
+        "label": "Lexical Retrieval",
+        "summary": "Patient uses specific, concrete nouns and verbs (cookies, stool, mother, water, running, tipping) without circumlocution or filler terms.",
+        "evidence": "No evidence of word-finding pauses, repetition, or vague terms like 'thing' or 'stuff'.",
+        "confidence": 0.75
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "clear",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "en"
+    ],
+    "language_confidence": 1.0,
+    "risk_score": 0.1,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "healthy",
+    "screening_summary": "Patient provides a concise but accurate description of the pictured scene, identifying key actors, actions, and spatial details without hesitation, repetition, or examiner dependence. No impairment-like cues are observed in speech or content.",
+    "evidence_for_risk": [],
+    "evidence_against_risk": [
+      "Accurate identification of multiple scene elements",
+      "No signs of word-finding difficulty or semantic vagueness",
+      "Self-contained, coherent response without scaffolding",
+      "No emotional dysregulation or affective flattening"
+    ],
+    "alternative_explanations": [
+      "Patient may be brief by nature or due to task constraints, not cognitive impairment",
+      "Limited elaboration does not imply cognitive deficit in structured picture description tasks"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "No immediate intervention needed",
+      "Routine follow-up may be appropriate if other domains show concern"
+    ],
+    "visit_recommendation": "routine follow-up",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; no persuasive evidence of cognitive decline observed.",
+    "reviewer_confidence": 0.9,
+    "context_notes": [
+      "Video component is unavailable but audio is usable and task-relevant.",
+      "Patient speech is intelligible and task-compliant",
+      "no signs of cognitive breakdown.",
+      "Examiner prompts are neutral context",
+      "patient response stands independently."
+    ],
+    "quality_flags": [],
+    "session_usability": "usable",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.",
+    "speaker_turn_summary": [
+      "Examiner: 'And that's the picture. All right, I see the little boy taking cookies out of the cookie jar and handing them to a little girl. He is falling over on the stool. She is telling him to be quiet. Mother is drying the dishes and the water is spilling out of the sink. The window is open, it looks like. She is drying a dish. She is standing in a puddle of water. That's all that I see. Action, I mean, you want something unusual out of picture. Do you want cabinets, dishes, two cups, the dish? No, that's not necessary. What you see happening, things that are going on in the kitchen. I don't see anything outside. Okay.'",
+      "Patient: 'The boy is reaching for the cookies, the stool is tipping, the mother is at the sink, and the water is running over. That is about all I see.'"
+    ],
+    "patient_cue_summary": [
+      "brief but accurate scene description",
+      "intelligible speech",
+      "core events identified",
+      "limited elaboration alone is not enough for cognitive_risk"
+    ]
+  },
+  "latency_ms": 15171,
+  "metadata": {
+    "source_language": "English",
+    "source_corpus": "Pitt",
+    "source_group": "Control",
+    "source_relative_path": "Control/cookie/139-0.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/English/Pitt/Control/cookie/139-0.mp3?f=save",
+    "expected_group_audio_count": 247,
+    "benchmark_language_group": "english",
+    "benchmark_seed": 20260411
+  }
+}

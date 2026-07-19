@@ -1,0 +1,129 @@
+{
+  "case_id": "mandarin__chou__hc__064__064_park",
+  "dataset": "talkbank_mandarin_chou",
+  "split": "full",
+  "ground_truth_label": "HC",
+  "predicted_label": "HC",
+  "predicted_screening_classification": "needs_observation",
+  "risk_score": 0.3,
+  "reviewer_confidence": 0.65,
+  "transcript": "黄色在很气势，打网球。他带狗出来，这个狗就要这个人的衣服。这边有荡秋千，有溜滑梯。打网球的小朋友吓到了，就倒过来，不知道要怎么打。他们两个人，老人家都是在看，这边还有泡茶的茶壶。就这样子。",
+  "patient_only_transcript": "黄色在很气势，打网球。他带狗出来，这个狗就要这个人的衣服。这边有荡秋千，有溜滑梯。打网球的小朋友吓到了，就倒过来，不知道要怎么打。他们两个人，老人家都是在看，这边还有泡茶的茶壶。就这样子。",
+  "speaker_turn_summary": [
+    "Examiner: prompts or sets context (implied)",
+    "Patient: describes a scene with multiple elements (tennis, dog, swing, slide, children, elders, teapot) but with fragmented, vague, and disorganized sequencing."
+  ],
+  "patient_cue_summary": [
+    "Vague and fragmented scene description with weak causal links",
+    "Use of generic phrases like '就这样子' indicating lack of elaboration or closure",
+    "Disorganized sequencing: elements mentioned without clear temporal or spatial coherence",
+    "Lack of specific detail despite multiple visible objects",
+    "No clear retrieval difficulty or word-finding pauses, but low informativeness and weak narrative control"
+  ],
+  "transcript_request_id": "chatcmpl-bf30cdc0-7b74-9951-867f-abc78b3253f1",
+  "classification_request_id": "chatcmpl-f3b89e1c-99c1-9dd2-91d9-195aed68a9e9",
+  "transcript_model": "qwen3-asr-flash",
+  "classifier_model": "qwen3-omni-flash",
+  "audio_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__064__064_park/audio.mp3",
+  "prepared_media_path": "/Users/macbookair/Documents/Cloud/REFLEXION/verification/data/prepared/mandarin__chou__hc__064__064_park/audio.mp3",
+  "assessment": {
+    "visual_findings": [],
+    "body_findings": [],
+    "voice_findings": [],
+    "content_findings": [
+      {
+        "label": "Scene Description Coherence",
+        "summary": "Patient describes multiple elements in a scene but with weak sequencing and lack of causal or spatial links.",
+        "evidence": "Patient mentions tennis, dog, swing, slide, children, elders, teapot but does not connect them logically or chronologically.",
+        "confidence": null
+      },
+      {
+        "label": "Informativeness and Detail",
+        "summary": "Description is sparse and lacks specific detail despite multiple visible elements.",
+        "evidence": "Patient uses vague phrases like '就这样子' and does not elaborate on actions, roles, or interactions.",
+        "confidence": null
+      },
+      {
+        "label": "Narrative Control",
+        "summary": "Patient does not maintain a clear narrative thread or task focus; description appears fragmented.",
+        "evidence": "Patient switches between elements without clear transitions or structure; ends with an incomplete phrase.",
+        "confidence": null
+      }
+    ],
+    "speaker_structure": "multi_speaker",
+    "target_patient_presence": "probable",
+    "target_patient_basis": "interaction_role",
+    "detected_languages": [
+      "zh"
+    ],
+    "language_confidence": 0.95,
+    "risk_score": 0.3,
+    "risk_label": "HC",
+    "risk_tier": "low",
+    "screening_classification": "needs_observation",
+    "screening_summary": "Patient provides a fragmented, disorganized description of a scene with multiple elements but lacks coherent narrative structure or specific detail. While some objects are correctly named, the description is low-informativeness and lacks logical sequencing. No clear signs of word-finding difficulty or semantic vagueness. Further observation or formal screening is recommended.",
+    "evidence_for_risk": [
+      "Disorganized scene description with weak causal links",
+      "Use of vague, non-specific phrases like '就这样子'",
+      "Lack of elaboration or closure despite multiple visible elements"
+    ],
+    "evidence_against_risk": [
+      "No obvious word-finding pauses or fillers",
+      "Correctly names multiple visible objects (tennis, dog, swing, slide, elders, teapot)",
+      "No signs of emotional dysregulation or affective flattening",
+      "Speech is intelligible despite being sparse and disorganized"
+    ],
+    "alternative_explanations": [
+      "Scene description task may be challenging for patient due to task complexity or lack of familiarity",
+      "Patient may be describing from memory or imagination rather than direct observation",
+      "Examiner may have prompted or guided the description, reducing patient autonomy"
+    ],
+    "risk_factor_findings": [],
+    "subjective_assessment_findings": [],
+    "emotional_assessment_findings": [],
+    "risk_control_suggestions": [
+      "Repeat the scene-description task with clearer prompts or visual cues",
+      "Use structured narrative tasks with fixed prompts to reduce disorganization",
+      "Consider formal cognitive screening tools (e.g., MoCA, MMSE) for further evaluation"
+    ],
+    "visit_recommendation": "Formal cognitive screening recommended",
+    "future_risk_trend_summary": "Longitudinal prediction is limited based on single clip; follow-up assessment recommended to track consistency of performance.",
+    "reviewer_confidence": 0.65,
+    "context_notes": [
+      "Video unavailable",
+      "assessment based solely on audio and transcript reconstruction.",
+      "Patient speech is intelligible but lacks narrative coherence and detail.",
+      "No clear dementia-level impairment detected",
+      "classification remains conservative."
+    ],
+    "quality_flags": [
+      "transcript_unavailable",
+      "speech_unintelligible"
+    ],
+    "session_usability": "usable_with_caveats",
+    "disclaimer": "Research demo only. This output is not a diagnosis and must not be used as a standalone medical decision.",
+    "patient_only_transcript": "黄色在很气势，打网球。他带狗出来，这个狗就要这个人的衣服。这边有荡秋千，有溜滑梯。打网球的小朋友吓到了，就倒过来，不知道要怎么打。他们两个人，老人家都是在看，这边还有泡茶的茶壶。就这样子。",
+    "speaker_turn_summary": [
+      "Examiner: prompts or sets context (implied)",
+      "Patient: describes a scene with multiple elements (tennis, dog, swing, slide, children, elders, teapot) but with fragmented, vague, and disorganized sequencing."
+    ],
+    "patient_cue_summary": [
+      "Vague and fragmented scene description with weak causal links",
+      "Use of generic phrases like '就这样子' indicating lack of elaboration or closure",
+      "Disorganized sequencing: elements mentioned without clear temporal or spatial coherence",
+      "Lack of specific detail despite multiple visible objects",
+      "No clear retrieval difficulty or word-finding pauses, but low informativeness and weak narrative control"
+    ]
+  },
+  "latency_ms": 14183,
+  "metadata": {
+    "source_language": "Mandarin",
+    "source_corpus": "Chou",
+    "source_group": "HC",
+    "source_relative_path": "HC/064/064_park.mp3",
+    "source_url": "https://media.talkbank.org:443/dementia/Mandarin/Chou/HC/064/064_park.mp3?f=save",
+    "expected_group_audio_count": 120,
+    "benchmark_language_group": "chinese",
+    "benchmark_seed": 20260410
+  }
+}
