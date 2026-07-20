@@ -10,6 +10,7 @@ import {
   type ScreeningAssessment,
 } from '../src/api/assess'
 import { resolveOwnerIds, saveCheckin } from '../src/api/saveCheckin'
+import { MirrorCameraPanel, type MirrorCameraHandle } from '../src/components/MirrorCameraPanel'
 
 // Standalone test screen: real voice interaction + live transcript + a post-session
 // cognitive-screening JUDGMENT. No pairing/MongoDB required (demo patient).
@@ -34,6 +35,7 @@ export default function RealtimeTestScreen() {
   const [assessError, setAssessError] = useState('')
   const [saveNote, setSaveNote] = useState('')
   const sessionStartRef = useRef<Date | null>(null)
+  const cameraRef = useRef<MirrorCameraHandle | null>(null)
 
   const busy = connecting || sessionActive
   const hasTurns = messages.some((m) => m.role === 'user' || m.role === 'assistant')
@@ -53,7 +55,8 @@ export default function RealtimeTestScreen() {
     if (!transcript.trim()) { setAssessError('没有可评估的对话内容'); return null }
     setAssessing(true)
     setAssessError('')
-    const r = await assessConversation(transcript, 'en')
+    const frames = cameraRef.current?.getFrames() ?? []
+    const r = await assessConversation(transcript, 'en', frames)
     setAssessing(false)
     if (r.success) { setAssessment(r.assessment); return r.assessment }
     setAssessError(`评估失败: ${r.reason}`)
@@ -64,6 +67,7 @@ export default function RealtimeTestScreen() {
     setAssessment(null)
     setAssessError('')
     setSaveNote('')
+    cameraRef.current?.reset()
     sessionStartRef.current = new Date()
     void startConversation()
   }, [startConversation])
@@ -97,6 +101,8 @@ export default function RealtimeTestScreen() {
         <Pressable onPress={() => router.push('/hardware-check')}>
           <Text style={styles.linkText}>🔧 硬件自检</Text>
         </Pressable>
+
+        <MirrorCameraPanel ref={cameraRef} active={sessionActive} />
 
         <Pressable
           onPress={() => (busy ? void onEnd() : onStart())}
@@ -161,6 +167,7 @@ function AssessmentCard({ a }: { a: ScreeningAssessment }) {
       <Section title="发现" items={a.findings} />
       <Section title="支持风险的证据" items={a.evidence_for_risk} color="#C97068" />
       <Section title="不支持风险的证据" items={a.evidence_against_risk} color="#4D9668" />
+      <Section title="视觉观察（参与度/情绪/警觉,非诊断)" items={a.visual_observations ?? []} color="#5B8DBE" />
     </View>
   )
 }

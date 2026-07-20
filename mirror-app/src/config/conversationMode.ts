@@ -20,6 +20,7 @@ export const QWEN = {
   // China-region host (our key is China-region: relay showed intl 401 -> china OK).
   base: process.env.EXPO_PUBLIC_QWEN_BASE || 'https://dashscope.aliyuncs.com',
   chatModel: process.env.EXPO_PUBLIC_QWEN_CHAT_MODEL || 'qwen-plus',
+  visionModel: process.env.EXPO_PUBLIC_QWEN_VISION_MODEL || 'qwen-vl-max',
   ttsModel: process.env.EXPO_PUBLIC_QWEN_TTS_MODEL || 'qwen-tts',
   asrModel: process.env.EXPO_PUBLIC_QWEN_ASR_MODEL || 'qwen3-asr-flash',
   realtimeModel: process.env.EXPO_PUBLIC_QWEN_REALTIME_MODEL || 'qwen3-omni-flash-realtime',

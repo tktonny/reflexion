@@ -62,14 +62,38 @@ async function checkMicrophone(): Promise<HardwareCheck> {
 
 async function checkCamera(): Promise<HardwareCheck> {
   const label = '摄像头'
+  // Passive probe only — we deliberately do NOT auto-prompt (the camera is for the future face
+  // pre-check, not the voice check-in), so an "undetermined" state is expected, not an error.
+  if (Platform.OS === 'web') {
+    try {
+      const md = (globalThis as any)?.navigator?.mediaDevices
+      if (md?.enumerateDevices) {
+        const devices = await md.enumerateDevices()
+        if (!devices.some((d: any) => d.kind === 'videoinput')) {
+          return { key: 'camera', label, status: 'warn', detail: '未检测到摄像头' }
+        }
+      }
+      let state = 'prompt'
+      try {
+        const perm = await (navigator as any).permissions?.query?.({ name: 'camera' })
+        state = perm?.state ?? 'prompt'
+      } catch { /* Safari/Firefox may not support querying camera permission */ }
+      if (state === 'granted') return { key: 'camera', label, status: 'ok', detail: '已授权' }
+      if (state === 'denied') return { key: 'camera', label, status: 'fail', detail: '已拒绝(浏览器里允许)' }
+      return { key: 'camera', label, status: 'warn', detail: '检测到摄像头,尚未授权(人脸预检时再申请)' }
+    } catch {
+      return { key: 'camera', label, status: 'unknown', detail: '无法探测' }
+    }
+  }
   try {
     const cam: any = await import('expo-camera')
-    const get = cam?.Camera?.getCameraPermissionsAsync ?? cam?.getCameraPermissionsAsync
+    const get = cam?.getCameraPermissionsAsync ?? cam?.Camera?.getCameraPermissionsAsync
     const perm = get ? await get() : null
     if (perm?.granted) return { key: 'camera', label, status: 'ok', detail: '已授权' }
-    return { key: 'camera', label, status: 'warn', detail: '未授权 / 未探测' }
+    if (perm && perm.canAskAgain === false) return { key: 'camera', label, status: 'fail', detail: '已拒绝(系统设置里开启)' }
+    return { key: 'camera', label, status: 'warn', detail: '尚未授权(人脸预检时再申请)' }
   } catch {
-    return { key: 'camera', label, status: 'unknown', detail: '无法探测' }
+    return { key: 'camera', label, status: 'unknown', detail: '无法探测(需真机)' }
   }
 }
 

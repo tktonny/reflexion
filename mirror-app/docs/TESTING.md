@@ -83,4 +83,13 @@ node --env-file=.env server/smoke-turnloop.mjs   # v2 4阶段编排
 node --env-file=.env server/smoke-direct-ws.mjs  # v3 token→直连WS
 node --env-file=.env server/smoke-assess.mjs     # 判断结果(健康 vs 受损)
 node server/smoke-hwcheck.mjs                     # 硬件自检决策表(7 组合全 PASS)
+node --env-file=.env server/smoke-vision.mjs      # 多模态视觉筛查(qwen-vl-max 收图+返回完整判断)
 ```
+
+## 视频输入(多模态认知筛查)
+每日检查在语音之外还接入了**摄像头**:界面显示实时镜面预览(`src/components/MirrorCameraPanel.tsx`),
+会话进行中每 ~8 秒采样一帧(前置、低分辨率),结束评估时连同转写一起送 **qwen-vl-max**,判断卡片
+多出「视觉观察」一栏(参与度/情绪/警觉,**非**依据外貌诊断;分类仍以对话为准)。
+- web:`npm run web` → `/realtime-test` → 允许摄像头 → 预览出现、结束后卡片含视觉观察。
+- 原生:同一套 `CameraView`,dev build/APK 上自动生效(`app.json` 已含 CAMERA 权限)。
+- 帧数上限 6(客户端 + 服务端各自 cap),控制体积与成本。

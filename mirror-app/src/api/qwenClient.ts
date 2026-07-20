@@ -6,10 +6,41 @@ import { QWEN } from '../config/conversationMode'
 import { getBearer } from './qwenToken'
 
 export type QwenChatMessage = { role: 'system' | 'user' | 'assistant'; content: string }
+export type QwenContentPart =
+  | { type: 'text'; text: string }
+  | { type: 'image_url'; image_url: { url: string } }
 
 async function authHeaders(apiKey?: string) {
   const key = apiKey || (await getBearer())
   return { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }
+}
+
+/**
+ * Multimodal chat (text + images) for the video-batch screening. `parts` is the user message
+ * content array (text + image_url data URLs). Uses the vision model (qwen-vl-max). Verified live
+ * via server/smoke-vision.mjs. Returns the assistant reply text.
+ */
+export async function qwenVisionChat(
+  system: string,
+  parts: QwenContentPart[],
+  opts: { apiKey?: string; model?: string; maxTokens?: number; temperature?: number } = {},
+): Promise<string> {
+  const res = await fetch(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
+    method: 'POST',
+    headers: await authHeaders(opts.apiKey),
+    body: JSON.stringify({
+      model: opts.model || QWEN.visionModel,
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: parts },
+      ],
+      max_tokens: opts.maxTokens ?? 700,
+      temperature: opts.temperature ?? 0.2,
+    }),
+  })
+  const body = await res.json()
+  if (!res.ok) throw new Error(`qwen vision ${res.status}: ${JSON.stringify(body).slice(0, 200)}`)
+  return String(body?.choices?.[0]?.message?.content ?? '').trim()
 }
 
 /** LLM chat turn (OpenAI-compatible endpoint). Returns the assistant reply text. */

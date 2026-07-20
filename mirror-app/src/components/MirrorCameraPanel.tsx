@@ -1,0 +1,94 @@
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { CameraView, useCameraPermissions } from 'expo-camera'
+
+// Live mirror preview + periodic frame sampling for the multimodal cognitive screening.
+// While `active`, grabs a low-res JPEG every SAMPLE_INTERVAL_MS (front camera) into a ring buffer;
+// the parent reads them via the imperative handle at assessment time. Works on web + native
+// (expo-camera CameraView). Frames are base64 data URLs ready for the vision model.
+
+export type MirrorCameraHandle = { getFrames: () => string[]; reset: () => void }
+
+const SAMPLE_INTERVAL_MS = 8000
+const MAX_FRAMES = 6
+const JPEG_QUALITY = 0.35
+
+type Props = { active: boolean }
+
+export const MirrorCameraPanel = forwardRef<MirrorCameraHandle, Props>(function MirrorCameraPanel({ active }, ref) {
+  const [permission, requestPermission] = useCameraPermissions()
+  const camRef = useRef<CameraView | null>(null)
+  const framesRef = useRef<string[]>([])
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const capturingRef = useRef(false)
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getFrames: () => framesRef.current.slice(),
+      reset: () => { framesRef.current = [] },
+    }),
+    [],
+  )
+
+  const captureFrame = useCallback(async () => {
+    if (capturingRef.current || !camRef.current) return
+    capturingRef.current = true
+    try {
+      const pic = await camRef.current.takePictureAsync({ base64: true, quality: JPEG_QUALITY })
+      let dataUrl: string | null = null
+      if (pic?.uri && pic.uri.startsWith('data:')) dataUrl = pic.uri
+      else if (pic?.base64) dataUrl = `data:image/jpeg;base64,${pic.base64}`
+      if (dataUrl) {
+        const arr = framesRef.current
+        arr.push(dataUrl)
+        if (arr.length > MAX_FRAMES) arr.shift()
+      }
+    } catch {
+      /* transient capture error (preview not ready / device busy) — skip this tick */
+    } finally {
+      capturingRef.current = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!active || !permission?.granted) {
+      if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
+      return
+    }
+    void captureFrame() // one immediately, then on interval
+    timerRef.current = setInterval(() => { void captureFrame() }, SAMPLE_INTERVAL_MS)
+    return () => {
+      if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
+    }
+  }, [active, permission?.granted, captureFrame])
+
+  if (!permission) return <View style={styles.panel} />
+  if (!permission.granted) {
+    return (
+      <View style={[styles.panel, styles.centered]}>
+        <Text style={styles.hint}>视觉筛查需要摄像头</Text>
+        <Pressable style={styles.btn} onPress={() => void requestPermission()}>
+          <Text style={styles.btnText}>允许摄像头</Text>
+        </Pressable>
+      </View>
+    )
+  }
+  return (
+    <View style={styles.panel}>
+      <CameraView ref={camRef} style={styles.cam} facing="front" />
+      {active ? <Text style={styles.rec}>● 视觉采样中</Text> : <Text style={styles.idle}>镜面预览</Text>}
+    </View>
+  )
+})
+
+const styles = StyleSheet.create({
+  panel: { height: 180, borderRadius: 12, overflow: 'hidden', backgroundColor: '#20201e', position: 'relative' },
+  centered: { alignItems: 'center', justifyContent: 'center', gap: 10 },
+  cam: { flex: 1 },
+  rec: { position: 'absolute', top: 8, left: 10, color: '#FF6B6B', fontSize: 12, fontWeight: '900' },
+  idle: { position: 'absolute', top: 8, left: 10, color: '#FFFFFF', fontSize: 12, fontWeight: '800', opacity: 0.7 },
+  hint: { color: '#E7CFA6', fontSize: 14, fontWeight: '700' },
+  btn: { backgroundColor: '#C89755', borderRadius: 8, paddingHorizontal: 16, paddingVertical: 10 },
+  btnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
+})
