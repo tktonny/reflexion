@@ -15,6 +15,17 @@ async function authHeaders(apiKey?: string) {
   return { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }
 }
 
+/** fetch that always settles: aborts after `ms` so callers can't hang indefinitely. */
+export async function fetchWithTimeout(url: string, init: RequestInit, ms = 45000): Promise<Response> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), ms)
+  try {
+    return await fetch(url, { ...init, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 /**
  * Multimodal chat (text + images) for the video-batch screening. `parts` is the user message
  * content array (text + image_url data URLs). Uses the vision model (qwen-vl-max). Verified live
@@ -25,7 +36,7 @@ export async function qwenVisionChat(
   parts: QwenContentPart[],
   opts: { apiKey?: string; model?: string; maxTokens?: number; temperature?: number } = {},
 ): Promise<string> {
-  const res = await fetch(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
+  const res = await fetchWithTimeout(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
     method: 'POST',
     headers: await authHeaders(opts.apiKey),
     body: JSON.stringify({
@@ -48,7 +59,7 @@ export async function qwenChat(
   messages: QwenChatMessage[],
   opts: { apiKey?: string; model?: string; maxTokens?: number; temperature?: number } = {},
 ): Promise<string> {
-  const res = await fetch(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
+  const res = await fetchWithTimeout(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
     method: 'POST',
     headers: await authHeaders(opts.apiKey),
     body: JSON.stringify({

@@ -1,17 +1,21 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { CameraView, useCameraPermissions } from 'expo-camera'
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
 
 // Live mirror preview + periodic frame sampling for the multimodal cognitive screening.
-// While `active`, grabs a low-res JPEG every SAMPLE_INTERVAL_MS (front camera) into a ring buffer;
-// the parent reads them via the imperative handle at assessment time. Works on web + native
-// (expo-camera CameraView). Frames are base64 data URLs ready for the vision model.
+// While `active`, grabs a frame every SAMPLE_INTERVAL_MS (front camera), DOWNSCALES it to a small
+// JPEG (~512px, tens of KB) and pushes it to a ring buffer; the parent reads them via the
+// imperative handle at assessment time. Downscaling is essential: takePictureAsync captures at full
+// sensor resolution (native) or full-res PNG (web ignores `quality`), so 6 raw frames would be
+// multi-MB and could 413 / break the assessment. Works on web + native (expo-camera CameraView).
 
 export type MirrorCameraHandle = { getFrames: () => string[]; reset: () => void }
 
 const SAMPLE_INTERVAL_MS = 8000
 const MAX_FRAMES = 6
-const JPEG_QUALITY = 0.35
+const FRAME_WIDTH = 512
+const JPEG_QUALITY = 0.4
 
 type Props = { active: boolean }
 
@@ -35,14 +39,20 @@ export const MirrorCameraPanel = forwardRef<MirrorCameraHandle, Props>(function 
     if (capturingRef.current || !camRef.current) return
     capturingRef.current = true
     try {
-      const pic = await camRef.current.takePictureAsync({ base64: true, quality: JPEG_QUALITY })
-      let dataUrl: string | null = null
-      if (pic?.uri && pic.uri.startsWith('data:')) dataUrl = pic.uri
-      else if (pic?.base64) dataUrl = `data:image/jpeg;base64,${pic.base64}`
-      if (dataUrl) {
-        const arr = framesRef.current
-        arr.push(dataUrl)
-        if (arr.length > MAX_FRAMES) arr.shift()
+      // Capture the URI, then resize+recompress to a small JPEG so the frame is tens of KB on both
+      // web and native (takePictureAsync's own `quality` does not reduce resolution, and web ignores it).
+      const pic = await camRef.current.takePictureAsync({ quality: 1 })
+      if (pic?.uri) {
+        const small = await manipulateAsync(pic.uri, [{ resize: { width: FRAME_WIDTH } }], {
+          compress: JPEG_QUALITY,
+          format: SaveFormat.JPEG,
+          base64: true,
+        })
+        if (small.base64) {
+          const arr = framesRef.current
+          arr.push(`data:image/jpeg;base64,${small.base64}`)
+          if (arr.length > MAX_FRAMES) arr.shift()
+        }
       }
     } catch {
       /* transient capture error (preview not ready / device busy) — skip this tick */
@@ -76,7 +86,7 @@ export const MirrorCameraPanel = forwardRef<MirrorCameraHandle, Props>(function 
   }
   return (
     <View style={styles.panel}>
-      <CameraView ref={camRef} style={styles.cam} facing="front" />
+      <CameraView ref={camRef} style={styles.cam} facing="front" animateShutter={false} />
       {active ? <Text style={styles.rec}>● 视觉采样中</Text> : <Text style={styles.idle}>镜面预览</Text>}
     </View>
   )
