@@ -6,18 +6,23 @@
   "scripts": {
     "start": "expo start",
     "dev": "expo start",
-    "ios": "expo start --ios",
-    "android": "expo start --android",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
     "web": "expo start --web",
-    "relay": "node --env-file=.env server/index.mjs",
+    "build:orch": "esbuild src/orchestration/index.ts --bundle --format=esm --platform=node --outfile=server/generated/orchestration.mjs",
+    "relay": "npm run build:orch && node --env-file=.env server/index.mjs",
+    "seed": "node --env-file=.env server/seed-demo-patient.mjs",
+    "smoke:hwcheck": "node server/smoke-hwcheck.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "expo": "~56.0.9",
+    "expo-audio": "~56.0.12",
     "expo-camera": "~17.0.10",
     "expo-constants": "~56.0.17",
+    "expo-file-system": "~56.0.8",
     "expo-linking": "~56.0.13",
     "expo-router": "~56.2.9",
     "expo-secure-store": "~15.0.8",
@@ -33,6 +38,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "esbuild": "^0.28.1",
     "typescript": "~6.0.3"
   }
 }

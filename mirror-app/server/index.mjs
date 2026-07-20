@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs'
 import { WebSocketServer } from 'ws'
 
 import { qwenConfig, relayPort, realtimeWsPath } from './qwenConfig.mjs'
-import { voiceProfileForSession } from './voice.mjs'
+import { voiceProfileForSession } from './generated/orchestration.mjs'
 import { runLiveQwen } from './relay.mjs'
 
 // Minimal .env fallback loader (in case the process was started without --env-file).
@@ -44,7 +44,24 @@ const httpServer = createServer((req, res) => {
 
 const wss = new WebSocketServer({ noServer: true })
 
-httpServer.on('upgrade', (req, socket, head) => {
+// Relay upgrade auth (production): verify the paired device. Enable via RELAY_ENFORCE_AUTH=true.
+let relayMongo = null
+async function relayVerify(deviceId, authToken) {
+  if (!deviceId || !authToken) return false
+  const uri = process.env.MONGODB_URI
+  if (!uri) return false
+  try {
+    if (!relayMongo) {
+      const { MongoClient } = await import('mongodb')
+      relayMongo = new MongoClient(uri)
+      await relayMongo.connect()
+    }
+    const session = await relayMongo.db('ref').collection('MirrorPairingSessions').findOne({ deviceId, authToken, status: 'paired' })
+    return Boolean(session)
+  } catch { return false }
+}
+
+httpServer.on('upgrade', async (req, socket, head) => {
   const url = new URL(req.url, 'http://localhost')
   if (url.pathname !== realtimeWsPath) {
     socket.destroy()
@@ -52,6 +69,13 @@ httpServer.on('upgrade', (req, socket, head) => {
   }
   const patientId = url.searchParams.get('patient_id') || 'demo-patient'
   const language = url.searchParams.get('language') || 'en'
+  if (process.env.RELAY_ENFORCE_AUTH === 'true') {
+    const ok = await relayVerify(url.searchParams.get('device_id') || undefined, url.searchParams.get('auth_token') || undefined)
+    if (!ok) { socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); socket.destroy(); return }
+  } else if (!process.env.__RELAY_AUTH_WARNED) {
+    process.env.__RELAY_AUTH_WARNED = '1'
+    console.warn('[relay] WARNING: WS upgrade auth is OFF (dev). Set RELAY_ENFORCE_AUTH=true in production.')
+  }
   wss.handleUpgrade(req, socket, head, (clientWs) => {
     void handleSession(clientWs, { patientId, language })
   })

@@ -1,6 +1,8 @@
 import type { RequestHandler } from 'expo-router/server'
 import { MongoClient, ObjectId } from 'mongodb'
 
+import { verifyDevice } from '../../src/server/deviceAuth'
+
 declare const process: {
   env: Record<string, string | undefined>
 }
@@ -20,6 +22,7 @@ type ConversationLogEntry = {
 type SaveConversationInput = {
   clientSessionId?: string
   deviceId?: string
+  authToken?: string
   startedAt?: string
   endedAt?: string
   sessionStatus?: 'completed' | 'incomplete'
@@ -39,6 +42,17 @@ type SaveConversationInput = {
   exchanges: number
   avgLatency: number
   logs: ConversationLogEntry[]
+  assessment?: ConversationAssessment
+}
+
+type ConversationAssessment = {
+  risk_score?: number | null
+  risk_tier?: string | null
+  screening_classification?: string | null
+  summary?: string
+  findings?: string[]
+  evidence_for_risk?: string[]
+  evidence_against_risk?: string[]
 }
 
 function toNumber(value: unknown) {
@@ -86,6 +100,14 @@ export const POST: RequestHandler = async (request) => {
       { success: false, reason: 'invalid_patient_id' },
       { status: 400 },
     )
+  }
+
+  // Device auth (production): only accept saves from a paired device. Enable via REFLEXION_ENFORCE_DEVICE_AUTH=true.
+  if (process.env.REFLEXION_ENFORCE_DEVICE_AUTH === 'true') {
+    const verified = await verifyDevice(uri, data.deviceId, data.authToken)
+    if (!verified.ok) {
+      return Response.json({ success: false, reason: 'unauthorized_device' }, { status: 401 })
+    }
   }
 
   const client = new MongoClient(uri)
@@ -140,6 +162,14 @@ export const POST: RequestHandler = async (request) => {
         duration: toNumber(log.duration),
         wordsPerSecond: toNumber(log.wordsPerSecond),
       })),
+      // Reflexion cognitive-screening judgment (extra fields beyond the caregiver base schema).
+      assessment: data.assessment && typeof data.assessment === 'object' ? data.assessment : null,
+      riskScore:
+        data.assessment && typeof data.assessment.risk_score === 'number'
+          ? data.assessment.risk_score
+          : null,
+      riskTier: data.assessment?.risk_tier ?? null,
+      screeningClassification: data.assessment?.screening_classification ?? null,
       createdAt: now,
       updatedAt: now,
     }

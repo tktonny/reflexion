@@ -8,14 +8,17 @@ import { WebSocket } from 'ws'
 import { randomUUID } from 'node:crypto'
 
 import { qwenConfig } from './qwenConfig.mjs'
-import { buildLiveInstructions, closingGoodbyeSentence, flowId, promptStepCount } from './orchestrator.mjs'
 import {
+  buildLiveInstructions,
+  closingGoodbyeSentence,
   detectLanguageSignal,
+  flowId,
   languageInputValue,
+  promptStepCount,
   shouldRestartResponseForLanguageSwitch,
   voiceProfileForSession,
   voiceProfileFromRecentSignals,
-} from './voice.mjs'
+} from './generated/orchestration.mjs'
 
 const SESSION_READY_EVENTS = new Set(['session.updated', 'session.created'])
 const CLIENT_EVENT_WHITELIST = new Set([

@@ -11,6 +11,7 @@ export type ConversationLogEntry = {
 export type SaveConversationInput = {
   clientSessionId?: string
   deviceId?: string
+  authToken?: string
   startedAt?: string
   endedAt?: string
   sessionStatus?: 'completed' | 'incomplete'
@@ -30,6 +31,15 @@ export type SaveConversationInput = {
   exchanges: number
   avgLatency: number
   logs: ConversationLogEntry[]
+  assessment?: {
+    risk_score?: number | null
+    risk_tier?: string | null
+    screening_classification?: string | null
+    summary?: string
+    findings?: string[]
+    evidence_for_risk?: string[]
+    evidence_against_risk?: string[]
+  }
 }
 
 export type SaveConversationResponse =

@@ -8,7 +8,7 @@
 | **v2 本地回合制** | `http` | 设备直调 ASR→chat→TTS(HTTPS) | web + 原生* | 无(kiosk)/token 端点 | `server/smoke-turnbased.mjs` + `smoke-turnloop.mjs` ✅ |
 | **v3 原生直连** | `ws` | 原生 RN WebSocket 直连 Qwen 实时(header 鉴权) | 仅原生(web 回退 relay) | 仅 token 端点 | `server/smoke-direct-ws.mjs` ✅ |
 
-\* v2 原生音频未接(现 web 路径用 Web Audio);v3 原生音频未接(见下)。三版的 **API/编排链路均已用真实 Qwen 实测通过**。
+\* v2 原生音频用 expo-audio;**v3 原生流式音频已由本地模块 `modules/expo-pcm-audio` 实现(代码完整,待真机验收)**。三版的 **API/编排链路均已用真实 Qwen 实测通过**。
 
 ## 切换与运行
 
@@ -26,10 +26,11 @@ npm run web          # 终端B → http://localhost:8081/realtime-test → Start
 #   .env: EXPO_PUBLIC_CONVERSATION_MODE=http  (EXPO_PUBLIC_QWEN_API_KEY 已写入)
 npm run web          # /realtime-test → Start(Aria 开场)→ 🎤 开始说话 → 发送 → 循环
 
-# 版本三(ws,原生直连,需真机 dev build + 原生音频模块):
+# 版本三(ws,原生直连,需真机 dev build):
 #   .env: EXPO_PUBLIC_CONVERSATION_MODE=ws
 #   token 端点由 Expo 服务端 +api.ts 提供(npm run web 时可用),或部署后端
-#   需先接入原生 PCM 音频(见下),再 EAS dev build 到真机
+#   原生 PCM 音频已由 modules/expo-pcm-audio 提供(autolink);dev build 到真机即可
+#   → npx expo run:android  (详见 docs/ANDROID_BUILD.md 方式 D + 验收清单)
 ```
 
 ## 无需真机就能跑的验证(已全部 PASS)

@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
-import { getApiUrl } from '../../app/apiUrl'
-import { QWEN } from '../config/conversationMode'
+import { getBearer } from '../api/qwenToken'
 import { buildLiveSessionUpdate, realtimeWsUrl } from '../orchestration/realtime'
 import {
   detectLanguageSignal,
@@ -42,10 +41,20 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const openingRequestedRef = useRef(false)
   const streamIdRef = useRef<string | null>(null)
   const assistantTextRef = useRef('')
+  const drainTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const wrapupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const wrappingUpRef = useRef(false)
 
   const updateStatus = useCallback((kind: StatusKind, text: string) => {
     setStatusKind(kind)
     setStatusText(text)
+  }, [])
+
+  const clearDrain = useCallback(() => {
+    if (drainTimerRef.current) {
+      clearTimeout(drainTimerRef.current)
+      drainTimerRef.current = null
+    }
   }, [])
 
   const send = useCallback((event: Record<string, unknown>) => {
@@ -83,6 +92,14 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     (payload: any) => {
       const type = String(payload?.type || '')
 
+      if (type === 'error') {
+        // Qwen delivers app-level errors as in-band frames over the OPEN socket (not socket.onerror).
+        // Surface them so an unattended kiosk doesn't hang silently, and free the mic.
+        clearDrain()
+        if (!wrappingUpRef.current) audioRef.current?.setCaptureMuted(false)
+        updateStatus('error', String(payload?.error?.message || 'realtime error'))
+        return
+      }
       if (type === 'session.created' || type === 'session.updated') {
         if (!openingRequestedRef.current) {
           openingRequestedRef.current = true
@@ -103,7 +120,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       }
       if (type === 'input_audio_buffer.speech_started') { setUserSpeaking(true); updateStatus('listening', 'Listening...'); return }
       if (type === 'input_audio_buffer.speech_stopped') { setUserSpeaking(false); updateStatus('processing', 'Thinking...'); return }
-      if (type === 'response.created') { audioRef.current?.setCaptureMuted(true); updateStatus('speaking', 'Speaking...'); return }
+      if (type === 'response.created') { clearDrain(); audioRef.current?.setCaptureMuted(true); updateStatus('speaking', 'Speaking...'); return }
       if (type === 'response.audio.delta') { audioRef.current?.play(String(payload?.delta || '')); return }
       if (type === 'response.audio_transcript.delta' || type === 'response.output_audio_transcript.delta') {
         assistantTextRef.current += String(payload?.delta || '')
@@ -114,12 +131,35 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         finalizeAssistant(String(payload?.transcript ?? assistantTextRef.current))
         return
       }
-      if (type === 'response.done') { audioRef.current?.setCaptureMuted(false); updateStatus('listening', 'Listening...'); return }
+      if (type === 'response.done') {
+        updateStatus('listening', 'Listening...')
+        // During wrap-up we deliberately stay muted until cleanup (stopConversation drives teardown).
+        if (wrappingUpRef.current) return
+        // `response.done` fires when the last audio delta is ENQUEUED, not when it finishes playing.
+        // Poll the native playback backlog and un-mute only once the assistant is actually silent,
+        // otherwise the mirror captures its own voice tail and server-VAD self-triggers a turn.
+        const bridge = audioRef.current
+        clearDrain()
+        const drain = () => {
+          const backlogMs = bridge?.getPlaybackBacklogMs?.() ?? 0
+          if (backlogMs <= 20 || bridge !== audioRef.current) {
+            bridge?.setCaptureMuted(false)
+            drainTimerRef.current = null
+            return
+          }
+          drainTimerRef.current = setTimeout(drain, Math.min(backlogMs, 250))
+        }
+        drain()
+        return
+      }
     },
-    [appendAssistantStreaming, applyVoice, finalizeAssistant, send, updateStatus],
+    [appendAssistantStreaming, applyVoice, clearDrain, finalizeAssistant, send, updateStatus],
   )
 
   const cleanup = useCallback(() => {
+    if (drainTimerRef.current) { clearTimeout(drainTimerRef.current); drainTimerRef.current = null }
+    if (wrapupTimerRef.current) { clearTimeout(wrapupTimerRef.current); wrapupTimerRef.current = null }
+    wrappingUpRef.current = false
     void audioRef.current?.stop()
     audioRef.current = null
     try { socketRef.current?.close() } catch {}
@@ -145,10 +185,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     openingRequestedRef.current = false
 
     try {
-      // Prefer a short-lived token from our endpoint; fall back to a client key (kiosk only).
-      const token = await mintToken().catch(() => null)
-      const bearer = token || QWEN.apiKey
-      if (!bearer) throw new Error('no token and no EXPO_PUBLIC_QWEN_API_KEY')
+      // Short-lived server-minted token (secure) or, if explicitly enabled, the kiosk client key.
+      const bearer = await getBearer()
 
       // RN WebSocket supports a 3rd `options.headers` arg (not in DOM types → cast).
       const socket = new (WebSocket as any)(realtimeWsUrl(), undefined, {
@@ -180,12 +218,27 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   }, [cleanup, handleMessage, language, patientId, send, sessionActive, updateStatus])
 
   const stopConversation = useCallback(async () => {
+    // Latch wrap-up and mute immediately: the goodbye's response.done must NOT re-open the mic, or
+    // server-VAD spawns a spurious turn that teardown would truncate. Cancel any pending
+    // normal-turn drain so it can't un-mute us mid-wrap-up.
+    wrappingUpRef.current = true
+    clearDrain()
+    audioRef.current?.setCaptureMuted(true)
     // Ask for a graceful wrap-up (goodbye) before closing.
     send(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, { voice: voiceRef.current.voice, wrapUp: true }))
     send({ type: 'response.create' })
     updateStatus('idle', 'Wrapping up...')
-    setTimeout(() => cleanup(), 4000)
-  }, [cleanup, patientId, send, updateStatus])
+    // Wait for the queued goodbye to finish PLAYING before teardown (cap ~10s), instead of a fixed
+    // 4s that could clip a longer goodbye. Give it a moment to start producing audio, then drain.
+    const startedAt = Date.now()
+    if (wrapupTimerRef.current) clearTimeout(wrapupTimerRef.current)
+    const waitDrain = () => {
+      const backlogMs = audioRef.current?.getPlaybackBacklogMs?.() ?? 0
+      if (backlogMs <= 20 || Date.now() - startedAt > 10000) { cleanup(); return }
+      wrapupTimerRef.current = setTimeout(waitDrain, Math.min(Math.max(backlogMs, 60), 300))
+    }
+    wrapupTimerRef.current = setTimeout(waitDrain, 1500)
+  }, [cleanup, clearDrain, patientId, send, updateStatus])
 
   useEffect(() => cleanup, [cleanup])
 
@@ -202,8 +255,3 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   }
 }
 
-async function mintToken(): Promise<string | null> {
-  const res = await fetch(getApiUrl('/api/qwen-token'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
-  const body = (await res.json()) as { success?: boolean; token?: string }
-  return body?.success && body.token ? body.token : null
-}

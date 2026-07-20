@@ -3,12 +3,12 @@
 // via server/smoke-turnbased.mjs: chat=qwen-plus, tts=qwen-tts, asr=qwen3-asr-flash.
 
 import { QWEN } from '../config/conversationMode'
+import { getBearer } from './qwenToken'
 
 export type QwenChatMessage = { role: 'system' | 'user' | 'assistant'; content: string }
 
-function authHeaders(apiKey?: string) {
-  const key = apiKey || QWEN.apiKey
-  if (!key) throw new Error('missing Qwen key: set EXPO_PUBLIC_QWEN_API_KEY (kiosk/demo) or pass a token')
+async function authHeaders(apiKey?: string) {
+  const key = apiKey || (await getBearer())
   return { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }
 }
 
@@ -19,7 +19,7 @@ export async function qwenChat(
 ): Promise<string> {
   const res = await fetch(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
     method: 'POST',
-    headers: authHeaders(opts.apiKey),
+    headers: await authHeaders(opts.apiKey),
     body: JSON.stringify({
       model: opts.model || QWEN.chatModel,
       messages,
@@ -39,7 +39,7 @@ export async function qwenTTS(
 ): Promise<{ audioBase64: string | null; url: string | null; format: 'wav' }> {
   const res = await fetch(`${QWEN.base}/api/v1/services/aigc/multimodal-generation/generation`, {
     method: 'POST',
-    headers: authHeaders(opts.apiKey),
+    headers: await authHeaders(opts.apiKey),
     body: JSON.stringify({
       model: opts.model || QWEN.ttsModel,
       input: { text, voice: opts.voice || QWEN.defaultVoice },
@@ -51,18 +51,24 @@ export async function qwenTTS(
   return { audioBase64: audio.data ?? null, url: audio.url ?? null, format: 'wav' }
 }
 
-/** Speech-to-text. `wavBase64` = base64 of a WAV (or other supported) audio clip. */
+/**
+ * Speech-to-text. `audioBase64` = base64 of an audio clip.
+ * `format` (e.g. 'wav' | 'm4a' | 'mp3') is passed through when provided; web sends WAV
+ * (no format, verified working), native sends m4a with format.
+ */
 export async function qwenASR(
-  wavBase64: string,
-  opts: { apiKey?: string; model?: string } = {},
+  audioBase64: string,
+  opts: { apiKey?: string; model?: string; format?: string } = {},
 ): Promise<string> {
+  const inputAudio: Record<string, string> = { data: `data:;base64,${audioBase64}` }
+  if (opts.format) inputAudio.format = opts.format
   const res = await fetch(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
     method: 'POST',
-    headers: authHeaders(opts.apiKey),
+    headers: await authHeaders(opts.apiKey),
     body: JSON.stringify({
       model: opts.model || QWEN.asrModel,
       messages: [
-        { role: 'user', content: [{ type: 'input_audio', input_audio: { data: `data:;base64,${wavBase64}` } }] },
+        { role: 'user', content: [{ type: 'input_audio', input_audio: inputAudio }] },
       ],
     }),
   })

@@ -1,7 +1,19 @@
+import { useEffect } from 'react'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 
+import { runHardwareChecks } from '../src/lib/hardwareCheck'
+
 export default function RootLayout() {
+  // Auto hardware self-check on every launch. Logs the readiness report to the console so a
+  // real mirror reports its own hardware status at startup (no physical device needed to wire it).
+  useEffect(() => {
+    void runHardwareChecks().then((r) => {
+      console.log(`[hardware] platform=${r.platform} recommendedMode=${r.recommendedMode} (${r.recommendedReason})`)
+      for (const c of r.checks) console.log(`[hardware] ${c.status.toUpperCase().padEnd(7)} ${c.label}: ${c.detail}`)
+    })
+  }, [])
+
   return (
     <>
       <StatusBar style="dark" />
@@ -20,6 +32,7 @@ export default function RootLayout() {
         <Stack.Screen name="settings" options={{ headerShown: false }} />
         <Stack.Screen name="test-device" options={{ headerShown: false }} />
         <Stack.Screen name="realtime-test" options={{ headerShown: false }} />
+        <Stack.Screen name="hardware-check" options={{ headerShown: false }} />
       </Stack>
     </>
   )

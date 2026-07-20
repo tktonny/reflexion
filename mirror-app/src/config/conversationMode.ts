@@ -30,3 +30,11 @@ export const QWEN = {
   minnanVoice: 'Roy',
   cantoneseVoice: 'Kiki',
 }
+
+// Fallback nurse/patient ObjectIds for saving check-ins when the device isn't paired
+// (testing without the caregiver app). Seed a matching NursePatientConfig with
+// server/seed-demo-patient.mjs so the caregiver app can display them.
+export const DEMO_IDS = {
+  nurseId: process.env.EXPO_PUBLIC_DEMO_NURSE_ID || '64f0000000000000000000a1',
+  patientId: process.env.EXPO_PUBLIC_DEMO_PATIENT_ID || '65f0000000000000000000b2',
+}

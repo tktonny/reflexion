@@ -51,3 +51,4 @@ caregiver-app/.expo/
 caregiver-app/dist/
 caregiver-server/node_modules/
 caregiver-server/dist/
+mirror-app/server/generated/

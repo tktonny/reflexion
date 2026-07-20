@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native'
+import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { getApiUrl } from './apiUrl'
@@ -344,6 +344,9 @@ function PairingScreen({
           <QrCode value={pairing?.qrPayload || 'reflexion:pairing:pending'} />
           <Text style={styles.scanText}>Scan with caregiver app{'\n'}to pair this mirror.</Text>
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          <Pressable onPress={() => router.push('/realtime-test')} style={styles.demoLink}>
+            <Text style={styles.demoLinkText}>开始每日检查(演示)→</Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
@@ -644,6 +647,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     lineHeight: 18,
+    textAlign: 'center',
+  },
+  demoLink: {
+    backgroundColor: colors.goldDark,
+    borderRadius: 10,
+    marginTop: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+  },
+  demoLinkText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '900',
     textAlign: 'center',
   },
   offlineIcon: {

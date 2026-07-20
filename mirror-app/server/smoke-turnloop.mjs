@@ -4,7 +4,7 @@
 // the hidden 4-stage plan + keeps replies short (no mic needed).
 // Run: node --env-file=.env server/smoke-turnloop.mjs
 
-import { buildLiveInstructions, openingMessageForLanguage } from './orchestrator.mjs'
+import { buildLiveInstructions, openingMessageForLanguage } from './generated/orchestration.mjs'
 
 const KEY = process.env.QWEN_API_KEY || process.env.DASHSCOPE_API_KEY
 const CHAT_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions'

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import {
   CAPTURE_SAMPLE_RATE,
   PLAYBACK_SAMPLE_RATE,
   getRealtimeWsUrl,
 } from '../constants/realtime'
+import { DEVICE_AUTH_TOKEN_STORAGE_KEY, DEVICE_ID_STORAGE_KEY } from '../constants/nursePatientConfig'
 import { randomId } from '../utils/id'
 
 export type ChatRole = 'system' | 'user' | 'assistant'
@@ -242,7 +244,11 @@ export function useQwenRealtimeConversation(options: Options = {}) {
       const stream = await (navigator as any).mediaDevices.getUserMedia({ audio: true, video: false })
       mediaStreamRef.current = stream
 
-      const url = getRealtimeWsUrl(patientId, language)
+      const [deviceId, authToken] = await Promise.all([
+        AsyncStorage.getItem(DEVICE_ID_STORAGE_KEY),
+        AsyncStorage.getItem(DEVICE_AUTH_TOKEN_STORAGE_KEY),
+      ])
+      const url = getRealtimeWsUrl(patientId, language, { deviceId, authToken })
       const socket = new WebSocket(url)
       socketRef.current = socket
 

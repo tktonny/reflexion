@@ -1,7 +1,8 @@
 // Voice-profile selection + transcript language detection (client TS port of server/voice.mjs).
 // Pure functions, no I/O. Shared by the turn-based (v2) and direct-WS (v3) conversation hooks.
 
-import { QWEN } from '../config/conversationMode'
+// Single source of the voice names for BOTH client (conversationMode) and server (qwenConfig).
+const VOICES = { default: 'Cherry', english: 'Cherry', minnan: 'Roy', cantonese: 'Kiki' } as const
 
 export type LanguageKey = 'english' | 'mandarin' | 'cantonese' | 'minnan' | 'malay' | 'tamil' | 'custom'
 export type VoiceProfile = {
@@ -70,17 +71,17 @@ function profile(languageKey: LanguageKey, languageLabel: string, voice: string,
 }
 
 export function defaultVoiceProfile(source = 'default'): VoiceProfile {
-  return profile('mandarin', 'Mandarin Chinese', QWEN.defaultVoice, source)
+  return profile('mandarin', 'Mandarin Chinese', VOICES.default, source)
 }
 
 export function voiceProfileForLanguageKey(languageKey: LanguageKey, source: string): VoiceProfile {
   switch (languageKey) {
-    case 'english': return profile('english', 'English', QWEN.englishVoice, source)
-    case 'mandarin': return profile('mandarin', 'Mandarin Chinese', QWEN.defaultVoice, source)
-    case 'minnan': return profile('minnan', 'Minnan Chinese', QWEN.minnanVoice, source)
-    case 'cantonese': return profile('cantonese', 'Cantonese', QWEN.cantoneseVoice, source)
-    case 'malay': return profile('malay', 'Malay', QWEN.defaultVoice, source)
-    case 'tamil': return profile('tamil', 'Tamil', QWEN.defaultVoice, source)
+    case 'english': return profile('english', 'English', VOICES.english, source)
+    case 'mandarin': return profile('mandarin', 'Mandarin Chinese', VOICES.default, source)
+    case 'minnan': return profile('minnan', 'Minnan Chinese', VOICES.minnan, source)
+    case 'cantonese': return profile('cantonese', 'Cantonese', VOICES.cantonese, source)
+    case 'malay': return profile('malay', 'Malay', VOICES.default, source)
+    case 'tamil': return profile('tamil', 'Tamil', VOICES.default, source)
     default: return defaultVoiceProfile(source)
   }
 }
@@ -91,7 +92,7 @@ export function voiceProfileForSession(languageHint: string | null | undefined, 
   const hintedKey = normalizeLanguageKey(languageHint)
   if (hintedKey) return voiceProfileForLanguageKey(hintedKey, 'language_hint')
   const cleanHint = String(languageHint || '').trim()
-  if (cleanHint) return profile('custom', cleanHint, QWEN.defaultVoice, 'language_hint')
+  if (cleanHint) return profile('custom', cleanHint, VOICES.default, 'language_hint')
   return defaultVoiceProfile('language_hint')
 }
 

@@ -2,14 +2,13 @@
 //
 // The realtime path needs continuous mic PCM16 @16kHz -> base64 frames sent to Qwen, and
 // gapless PCM16 @24kHz playback of the audio deltas. React Native core has no raw-PCM audio
-// API, so this requires a native module + a custom dev build (Expo Go cannot do it).
-//
-// This file defines the interface the v3 hook depends on. The concrete implementation is a
-// device-only task: install a PCM module (e.g. `npx expo install react-native-audio-api`,
-// or @fugood/react-native-audio-pcm-stream for capture + a native AudioTrack player) and wire
-// it here. Until then the factory throws a clear message so the WS/orchestration path can be
-// built and verified independently (see server/smoke-direct-ws.mjs, which already proves the
-// direct-WS + ephemeral-token + orchestration path works end-to-end minus device audio).
+// API, so this is backed by the local Expo native module `modules/expo-pcm-audio` (Android:
+// AudioRecord/AudioTrack; iOS: AVAudioEngine). It requires a custom dev build — Expo Go and web
+// cannot load it, so requireOptionalNativeModule returns null there and we fall back to a stub
+// that throws a clear message. The WS/orchestration path is verified independently by
+// server/smoke-direct-ws.mjs (direct-WS + ephemeral-token + orchestration, minus device audio).
+
+import ExpoPcmAudio from '../../modules/expo-pcm-audio'
 
 export type PcmAudioBridge = {
   /** Begin mic capture; onChunk receives base64 PCM16 mono @16kHz frames. */
@@ -18,21 +17,54 @@ export type PcmAudioBridge = {
   play: (base64Pcm16: string) => void
   /** Suppress mic capture during assistant playback (half-duplex). */
   setCaptureMuted: (muted: boolean) => void
+  /** Unplayed playback backlog in ms; used to un-mute the mic only after playback drains. */
+  getPlaybackBacklogMs: () => number
   stop: () => Promise<void>
 }
 
+/** True when the native PCM module is present in the running build (dev build on a device). */
+export function isNativePcmAvailable(): boolean {
+  return ExpoPcmAudio != null
+}
+
+const CAPTURE_SAMPLE_RATE = 16000
+
 export function createPcmAudioBridge(): PcmAudioBridge {
-  const notWired = () => {
-    throw new Error(
-      'Native PCM audio not wired. v3 (direct realtime WS) needs a native PCM module + dev build. ' +
-        'Install one (e.g. react-native-audio-api) and implement createPcmAudioBridge in src/native/pcmAudio.ts. ' +
-        'Use v1 (relay) or v2 (http) meanwhile.',
-    )
+  const native = ExpoPcmAudio
+  if (!native) {
+    const notWired = () => {
+      throw new Error(
+        'Native PCM audio module not in this build. v3 (direct realtime WS) needs the ' +
+          'modules/expo-pcm-audio native module + a custom dev build (not Expo Go / web). ' +
+          'Run `npx expo run:android` (or an EAS dev build), or use v1 (relay) / v2 (http).',
+      )
+    }
+    return {
+      start: async () => notWired(),
+      play: () => notWired(),
+      setCaptureMuted: () => {},
+      getPlaybackBacklogMs: () => 0,
+      stop: async () => {},
+    }
   }
+
+  let subscription: { remove: () => void } | null = null
+
   return {
-    start: async () => notWired(),
-    play: () => notWired(),
-    setCaptureMuted: () => {},
-    stop: async () => {},
+    start: async (onChunk) => {
+      subscription?.remove()
+      subscription = native.addListener('onAudioChunk', (event: { data: string }) => {
+        if (event?.data) onChunk(event.data)
+      })
+      await native.start(CAPTURE_SAMPLE_RATE)
+    },
+    play: (base64Pcm16) => native.play(base64Pcm16),
+    setCaptureMuted: (muted) => native.setCaptureMuted(muted),
+    getPlaybackBacklogMs: () => native.getPlaybackBacklogMs?.() ?? 0,
+    stop: async () => {
+      subscription?.remove()
+      subscription = null
+      await native.stop()
+    },
   }
 }

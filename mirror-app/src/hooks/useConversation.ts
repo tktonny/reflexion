@@ -5,6 +5,7 @@ import type { ConversationApi } from './conversationTypes'
 import { useDirectRealtimeConversation } from './useDirectRealtimeConversation'
 import { useQwenRealtimeConversation } from './useQwenRealtimeConversation'
 import { useTurnBasedConversation } from './useTurnBasedConversation'
+import { useTurnBasedConversationNative } from './useTurnBasedConversationNative'
 
 type Options = { patientId?: string; language?: string }
 
@@ -22,7 +23,8 @@ export function useConversation(opts: Options = {}): ConversationApi {
   // the app's lifetime, so the conditional hook calls are stable.
   /* eslint-disable react-hooks/rules-of-hooks */
   if (CONVERSATION_MODE === 'http') {
-    return useTurnBasedConversation(opts)
+    // web uses the Web-Audio pipeline; native uses expo-audio (record file -> ASR).
+    return Platform.OS === 'web' ? useTurnBasedConversation(opts) : useTurnBasedConversationNative(opts)
   }
   if (CONVERSATION_MODE === 'ws' && Platform.OS !== 'web') {
     return useDirectRealtimeConversation(opts)

@@ -2,7 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
 import { QWEN } from '../config/conversationMode'
-import { buildLiveInstructions, openingMessageForLanguage } from '../orchestration/orchestrator'
+import {
+  RECALL_DIRECTIVE,
+  WRAPUP_DIRECTIVE,
+  buildLiveInstructions,
+  looksLikeRecallProbe,
+  openingMessageForLanguage,
+  recallBudgetStep,
+} from '../orchestration/orchestrator'
 import { detectLanguageSignal, voiceProfileForLanguageKey, voiceProfileForSession, type VoiceProfile } from '../orchestration/voice'
 import { qwenASR, qwenChat, qwenTTS, type QwenChatMessage } from '../api/qwenClient'
 import { randomId } from '../utils/id'
@@ -39,6 +46,10 @@ export function useTurnBasedConversation(options: Options = {}): ConversationApi
   const voiceRef = useRef<VoiceProfile>(voiceProfileForSession(language))
   const playbackCursorRef = useRef(0)
   const sessionActiveRef = useRef(false)
+  const turnCountRef = useRef(0)
+  const recallProbeIssuedRef = useRef(false)
+  const recallAnsweredRef = useRef(false)
+  const closingRef = useRef(false)
 
   const updateStatus = useCallback((kind: StatusKind, text: string) => {
     setStatusKind(kind)
@@ -106,6 +117,10 @@ export function useTurnBasedConversation(options: Options = {}): ConversationApi
     setMessages([])
     voiceRef.current = voiceProfileForSession(language)
     llmRef.current = [{ role: 'system', content: buildLiveInstructions(patientId, language, {}) }]
+    turnCountRef.current = 0
+    recallProbeIssuedRef.current = false
+    recallAnsweredRef.current = false
+    closingRef.current = false
 
     try {
       await ensureAudio()
@@ -134,6 +149,7 @@ export function useTurnBasedConversation(options: Options = {}): ConversationApi
       if (!transcript) { updateStatus('listening', "Didn't catch that — tap to try again"); return }
       addMessage('user', transcript)
       llmRef.current.push({ role: 'user', content: transcript })
+      turnCountRef.current += 1
 
       // Dynamic voice: switch TTS voice if the patient's language clearly changed.
       const signal = detectLanguageSignal(transcript)
@@ -141,14 +157,33 @@ export function useTurnBasedConversation(options: Options = {}): ConversationApi
         voiceRef.current = voiceProfileForLanguageKey(signal.languageKey, 'transcript_reassessment')
       }
 
+      // Layer 2: deterministic recall floor — inject a one-turn steering directive if needed.
+      const step = recallBudgetStep({
+        turnCount: turnCountRef.current,
+        recallProbeIssued: recallProbeIssuedRef.current,
+        recallAnswered: recallAnsweredRef.current,
+      })
+      let directive: string | null = null
+      if (step.action === 'force_recall') { recallProbeIssuedRef.current = true; directive = RECALL_DIRECTIVE }
+      else if (step.action === 'wrap_up') { recallAnsweredRef.current = true; directive = WRAPUP_DIRECTIVE; closingRef.current = true }
+
       updateStatus('processing', 'Thinking...')
-      const reply = await qwenChat(llmRef.current, { maxTokens: 120, temperature: 0.4 })
+      // Ephemeral directive: passed for this one turn only, NOT pushed into history.
+      const msgs = directive ? [...llmRef.current, { role: 'system' as const, content: directive }] : llmRef.current
+      const reply = await qwenChat(msgs, { maxTokens: 120, temperature: 0.4 })
       if (reply) {
         llmRef.current.push({ role: 'assistant', content: reply })
         addMessage('assistant', reply)
+        if (!recallProbeIssuedRef.current && looksLikeRecallProbe(reply)) recallProbeIssuedRef.current = true
         await speakAssistant(reply)
       }
-      updateStatus('listening', 'Tap the mic to answer')
+      if (closingRef.current) {
+        sessionActiveRef.current = false
+        setSessionActive(false)
+        updateStatus('idle', '结束了,可点"结束并评估"看判断')
+      } else {
+        updateStatus('listening', 'Tap the mic to answer')
+      }
     } catch (e) {
       updateStatus('error', `Error: ${e instanceof Error ? e.message : 'unknown'}`)
     }

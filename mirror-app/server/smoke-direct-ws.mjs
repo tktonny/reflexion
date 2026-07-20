@@ -6,7 +6,7 @@
 
 import { WebSocket } from 'ws'
 import { qwenConfig } from './qwenConfig.mjs'
-import { buildLiveInstructions } from './orchestrator.mjs'
+import { buildLiveInstructions } from './generated/orchestration.mjs'
 
 const LONG_KEY = qwenConfig.apiKey
 const H = { Authorization: `Bearer ${LONG_KEY}`, 'Content-Type': 'application/json' }

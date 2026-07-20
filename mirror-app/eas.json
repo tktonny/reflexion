@@ -13,7 +13,7 @@
       "distribution": "internal",
       "android": { "buildType": "apk" },
       "env": {
-        "EXPO_PUBLIC_RELAY_WS_URL": "ws://192.168.1.50:8787"
+        "EXPO_PUBLIC_CONVERSATION_MODE": "http"
       }
     },
     "production": {
