@@ -191,12 +191,10 @@ export const POST: RequestHandler = async (request) => {
       conversationId: insertResult.insertedId.toHexString(),
     })
   } catch (error) {
+    // Log the driver detail server-side only; return a generic reason (don't leak Mongo internals).
+    console.error('save_conversation_failed', error)
     return Response.json(
-      {
-        success: false,
-        reason:
-          error instanceof Error ? error.message : 'unknown_save_conversation_error',
-      },
+      { success: false, reason: 'save_conversation_failed' },
       { status: 500 },
     )
   } finally {

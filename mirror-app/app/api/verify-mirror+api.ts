@@ -66,12 +66,9 @@ export const POST: RequestHandler = async (request) => {
       nursePatientConfig: serializeDocument(updatedConfig),
     })
   } catch (error) {
+    console.error('verify_mirror_failed', error)
     return Response.json(
-      {
-        success: false,
-        reason:
-          error instanceof Error ? error.message : 'unknown_verify_mirror_error',
-      },
+      { success: false, reason: 'verify_mirror_failed' },
       { status: 500 },
     )
   } finally {

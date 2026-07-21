@@ -114,6 +114,10 @@ function latestAssistantMessage(messages: ChatMessage[]) {
 
 export default function ConversationScreen() {
   const [language, setLanguage] = useState<string>(DEFAULT_LANGUAGE)
+  // companion = everyday voice assistant (default, the common daily interaction); screening = the
+  // structured cognitive check-in. Set by the idle-screen entries before starting.
+  const [persona, setPersona] = useState<'screening' | 'companion'>('companion')
+  const [pendingStart, setPendingStart] = useState(false)
   const {
     statusKind,
     statusText,
@@ -126,7 +130,7 @@ export default function ConversationScreen() {
     ended,
     recording,
     toggleRecording,
-  } = useConversation({ language })
+  } = useConversation({ language, persona })
 
   const [now, setNow] = useState(() => new Date())
   const [patientName, setPatientName] = useState('Margaret')
@@ -225,6 +229,14 @@ export default function ConversationScreen() {
     await startConversation()
   }
 
+  // Pick a persona then start on the next render (state isn't synchronous, so the hook must re-bind
+  // to the chosen persona before startConversation reads it). The wake word / plain tap use companion.
+  function startWith(p: 'screening' | 'companion') {
+    if (busy || checkingPairing) return
+    setPersona(p)
+    setPendingStart(true)
+  }
+
   // End the check-in: stop the session, run the two-stage screening (transcript + camera frames),
   // persist the Conversation (+judgment; offline-queues on failure), THEN navigate to the closing
   // screen. Shared by the manual "End Chat" button and the auto-end path (Aria's goodbye -> `ended`).
@@ -267,6 +279,12 @@ export default function ConversationScreen() {
     if (ended) void finalize()
   }, [ended, finalize])
 
+  // Start once the chosen persona has been applied to the hook on the next render.
+  useEffect(() => {
+    if (pendingStart && !busy) { setPendingStart(false); void handleStart() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingStart, busy])
+
   function startWakeListener() {
     if (Platform.OS !== 'web' || wakeRecognitionRef.current) return
     const SpeechRecognition = getSpeechRecognitionConstructor()
@@ -293,7 +311,7 @@ export default function ConversationScreen() {
         wakeTriggeredRef.current = true
         shouldRunWakeListenerRef.current = false
         stopWakeListener()
-        void handleStart()
+        startWith('companion') // wake word opens the everyday assistant
       }
     }
     recognition.onerror = (event) => {
@@ -366,7 +384,8 @@ export default function ConversationScreen() {
             <IdleScreen
               date={formatDate(now)}
               greeting={greeting}
-              onStart={() => void handleStart()}
+              onStart={() => startWith('companion')}
+              onScreening={() => startWith('screening')}
               patientName={patientName}
               time={formatTime(now)}
               wakeError={wakeError}
@@ -480,6 +499,7 @@ function IdleScreen({
   date,
   greeting,
   onStart,
+  onScreening,
   patientName,
   time,
   wakeError,
@@ -488,11 +508,14 @@ function IdleScreen({
   date: string
   greeting: string
   onStart: () => void
+  onScreening: () => void
   patientName: string
   time: string
   wakeError: string
   wakeListening: boolean
 }) {
+  // Tapping anywhere (or the "Hello" wake word) opens the everyday companion; the pill starts the
+  // structured cognitive check-in.
   return (
     <Pressable style={styles.fillCenter} onPress={onStart}>
       <View style={styles.idleCopy}>
@@ -505,13 +528,13 @@ function IdleScreen({
       </View>
       <View style={styles.startPrompt}>
         <Text style={styles.promptMain}>Say “Hello”</Text>
-        <Text style={styles.promptSub}>to begin</Text>
-        <Text style={styles.wakeStatus}>{wakeListening ? 'Listening for Hello...' : wakeError || 'Starting microphone...'}</Text>
+        <Text style={styles.promptSub}>to chat with Aria</Text>
+        <Text style={styles.wakeStatus}>{wakeListening ? 'Listening for Hello…' : wakeError || 'Or tap anywhere to start'}</Text>
       </View>
-      <View style={styles.infoTiles}>
-        <InfoTile icon="sunny-outline" primary="24°C" secondary="Partly cloudy" />
-        <InfoTile icon="calendar-outline" primary="Medication" secondary="9:00 AM" />
-      </View>
+      <Pressable onPress={onScreening} style={styles.screeningPill} hitSlop={10}>
+        <Ionicons name="pulse-outline" size={18} color={colors.goldDark} />
+        <Text style={styles.screeningPillText}>认知检查 · Daily check</Text>
+      </Pressable>
     </Pressable>
   )
 }
@@ -588,26 +611,6 @@ function ErrorScreen({ message, onRetry }: { message: string; onRetry: () => voi
       <Pressable style={styles.endButton} onPress={onRetry}>
         <Text style={styles.endButtonText}>重试</Text>
       </Pressable>
-    </View>
-  )
-}
-
-function InfoTile({
-  icon,
-  primary,
-  secondary,
-}: {
-  icon: keyof typeof Ionicons.glyphMap
-  primary: string
-  secondary: string
-}) {
-  return (
-    <View style={styles.infoTile}>
-      <Ionicons name={icon} size={24} color={colors.goldDark} />
-      <View>
-        <Text style={styles.infoPrimary}>{primary}</Text>
-        <Text style={styles.infoSecondary}>{secondary}</Text>
-      </View>
     </View>
   )
 }
@@ -819,35 +822,23 @@ const styles = StyleSheet.create({
     marginTop: 12,
     textAlign: 'center',
   },
-  infoTiles: {
-    bottom: 34,
-    flexDirection: 'row',
-    gap: 12,
-    left: 20,
-    position: 'absolute',
-    right: 20,
-  },
-  infoTile: {
+  screeningPill: {
     alignItems: 'center',
     backgroundColor: '#FFF4E2',
     borderColor: '#F0DEC1',
-    borderRadius: 8,
+    borderRadius: 22,
     borderWidth: 1,
-    flex: 1,
+    bottom: 34,
     flexDirection: 'row',
-    gap: 10,
-    justifyContent: 'center',
-    minHeight: 70,
+    gap: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    position: 'absolute',
   },
-  infoPrimary: {
-    color: colors.text,
-    fontSize: 14,
+  screeningPillText: {
+    color: colors.goldDark,
+    fontSize: 15,
     fontWeight: '900',
-  },
-  infoSecondary: {
-    color: colors.secondary,
-    fontSize: 10,
-    fontWeight: '700',
   },
   startCopy: {
     alignItems: 'center',
