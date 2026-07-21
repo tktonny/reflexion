@@ -16,6 +16,8 @@ import { MirrorCameraPanel, type MirrorCameraHandle } from '../src/components/Mi
 // cognitive-screening JUDGMENT. No pairing/MongoDB required (demo patient).
 // Web: open /realtime-test in Chrome (mode relay needs `npm run relay`).
 export default function RealtimeTestScreen() {
+  const [persona, setPersona] = useState<'screening' | 'companion'>('companion')
+  const [pendingStart, setPendingStart] = useState(false)
   const {
     mode,
     statusKind,
@@ -29,7 +31,7 @@ export default function RealtimeTestScreen() {
     ended,
     recording,
     toggleRecording,
-  } = useConversation({ patientId: 'demo-patient', language: 'en' })
+  } = useConversation({ patientId: 'demo-patient', language: 'en', persona })
 
   const [assessment, setAssessment] = useState<ScreeningAssessment | null>(null)
   const [assessing, setAssessing] = useState(false)
@@ -104,13 +106,19 @@ export default function RealtimeTestScreen() {
     if (ended) void finalize()
   }, [ended, finalize])
 
+  // Two entry buttons set the persona, then start once the hook has re-bound to it on the next
+  // render (React state isn't synchronous, so the start is deferred via pendingStart).
+  useEffect(() => {
+    if (pendingStart && !busy) { setPendingStart(false); onStart() }
+  }, [pendingStart, busy, onStart])
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.stage}>
         <Text style={styles.title}>Reflexion 检查 · 测试</Text>
         <View style={styles.statusRow}>
           <Text style={[styles.status, { color: statusColor }]}>{statusText}{userSpeaking ? ' 🎤' : ''}</Text>
-          <Text style={styles.modeTag}>版本: {mode}</Text>
+          <Text style={styles.modeTag}>版本: {mode} · {persona === 'companion' ? '日常助手' : '认知检查'}</Text>
         </View>
         <Pressable onPress={() => router.push('/hardware-check')}>
           <Text style={styles.linkText}>🔧 硬件自检</Text>
@@ -118,12 +126,20 @@ export default function RealtimeTestScreen() {
 
         <MirrorCameraPanel ref={cameraRef} active={sessionActive} />
 
-        <Pressable
-          onPress={() => (busy ? void onEnd() : onStart())}
-          style={[styles.button, busy ? styles.stopButton : styles.startButton]}
-        >
-          <Text style={styles.buttonText}>{busy ? '结束并评估' : '开始对话'}</Text>
-        </Pressable>
+        {busy ? (
+          <Pressable onPress={() => void onEnd()} style={[styles.button, styles.stopButton]}>
+            <Text style={styles.buttonText}>结束并评估</Text>
+          </Pressable>
+        ) : (
+          <View style={styles.startRow}>
+            <Pressable onPress={() => { setPersona('companion'); setPendingStart(true) }} style={[styles.button, styles.talkButton, styles.halfButton]}>
+              <Text style={styles.buttonText}>🗣 日常助手</Text>
+            </Pressable>
+            <Pressable onPress={() => { setPersona('screening'); setPendingStart(true) }} style={[styles.button, styles.startButton, styles.halfButton]}>
+              <Text style={styles.buttonText}>🧠 认知检查</Text>
+            </Pressable>
+          </View>
+        )}
 
         {busy && mode === 'http' && toggleRecording ? (
           <Pressable onPress={toggleRecording} style={[styles.button, recording ? styles.stopButton : styles.talkButton]}>
@@ -207,6 +223,8 @@ const styles = StyleSheet.create({
   modeTag: { color: '#8E7F6D', fontSize: 12, fontWeight: '800' },
   linkText: { color: '#4D9668', fontSize: 13, fontWeight: '700', marginTop: 4 },
   button: { alignItems: 'center', borderRadius: 10, justifyContent: 'center', minHeight: 52 },
+  startRow: { flexDirection: 'row', gap: 10 },
+  halfButton: { flex: 1 },
   startButton: { backgroundColor: '#C89755' },
   talkButton: { backgroundColor: '#4D9668' },
   stopButton: { backgroundColor: '#C97068' },

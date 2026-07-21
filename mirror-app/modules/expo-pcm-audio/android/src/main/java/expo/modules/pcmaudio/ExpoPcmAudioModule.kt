@@ -97,7 +97,15 @@ class ExpoPcmAudioModule : Module() {
       val t = track
       if (!playing.get() || t == null) return@Function 0.0
       val playedBytes = (t.playbackHeadPosition.toLong() and 0xFFFFFFFFL) * 2 // frames -> bytes (mono 16-bit)
-      val backlogBytes = (totalBytesWritten.get() - playedBytes).coerceAtLeast(0)
+      val writtenBacklog = (totalBytesWritten.get() - playedBytes).coerceAtLeast(0)
+      // Bytes still in the queue, not yet written to the track. This is the crucial term: at
+      // response.done ALL deltas are enqueued, but the writer thread has only pushed ~0.5 s into
+      // AudioTrack, so writtenBacklog alone reads near-zero — the mic would re-open while seconds
+      // of the assistant's speech are still queued, and the speaker would feed a whole sentence
+      // back into the mic (server-VAD then transcribes the echo as a user turn). Count the queue.
+      var queuedBytes = 0L
+      for (chunk in playbackQueue) queuedBytes += chunk.size.toLong()
+      val backlogBytes = writtenBacklog + queuedBytes
       backlogBytes.toDouble() / (playbackSampleRate * 2) * 1000.0
     }
 

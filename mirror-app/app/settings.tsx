@@ -19,6 +19,19 @@ import {
 } from '../src/constants/nursePatientConfig'
 import { loadJson } from '../src/storage/mirrorStorage'
 import { clearPendingConversations, flushPendingConversations, loadPendingConversations } from '../src/storage/conversationQueue'
+import { DEFAULT_LANGUAGE } from '../src/config/conversationMode'
+
+// Language options (value = hint string understood by normalizeLanguageKey). Applied on the next
+// check-in; each maps to a qwen3.5-omni realtime voice (Serena / Kiki粤语 / Joseph Chen闽南).
+const LANGUAGE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'mandarin', label: '中文(普通话)' },
+  { value: 'cantonese', label: '粤语' },
+  { value: 'minnan', label: '闽南话' },
+  { value: 'english', label: 'English' },
+  { value: 'malay', label: 'Malay' },
+  { value: 'hindi', label: 'हिन्दी' },
+  { value: 'urdu', label: 'اردو' },
+]
 
 type AdminState = {
   backendOnline: boolean
@@ -44,6 +57,7 @@ export default function SettingsScreen() {
     speakerStatus: 'Good',
     wifiStatus: 'Checking',
   })
+  const [language, setLanguage] = useState<string>(DEFAULT_LANGUAGE)
 
   const rows = useMemo(
     () => [
@@ -72,13 +86,16 @@ export default function SettingsScreen() {
       authToken,
       config,
       pending,
+      storedLang,
     ] = await Promise.all([
       AsyncStorage.getItem(DEVICE_ID_STORAGE_KEY),
       AsyncStorage.getItem(ACTIVE_MIRROR_ID_STORAGE_KEY),
       AsyncStorage.getItem(DEVICE_AUTH_TOKEN_STORAGE_KEY),
       loadJson<unknown>(NURSE_PATIENT_CONFIG_STORAGE_KEY),
       loadPendingConversations(),
+      AsyncStorage.getItem(MIRROR_LANGUAGE_STORAGE_KEY),
     ])
+    if (storedLang && storedLang.trim()) setLanguage(storedLang.trim())
     const online = typeof navigator === 'undefined' ? true : navigator.onLine !== false
     const backendOnline = online ? await checkBackend() : false
     const microphoneStatus = await checkMicrophone()
@@ -99,12 +116,30 @@ export default function SettingsScreen() {
   }
 
   async function resetPairing() {
+    // Notify the backend to release the server-side pairing session (best-effort) so it doesn't leave
+    // an orphaned status:'paired' row that would 409 re-pairing and keep device-status "paired".
+    try {
+      const [deviceId, authToken] = await Promise.all([
+        AsyncStorage.getItem(DEVICE_ID_STORAGE_KEY),
+        AsyncStorage.getItem(DEVICE_AUTH_TOKEN_STORAGE_KEY),
+      ])
+      if (deviceId) {
+        await fetch(getApiUrl('/api/mirror-pairing/unpair'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deviceId, authToken }),
+        }).catch(() => {})
+      }
+    } catch {
+      /* offline / unreachable — proceed with the local reset */
+    }
+    // Preserve DEVICE_ID: a support reset should re-pair the SAME mirror identity, not mint a new one
+    // (only the /test-device dev flow intentionally changes the deviceId).
     await AsyncStorage.multiRemove([
       ACTIVE_MIRROR_ID_STORAGE_KEY,
       ACTIVE_NURSE_ID_STORAGE_KEY,
       ACTIVE_PATIENT_ID_STORAGE_KEY,
       DEVICE_AUTH_TOKEN_STORAGE_KEY,
-      DEVICE_ID_STORAGE_KEY,
       MIRROR_LANGUAGE_STORAGE_KEY,
       MIRROR_TIMEZONE_STORAGE_KEY,
       NURSE_PATIENT_CONFIG_STORAGE_KEY,
@@ -119,6 +154,11 @@ export default function SettingsScreen() {
     Alert.alert('Upload logs', `Synced ${result.synced}. Remaining ${result.remaining}.`)
   }
 
+  async function changeLanguage(value: string) {
+    setLanguage(value)
+    await AsyncStorage.setItem(MIRROR_LANGUAGE_STORAGE_KEY, value)
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.stage}>
@@ -131,6 +171,22 @@ export default function SettingsScreen() {
                 <Text style={[styles.value, isGoodValue(value) && styles.goodValue]}>{value}</Text>
               </View>
             ))}
+          </View>
+
+          <View style={styles.langSection}>
+            <Text style={styles.langTitle}>对话语言 / Language</Text>
+            <View style={styles.langChips}>
+              {LANGUAGE_OPTIONS.map((opt) => (
+                <Pressable
+                  key={opt.value}
+                  onPress={() => void changeLanguage(opt.value)}
+                  style={[styles.langChip, language === opt.value && styles.langChipActive]}
+                >
+                  <Text style={[styles.langChipText, language === opt.value && styles.langChipTextActive]}>{opt.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <Text style={styles.langHint}>下次检查生效 · 默认中文(普通话)</Text>
           </View>
 
           <View style={styles.actions}>
@@ -282,6 +338,47 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     gap: 2,
     paddingTop: 12,
+  },
+  langSection: {
+    borderTopColor: '#EDE5D6',
+    borderTopWidth: 1,
+    gap: 10,
+    paddingTop: 16,
+  },
+  langTitle: {
+    color: '#282828',
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  langChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  langChip: {
+    backgroundColor: '#FFF4E2',
+    borderColor: '#F0DEC1',
+    borderRadius: 8,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  langChipActive: {
+    backgroundColor: '#C89755',
+    borderColor: '#C89755',
+  },
+  langChipText: {
+    color: '#8E7F6D',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  langChipTextActive: {
+    color: '#FFFFFF',
+  },
+  langHint: {
+    color: '#BBAFA0',
+    fontSize: 12,
+    fontWeight: '700',
   },
   actionRow: {
     alignItems: 'center',

@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   Animated,
@@ -27,6 +27,10 @@ import {
 } from '../src/constants/nursePatientConfig'
 import { type ChatMessage } from '../src/hooks/conversationTypes'
 import { useConversation } from '../src/hooks/useConversation'
+import { DEFAULT_LANGUAGE } from '../src/config/conversationMode'
+import { assessCheckin, transcriptFromMessages, type ScreeningAssessment } from '../src/api/assess'
+import { resolveOwnerIds, saveCheckin } from '../src/api/saveCheckin'
+import { MirrorCameraPanel, type MirrorCameraHandle } from '../src/components/MirrorCameraPanel'
 import { getStoredMirrorProfile, persistNursePatientIds } from '../src/storage/mirrorStorage'
 
 type DevicePairingStatus =
@@ -44,7 +48,7 @@ type DevicePairingStatus =
   | { success: true; paired: false }
   | { success: false; reason: string }
 
-type MirrorState = 'idle' | 'starting' | 'listening' | 'response'
+type MirrorState = 'idle' | 'starting' | 'listening' | 'response' | 'error'
 
 type SpeechRecognitionResultLike = {
   isFinal: boolean
@@ -109,15 +113,20 @@ function latestAssistantMessage(messages: ChatMessage[]) {
 }
 
 export default function ConversationScreen() {
+  const [language, setLanguage] = useState<string>(DEFAULT_LANGUAGE)
   const {
     statusKind,
+    statusText,
     messages,
     startConversation,
     stopConversation,
     connecting,
     sessionActive,
     userSpeaking,
-  } = useConversation()
+    ended,
+    recording,
+    toggleRecording,
+  } = useConversation({ language })
 
   const [now, setNow] = useState(() => new Date())
   const [patientName, setPatientName] = useState('Margaret')
@@ -132,17 +141,20 @@ export default function ConversationScreen() {
   const wakeRecognitionRef = useRef<SpeechRecognitionLike | null>(null)
   const wakeTriggeredRef = useRef(false)
   const shouldRunWakeListenerRef = useRef(false)
+  const cameraRef = useRef<MirrorCameraHandle | null>(null)
+  const sessionStartRef = useRef<Date | null>(null)
 
   const assistantText = latestAssistantMessage(messages)
   const greeting = getGreeting(now)
   const busy = connecting || sessionActive
 
   const mirrorState: MirrorState = useMemo(() => {
+    if (statusKind === 'error' && !endingConversation) return 'error'
     if (connecting) return 'starting'
     if (visibleAssistantText || statusKind === 'speaking') return 'response'
     if (sessionActive || statusKind === 'listening' || statusKind === 'processing') return 'listening'
     return 'idle'
-  }, [connecting, sessionActive, statusKind, visibleAssistantText])
+  }, [connecting, endingConversation, sessionActive, statusKind, visibleAssistantText])
 
   useEffect(() => {
     const timerId = setInterval(() => setNow(new Date()), 1000)
@@ -165,6 +177,8 @@ export default function ConversationScreen() {
       if (!mounted) return
       setPatientName(profile.patientName ?? 'Margaret')
       setNurseName(profile.nurseName ?? 'your nurse')
+      const storedLang = await AsyncStorage.getItem(MIRROR_LANGUAGE_STORAGE_KEY)
+      if (mounted && storedLang && storedLang.trim()) setLanguage(storedLang.trim())
       setCheckingPairing(false)
     }
 
@@ -206,24 +220,52 @@ export default function ConversationScreen() {
     if (busy || checkingPairing) return
     shouldRunWakeListenerRef.current = false
     stopWakeListener()
+    sessionStartRef.current = new Date()
+    cameraRef.current?.reset()
     await startConversation()
   }
 
-  async function handleEnd() {
+  // End the check-in: stop the session, run the two-stage screening (transcript + camera frames),
+  // persist the Conversation (+judgment; offline-queues on failure), THEN navigate to the closing
+  // screen. Shared by the manual "End Chat" button and the auto-end path (Aria's goodbye -> `ended`).
+  const finalize = useCallback(async () => {
     if (endingRef.current) return
     endingRef.current = true
     setEndingConversation(true)
     try {
       await stopConversation()
-      router.replace({
-        pathname: '/conversation-closing',
-        params: { nurseName },
+      const transcript = transcriptFromMessages(messages)
+      let assessment: ScreeningAssessment | null = null
+      if (transcript.trim()) {
+        const frames = cameraRef.current?.getFrames() ?? []
+        const r = await assessCheckin(transcript, language, frames)
+        if (r.success) assessment = r.assessment
+      }
+      const ids = await resolveOwnerIds()
+      await saveCheckin({
+        messages,
+        startedAt: sessionStartRef.current ?? new Date(),
+        endedAt: new Date(),
+        nurseId: ids.nurseId,
+        patientId: ids.patientId,
+        deviceId: ids.deviceId,
+        authToken: ids.authToken,
+        language: ids.language ?? language,
+        assessment,
       })
+      router.replace({ pathname: '/conversation-closing', params: { nurseName } })
     } catch {
       endingRef.current = false
       setEndingConversation(false)
     }
-  }
+  }, [language, messages, nurseName, stopConversation])
+
+  const handleEnd = finalize
+
+  // Auto-finalize when the assistant delivers its closing goodbye (hands-free).
+  useEffect(() => {
+    if (ended) void finalize()
+  }, [ended, finalize])
 
   function startWakeListener() {
     if (Platform.OS !== 'web' || wakeRecognitionRef.current) return
@@ -314,6 +356,12 @@ export default function ConversationScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.stage}>
         <View style={styles.mirrorCard}>
+          {busy ? (
+            <View style={styles.cameraCorner}>
+              <MirrorCameraPanel ref={cameraRef} active={sessionActive} />
+            </View>
+          ) : null}
+
           {mirrorState === 'idle' ? (
             <IdleScreen
               date={formatDate(now)}
@@ -340,8 +388,25 @@ export default function ConversationScreen() {
               disabled={endingConversation}
               onEnd={() => void handleEnd()}
               opacity={responseOpacity}
+              raiseEnd={!!toggleRecording}
               userSpeaking={userSpeaking}
             />
+          ) : null}
+
+          {mirrorState === 'error' ? (
+            <ErrorScreen message={statusText} onRetry={() => void handleStart()} />
+          ) : null}
+
+          {/* Fallback (v2 turn-based) is push-to-talk — show a record control so the degraded path
+              is usable on the hands-free screen. Absent in the omni (v3) path (no toggleRecording). */}
+          {toggleRecording && busy && !endingConversation && mirrorState !== 'error' ? (
+            <Pressable
+              style={[styles.recordButton, recording && styles.recordButtonActive]}
+              onPress={() => toggleRecording?.()}
+            >
+              <Ionicons name={recording ? 'send' : 'mic'} size={22} color="#FFFFFF" />
+              <Text style={styles.recordButtonText}>{recording ? '发送（结束说话）' : '按此说话'}</Text>
+            </Pressable>
           ) : null}
         </View>
       </View>
@@ -353,6 +418,12 @@ async function verifyStoredPairing() {
   const deviceId = await AsyncStorage.getItem(DEVICE_ID_STORAGE_KEY)
   if (!deviceId) return false
 
+  const [authToken, config] = await Promise.all([
+    AsyncStorage.getItem(DEVICE_AUTH_TOKEN_STORAGE_KEY),
+    AsyncStorage.getItem(NURSE_PATIENT_CONFIG_STORAGE_KEY),
+  ])
+  const hasLocalPairing = Boolean(authToken && config)
+
   try {
     const response = await fetch(getApiUrl('/api/mirror-pairing/device-status'), {
       method: 'POST',
@@ -360,12 +431,17 @@ async function verifyStoredPairing() {
       body: JSON.stringify({ deviceId }),
     })
     const status = (await response.json()) as DevicePairingStatus
-    if (!status.success || !status.paired) return false
-
-    await persistPairedMirror(status)
-    return true
+    if (status.success && status.paired) {
+      await persistPairedMirror(status)
+      return true
+    }
+    // AUTHORITATIVE "not paired" only when the server clearly says so — then clear.
+    if (status.success && !status.paired) return false
+    // Server error / unexpected shape = treat as unreachable: keep the local pairing (offline).
+    return hasLocalPairing
   } catch {
-    return false
+    // Network unreachable — do NOT wipe pairing on a transient blip; run offline if paired locally.
+    return hasLocalPairing
   }
 }
 
@@ -375,7 +451,7 @@ async function persistPairedMirror(status: Extract<DevicePairingStatus, { paired
     [ACTIVE_MIRROR_ID_STORAGE_KEY, status.deviceId],
     [DEVICE_AUTH_TOKEN_STORAGE_KEY, status.authToken],
     [NURSE_PATIENT_CONFIG_STORAGE_KEY, JSON.stringify(status.nursePatientConfig)],
-    [MIRROR_LANGUAGE_STORAGE_KEY, status.language || 'english'],
+    [MIRROR_LANGUAGE_STORAGE_KEY, status.language || DEFAULT_LANGUAGE],
     [MIRROR_TIMEZONE_STORAGE_KEY, status.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone],
   ])
   if (status.nurseId && status.patientId) {
@@ -475,12 +551,14 @@ function ResponseScreen({
   disabled,
   onEnd,
   opacity,
+  raiseEnd = false,
   userSpeaking,
 }: {
   assistantText: string
   disabled: boolean
   onEnd: () => void
   opacity: Animated.Value
+  raiseEnd?: boolean
   userSpeaking: boolean
 }) {
   return (
@@ -491,9 +569,24 @@ function ResponseScreen({
         <AriaAvatar size={112} />
       </View>
       <Waveform active={userSpeaking} cool />
-      <Pressable disabled={disabled} style={[styles.endButton, disabled && styles.disabledButton]} onPress={onEnd}>
+      <Pressable disabled={disabled} style={[styles.endButton, raiseEnd && styles.endButtonRaised, disabled && styles.disabledButton]} onPress={onEnd}>
         <Text style={styles.endButtonText}>{disabled ? 'Ending...' : 'End Chat'}</Text>
         <Ionicons name="close" size={20} color={colors.text} />
+      </Pressable>
+    </View>
+  )
+}
+
+function ErrorScreen({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <View style={styles.fillCenter}>
+      <View style={styles.micButton}>
+        <Ionicons name="cloud-offline-outline" size={34} color={colors.goldDark} />
+      </View>
+      <Text style={styles.listeningText}>连接出现问题</Text>
+      <Text style={styles.wakeStatus}>{message || '请稍后重试'}</Text>
+      <Pressable style={styles.endButton} onPress={onRetry}>
+        <Text style={styles.endButtonText}>重试</Text>
       </Pressable>
     </View>
   )
@@ -666,6 +759,16 @@ const styles = StyleSheet.create({
     gap: 28,
     justifyContent: 'center',
     padding: 28,
+  },
+  cameraCorner: {
+    borderRadius: 12,
+    height: 118,
+    overflow: 'hidden',
+    position: 'absolute',
+    right: 14,
+    top: 14,
+    width: 88,
+    zIndex: 5,
   },
   idleCopy: {
     alignItems: 'center',
@@ -840,6 +943,32 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.55,
+  },
+  endButtonRaised: {
+    bottom: 104,
+  },
+  recordButton: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: '#4D9668',
+    borderRadius: 8,
+    bottom: 34,
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'center',
+    minWidth: 210,
+    paddingHorizontal: 24,
+    paddingVertical: 18,
+    position: 'absolute',
+    zIndex: 10,
+  },
+  recordButtonActive: {
+    backgroundColor: '#C97068',
+  },
+  recordButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '800',
   },
   avatar: {
     alignItems: 'center',

@@ -4,8 +4,10 @@ import { router } from 'expo-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import qrcode from 'qrcode-generator'
 
 import { getApiUrl } from './apiUrl'
+import { DEFAULT_LANGUAGE } from '../src/config/conversationMode'
 import {
   ACTIVE_MIRROR_ID_STORAGE_KEY,
   ACTIVE_NURSE_ID_STORAGE_KEY,
@@ -284,7 +286,7 @@ async function persistPairedMirror(status: Extract<PairingStatusResponse, { pair
     [ACTIVE_MIRROR_ID_STORAGE_KEY, status.deviceId],
     [DEVICE_AUTH_TOKEN_STORAGE_KEY, status.authToken],
     [NURSE_PATIENT_CONFIG_STORAGE_KEY, JSON.stringify(status.nursePatientConfig)],
-    [MIRROR_LANGUAGE_STORAGE_KEY, status.language || 'english'],
+    [MIRROR_LANGUAGE_STORAGE_KEY, status.language || DEFAULT_LANGUAGE],
     [MIRROR_TIMEZONE_STORAGE_KEY, status.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone],
   ])
   if (status.nurseId && status.patientId) {
@@ -426,40 +428,34 @@ function LoadingDots() {
   )
 }
 
+// Real, scannable QR of the pairing payload (pure-JS encoder -> View grid; works web + native, no
+// native module). The caregiver app scans this to claim the mirror.
 function QrCode({ value }: { value: string }) {
-  const cells = useMemo(() => makeQrCells(value), [value])
+  const grid = useMemo(() => {
+    const qr = qrcode(0, 'M') // type 0 = auto-fit, error-correction level M
+    qr.addData(value)
+    qr.make()
+    const count = qr.getModuleCount()
+    const rows: boolean[][] = []
+    for (let r = 0; r < count; r += 1) {
+      const row: boolean[] = []
+      for (let c = 0; c < count; c += 1) row.push(qr.isDark(r, c))
+      rows.push(row)
+    }
+    return { rows, cell: Math.max(4, Math.floor(180 / count)) }
+  }, [value])
+
   return (
     <View style={styles.qr}>
-      {cells.map((filled, index) => (
-        <View key={index} style={[styles.qrCell, filled && styles.qrCellFilled]} />
+      {grid.rows.map((row, r) => (
+        <View key={r} style={styles.qrRow}>
+          {row.map((dark, c) => (
+            <View key={c} style={{ backgroundColor: dark ? colors.text : 'transparent', height: grid.cell, width: grid.cell }} />
+          ))}
+        </View>
       ))}
     </View>
   )
-}
-
-function makeQrCells(value: string) {
-  let seed = 0
-  for (let index = 0; index < value.length; index += 1) {
-    seed = (seed * 31 + value.charCodeAt(index)) >>> 0
-  }
-
-  const size = 17
-  const cells = Array.from({ length: size * size }, (_, index) => {
-    const row = Math.floor(index / size)
-    const col = index % size
-    const finder =
-      (row < 5 && col < 5) ||
-      (row < 5 && col >= size - 5) ||
-      (row >= size - 5 && col < 5)
-    if (finder) {
-      const localRow = row < 5 ? row : row - (size - 5)
-      const localCol = col < 5 ? col : col - (size - 5)
-      return localRow === 0 || localRow === 4 || localCol === 0 || localCol === 4 || (localRow === 2 && localCol === 2)
-    }
-    seed = (seed * 1664525 + 1013904223) >>> 0
-    return seed % 3 !== 0
-  })
-  return cells
 }
 
 function formatPairingCode(code: string) {
@@ -618,22 +614,16 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   qr: {
+    alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderColor: colors.line,
     borderRadius: 8,
     borderWidth: 1,
+    justifyContent: 'center',
+    padding: 12,
+  },
+  qrRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    height: 156,
-    padding: 10,
-    width: 156,
-  },
-  qrCell: {
-    height: 8,
-    width: 8,
-  },
-  qrCellFilled: {
-    backgroundColor: colors.text,
   },
   scanText: {
     color: colors.secondary,

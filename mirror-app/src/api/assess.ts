@@ -1,5 +1,6 @@
 import { getApiUrl } from '../../app/apiUrl'
 import { qwenChat, qwenVisionChat, fetchWithTimeout, type QwenContentPart } from './qwenClient'
+import { QWEN, OMNI_JUDGMENT } from '../config/conversationMode'
 import type { ChatMessage } from '../hooks/conversationTypes'
 
 // Two-stage screening (shared shape with app/api/assess+api.ts). The scoring model NEVER sees the
@@ -103,6 +104,45 @@ async function assessDirect(transcript: string, frames: string[]): Promise<Asses
   } catch (error) {
     return { success: false, reason: error instanceof Error ? error.message : 'assess_failed' }
   }
+}
+
+// Experimental: single omni model produces the WHOLE judgment (transcript + frames -> classification
+// + visual_observations) in ONE call, instead of the two-stage vl+plus split. Same output shape.
+const SCREENING_SYSTEM_OMNI = `${SCREENING_SYSTEM}
+You may also directly receive sampled video frames of the patient. Base the classification on the CONVERSATION; use anything you observe in the frames only as supporting engagement/affect context, and place those notes in a "visual_observations" array. Never infer dementia from appearance or age.
+Return STRICT JSON with the shape above plus an added "visual_observations": ["..."] field.`
+
+/**
+ * Experimental omni-first judgment: one multimodal call to an omni model (QWEN.omniModel). Falls
+ * back to the reliable two-stage pipeline via assessConversation() on ANY failure (see assessCheckin).
+ * Runs client-direct (frames go to DashScope) — intended for the standalone/kiosk build.
+ */
+export async function assessViaOmni(transcript: string, frames: string[] = []): Promise<AssessResponse> {
+  try {
+    const parts: QwenContentPart[] = [{ type: 'text', text: `Transcript of the check-in:\n${transcript}` }]
+    for (const url of frames.slice(-MAX_ASSESS_FRAMES)) parts.push({ type: 'image_url', image_url: { url } })
+    const text = await qwenVisionChat(SCREENING_SYSTEM_OMNI, parts, { model: QWEN.omniModel, maxTokens: 800, temperature: 0.2 })
+    const match = text.match(/\{[\s\S]*\}/)
+    const assessment = JSON.parse(match ? match[0] : text) as ScreeningAssessment
+    if (!assessment.visual_observations) assessment.visual_observations = []
+    return { success: true, assessment }
+  } catch (error) {
+    return { success: false, reason: error instanceof Error ? error.message : 'omni_assess_failed' }
+  }
+}
+
+/**
+ * Screening entry point used by the check-in screens. If OMNI_JUDGMENT is on, TRY the single-call
+ * omni judgment first (用户意图: 尝试让 omni 自己产出判断); on any failure fall back to the reliable
+ * two-stage qwen-vl-max + qwen-plus pipeline. If off, go straight to the two-stage pipeline.
+ */
+export async function assessCheckin(transcript: string, language = 'en', frames: string[] = []): Promise<AssessResponse> {
+  if (OMNI_JUDGMENT) {
+    const omni = await assessViaOmni(transcript, frames)
+    if (omni.success) return omni
+    // omni unavailable/invalid -> reliable path
+  }
+  return assessConversation(transcript, language, frames)
 }
 
 async function visualObservationsDirect(frames: string[]): Promise<string[]> {

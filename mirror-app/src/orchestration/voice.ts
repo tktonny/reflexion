@@ -1,10 +1,43 @@
 // Voice-profile selection + transcript language detection (client TS port of server/voice.mjs).
 // Pure functions, no I/O. Shared by the turn-based (v2) and direct-WS (v3) conversation hooks.
 
-// Single source of the voice names for BOTH client (conversationMode) and server (qwenConfig).
+// qwen-tts / v2 voice names (turn-based HTTP path). Do NOT reuse these for the v3 realtime model —
+// qwen3.5-omni-realtime has its own voice list (see REALTIME_VOICES) and rejects Cherry/Roy.
 const VOICES = { default: 'Cherry', english: 'Cherry', minnan: 'Roy', cantonese: 'Kiki' } as const
 
-export type LanguageKey = 'english' | 'mandarin' | 'cantonese' | 'minnan' | 'malay' | 'tamil' | 'custom'
+// Voice per language for the v3 realtime model (qwen3.5-omni-*-realtime). ALL live-verified to stream
+// audio on qwen3.5-omni-flash-realtime (server/smoke-voice-probe.mjs). The old qwen-tts voices
+// (Cherry/Roy) are rejected by 3.5. Multilingual voices cover en/zh/ms/hi/ur; 粤语/闽南 use dialect voices.
+//   Serena       — 多语言, warm female (en, mandarin, malay, hindi, urdu, …)
+//   Kiki (阿清)  — 粤语 Cantonese dialect voice
+//   Joseph Chen  — 闽南话 Minnan/Hokkien dialect voice (note: the voice ID contains a space)
+const REALTIME_VOICES: Record<string, string> = {
+  english: 'Serena',
+  mandarin: 'Serena',
+  cantonese: 'Kiki',
+  minnan: 'Joseph Chen',
+  malay: 'Serena',
+  tamil: 'Serena',
+  hindi: 'Serena',
+  urdu: 'Serena',
+  custom: 'Serena',
+}
+
+export type LanguageKey =
+  | 'english'
+  | 'mandarin'
+  | 'cantonese'
+  | 'minnan'
+  | 'malay'
+  | 'tamil'
+  | 'hindi'
+  | 'urdu'
+  | 'custom'
+
+/** qwen3.5-omni-realtime voice for a language (v3 only). Falls back to the multilingual default. */
+export function realtimeVoiceForLanguageKey(languageKey: LanguageKey): string {
+  return REALTIME_VOICES[languageKey] ?? REALTIME_VOICES.custom
+}
 export type VoiceProfile = {
   languageKey: LanguageKey
   languageLabel: string
@@ -18,8 +51,10 @@ export const LANGUAGE_HINT_ALIASES: Record<string, string[]> = {
   mandarin: ['zh', 'zh-cn', 'zh-hans', 'cmn', 'chinese', 'mandarin', 'mandarin chinese', 'putonghua', '普通话', '国语', '中文', '汉语', '漢語'],
   cantonese: ['yue', 'zh-hk', 'cantonese', 'cantonese chinese', 'guangdonghua', '广东话', '廣東話', '粤语', '粵語'],
   minnan: ['nan', 'minnan', 'hokkien', 'taiwanese', 'taiyu', 'min nan', 'minnan chinese', '闽南', '闽南话', '闽南语', '閩南', '閩南話', '閩南語', '台语', '台語', '臺語'],
-  malay: ['ms', 'ms-my', 'malay', 'bahasa', 'bahasa melayu', 'melayu'],
+  malay: ['ms', 'ms-my', 'malay', 'bahasa', 'bahasa melayu', 'melayu', '马来语', '馬來語'],
   tamil: ['ta', 'ta-in', 'tamil', 'தமிழ்'],
+  hindi: ['hi', 'hi-in', 'hindi', 'हिन्दी', 'हिंदी', '印地语', '印地文', '印地語'],
+  urdu: ['ur', 'ur-pk', 'ur-in', 'urdu', 'اردو', '乌尔都语', '烏爾都語', '乌尔都'],
 }
 
 const MINNAN_MARKERS = ['按怎', '啥物', '歹势', '歹勢', '有影', '毋知', '欲', '今仔日', '昨昏', '恁', '阮', '咱', '這馬', '这马', '家己', '逐家', '伊', '彼个', '啥人', '無啥', '无啥', '有夠', '真濟', '遐', '食饱未', '食飽未']
@@ -45,6 +80,9 @@ function countUniqueMarkers(text: string, markers: string[]): number {
 export function detectLanguageSignal(transcript: string | null | undefined): LanguageSignal | null {
   const normalized = String(transcript || '').trim().toLowerCase()
   if (!normalized) return null
+  // Distinct scripts are unambiguous: Devanagari -> Hindi, Arabic/Urdu block -> Urdu.
+  if (/[ऀ-ॿ]/.test(normalized)) return { languageKey: 'hindi', confidence: 0.9, source: 'transcript_reassessment' }
+  if (/[؀-ۿݐ-ݿ]/.test(normalized)) return { languageKey: 'urdu', confidence: 0.9, source: 'transcript_reassessment' }
   const minnanHits = countUniqueMarkers(normalized, MINNAN_MARKERS)
   if (minnanHits >= 1) return { languageKey: 'minnan', confidence: minnanHits >= 2 ? 0.95 : 0.82, source: 'transcript_reassessment' }
   const cantoneseHits = countUniqueMarkers(normalized, CANTONESE_MARKERS)
@@ -62,7 +100,12 @@ export function detectLanguageSignal(transcript: string | null | undefined): Lan
     else confidence = 0.65
     return { languageKey: 'english', confidence, source: 'transcript_reassessment' }
   }
-  if (containsCjk) return { languageKey: 'mandarin', confidence: 0.72, source: 'transcript_reassessment' }
+  if (containsCjk) {
+    // >=2 CJK chars = a real Mandarin utterance -> confident enough to cross the >=0.8 switch gate
+    // (so the model CAN switch INTO Mandarin mid-conversation); a lone stray CJK char stays low.
+    const cjkCount = (normalized.match(/[一-鿿]/g) || []).length
+    return { languageKey: 'mandarin', confidence: cjkCount >= 2 ? 0.85 : 0.72, source: 'transcript_reassessment' }
+  }
   return null
 }
 
@@ -82,6 +125,8 @@ export function voiceProfileForLanguageKey(languageKey: LanguageKey, source: str
     case 'cantonese': return profile('cantonese', 'Cantonese', VOICES.cantonese, source)
     case 'malay': return profile('malay', 'Malay', VOICES.default, source)
     case 'tamil': return profile('tamil', 'Tamil', VOICES.default, source)
+    case 'hindi': return profile('hindi', 'Hindi', VOICES.default, source)
+    case 'urdu': return profile('urdu', 'Urdu', VOICES.default, source)
     default: return defaultVoiceProfile(source)
   }
 }
@@ -130,6 +175,6 @@ export function shouldRestartResponseForLanguageSwitch(args: {
 }
 
 export function languageInputValue(languageKey: LanguageKey, languageLabel: string): string {
-  const map: Record<string, string> = { english: 'en', mandarin: 'zh', minnan: 'nan', cantonese: 'yue', malay: 'ms', tamil: 'ta' }
+  const map: Record<string, string> = { english: 'en', mandarin: 'zh', minnan: 'nan', cantonese: 'yue', malay: 'ms', tamil: 'ta', hindi: 'hi', urdu: 'ur' }
   return map[languageKey] || languageLabel
 }

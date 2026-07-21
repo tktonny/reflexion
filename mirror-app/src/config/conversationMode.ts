@@ -11,6 +11,16 @@ export type ConversationMode = 'relay' | 'http' | 'ws'
 export const CONVERSATION_MODE: ConversationMode =
   (process.env.EXPO_PUBLIC_CONVERSATION_MODE as ConversationMode) || 'relay'
 
+// Initial conversation language when nothing is configured/paired. Chinese (Mandarin) by default;
+// a paired patient's preferredLanguage and the /settings picker override it. Value is a hint string
+// understood by normalizeLanguageKey (voice.ts).
+export const DEFAULT_LANGUAGE = process.env.EXPO_PUBLIC_DEFAULT_LANGUAGE || 'mandarin'
+
+// Experimental: let an omni model produce the screening judgment in ONE multimodal call, with an
+// automatic fallback to the reliable two-stage qwen-vl-max + qwen-plus pipeline. Toggle with
+// EXPO_PUBLIC_OMNI_JUDGMENT=false to force the two-stage path only.
+export const OMNI_JUDGMENT = (process.env.EXPO_PUBLIC_OMNI_JUDGMENT ?? 'true') !== 'false'
+
 // Client-reachable Qwen config. Used ONLY by the local modes (http / ws).
 // SECURITY: in http/ws modes the API key is reachable by the client — acceptable for a
 // self-owned kiosk/demo only. For production, leave apiKey empty and fetch a short-lived
@@ -23,8 +33,13 @@ export const QWEN = {
   visionModel: process.env.EXPO_PUBLIC_QWEN_VISION_MODEL || 'qwen-vl-max',
   ttsModel: process.env.EXPO_PUBLIC_QWEN_TTS_MODEL || 'qwen-tts',
   asrModel: process.env.EXPO_PUBLIC_QWEN_ASR_MODEL || 'qwen3-asr-flash',
-  realtimeModel: process.env.EXPO_PUBLIC_QWEN_REALTIME_MODEL || 'qwen3-omni-flash-realtime',
+  // qwen3.5-omni-realtime series (NOT the old qwen3-omni-flash-realtime): required for semantic_vad
+  // (语义打断) which rejects the assistant's own speaker echo / backchannel at the turn-detection
+  // level. flash = 80 turns / 480s, ample for a check-in. Live-verified on the generic China host.
+  realtimeModel: process.env.EXPO_PUBLIC_QWEN_REALTIME_MODEL || 'qwen3.5-omni-flash-realtime',
   realtimeUrl: process.env.EXPO_PUBLIC_QWEN_REALTIME_URL || 'wss://dashscope.aliyuncs.com/api-ws/v1/realtime',
+  // Non-realtime omni model for the experimental single-call screening judgment (OMNI_JUDGMENT).
+  omniModel: process.env.EXPO_PUBLIC_QWEN_OMNI_MODEL || 'qwen3-omni-flash',
   // voice profiles (match server/qwenConfig.mjs)
   defaultVoice: 'Cherry',
   englishVoice: 'Cherry',

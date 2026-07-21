@@ -12,6 +12,7 @@ import {
   RECALL_DIRECTIVE,
   WRAPUP_DIRECTIVE,
   buildLiveInstructions,
+  looksLikeGoodbye,
   looksLikeRecallProbe,
   openingMessageForLanguage,
   recallBudgetStep,
@@ -21,7 +22,7 @@ import { qwenASR, qwenChat, qwenTTS, type QwenChatMessage } from '../api/qwenCli
 import { randomId } from '../utils/id'
 import type { ChatMessage, ConversationApi, StatusKind } from './conversationTypes'
 
-type Options = { patientId?: string; language?: string }
+type Options = { patientId?: string; language?: string; persona?: 'screening' | 'companion' }
 
 /**
  * Version 2 (Flavor B) — NATIVE build. Turn-based voice loop using expo-audio:
@@ -34,6 +35,7 @@ type Options = { patientId?: string; language?: string }
 export function useTurnBasedConversationNative(options: Options = {}): ConversationApi {
   const patientId = options.patientId ?? 'demo-patient'
   const language = options.language ?? 'en'
+  const persona = options.persona ?? 'screening'
 
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY)
 
@@ -43,8 +45,12 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
   const [connecting, setConnecting] = useState(false)
   const [sessionActive, setSessionActive] = useState(false)
   const [recording, setRecording] = useState(false)
+  const [ended, setEnded] = useState(false)
 
   const llmRef = useRef<QwenChatMessage[]>([])
+  const recordingRef = useRef(false) // mirrors `recording` so cleanup needn't depend on the state
+  const recorderRef = useRef(recorder)
+  recorderRef.current = recorder
   const voiceRef = useRef<VoiceProfile>(voiceProfileForSession(language))
   const playerRef = useRef<ReturnType<typeof createAudioPlayer> | null>(null)
   const sessionActiveRef = useRef(false)
@@ -90,11 +96,12 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
     updateStatus('processing', 'Starting...')
     setMessages([])
     voiceRef.current = voiceProfileForSession(language)
-    llmRef.current = [{ role: 'system', content: buildLiveInstructions(patientId, language, {}) }]
+    llmRef.current = [{ role: 'system', content: buildLiveInstructions(patientId, language, { persona }) }]
     turnCountRef.current = 0
     recallProbeIssuedRef.current = false
     recallAnsweredRef.current = false
     closingRef.current = false
+    setEnded(false)
     try {
       const { granted } = await AudioModule.requestRecordingPermissionsAsync()
       if (!granted) throw new Error('microphone permission denied')
@@ -131,14 +138,17 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
         voiceRef.current = voiceProfileForLanguageKey(signal.languageKey, 'transcript_reassessment')
       }
 
-      const step = recallBudgetStep({
-        turnCount: turnCountRef.current,
-        recallProbeIssued: recallProbeIssuedRef.current,
-        recallAnswered: recallAnsweredRef.current,
-      })
+      // Recall floor + forced wrap-up is SCREENING-only. Companion is open chat with no agenda.
       let directive: string | null = null
-      if (step.action === 'force_recall') { recallProbeIssuedRef.current = true; directive = RECALL_DIRECTIVE }
-      else if (step.action === 'wrap_up') { recallAnsweredRef.current = true; directive = WRAPUP_DIRECTIVE; closingRef.current = true }
+      if (persona === 'screening') {
+        const step = recallBudgetStep({
+          turnCount: turnCountRef.current,
+          recallProbeIssued: recallProbeIssuedRef.current,
+          recallAnswered: recallAnsweredRef.current,
+        })
+        if (step.action === 'force_recall') { recallProbeIssuedRef.current = true; directive = RECALL_DIRECTIVE }
+        else if (step.action === 'wrap_up') { recallAnsweredRef.current = true; directive = WRAPUP_DIRECTIVE; closingRef.current = true }
+      }
 
       updateStatus('processing', 'Thinking...')
       const msgs = directive ? [...llmRef.current, { role: 'system' as const, content: directive }] : llmRef.current
@@ -149,10 +159,13 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
         if (!recallProbeIssuedRef.current && looksLikeRecallProbe(reply)) recallProbeIssuedRef.current = true
         await speak(reply)
       }
+      // Companion has no agenda/recall — it ends when Aria says goodbye (user wrapped up).
+      if (persona === 'companion' && reply && looksLikeGoodbye(reply)) closingRef.current = true
       if (closingRef.current) {
         sessionActiveRef.current = false
         setSessionActive(false)
         updateStatus('idle', '结束了,可点"结束并评估"看判断')
+        setEnded(true) // hands-free auto-finalize (parity with v3; needed for the v3->v2 fallback path)
       } else {
         updateStatus('listening', '点麦克风开始回答')
       }
@@ -164,27 +177,33 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
   const toggleRecording = useCallback(() => {
     if (!sessionActiveRef.current) return
     if (recording) {
+      recordingRef.current = false
       setRecording(false)
       void runTurn()
     } else {
       void (async () => {
         await recorder.prepareToRecordAsync()
         recorder.record()
+        recordingRef.current = true
         setRecording(true)
         updateStatus('listening', '录音中… 再点一次发送')
       })()
     }
   }, [recorder, recording, runTurn, updateStatus])
 
+  // Stable teardown ([] deps + refs): the unmount effect is `useEffect(() => cleanup, [cleanup])`,
+  // so cleanup MUST NOT change identity mid-session — otherwise React fires the previous cleanup on
+  // every `recording` toggle and the session self-destructs on the first mic tap.
   const cleanup = useCallback(() => {
     sessionActiveRef.current = false
-    try { if (recording) void recorder.stop() } catch {}
+    try { if (recordingRef.current) void recorderRef.current.stop() } catch {}
     try { playerRef.current?.remove() } catch {}
     playerRef.current = null
+    recordingRef.current = false
     setRecording(false)
     setSessionActive(false)
     setConnecting(false)
-  }, [recorder, recording])
+  }, [])
 
   const stopConversation = useCallback(async () => {
     cleanup()
@@ -203,6 +222,7 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
     connecting,
     sessionActive,
     userSpeaking: recording,
+    ended,
     recording,
     toggleRecording,
   }
