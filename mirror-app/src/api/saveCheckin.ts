@@ -30,13 +30,15 @@ export function buildCheckinPayload(a: CheckinArgs): SaveConversationInput {
   const turns = a.messages.filter((m) => m.role === 'user' || m.role === 'assistant')
   const logs: ConversationLogEntry[] = turns.map((m) => ({
     sentence: m.text.trim(),
-    role: m.role === 'assistant' ? 'AI' : 'Patient',
+    // lowercase to match the caregiver-server contract: it converts role 'ai' -> "Aria" and labels
+    // everything else as the patient. Uppercase 'AI' would make it count Aria's lines as the patient.
+    role: m.role === 'assistant' ? 'ai' : 'patient',
     words: countWords(m.text),
     duration: 0,
     wordsPerSecond: 0,
   }))
-  const userTurnCount = logs.filter((l) => l.role === 'Patient').length
-  const aiTurnCount = logs.filter((l) => l.role === 'AI').length
+  const userTurnCount = logs.filter((l) => l.role === 'patient').length
+  const aiTurnCount = logs.filter((l) => l.role === 'ai').length
   const totalWords = logs.reduce((sum, l) => sum + l.words, 0)
   const durationSec = Math.max(0, Math.round((a.endedAt.getTime() - a.startedAt.getTime()) / 1000))
   // Heuristic (we don't measure per-utterance speech seconds like the old WebRTC hook did):

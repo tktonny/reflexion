@@ -13,7 +13,7 @@ const CONVERSATION_MAP_COLLECTION = 'ConversationIdToPatientIdMap'
 
 type ConversationLogEntry = {
   sentence: string
-  role: 'Patient' | 'AI'
+  role: 'patient' | 'ai'
   words: number
   duration: number
   wordsPerSecond: number

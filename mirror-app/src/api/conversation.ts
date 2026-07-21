@@ -2,7 +2,7 @@ import { apiPost } from './client'
 
 export type ConversationLogEntry = {
   sentence: string
-  role: 'Patient' | 'AI'
+  role: 'patient' | 'ai'
   words: number
   duration: number
   wordsPerSecond: number
