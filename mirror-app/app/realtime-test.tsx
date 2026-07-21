@@ -17,6 +17,7 @@ import { MirrorCameraPanel, type MirrorCameraHandle } from '../src/components/Mi
 // Web: open /realtime-test in Chrome (mode relay needs `npm run relay`).
 export default function RealtimeTestScreen() {
   const [persona, setPersona] = useState<'screening' | 'companion'>('companion')
+  const [pushToTalk, setPushToTalk] = useState(false)
   const [pendingStart, setPendingStart] = useState(false)
   const {
     mode,
@@ -31,7 +32,7 @@ export default function RealtimeTestScreen() {
     ended,
     recording,
     toggleRecording,
-  } = useConversation({ patientId: 'demo-patient', language: 'en', persona })
+  } = useConversation({ patientId: 'demo-patient', language: 'en', persona, pushToTalk })
 
   const [assessment, setAssessment] = useState<ScreeningAssessment | null>(null)
   const [assessing, setAssessing] = useState(false)
@@ -131,17 +132,26 @@ export default function RealtimeTestScreen() {
             <Text style={styles.buttonText}>结束并评估</Text>
           </Pressable>
         ) : (
-          <View style={styles.startRow}>
-            <Pressable onPress={() => { setPersona('companion'); setPendingStart(true) }} style={[styles.button, styles.talkButton, styles.halfButton]}>
-              <Text style={styles.buttonText}>🗣 日常助手</Text>
+          <View style={{ gap: 10 }}>
+            <Pressable onPress={() => setPushToTalk((v) => !v)} style={styles.pttToggle}>
+              <Text style={styles.pttToggleText}>
+                {pushToTalk
+                  ? '🎙 手动 · 按住说话（模拟器/嘈杂环境，防回声）— 点此切免手'
+                  : '🖐 免手 · 自动断句（真机推荐）— 点此切手动'}
+              </Text>
             </Pressable>
-            <Pressable onPress={() => { setPersona('screening'); setPendingStart(true) }} style={[styles.button, styles.startButton, styles.halfButton]}>
-              <Text style={styles.buttonText}>🧠 认知检查</Text>
-            </Pressable>
+            <View style={styles.startRow}>
+              <Pressable onPress={() => { setPersona('companion'); setPendingStart(true) }} style={[styles.button, styles.talkButton, styles.halfButton]}>
+                <Text style={styles.buttonText}>🗣 日常助手</Text>
+              </Pressable>
+              <Pressable onPress={() => { setPersona('screening'); setPendingStart(true) }} style={[styles.button, styles.startButton, styles.halfButton]}>
+                <Text style={styles.buttonText}>🧠 认知检查</Text>
+              </Pressable>
+            </View>
           </View>
         )}
 
-        {busy && mode === 'http' && toggleRecording ? (
+        {busy && toggleRecording ? (
           <Pressable onPress={toggleRecording} style={[styles.button, recording ? styles.stopButton : styles.talkButton]}>
             <Text style={styles.buttonText}>{recording ? '发送（结束说话）' : '🎤 开始说话'}</Text>
           </Pressable>
@@ -224,6 +234,8 @@ const styles = StyleSheet.create({
   linkText: { color: '#4D9668', fontSize: 13, fontWeight: '700', marginTop: 4 },
   button: { alignItems: 'center', borderRadius: 10, justifyContent: 'center', minHeight: 52 },
   startRow: { flexDirection: 'row', gap: 10 },
+  pttToggle: { alignItems: 'center', backgroundColor: '#FFF4E2', borderColor: '#F0DEC1', borderRadius: 8, borderWidth: 1, justifyContent: 'center', minHeight: 40, paddingHorizontal: 12 },
+  pttToggleText: { color: '#8E7F6D', fontSize: 13, fontWeight: '800', textAlign: 'center' },
   halfButton: { flex: 1 },
   startButton: { backgroundColor: '#C89755' },
   talkButton: { backgroundColor: '#4D9668' },

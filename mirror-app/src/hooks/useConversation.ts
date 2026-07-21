@@ -8,7 +8,7 @@ import { useQwenRealtimeConversation } from './useQwenRealtimeConversation'
 import { useTurnBasedConversation } from './useTurnBasedConversation'
 import { useTurnBasedConversationNative } from './useTurnBasedConversationNative'
 
-type Options = { patientId?: string; language?: string; persona?: 'screening' | 'companion' }
+type Options = { patientId?: string; language?: string; persona?: 'screening' | 'companion'; pushToTalk?: boolean }
 
 /**
  * Version selector. Picks the conversation implementation from EXPO_PUBLIC_CONVERSATION_MODE:

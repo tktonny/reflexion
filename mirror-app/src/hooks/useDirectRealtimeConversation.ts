@@ -20,7 +20,15 @@ import { createPcmAudioBridge, type PcmAudioBridge } from '../native/pcmAudio'
 import { randomId } from '../utils/id'
 import type { ChatMessage, ConversationApi, StatusKind } from './conversationTypes'
 
-type Options = { patientId?: string; language?: string; persona?: 'screening' | 'companion'; onUnavailable?: (reason: string) => void }
+type Options = {
+  patientId?: string
+  language?: string
+  persona?: 'screening' | 'companion'
+  // Manual push-to-talk: mic stays muted except while the user holds "speak". Kills the echo loop on
+  // devices with no hardware AEC (e.g. an emulator sharing the host mic + speaker).
+  pushToTalk?: boolean
+  onUnavailable?: (reason: string) => void
+}
 
 /**
  * Version 3 (Flavor A): NATIVE device opens a direct realtime WebSocket to Qwen (header auth
@@ -35,6 +43,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const patientId = options.patientId ?? 'demo-patient'
   const language = options.language ?? 'en'
   const persona = options.persona ?? 'screening'
+  const pushToTalk = options.pushToTalk ?? false
 
   const [statusKind, setStatusKind] = useState<StatusKind>('idle')
   const [statusText, setStatusText] = useState('Ready to start')
@@ -43,6 +52,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const [sessionActive, setSessionActive] = useState(false)
   const [userSpeaking, setUserSpeaking] = useState(false)
   const [ended, setEnded] = useState(false)
+  const [recording, setRecording] = useState(false)
 
   const endedRef = useRef(false)
   const endTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -218,7 +228,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
       if (type === 'response.done') {
-        updateStatus('listening', 'Listening...')
+        updateStatus('listening', pushToTalk ? '按住说话' : 'Listening...')
         // During wrap-up we deliberately stay muted until cleanup (stopConversation drives teardown).
         if (wrappingUpRef.current) return
         // Natural ending: the realtime model won't conclude on its own, so drive it from the turn
@@ -233,6 +243,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           // (already forced) must fall through to the drain so the mic re-opens — else it wedges.
           if (!recallProbeIssuedRef.current && turnCountRef.current >= RECALL_DEADLINE_TURN && steerRecall()) return
         }
+        // Push-to-talk: never auto-un-mute — the mic stays muted until the user holds "speak" again.
+        if (pushToTalk) return
         // `response.done` fires when the last audio delta is ENQUEUED, not when it finishes playing.
         // Poll the native playback backlog (now includes the not-yet-written queue) and un-mute only
         // once the assistant is actually silent, otherwise the mirror captures its own voice and
@@ -303,6 +315,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     recallAnsweredRef.current = false
     recallForcedRef.current = false
     closingRef.current = false
+    setRecording(false)
 
     try {
       // Short-lived server-minted token (secure) or, if explicitly enabled, the kiosk client key.
@@ -331,6 +344,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         // Start native PCM capture -> stream frames upstream.
         const audio = createPcmAudioBridge()
         audioRef.current = audio
+        // Push-to-talk: capture starts muted; the mic only opens while the user holds "speak".
+        if (pushToTalk) { audio.setCaptureMuted(true); updateStatus('listening', '按住说话') }
         audio
           .start((base64Pcm16) => send({ type: 'input_audio_buffer.append', audio: base64Pcm16 }))
           .catch((e: unknown) => updateStatus('error', e instanceof Error ? e.message : 'audio start failed'))
@@ -389,6 +404,18 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     wrapupTimerRef.current = setTimeout(waitDrain, 1500)
   }, [cleanup, clearDrain, requestGoodbye, updateStatus])
 
+  // Push-to-talk control: tap to open the mic ("speaking"), tap again to send — muting ends the turn
+  // so server-VAD generates Aria's reply. No-op unless pushToTalk is enabled.
+  const toggleRecording = useCallback(() => {
+    if (!pushToTalk || wrappingUpRef.current) return
+    setRecording((r) => {
+      const next = !r
+      audioRef.current?.setCaptureMuted(!next)
+      setUserSpeaking(next)
+      return next
+    })
+  }, [pushToTalk])
+
   useEffect(() => cleanup, [cleanup])
 
   return {
@@ -402,6 +429,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     sessionActive,
     userSpeaking,
     ended,
+    recording: pushToTalk ? recording : undefined,
+    toggleRecording: pushToTalk ? toggleRecording : undefined,
   }
 }
 
