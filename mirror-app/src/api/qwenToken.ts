@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Platform } from 'react-native'
 
 import { getApiUrl } from '../../app/apiUrl'
 import { QWEN } from '../config/conversationMode'
@@ -40,11 +41,16 @@ async function fetchServerToken(): Promise<string | null> {
 
 /** Bearer credential for a Qwen HTTP/WS call. Prefers the server-minted short-lived token. */
 export async function getBearer(): Promise<string> {
+  const insecureKey =
+    process.env.EXPO_PUBLIC_ALLOW_INSECURE_CLIENT_KEY === 'true' && !!QWEN.apiKey
+  // Backendless kiosk/self-test build (inlined key, no API base on native): use the key directly
+  // instead of wasting a round-trip on an unreachable /api/qwen-token every Qwen call.
+  const hasBackend = Platform.OS === 'web' || !!process.env.EXPO_PUBLIC_API_BASE
+  if (insecureKey && !hasBackend) return QWEN.apiKey
+
   const token = await fetchServerToken()
   if (token) return token
-  if (process.env.EXPO_PUBLIC_ALLOW_INSECURE_CLIENT_KEY === 'true' && QWEN.apiKey) {
-    return QWEN.apiKey
-  }
+  if (insecureKey) return QWEN.apiKey
   throw new Error(
     'No Qwen credential: /api/qwen-token unreachable and EXPO_PUBLIC_ALLOW_INSECURE_CLIENT_KEY is not enabled.',
   )

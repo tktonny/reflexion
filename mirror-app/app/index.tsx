@@ -61,6 +61,12 @@ export default function BootScreen() {
     let mounted = true
 
     async function boot() {
+      // Backendless self-test / kiosk build (no EXPO_PUBLIC_API_BASE on native): pairing requires the
+      // backend, so skip it and open the Qwen conversation directly (companion / screening).
+      if (Platform.OS !== 'web' && !process.env.EXPO_PUBLIC_API_BASE) {
+        router.replace('/realtime-test')
+        return
+      }
       const result = await runBootChecks()
       if (!mounted) return
       setChecks(result.checks)
