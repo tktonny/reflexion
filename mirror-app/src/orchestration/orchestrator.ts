@@ -56,6 +56,17 @@ export function looksLikeRecallProbe(text: string | null | undefined): boolean {
   return /mention|earlier|told me|talk(ed)? about|said (before|earlier)|brought up|think back|remember/i.test(String(text || ''))
 }
 
+/**
+ * True when an assistant line reads as a closing goodbye — used by the realtime hooks (v1/v3) to
+ * auto-finalize the check-in (stop + run the screening) instead of hanging on "listening".
+ * Deliberately strong phrases only (not a bare "bye") to avoid ending mid-conversation.
+ */
+export function looksLikeGoodbye(text: string | null | undefined): boolean {
+  const t = String(text || '')
+  if (/(再见|再會|拜拜|回头见|回頭見|下次見|下次见|保重)/.test(t)) return true
+  return /\b(bye[-\s]?bye|good\s?bye|see you (soon|again|next time|later)|take care( of yourself| now)?|until next time|talk (to you )?(soon|again)|have a (good|great|wonderful) (day|one|rest))\b/i.test(t)
+}
+
 export function openingMessageForLanguage(language: string | null | undefined): string {
   const key = normalizeLanguageKey(language)
   if (!key) return FLOW.opening_message

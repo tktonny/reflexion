@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
 import { getBearer } from '../api/qwenToken'
+import { looksLikeGoodbye } from '../orchestration/orchestrator'
 import { buildLiveSessionUpdate, realtimeWsUrl } from '../orchestration/realtime'
 import {
   detectLanguageSignal,
@@ -34,7 +35,10 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const [connecting, setConnecting] = useState(false)
   const [sessionActive, setSessionActive] = useState(false)
   const [userSpeaking, setUserSpeaking] = useState(false)
+  const [ended, setEnded] = useState(false)
 
+  const endedRef = useRef(false)
+  const endTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const socketRef = useRef<WebSocket | null>(null)
   const audioRef = useRef<PcmAudioBridge | null>(null)
   const voiceRef = useRef<VoiceProfile>(voiceProfileForSession(language))
@@ -49,6 +53,18 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     setStatusKind(kind)
     setStatusText(text)
   }, [])
+
+  // Aria delivered her closing goodbye — auto-finalize. Keep the mic muted through the goodbye
+  // tail, then flip `ended` so the screen runs the screening + save on its own.
+  const scheduleEnd = useCallback(() => {
+    if (endedRef.current) return
+    endedRef.current = true
+    wrappingUpRef.current = true
+    audioRef.current?.setCaptureMuted(true)
+    updateStatus('idle', '检查完成,正在生成判断…')
+    if (endTimerRef.current) clearTimeout(endTimerRef.current)
+    endTimerRef.current = setTimeout(() => setEnded(true), 3000)
+  }, [updateStatus])
 
   const clearDrain = useCallback(() => {
     if (drainTimerRef.current) {
@@ -128,7 +144,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
       if (type === 'response.audio_transcript.done' || type === 'response.output_audio_transcript.done') {
-        finalizeAssistant(String(payload?.transcript ?? assistantTextRef.current))
+        const finalText = String(payload?.transcript ?? assistantTextRef.current)
+        finalizeAssistant(finalText)
+        if (looksLikeGoodbye(finalText)) scheduleEnd()
         return
       }
       if (type === 'response.done') {
@@ -153,12 +171,13 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
     },
-    [appendAssistantStreaming, applyVoice, clearDrain, finalizeAssistant, send, updateStatus],
+    [appendAssistantStreaming, applyVoice, clearDrain, finalizeAssistant, scheduleEnd, send, updateStatus],
   )
 
   const cleanup = useCallback(() => {
     if (drainTimerRef.current) { clearTimeout(drainTimerRef.current); drainTimerRef.current = null }
     if (wrapupTimerRef.current) { clearTimeout(wrapupTimerRef.current); wrapupTimerRef.current = null }
+    if (endTimerRef.current) { clearTimeout(endTimerRef.current); endTimerRef.current = null }
     wrappingUpRef.current = false
     void audioRef.current?.stop()
     audioRef.current = null
@@ -181,6 +200,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     setConnecting(true)
     updateStatus('processing', 'Connecting...')
     setMessages([])
+    setEnded(false)
+    endedRef.current = false
     voiceRef.current = voiceProfileForSession(language)
     openingRequestedRef.current = false
 
@@ -252,6 +273,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     connecting,
     sessionActive,
     userSpeaking,
+    ended,
   }
 }
 

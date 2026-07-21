@@ -79,7 +79,7 @@ export async function qwenTTS(
   text: string,
   opts: { apiKey?: string; model?: string; voice?: string } = {},
 ): Promise<{ audioBase64: string | null; url: string | null; format: 'wav' }> {
-  const res = await fetch(`${QWEN.base}/api/v1/services/aigc/multimodal-generation/generation`, {
+  const res = await fetchWithTimeout(`${QWEN.base}/api/v1/services/aigc/multimodal-generation/generation`, {
     method: 'POST',
     headers: await authHeaders(opts.apiKey),
     body: JSON.stringify({
@@ -104,7 +104,7 @@ export async function qwenASR(
 ): Promise<string> {
   const inputAudio: Record<string, string> = { data: `data:;base64,${audioBase64}` }
   if (opts.format) inputAudio.format = opts.format
-  const res = await fetch(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
+  const res = await fetchWithTimeout(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
     method: 'POST',
     headers: await authHeaders(opts.apiKey),
     body: JSON.stringify({

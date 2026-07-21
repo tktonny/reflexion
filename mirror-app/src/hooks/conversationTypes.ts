@@ -22,6 +22,8 @@ export interface ConversationApi {
   connecting: boolean
   sessionActive: boolean
   userSpeaking: boolean
+  /** Flips true once the assistant delivers its closing goodbye, so screens auto-finalize. */
+  ended?: boolean
   // Turn-based (v2) extras — present only in 'http' mode.
   recording?: boolean
   toggleRecording?: () => void

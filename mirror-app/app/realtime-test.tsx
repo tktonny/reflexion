@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
@@ -26,6 +26,7 @@ export default function RealtimeTestScreen() {
     connecting,
     sessionActive,
     userSpeaking,
+    ended,
     recording,
     toggleRecording,
   } = useConversation({ patientId: 'demo-patient', language: 'en' })
@@ -36,6 +37,7 @@ export default function RealtimeTestScreen() {
   const [saveNote, setSaveNote] = useState('')
   const sessionStartRef = useRef<Date | null>(null)
   const cameraRef = useRef<MirrorCameraHandle | null>(null)
+  const finalizingRef = useRef(false)
 
   const busy = connecting || sessionActive
   const hasTurns = messages.some((m) => m.role === 'user' || m.role === 'assistant')
@@ -67,12 +69,17 @@ export default function RealtimeTestScreen() {
     setAssessment(null)
     setAssessError('')
     setSaveNote('')
+    finalizingRef.current = false
     cameraRef.current?.reset()
     sessionStartRef.current = new Date()
     void startConversation()
   }, [startConversation])
 
-  const onEnd = useCallback(async () => {
+  // Finalize once: stop the session, run the screening (transcript + frames), save. Shared by the
+  // manual 结束并评估 button AND the auto-end path (Aria's goodbye -> `ended`), guarded so it runs once.
+  const finalize = useCallback(async () => {
+    if (finalizingRef.current) return
+    finalizingRef.current = true
     await stopConversation()
     const a = await runAssessment()
     const ids = await resolveOwnerIds()
@@ -89,6 +96,13 @@ export default function RealtimeTestScreen() {
     })
     setSaveNote(res.saved ? '✓ 已保存到后台(Conversation + 判断)' : `未入库: ${res.reason}(已进离线队列)`)
   }, [messages, runAssessment, stopConversation])
+
+  const onEnd = finalize
+
+  // Auto-finalize when the assistant delivers its closing goodbye (hands-free — no button needed).
+  useEffect(() => {
+    if (ended) void finalize()
+  }, [ended, finalize])
 
   return (
     <SafeAreaView style={styles.safe}>

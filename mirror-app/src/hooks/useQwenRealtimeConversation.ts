@@ -8,6 +8,7 @@ import {
   getRealtimeWsUrl,
 } from '../constants/realtime'
 import { DEVICE_AUTH_TOKEN_STORAGE_KEY, DEVICE_ID_STORAGE_KEY } from '../constants/nursePatientConfig'
+import { looksLikeGoodbye } from '../orchestration/orchestrator'
 import { randomId } from '../utils/id'
 
 export type ChatRole = 'system' | 'user' | 'assistant'
@@ -41,7 +42,10 @@ export function useQwenRealtimeConversation(options: Options = {}) {
   const [connecting, setConnecting] = useState(false)
   const [sessionActive, setSessionActive] = useState(false)
   const [userSpeaking, setUserSpeaking] = useState(false)
+  const [ended, setEnded] = useState(false)
 
+  const endedRef = useRef(false)
+  const endTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const socketRef = useRef<WebSocket | null>(null)
   const audioContextRef = useRef<any>(null)
   const mediaStreamRef = useRef<MediaStream | null>(null)
@@ -59,6 +63,16 @@ export function useQwenRealtimeConversation(options: Options = {}) {
     setStatusKind(kind)
     setStatusText(text)
   }, [])
+
+  // Aria delivered her closing goodbye — auto-finalize the check-in. Brief grace so her audio
+  // finishes playing, then flip `ended` so the screen runs the screening + save on its own.
+  const scheduleEnd = useCallback(() => {
+    if (endedRef.current) return
+    endedRef.current = true
+    updateStatus('idle', '检查完成,正在生成判断…')
+    if (endTimerRef.current) clearTimeout(endTimerRef.current)
+    endTimerRef.current = setTimeout(() => setEnded(true), 3000)
+  }, [updateStatus])
 
   const appendAssistantStreaming = useCallback((text: string) => {
     if (!assistantStreamIdRef.current) {
@@ -150,9 +164,12 @@ export function useQwenRealtimeConversation(options: Options = {}) {
           appendAssistantStreaming(assistantTextRef.current)
           break
         case 'response.audio_transcript.done':
-        case 'response.text.done':
-          finalizeAssistant(String(payload?.transcript ?? payload?.text ?? assistantTextRef.current))
+        case 'response.text.done': {
+          const finalText = String(payload?.transcript ?? payload?.text ?? assistantTextRef.current)
+          finalizeAssistant(finalText)
+          if (looksLikeGoodbye(finalText)) scheduleEnd()
           break
+        }
         case 'response.done':
           updateStatus('listening', 'Listening...')
           break
@@ -160,10 +177,11 @@ export function useQwenRealtimeConversation(options: Options = {}) {
           break
       }
     },
-    [appendAssistantStreaming, finalizeAssistant, playAssistantAudio, updateStatus],
+    [appendAssistantStreaming, finalizeAssistant, playAssistantAudio, scheduleEnd, updateStatus],
   )
 
   const cleanup = useCallback(() => {
+    if (endTimerRef.current) { clearTimeout(endTimerRef.current); endTimerRef.current = null }
     isRecordingRef.current = false
     sessionReadyRef.current = false
     try { processorRef.current?.disconnect() } catch {}
@@ -239,6 +257,8 @@ export function useQwenRealtimeConversation(options: Options = {}) {
     setConnecting(true)
     updateStatus('processing', 'Connecting...')
     setMessages([])
+    setEnded(false)
+    endedRef.current = false
 
     try {
       const stream = await (navigator as any).mediaDevices.getUserMedia({ audio: true, video: false })
@@ -288,6 +308,7 @@ export function useQwenRealtimeConversation(options: Options = {}) {
     connecting,
     sessionActive,
     userSpeaking,
+    ended,
     language,
   }
 }
