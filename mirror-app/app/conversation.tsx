@@ -31,6 +31,7 @@ import { DEFAULT_LANGUAGE } from '../src/config/conversationMode'
 import { assessCheckin, transcriptFromMessages, type ScreeningAssessment } from '../src/api/assess'
 import { resolveOwnerIds, saveCheckin } from '../src/api/saveCheckin'
 import { MirrorCameraPanel, type MirrorCameraHandle } from '../src/components/MirrorCameraPanel'
+import { useWakeWord } from '../src/hooks/useWakeWord'
 import { getStoredMirrorProfile, persistNursePatientIds } from '../src/storage/mirrorStorage'
 
 type DevicePairingStatus =
@@ -284,6 +285,13 @@ export default function ConversationScreen() {
     if (pendingStart && !busy) { setPendingStart(false); void handleStart() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingStart, busy])
+
+  // Native open-source wake word while idle -> opens the everyday companion. No-op unless the
+  // onnxruntime runtime + ONNX models are present (see docs/WAKEWORD.md); web uses SpeechRecognition.
+  useWakeWord(
+    Platform.OS !== 'web' && !checkingPairing && !busy && !endingConversation,
+    () => startWith('companion'),
+  )
 
   function startWakeListener() {
     if (Platform.OS !== 'web' || wakeRecognitionRef.current) return
