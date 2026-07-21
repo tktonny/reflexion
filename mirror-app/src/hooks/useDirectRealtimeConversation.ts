@@ -30,6 +30,38 @@ type Options = {
   onUnavailable?: (reason: string) => void
 }
 
+// --- automatic echo suppression (hands-free) ---
+// On devices with no hardware AEC (e.g. an emulator sharing mic+speaker), the assistant's own audio
+// can leak into the mic during the un-mute tail and get transcribed as a "user" turn, causing Aria to
+// talk to herself. We compare each incoming transcript to Aria's recent lines and drop close matches.
+function normEcho(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9一-鿿]/g, '')
+}
+function bigramJaccard(a: string, b: string): number {
+  const grams = (s: string) => {
+    const g = new Set<string>()
+    for (let i = 0; i < s.length - 1; i += 1) g.add(s.slice(i, i + 2))
+    return g
+  }
+  const ga = grams(a)
+  const gb = grams(b)
+  if (ga.size === 0 || gb.size === 0) return 0
+  let inter = 0
+  for (const x of ga) if (gb.has(x)) inter += 1
+  return inter / (ga.size + gb.size - inter)
+}
+function looksLikeEchoOfAria(userText: string, ariaLines: string[]): boolean {
+  const u = normEcho(userText)
+  if (u.length < 4) return false // too short to judge; let it through
+  for (const line of ariaLines) {
+    const a = normEcho(line)
+    if (a.length < 4) continue
+    if (a.includes(u) || u.includes(a)) return true
+    if (bigramJaccard(u, a) >= 0.5) return true
+  }
+  return false
+}
+
 /**
  * Version 3 (Flavor A): NATIVE device opens a direct realtime WebSocket to Qwen (header auth
  * with a short-lived token minted by /api/qwen-token), running the on-device orchestration
@@ -62,6 +94,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const openingRequestedRef = useRef(false)
   const streamIdRef = useRef<string | null>(null)
   const assistantTextRef = useRef('')
+  const recentAriaRef = useRef<string[]>([]) // Aria's last few finalized lines, for echo suppression
+  const suppressErrorRef = useRef(false) // swallow the (possibly-unsupported) response.cancel's error frame
   const drainTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const wrapupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const wrappingUpRef = useRef(false)
@@ -136,6 +170,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     assistantTextRef.current = ''
     const clean = text.trim()
     if (!clean) return
+    recentAriaRef.current = [clean, ...recentAriaRef.current].slice(0, 4)
     if (id) setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, text: clean, streaming: false } : m)))
     else setMessages((prev) => [...prev, { id: randomId('assistant'), role: 'assistant', text: clean }])
   }, [])
@@ -172,6 +207,10 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       const type = String(payload?.type || '')
 
       if (type === 'error') {
+        // A response.cancel we just sent may be unsupported / target no active response and bounce back
+        // as an error frame. Swallow exactly that one benignly — do NOT un-mute (would re-open the echo)
+        // and do NOT surface an error; the drain/response.done path re-opens the mic on its own.
+        if (suppressErrorRef.current) { suppressErrorRef.current = false; return }
         // Qwen delivers app-level errors as in-band frames over the OPEN socket (not socket.onerror).
         clearDrain()
         if (!hadResponseRef.current) {
@@ -195,6 +234,14 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       }
       if (type === 'conversation.item.input_audio_transcription.completed') {
         const transcript = String(payload?.transcript || '').trim()
+        // Automatic echo suppression: if this "user" transcript closely matches something Aria just
+        // said, it's the assistant's own audio leaking into the mic (no hardware AEC). Drop the turn
+        // and cancel any response it triggered, so Aria never ends up talking to herself.
+        if (transcript && looksLikeEchoOfAria(transcript, recentAriaRef.current)) {
+          suppressErrorRef.current = true
+          send({ type: 'response.cancel' })
+          return
+        }
         if (transcript) {
           setMessages((prev) => [...prev, { id: randomId('user'), role: 'user', text: transcript }])
           turnCountRef.current += 1
@@ -209,7 +256,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       }
       if (type === 'input_audio_buffer.speech_started') { setUserSpeaking(true); updateStatus('listening', 'Listening...'); return }
       if (type === 'input_audio_buffer.speech_stopped') { setUserSpeaking(false); updateStatus('processing', 'Thinking...'); return }
-      if (type === 'response.created') { hadResponseRef.current = true; clearDrain(); audioRef.current?.setCaptureMuted(true); updateStatus('speaking', 'Speaking...'); return }
+      if (type === 'response.created') { hadResponseRef.current = true; suppressErrorRef.current = false; clearDrain(); audioRef.current?.setCaptureMuted(true); updateStatus('speaking', 'Speaking...'); return }
       if (type === 'response.audio.delta') { audioRef.current?.play(String(payload?.delta || '')); return }
       if (type === 'response.audio_transcript.delta' || type === 'response.output_audio_transcript.delta') {
         assistantTextRef.current += String(payload?.delta || '')
@@ -253,7 +300,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         clearDrain()
         const startedAt = Date.now()
         const THRESHOLD_MS = 120 // treat as drained once backlog is this small
-        const GUARD_MS = 550 // acoustic + capture-pipeline tail to let the room go quiet (echo guard)
+        // Acoustic + capture-pipeline tail to let the room go quiet before re-opening the mic. Kept
+        // generous because emulators/soft-speakers report "playback done" well before the sound has
+        // physically stopped; the transcript-level echo suppressor is the backstop for anything that
+        // still leaks through this window.
+        const GUARD_MS = 1100
         const MAX_WAIT_MS = 20000 // safety: never leave the mic muted forever if playback wedges
         const drain = () => {
           if (bridge !== audioRef.current) { drainTimerRef.current = null; return }
@@ -315,6 +366,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     recallAnsweredRef.current = false
     recallForcedRef.current = false
     closingRef.current = false
+    recentAriaRef.current = []
     setRecording(false)
 
     try {
