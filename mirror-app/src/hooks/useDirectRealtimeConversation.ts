@@ -241,7 +241,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         clearDrain()
         const startedAt = Date.now()
         const THRESHOLD_MS = 120 // treat as drained once backlog is this small
-        const GUARD_MS = 350 // acoustic + capture-pipeline tail to let the room go quiet
+        const GUARD_MS = 550 // acoustic + capture-pipeline tail to let the room go quiet (echo guard)
         const MAX_WAIT_MS = 20000 // safety: never leave the mic muted forever if playback wedges
         const drain = () => {
           if (bridge !== audioRef.current) { drainTimerRef.current = null; return }

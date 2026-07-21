@@ -22,7 +22,7 @@ export function getApiUrl(path: string) {
   }
 
   // Standalone APK with no backend configured: return an ABSOLUTE but unreachable URL so fetch fails
-  // cleanly (callers offline-queue / fall back to client-direct) instead of throwing
-  // MalformedURLException on a relative path (native fetch requires a protocol).
-  return `http://127.0.0.1:0${path}`
+  // cleanly (callers offline-queue / fall back to client-direct) instead of throwing on a relative
+  // path. Port 9 (discard) is a VALID port that just refuses — avoids the "Invalid URL port 0" error.
+  return `http://127.0.0.1:9${path}`
 }
