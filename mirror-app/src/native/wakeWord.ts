@@ -4,13 +4,11 @@
 // (frames,32), scaled x/10+2) -> embedding_model.onnx ([1,76,32,1] windows, stride 8 -> 96-dim) ->
 // wakeword.onnx ([1,16,96] -> score); fire when score > THRESHOLD on TRIGGER_HITS consecutive frames.
 //
-// Models are NOT bundled (they are binaries): the engine loads them at runtime from
-//   <documentDirectory>/wakeword/{melspectrogram,embedding_model,wakeword}.onnx
-// so the app builds without them and lights up once they are placed on a real device (see
-// docs/WAKEWORD.md). If onnxruntime is unlinked or the models are missing, create() returns null and
-// callers fall back to tap-to-start — the APK is unaffected.
+// Models are BUNDLED in the APK (assets/wakeword/*.onnx, ~3.7 MB total) and loaded via expo-asset,
+// so the wake word works out of the box with no device-side setup. If onnxruntime's native module
+// isn't linked in the running build, create() returns null and callers fall back to tap-to-start.
 
-import { File, Paths } from 'expo-file-system'
+import { Asset } from 'expo-asset'
 import { Platform } from 'react-native'
 
 // Static import is safe for bundling (the JS package is installed); the NATIVE calls throw if the
@@ -26,36 +24,36 @@ const THRESHOLD = 0.5 // openWakeWord default
 const TRIGGER_HITS = 3 // frames above threshold before firing (debounce)
 const MEL_SCALE = (v: number) => v / 10 + 2
 
-const FILES = { mel: 'melspectrogram.onnx', emb: 'embedding_model.onnx', ww: 'wakeword.onnx' }
-// Runtime model location: <documentDirectory>/wakeword/*.onnx (see docs/WAKEWORD.md).
-const wakeFile = (f: string) => new File(`${Paths.document.uri.replace(/\/$/, '')}/wakeword/${f}`)
+// Bundled ONNX assets (metro.config.js registers .onnx as an asset).
+const MODEL_MODULES = {
+  mel: require('../../assets/wakeword/melspectrogram.onnx'),
+  emb: require('../../assets/wakeword/embedding_model.onnx'),
+  ww: require('../../assets/wakeword/wakeword.onnx'),
+}
 
 export function isWakeWordRuntimeAvailable(): boolean {
   return Platform.OS !== 'web' && !!InferenceSession
 }
 
-export async function wakeWordModelsPresent(): Promise<boolean> {
-  if (!isWakeWordRuntimeAvailable()) return false
-  try {
-    return Object.values(FILES).every((f) => wakeFile(f).exists)
-  } catch {
-    return false
-  }
+/** Resolve a bundled ONNX asset to a local filesystem path for InferenceSession.create. */
+async function assetPath(moduleId: number): Promise<string> {
+  const asset = Asset.fromModule(moduleId)
+  if (!asset.localUri) await asset.downloadAsync()
+  return (asset.localUri ?? asset.uri).replace('file://', '')
 }
 
 export type WakeWordEngine = { feed: (pcm16: Int16Array) => Promise<void>; reset: () => void }
 
 /** Build the engine, or null if the runtime/models are unavailable (caller then uses tap-to-start). */
 export async function createWakeWordEngine(onDetected: () => void): Promise<WakeWordEngine | null> {
-  if (!(await wakeWordModelsPresent())) return null
-  const p = (f: string) => wakeFile(f).uri.replace('file://', '')
+  if (!isWakeWordRuntimeAvailable()) return null
   let mel: InferenceSession, emb: InferenceSession, ww: InferenceSession
   try {
-    mel = await InferenceSession.create(p(FILES.mel))
-    emb = await InferenceSession.create(p(FILES.emb))
-    ww = await InferenceSession.create(p(FILES.ww))
+    mel = await InferenceSession.create(await assetPath(MODEL_MODULES.mel))
+    emb = await InferenceSession.create(await assetPath(MODEL_MODULES.emb))
+    ww = await InferenceSession.create(await assetPath(MODEL_MODULES.ww))
   } catch {
-    return null // native module not linked in this build
+    return null // native onnxruntime not linked, or model load failed
   }
 
   const melIn = mel.inputNames[0]
