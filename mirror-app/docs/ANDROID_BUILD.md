@@ -13,7 +13,7 @@
 Create `mirror-app/.env` from `.env.example`:
 
 ```bash
-EXPO_PUBLIC_API_BASE=https://api.example.com
+EXPO_PUBLIC_API_BASE=https://reflexion.production.tktonny.top
 EXPO_PUBLIC_CONVERSATION_MODE=ws
 EXPO_PUBLIC_DEVICE_BOOTSTRAP_TOKEN=<this-device-only-bootstrap-token>
 ```

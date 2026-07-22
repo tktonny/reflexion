@@ -41,9 +41,11 @@ yarn-error.*
 /ios
 /android
 
+# Locally signed release artifacts
+/dist-apks/
+
 # excluded files
 June-Aug.md
 
 # ai
 .claude
-

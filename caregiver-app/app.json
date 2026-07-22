@@ -3,7 +3,7 @@
     "name": "Reflexion",
     "slug": "reflexion-app",
     "scheme": "reflexion",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +22,8 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.tarinpairor.reflexionapp"
+      "package": "com.tarinpairor.reflexionapp",
+      "versionCode": 2
     },
     "web": {
       "output": "server",

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { MongoClient, ObjectId } = require('mongodb');
 
-const DB_NAME = 'ref';
+const DB_NAME = process.env.MONGODB_DB || 'ref';
 const COLLECTION_NAME = 'MirrorIdToNurseIdMap';
 
 const mapping = {

@@ -56,7 +56,7 @@ async function relayVerify(deviceId, authToken) {
       relayMongo = new MongoClient(uri)
       await relayMongo.connect()
     }
-    const session = await relayMongo.db('ref').collection('MirrorPairingSessions').findOne({ deviceId, authToken, status: 'paired' })
+    const session = await relayMongo.db(process.env.MONGODB_DB || 'ref').collection('MirrorPairingSessions').findOne({ deviceId, authToken, status: 'paired' })
     return Boolean(session)
   } catch { return false }
 }

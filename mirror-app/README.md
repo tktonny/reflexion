@@ -20,7 +20,7 @@ cp .env.example .env
 Set at minimum:
 
 ```bash
-EXPO_PUBLIC_API_BASE=https://api.example.com
+EXPO_PUBLIC_API_BASE=https://reflexion.production.tktonny.top
 EXPO_PUBLIC_CONVERSATION_MODE=ws
 EXPO_PUBLIC_DEVICE_BOOTSTRAP_TOKEN=<token returned by caregiver-server provision:device>
 ```

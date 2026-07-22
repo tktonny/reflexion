@@ -1,12 +1,16 @@
 # Reflexion Mirror · 三个版本 · 设备测试总览
 
+> **归档说明（2026-07-22）：** 本页描述的是早期独立 APK 实验，不是当前生产发布流程。
+> 当前 APK 必须连接 `https://reflexion.production.tktonny.top`，完成 Device authentication 与
+> Pairing v2，并由 `/api/v1` 获取短期 realtime ticket。严禁把 Qwen 长期 key 编入 APK。
+
 三个版本是**同一个 App 的三种"对话引擎"**，由构建时的环境变量 `EXPO_PUBLIC_CONVERSATION_MODE` 决定，界面/筛查逻辑完全一样，只有"怎么和 Aria 说话"不同。
 
 | 版本 | mode | 交付形态 | 说话方式 | 需要服务器吗 | 适用平台 |
 |------|------|----------|----------|--------------|----------|
 | **v1** relay | `relay` | 网页(Chrome) | 全双工流式(直接说) | **要**中转服务器 `npm run relay` | 桌面 Chrome（音频引擎只支持 web） |
-| **v2** http | `http` | 安装包 `reflexion-v2-http.apk` | 按住说话(回合制) | 不要（key 已内置） | 真机 Android（也能在模拟器跑） |
-| **v3** ws | `ws` | 安装包 `reflexion-v3-ws.apk` | 全双工流式(直接说) | 不要（直连 Qwen，key 已内置） | **真机 Android**（模拟器麦克风 HAL 不工作） |
+| **v2** http | `http` | 历史实验包 `reflexion-v2-http.apk` | 按住说话(回合制) | 当前生产需要统一后端 | 真机 Android（也能在模拟器跑） |
+| **v3** ws | `ws` | 历史实验包 `reflexion-v3-ws.apk` | 全双工流式(直接说) | 当前生产需要统一后端签发 ticket | **真机 Android**（模拟器麦克风 HAL 不工作） |
 
 > 对应的详细文档：
 > - `docs/v1-relay-使用.md`
@@ -33,7 +37,7 @@ v3(原生App):  安卓App ────直接WS+请求头────────
 
 ## 两个 APK 的共同点
 
-- **独立运行**：JS 已打进包里，Qwen key 已内置（`EXPO_PUBLIC_ALLOW_INSECURE_CLIENT_KEY=true`），**不需要后台、不需要配对**，联网即可自测。
+- **历史行为（已禁用）**：旧实验包曾内置 Qwen key。当前 release APK 不含账号密钥，必须连接统一后端并完成设备配对。
 - **架构**：`arm64-v8a`（2017 年后的手机基本都是；不支持 x86 模拟器和 32 位老设备）。
 - **系统**：Android 7.0+（Expo SDK 56）。
 - **签名**：用的是 **debug 签名**（不是正式发布签名）。安装时系统会提示"来自未知来源/未经检测"，属正常，选"仍要安装"。
