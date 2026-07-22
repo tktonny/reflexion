@@ -1,5 +1,7 @@
 # Platform Architecture
 
+> This document is the original platform overview. The implementation-level v2 baseline is defined in [Platform v2 API and domain architecture](./platform-v2-api-and-domain-architecture.md), [Platform v2 database design](./platform-v2-database-design.md), and [longitudinal vector anomaly design](./longitudinal-vector-anomaly-design.md).
+
 ## 1. Architecture Goal
 
 Build a regulated evidence and product platform that can support:
