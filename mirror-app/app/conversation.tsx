@@ -408,6 +408,7 @@ export default function ConversationScreen() {
         date={formatDate(now)}
         greeting={formatGreeting(now)}
         microphoneActive={sessionActive}
+        onBegin={() => startWith('companion')}
         onEnd={() => void finalize()}
         onRetry={() => void retryProblem()}
         patientName={patientName}
