@@ -2,14 +2,37 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
 import { getBearer } from '../api/qwenToken'
+import { qwenTTS } from '../api/qwenClient'
 import {
   HARD_MAX_TURN,
   RECALL_DEADLINE_TURN,
-  RECALL_DIRECTIVE,
   looksLikeGoodbye,
   looksLikeRecallProbe,
+  looksLikeUserGoodbye,
 } from '../orchestration/orchestrator'
 import { buildLiveSessionUpdate, realtimeWsUrl } from '../orchestration/realtime'
+import { createEnergyVad, decodeBase64Pcm16 } from '../orchestration/energyVad'
+import {
+  base64ToBytes,
+  closingTextForLanguage,
+  companionClosingTextForLanguage,
+  qwenWavToPcm24kChunks,
+  recallQuestionForLanguage,
+  screeningQuestionForTurn,
+} from '../orchestration/deterministicSpeech'
+import {
+  acquireConversationRuntime,
+  type ConversationRuntimeLease,
+} from '../orchestration/conversationRuntime'
+import { createPushToTalkGesture } from '../orchestration/pushToTalkGesture'
+import {
+  choosePostPlaybackAction,
+  createTurnTakingState,
+  playbackDrainDecision,
+  reduceTurnTaking,
+  type TurnTakingEvent,
+  type TurnTakingPhase,
+} from '../orchestration/turnTaking'
 import {
   detectLanguageSignal,
   voiceProfileForLanguageKey,
@@ -85,20 +108,47 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const [userSpeaking, setUserSpeaking] = useState(false)
   const [ended, setEnded] = useState(false)
   const [recording, setRecording] = useState(false)
+  const [turnState, setTurnState] = useState<TurnTakingPhase>('idle')
 
+  const instanceIdRef = useRef(randomId('direct'))
+  const runtimeLeaseRef = useRef<ConversationRuntimeLease | null>(null)
   const endedRef = useRef(false)
-  const endTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const socketRef = useRef<WebSocket | null>(null)
+  const phase1InjectorRef = useRef<WebSocket | null>(null)
+  const phase1InjectionChainRef = useRef<Promise<void>>(Promise.resolve())
+  const phase1InjectionEpochRef = useRef(0)
+  const phase1StopAtRef = useRef<TurnTakingPhase | null>(null)
+  const phase1StopConversationRef = useRef<() => void>(() => {})
+  // startConversation may be invoked twice before getBearer resolves (for example by a development
+  // StrictMode effect). socketRef is still null during that window, so it cannot be the startup lock.
+  const startingRef = useRef(false)
+  const startAttemptRef = useRef(0)
   const audioRef = useRef<PcmAudioBridge | null>(null)
+  const vadRef = useRef(createEnergyVad())
+  const vadSpeakingRef = useRef(false)
+  const audioPreRollRef = useRef<string[]>([])
   const voiceRef = useRef<VoiceProfile>(voiceProfileForSession(language))
   const openingRequestedRef = useRef(false)
+  const responseAfterSessionUpdateRef = useRef<'normal' | 'recall' | 'closing' | null>(null)
   const streamIdRef = useRef<string | null>(null)
   const assistantTextRef = useRef('')
   const recentAriaRef = useRef<string[]>([]) // Aria's last few finalized lines, for echo suppression
-  const suppressErrorRef = useRef(false) // swallow the (possibly-unsupported) response.cancel's error frame
+  const userTranscriptsRef = useRef<string[]>([])
   const drainTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const transcriptTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const wrapupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const wrappingUpRef = useRef(false)
+  const turnTakingRef = useRef(createTurnTakingState())
+  const responseRequestedRef = useRef(false)
+  const responseActiveRef = useRef(false)
+  const responseAudioReceivedRef = useRef(false)
+  const responseCompletedRef = useRef(false)
+  const currentResponseClosingRef = useRef(false)
+  const goodbyeDetectedRef = useRef(false)
+  const drainInProgressRef = useRef(false)
+  const manualCloseRequestedRef = useRef(false)
+  const stopPromiseRef = useRef<Promise<void> | null>(null)
+  const stopResolveRef = useRef<(() => void) | null>(null)
   // Fallback plumbing: tell the supervisor (useConversation) when omni is unavailable so it can drop
   // to the turn-based (v2) stack. Only fires during STARTUP — once real audio/response has flowed
   // (hadResponseRef) a mid-session blip is surfaced as an error, not restarted in a new transport.
@@ -116,10 +166,41 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const recallAnsweredRef = useRef(false)
   const recallForcedRef = useRef(false)
   const closingRef = useRef(false)
+  const recordingRef = useRef(false)
+  const pushToTalkGestureRef = useRef(createPushToTalkGesture())
+  const handlePlaybackCompleteRef = useRef<(closing: boolean) => void>(() => {})
 
   const updateStatus = useCallback((kind: StatusKind, text: string) => {
     setStatusKind(kind)
     setStatusText(text)
+  }, [])
+
+  const transition = useCallback((event: TurnTakingEvent) => {
+    const previousViolationCount = turnTakingRef.current.violations.length
+    const next = reduceTurnTaking(turnTakingRef.current, event)
+    turnTakingRef.current = next
+    setTurnState(next.phase)
+    if (__DEV__ && phase1StopAtRef.current === next.phase) {
+      phase1StopAtRef.current = null
+      setTimeout(() => phase1StopConversationRef.current(), 0)
+    }
+    if (__DEV__) {
+      console.info(
+        `[turn-taking:${instanceIdRef.current}] #${next.sequence} ${event.type} -> ${next.phase} ` +
+          `response=${next.responseInFlight ? 'active' : 'idle'} playback=${next.awaitingPlayback ? 'pending' : 'clear'} mic=${next.captureMuted ? 'muted' : 'open'}`,
+      )
+    }
+    if (next.violations.length > previousViolationCount) {
+      console.warn(`[turn-taking:${instanceIdRef.current}] ${next.violations.at(-1)}`)
+    }
+    return next
+  }, [])
+
+  const resolveStop = useCallback(() => {
+    const resolve = stopResolveRef.current
+    stopResolveRef.current = null
+    stopPromiseRef.current = null
+    resolve?.()
   }, [])
 
   const reportUnavailable = useCallback((reason: string) => {
@@ -129,22 +210,42 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     onUnavailableRef.current?.(reason)
   }, [])
 
-  // Aria delivered her closing goodbye — auto-finalize. Keep the mic muted through the goodbye
-  // tail, then flip `ended` so the screen runs the screening + save on its own.
-  const scheduleEnd = useCallback(() => {
+  // The closing response has completed AND its native playback has drained. There is deliberately
+  // no normal-path timer here: provider generation completion is not speaker completion.
+  const completeConversation = useCallback(() => {
     if (endedRef.current) return
     endedRef.current = true
     wrappingUpRef.current = true
     audioRef.current?.setCaptureMuted(true)
-    updateStatus('idle', '检查完成,正在生成判断…')
-    if (endTimerRef.current) clearTimeout(endTimerRef.current)
-    endTimerRef.current = setTimeout(() => setEnded(true), 3000)
-  }, [updateStatus])
+    transition({ type: 'finished' })
+    updateStatus('processing', 'Goodbye complete. Saving the conversation...')
+    setEnded(true)
+    resolveStop()
+  }, [resolveStop, transition, updateStatus])
+
+  const failClosed = useCallback((reason: string) => {
+    if (endedRef.current) return
+    endedRef.current = true
+    wrappingUpRef.current = true
+    audioRef.current?.setCaptureMuted(true)
+    transition({ type: 'failed', reason })
+    updateStatus('error', reason)
+    setEnded(true)
+    resolveStop()
+  }, [resolveStop, transition, updateStatus])
 
   const clearDrain = useCallback(() => {
     if (drainTimerRef.current) {
       clearTimeout(drainTimerRef.current)
       drainTimerRef.current = null
+    }
+    drainInProgressRef.current = false
+  }, [])
+
+  const clearTranscriptWait = useCallback(() => {
+    if (transcriptTimerRef.current) {
+      clearTimeout(transcriptTimerRef.current)
+      transcriptTimerRef.current = null
     }
   }, [])
 
@@ -152,6 +253,20 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     const s = socketRef.current
     if (s && s.readyState === WebSocket.OPEN) s.send(JSON.stringify(event))
   }, [])
+
+  const configureNextResponse = useCallback((
+    sessionUpdate: Record<string, unknown>,
+    intent: 'normal' | 'recall' | 'closing',
+  ) => {
+    if (responseAfterSessionUpdateRef.current) {
+      failClosed('A second response configuration was queued before the first was acknowledged.')
+      return false
+    }
+    responseAfterSessionUpdateRef.current = intent
+    if (__DEV__) console.info(`[turn-taking] queued ${intent} session update`)
+    send(sessionUpdate)
+    return true
+  }, [failClosed, send])
 
   const appendAssistantStreaming = useCallback((text: string) => {
     if (!streamIdRef.current) {
@@ -177,40 +292,270 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
 
   const applyVoice = useCallback((profile: VoiceProfile) => {
     voiceRef.current = profile
-    send(buildLiveSessionUpdate(patientId, profile.languageLabel, { voice: profile.voice, languageKey: profile.languageKey, persona }))
-  }, [patientId, persona, send])
+  }, [])
 
-  // Ask the model for its closing goodbye (once). The goodbye's transcript triggers scheduleEnd,
-  // which flips `ended` so the screen finalizes (screening + save). Shared by the auto wrap-up and
-  // the manual stopConversation.
-  const requestGoodbye = useCallback(() => {
-    if (closingRef.current) return
+  const waitForPlaybackDrain = useCallback((onDrained: () => void) => {
+    const bridge = audioRef.current
+    clearDrain()
+    drainInProgressRef.current = true
+    const startedAt = Date.now()
+    const THRESHOLD_MS = 40
+    const MAX_WAIT_MS = 25_000
+
+    const poll = () => {
+      if (bridge !== audioRef.current) {
+        drainTimerRef.current = null
+        drainInProgressRef.current = false
+        return
+      }
+      const backlogMs = bridge?.getPlaybackBacklogMs?.() ?? 0
+      const decision = playbackDrainDecision(backlogMs, Date.now() - startedAt, THRESHOLD_MS, MAX_WAIT_MS)
+      if (decision.timedOut) {
+        drainTimerRef.current = null
+        drainInProgressRef.current = false
+        failClosed('Audio playback stalled; microphone kept muted for safety.')
+        return
+      }
+      if (decision.drained) {
+        drainTimerRef.current = null
+        drainInProgressRef.current = false
+        if (__DEV__) console.info(`[turn-taking] playback drained in ${Date.now() - startedAt}ms (backlog=${backlogMs}ms)`)
+        transition({ type: 'playback_drained' })
+        onDrained()
+        return
+      }
+      drainTimerRef.current = setTimeout(poll, Math.min(Math.max(backlogMs, 40), 250))
+    }
+
+    poll()
+  }, [clearDrain, failClosed, transition])
+
+  const playDeterministicResponse = useCallback(async (text: string, closing: boolean) => {
+    const lease = runtimeLeaseRef.current
+    if (!lease?.isCurrent()) return
+    try {
+      responseRequestedRef.current = false
+      responseActiveRef.current = true
+      responseCompletedRef.current = false
+      responseAudioReceivedRef.current = false
+      currentResponseClosingRef.current = closing
+      goodbyeDetectedRef.current = closing
+      audioRef.current?.setCaptureMuted(true)
+      transition({ type: 'response_created' })
+      updateStatus('speaking', 'Speaking...')
+
+      const tts = await qwenTTS(text, { voice: voiceRef.current.voice })
+      if (!lease.isCurrent()) return
+      let wav: Uint8Array
+      if (tts.url) {
+        const response = await fetch(tts.url)
+        if (!lease.isCurrent()) return
+        if (!response.ok) throw new Error(`Qwen TTS audio download failed (${response.status}).`)
+        wav = new Uint8Array(await response.arrayBuffer())
+      } else if (tts.audioBase64) {
+        wav = base64ToBytes(tts.audioBase64)
+      } else {
+        throw new Error('Qwen TTS returned no audio.')
+      }
+      const chunks = qwenWavToPcm24kChunks(wav)
+      if (chunks.length === 0) throw new Error('Qwen TTS returned empty audio.')
+
+      finalizeAssistant(text)
+      responseAudioReceivedRef.current = true
+      transition({ type: 'audio_delta' })
+      for (const chunk of chunks) audioRef.current?.play(chunk)
+
+      responseCompletedRef.current = true
+      responseActiveRef.current = false
+      audioRef.current?.setCaptureMuted(true)
+      transition({ type: 'response_done' })
+      updateStatus('speaking', 'Finishing playback...')
+      waitForPlaybackDrain(() => handlePlaybackCompleteRef.current(closing))
+    } catch (error) {
+      failClosed(error instanceof Error ? error.message : 'Deterministic assistant speech failed.')
+    }
+  }, [failClosed, finalizeAssistant, transition, updateStatus, waitForPlaybackDrain])
+
+  const recallDetail = useCallback(() => {
+    const turns = userTranscriptsRef.current
+    return turns.length > 1 ? turns[turns.length - 2] : turns[0] || 'what you were doing earlier'
+  }, [])
+
+  // Ask for exactly one closing response. This is called only while no response or local playback
+  // owns the turn, so the goodbye can never overlap the sentence that came before it.
+  const requestGoodbye = useCallback((): boolean => {
+    if (closingRef.current) return false
+    if (responseRequestedRef.current || responseActiveRef.current || drainInProgressRef.current) return false
     closingRef.current = true
     wrappingUpRef.current = true
     clearDrain()
     audioRef.current?.setCaptureMuted(true)
-    send(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, { voice: voiceRef.current.voice, languageKey: voiceRef.current.languageKey, persona, wrapUp: true }))
-    send({ type: 'response.create' })
-  }, [clearDrain, patientId, persona, send])
+    transition({ type: 'close_requested' })
+    transition({ type: 'response_requested', closing: true })
+    responseRequestedRef.current = true
+    // If manual close happened mid-utterance, discard the unfinished input so semantic VAD cannot
+    // create a second, competing response after the explicit goodbye response.
+    send({ type: 'input_audio_buffer.clear' })
+    const goodbye = persona === 'companion'
+      ? companionClosingTextForLanguage(voiceRef.current.languageKey)
+      : closingTextForLanguage(voiceRef.current.languageKey)
+    void playDeterministicResponse(goodbye, true)
+    return true
+  }, [clearDrain, persona, playDeterministicResponse, send, transition])
 
   // The model reached the recall deadline without asking it — steer it to do the recall step now.
   const steerRecall = useCallback((): boolean => {
     if (recallForcedRef.current || closingRef.current) return false
+    if (responseRequestedRef.current || responseActiveRef.current || drainInProgressRef.current) return false
     recallForcedRef.current = true
-    send(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, { voice: voiceRef.current.voice, languageKey: voiceRef.current.languageKey, persona, steer: RECALL_DIRECTIVE }))
-    send({ type: 'response.create' })
+    // The deterministic steering response is the recall probe even if transcript heuristics fail to
+    // recognize its wording. The next completed patient turn may then close the screening.
+    recallProbeIssuedRef.current = true
+    responseRequestedRef.current = true
+    audioRef.current?.setCaptureMuted(true)
+    transition({ type: 'response_requested' })
+    void playDeterministicResponse(
+      recallQuestionForLanguage(voiceRef.current.languageKey, recallDetail()),
+      false,
+    )
     return true
-  }, [patientId, persona, send])
+  }, [playDeterministicResponse, recallDetail, transition])
+
+  const resumeListening = useCallback(() => {
+    updateStatus('listening', pushToTalk ? '按住说话' : 'Listening...')
+    if (pushToTalk) return
+
+    // Let the physical speaker/room tail settle after native backlog reaches zero. If a manual close
+    // arrives during this guard, cancel reopening and generate the goodbye while still muted.
+    clearDrain()
+    drainInProgressRef.current = true
+    drainTimerRef.current = setTimeout(() => {
+      drainTimerRef.current = null
+      drainInProgressRef.current = false
+      if (manualCloseRequestedRef.current) {
+        requestGoodbye()
+        return
+      }
+      if (audioRef.current && !wrappingUpRef.current) {
+        vadRef.current.reset()
+        vadSpeakingRef.current = false
+        audioPreRollRef.current = []
+        audioRef.current.setCaptureMuted(false)
+        transition({ type: 'mic_reopened' })
+      }
+    }, 1100)
+  }, [clearDrain, pushToTalk, requestGoodbye, transition, updateStatus])
+
+  const rejectPendingInput = useCallback((reason: 'empty' | 'echo' | 'timeout' | 'failed') => {
+    clearTranscriptWait()
+    if (responseRequestedRef.current) {
+      responseRequestedRef.current = false
+      transition({ type: 'input_rejected' })
+    }
+    if (__DEV__) console.info(`[turn-taking] rejected ${reason} input before response.create`)
+    if (manualCloseRequestedRef.current) {
+      requestGoodbye()
+      return
+    }
+    updateStatus('listening', reason === 'timeout' ? 'I did not catch that. Please try again.' : 'Listening...')
+    resumeListening()
+  }, [clearTranscriptWait, requestGoodbye, resumeListening, transition, updateStatus])
+
+  const finishUserTurn = useCallback(() => {
+    if (turnTakingRef.current.captureMuted || responseRequestedRef.current || responseActiveRef.current) return
+    vadSpeakingRef.current = false
+    audioPreRollRef.current = []
+    transition({ type: 'user_speech_stopped' })
+    responseRequestedRef.current = true
+    audioRef.current?.setCaptureMuted(true)
+    transition({ type: 'response_requested' })
+    setUserSpeaking(false)
+    setRecording(false)
+    updateStatus('processing', 'Thinking...')
+    clearTranscriptWait()
+    // Manual Qwen mode: commit requests transcription but does not create a response. The
+    // transcript handler first chooses the response mode, waits for session.updated, then creates.
+    send({ type: 'input_audio_buffer.commit' })
+    transcriptTimerRef.current = setTimeout(() => rejectPendingInput('timeout'), 6000)
+  }, [clearTranscriptWait, rejectPendingInput, send, transition, updateStatus])
+
+  const handleCaptureChunk = useCallback((base64Pcm16: string) => {
+    if (!runtimeLeaseRef.current?.isCurrent()) return
+    if (pushToTalk) {
+      if (recordingRef.current) send({ type: 'input_audio_buffer.append', audio: base64Pcm16 })
+      return
+    }
+    if (turnTakingRef.current.captureMuted || responseRequestedRef.current || responseActiveRef.current) return
+
+    let result
+    try {
+      result = vadRef.current.feed(decodeBase64Pcm16(base64Pcm16))
+    } catch (error) {
+      failClosed(error instanceof Error ? error.message : 'Unable to inspect microphone audio.')
+      return
+    }
+
+    if (vadSpeakingRef.current) {
+      send({ type: 'input_audio_buffer.append', audio: base64Pcm16 })
+    } else {
+      // Preserve the beginning of the word while two frames confirm speech; discard endless idle
+      // silence instead of letting Qwen's uncommitted input buffer grow forever.
+      audioPreRollRef.current.push(base64Pcm16)
+      if (audioPreRollRef.current.length > 8) audioPreRollRef.current.shift()
+    }
+
+    if (result.event === 'speech_started') {
+      vadSpeakingRef.current = true
+      for (const chunk of audioPreRollRef.current) {
+        send({ type: 'input_audio_buffer.append', audio: chunk })
+      }
+      audioPreRollRef.current = []
+      transition({ type: 'user_speech_started' })
+      setUserSpeaking(true)
+      updateStatus('listening', 'Listening...')
+      if (__DEV__) console.info(`[local-vad] speech started rms=${result.rms.toFixed(4)} threshold=${result.threshold.toFixed(4)}`)
+      return
+    }
+    if (result.event === 'speech_stopped') {
+      if (__DEV__) console.info(`[local-vad] speech stopped rms=${result.rms.toFixed(4)} threshold=${result.threshold.toFixed(4)}`)
+      finishUserTurn()
+    }
+  }, [failClosed, finishUserTurn, pushToTalk, send, transition, updateStatus])
+
+  const handlePlaybackComplete = useCallback((closingResponse: boolean) => {
+    if (closingResponse && !goodbyeDetectedRef.current) {
+      failClosed('Closing response finished without the required goodbye sentence.')
+      return
+    }
+    const action = choosePostPlaybackAction({
+      persona,
+      closingResponse,
+      manualCloseRequested: manualCloseRequestedRef.current,
+      spontaneousGoodbye: goodbyeDetectedRef.current,
+      recallAnswered: recallAnsweredRef.current,
+      recallProbeIssued: recallProbeIssuedRef.current,
+      recallForced: recallForcedRef.current,
+      turnCount: turnCountRef.current,
+      recallDeadlineTurn: RECALL_DEADLINE_TURN,
+      hardMaxTurn: HARD_MAX_TURN,
+    })
+
+    if (action === 'finish') { completeConversation(); return }
+    if (action === 'request_goodbye') {
+      if (!requestGoodbye() && !closingRef.current) failClosed('Unable to start the closing response.')
+      return
+    }
+    if (action === 'steer_recall' && steerRecall()) return
+    resumeListening()
+  }, [completeConversation, failClosed, persona, requestGoodbye, resumeListening, steerRecall])
+  handlePlaybackCompleteRef.current = handlePlaybackComplete
 
   const handleMessage = useCallback(
     (payload: any) => {
+      if (!runtimeLeaseRef.current?.isCurrent()) return
       const type = String(payload?.type || '')
 
       if (type === 'error') {
-        // A response.cancel we just sent may be unsupported / target no active response and bounce back
-        // as an error frame. Swallow exactly that one benignly — do NOT un-mute (would re-open the echo)
-        // and do NOT surface an error; the drain/response.done path re-opens the mic on its own.
-        if (suppressErrorRef.current) { suppressErrorRef.current = false; return }
         // Qwen delivers app-level errors as in-band frames over the OPEN socket (not socket.onerror).
         clearDrain()
         if (!hadResponseRef.current) {
@@ -221,43 +566,140 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           try { socketRef.current?.close() } catch {}
           return
         }
-        if (!wrappingUpRef.current) audioRef.current?.setCaptureMuted(false)
-        updateStatus('error', String(payload?.error?.message || 'realtime error'))
+        failClosed(String(payload?.error?.message || 'Realtime provider error.'))
         return
       }
-      if (type === 'session.created' || type === 'session.updated') {
+      if (type === 'session.created') return
+      if (type === 'session.updated') {
         if (!openingRequestedRef.current) {
           openingRequestedRef.current = true
+          responseRequestedRef.current = true
+          audioRef.current?.setCaptureMuted(true)
+          transition({ type: 'response_requested' })
+          send({ type: 'response.create' })
+        } else if (responseAfterSessionUpdateRef.current) {
+          const intent = responseAfterSessionUpdateRef.current
+          responseAfterSessionUpdateRef.current = null
+          if (__DEV__) console.info(`[turn-taking] acknowledged ${intent} session update; creating response`)
           send({ type: 'response.create' })
         }
         return
       }
       if (type === 'conversation.item.input_audio_transcription.completed') {
+        clearTranscriptWait()
         const transcript = String(payload?.transcript || '').trim()
-        // Automatic echo suppression: if this "user" transcript closely matches something Aria just
-        // said, it's the assistant's own audio leaking into the mic (no hardware AEC). Drop the turn
-        // and cancel any response it triggered, so Aria never ends up talking to herself.
-        if (transcript && looksLikeEchoOfAria(transcript, recentAriaRef.current)) {
-          suppressErrorRef.current = true
-          send({ type: 'response.cancel' })
+        if (!transcript) {
+          rejectPendingInput('empty')
           return
         }
-        if (transcript) {
-          setMessages((prev) => [...prev, { id: randomId('user'), role: 'user', text: transcript }])
-          turnCountRef.current += 1
-          // A patient turn that follows a recall probe = the recall was answered -> we may wrap up.
-          if (recallProbeIssuedRef.current && !recallAnsweredRef.current) recallAnsweredRef.current = true
-          const signal = detectLanguageSignal(transcript)
-          if (signal && signal.confidence >= 0.8 && signal.languageKey !== voiceRef.current.languageKey) {
-            applyVoice(voiceProfileForLanguageKey(signal.languageKey, 'transcript_reassessment'))
+        // With create_response=false, echo/blank input is rejected before a response exists. This
+        // removes the race where response.cancel arrived after Qwen had already started speaking.
+        if (transcript && looksLikeEchoOfAria(transcript, recentAriaRef.current)) {
+          rejectPendingInput('echo')
+          return
+        }
+
+        if (!responseRequestedRef.current) {
+          responseRequestedRef.current = true
+          audioRef.current?.setCaptureMuted(true)
+          transition({ type: 'response_requested' })
+        }
+        setMessages((prev) => [...prev, { id: randomId('user'), role: 'user', text: transcript }])
+        userTranscriptsRef.current.push(transcript)
+        turnCountRef.current += 1
+        const answeredRecall =
+          persona === 'screening' && recallProbeIssuedRef.current && !recallAnsweredRef.current
+        const companionGoodbyeRequested =
+          persona === 'companion' && looksLikeUserGoodbye(transcript)
+        if (answeredRecall) recallAnsweredRef.current = true
+
+        const signal = detectLanguageSignal(transcript)
+        if (signal && signal.confidence >= 0.8 && signal.languageKey !== voiceRef.current.languageKey) {
+          applyVoice(voiceProfileForLanguageKey(signal.languageKey, 'transcript_reassessment'))
+        }
+
+        // The response to a recall answer is itself the closing response. Likewise, a manual close
+        // requested while waiting for transcription produces one goodbye, not a normal reply plus a
+        // second assistant turn.
+        if (answeredRecall || companionGoodbyeRequested || manualCloseRequestedRef.current) {
+          closingRef.current = true
+          wrappingUpRef.current = true
+          transition({ type: 'close_requested' })
+          const goodbye = persona === 'companion'
+            ? companionClosingTextForLanguage(voiceRef.current.languageKey)
+            : closingTextForLanguage(voiceRef.current.languageKey)
+          void playDeterministicResponse(goodbye, true)
+          return
+        }
+
+        // Steer the CURRENT response at the recall deadline. The previous implementation generated
+        // a normal question, waited for playback, then appended another assistant-only recall turn.
+        const recallDue =
+          persona === 'screening' &&
+          !recallProbeIssuedRef.current &&
+          turnCountRef.current >= RECALL_DEADLINE_TURN
+        if (recallDue) {
+          recallForcedRef.current = true
+          recallProbeIssuedRef.current = true
+          void playDeterministicResponse(
+            recallQuestionForLanguage(voiceRef.current.languageKey, recallDetail()),
+            false,
+          )
+        } else {
+          const scriptedQuestion = persona === 'screening'
+            ? screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current)
+            : null
+          if (scriptedQuestion) {
+            void playDeterministicResponse(scriptedQuestion, false)
+          } else {
+            configureNextResponse(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, {
+              voice: voiceRef.current.voice,
+              languageKey: voiceRef.current.languageKey,
+              persona,
+              autoCreateResponse: false,
+            }), 'normal')
           }
         }
         return
       }
-      if (type === 'input_audio_buffer.speech_started') { setUserSpeaking(true); updateStatus('listening', 'Listening...'); return }
-      if (type === 'input_audio_buffer.speech_stopped') { setUserSpeaking(false); updateStatus('processing', 'Thinking...'); return }
-      if (type === 'response.created') { hadResponseRef.current = true; suppressErrorRef.current = false; clearDrain(); audioRef.current?.setCaptureMuted(true); updateStatus('speaking', 'Speaking...'); return }
-      if (type === 'response.audio.delta') { audioRef.current?.play(String(payload?.delta || '')); return }
+      if (type === 'conversation.item.input_audio_transcription.failed') {
+        rejectPendingInput('failed')
+        return
+      }
+      if (type === 'response.created') {
+        hadResponseRef.current = true
+        if (drainInProgressRef.current) {
+          transition({ type: 'response_created' })
+          failClosed('A new response started before prior playback completed.')
+          return
+        }
+        responseRequestedRef.current = false
+        responseActiveRef.current = true
+        responseCompletedRef.current = false
+        responseAudioReceivedRef.current = false
+        currentResponseClosingRef.current = closingRef.current
+        goodbyeDetectedRef.current = false
+        audioRef.current?.setCaptureMuted(true)
+        transition({ type: 'response_created' })
+        updateStatus('speaking', 'Speaking...')
+        return
+      }
+      if (type === 'response.audio.delta') {
+        if (!responseAudioReceivedRef.current) {
+          responseAudioReceivedRef.current = true
+          transition({ type: 'audio_delta' })
+        }
+        try {
+          audioRef.current?.play(String(payload?.delta || ''))
+        } catch (error) {
+          failClosed(error instanceof Error ? error.message : 'Native audio playback failed.')
+        }
+        return
+      }
+      if (type === 'response.audio.done') {
+        // Qwen has finished generating audio, but the native speaker may still have a backlog.
+        return
+      }
       if (type === 'response.audio_transcript.delta' || type === 'response.output_audio_transcript.delta') {
         assistantTextRef.current += String(payload?.delta || '')
         appendAssistantStreaming(assistantTextRef.current)
@@ -271,93 +713,93 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         if (looksLikeRecallProbe(finalText) && (recallForcedRef.current || turnCountRef.current >= RECALL_DEADLINE_TURN)) {
           recallProbeIssuedRef.current = true
         }
-        if (looksLikeGoodbye(finalText)) scheduleEnd()
+        goodbyeDetectedRef.current = looksLikeGoodbye(finalText)
         return
       }
       if (type === 'response.done') {
-        updateStatus('listening', pushToTalk ? '按住说话' : 'Listening...')
-        // During wrap-up we deliberately stay muted until cleanup (stopConversation drives teardown).
-        if (wrappingUpRef.current) return
-        // Natural ending: the realtime model won't conclude on its own, so drive it from the turn
-        // counter. Once recall has been asked AND answered (or we hit the hard cap), request the
-        // goodbye -> scheduleEnd -> finalize. If recall hasn't happened by the deadline, steer it now.
-        // Recall floor + forced wrap-up is a SCREENING-only mechanism. The companion persona is
-        // open chat with no agenda: it ends only on the user's goodbye (looksLikeGoodbye) or a manual
-        // stop, so we skip this entirely and just drain/un-mute normally.
-        if (persona === 'screening' && !closingRef.current) {
-          if (recallAnsweredRef.current || turnCountRef.current >= HARD_MAX_TURN) { requestGoodbye(); return }
-          // Only skip the drain (stay muted) if steerRecall ACTUALLY issued a new response; a no-op
-          // (already forced) must fall through to the drain so the mic re-opens — else it wedges.
-          if (!recallProbeIssuedRef.current && turnCountRef.current >= RECALL_DEADLINE_TURN && steerRecall()) return
+        if (responseCompletedRef.current) {
+          transition({ type: 'response_done' })
+          return
         }
-        // Push-to-talk: never auto-un-mute — the mic stays muted until the user holds "speak" again.
-        if (pushToTalk) return
-        // `response.done` fires when the last audio delta is ENQUEUED, not when it finishes playing.
-        // Poll the native playback backlog (now includes the not-yet-written queue) and un-mute only
-        // once the assistant is actually silent, otherwise the mirror captures its own voice and
-        // server-VAD self-triggers a turn (Aria talking to her own echo).
-        const bridge = audioRef.current
-        clearDrain()
-        const startedAt = Date.now()
-        const THRESHOLD_MS = 120 // treat as drained once backlog is this small
-        // Acoustic + capture-pipeline tail to let the room go quiet before re-opening the mic. Kept
-        // generous because emulators/soft-speakers report "playback done" well before the sound has
-        // physically stopped; the transcript-level echo suppressor is the backstop for anything that
-        // still leaks through this window.
-        const GUARD_MS = 1100
-        const MAX_WAIT_MS = 20000 // safety: never leave the mic muted forever if playback wedges
-        const drain = () => {
-          if (bridge !== audioRef.current) { drainTimerRef.current = null; return }
-          const backlogMs = bridge?.getPlaybackBacklogMs?.() ?? 0
-          if (backlogMs <= THRESHOLD_MS || Date.now() - startedAt > MAX_WAIT_MS) {
-            // Playback has drained — wait a short guard tail, then re-open the mic (unless we've
-            // since started wrapping up or the session was torn down).
-            drainTimerRef.current = setTimeout(() => {
-              drainTimerRef.current = null
-              if (bridge === audioRef.current && !wrappingUpRef.current) bridge?.setCaptureMuted(false)
-            }, GUARD_MS)
-            return
-          }
-          drainTimerRef.current = setTimeout(drain, Math.min(backlogMs, 250))
-        }
-        drain()
+        responseCompletedRef.current = true
+        responseRequestedRef.current = false
+        responseActiveRef.current = false
+        audioRef.current?.setCaptureMuted(true)
+        transition({ type: 'response_done' })
+        updateStatus('speaking', 'Finishing playback...')
+        const closingResponse = currentResponseClosingRef.current
+        waitForPlaybackDrain(() => handlePlaybackComplete(closingResponse))
         return
       }
     },
-    [appendAssistantStreaming, applyVoice, clearDrain, finalizeAssistant, persona, reportUnavailable, requestGoodbye, scheduleEnd, steerRecall, send, updateStatus],
+    [appendAssistantStreaming, applyVoice, clearDrain, clearTranscriptWait, configureNextResponse, failClosed, finalizeAssistant, handlePlaybackComplete, patientId, persona, playDeterministicResponse, recallDetail, rejectPendingInput, reportUnavailable, send, transition, updateStatus, waitForPlaybackDrain],
   )
 
   const cleanup = useCallback(() => {
+    const lease = runtimeLeaseRef.current
+    runtimeLeaseRef.current = null
+    lease?.release()
+    startingRef.current = false
+    startAttemptRef.current += 1
     if (drainTimerRef.current) { clearTimeout(drainTimerRef.current); drainTimerRef.current = null }
+    if (transcriptTimerRef.current) { clearTimeout(transcriptTimerRef.current); transcriptTimerRef.current = null }
     if (wrapupTimerRef.current) { clearTimeout(wrapupTimerRef.current); wrapupTimerRef.current = null }
-    if (endTimerRef.current) { clearTimeout(endTimerRef.current); endTimerRef.current = null }
     if (connectTimerRef.current) { clearTimeout(connectTimerRef.current); connectTimerRef.current = null }
+    drainInProgressRef.current = false
     wrappingUpRef.current = false
+    vadRef.current.reset()
+    vadSpeakingRef.current = false
+    audioPreRollRef.current = []
+    recordingRef.current = false
+    pushToTalkGestureRef.current.reset()
     void audioRef.current?.stop()
     audioRef.current = null
     try { socketRef.current?.close() } catch {}
     socketRef.current = null
+    try { phase1InjectorRef.current?.close() } catch {}
+    phase1InjectorRef.current = null
+    phase1InjectionEpochRef.current += 1
+    phase1InjectionChainRef.current = Promise.resolve()
+    phase1StopAtRef.current = null
     openingRequestedRef.current = false
+    responseAfterSessionUpdateRef.current = null
+    responseRequestedRef.current = false
+    responseActiveRef.current = false
+    responseCompletedRef.current = false
+    responseAudioReceivedRef.current = false
+    currentResponseClosingRef.current = false
     streamIdRef.current = null
     assistantTextRef.current = ''
+    userTranscriptsRef.current = []
     setSessionActive(false)
     setConnecting(false)
     setUserSpeaking(false)
-  }, [])
+    setRecording(false)
+    resolveStop()
+  }, [resolveStop])
 
   const startConversation = useCallback(async () => {
     if (Platform.OS === 'web') {
       updateStatus('error', 'Direct WS (v3) is native-only — web uses the relay (v1). Set mode=relay on web.')
       return
     }
-    if (socketRef.current) return
+    if (socketRef.current || startingRef.current) return
+    const runtimeLease = acquireConversationRuntime(instanceIdRef.current, cleanup)
+    runtimeLeaseRef.current = runtimeLease
+    startingRef.current = true
+    const startAttempt = startAttemptRef.current + 1
+    startAttemptRef.current = startAttempt
     setConnecting(true)
     updateStatus('processing', 'Connecting...')
+    turnTakingRef.current = createTurnTakingState()
+    setTurnState('idle')
+    transition({ type: 'connect_started' })
     setMessages([])
     setEnded(false)
     endedRef.current = false
     voiceRef.current = voiceProfileForSession(language)
     openingRequestedRef.current = false
+    responseAfterSessionUpdateRef.current = null
     hadResponseRef.current = false
     openedRef.current = false
     reportedUnavailableRef.current = false
@@ -366,18 +808,35 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     recallAnsweredRef.current = false
     recallForcedRef.current = false
     closingRef.current = false
+    manualCloseRequestedRef.current = false
+    responseRequestedRef.current = false
+    responseActiveRef.current = false
+    responseCompletedRef.current = false
+    responseAudioReceivedRef.current = false
+    currentResponseClosingRef.current = false
+    goodbyeDetectedRef.current = false
+    drainInProgressRef.current = false
     recentAriaRef.current = []
+    userTranscriptsRef.current = []
+    vadRef.current.reset()
+    vadSpeakingRef.current = false
+    audioPreRollRef.current = []
+    recordingRef.current = false
+    pushToTalkGestureRef.current.reset()
     setRecording(false)
 
     try {
       // Short-lived server-minted token (secure) or, if explicitly enabled, the kiosk client key.
       const bearer = await getBearer()
+      // The hook may have been cleaned up or superseded while the token request was in flight.
+      if (!runtimeLease.isCurrent() || !startingRef.current || startAttemptRef.current !== startAttempt) return
 
       // RN WebSocket supports a 3rd `options.headers` arg (not in DOM types → cast).
       const socket = new (WebSocket as any)(realtimeWsUrl(), undefined, {
         headers: { Authorization: `Bearer ${bearer}` },
       }) as WebSocket
       socketRef.current = socket
+      startingRef.current = false
       // Connection watchdog: if the socket never opens within 7s (dead region/network), fall back
       // to the turn-based stack instead of hanging in "Connecting..." forever.
       if (connectTimerRef.current) clearTimeout(connectTimerRef.current)
@@ -387,40 +846,104 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       }, 7000)
 
       socket.onopen = () => {
+        if (!runtimeLease.isCurrent()) { try { socket.close() } catch {}; return }
         openedRef.current = true
         if (connectTimerRef.current) { clearTimeout(connectTimerRef.current); connectTimerRef.current = null }
         setSessionActive(true)
         setConnecting(false)
-        updateStatus('listening', 'Listening...')
-        send(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, { voice: voiceRef.current.voice, languageKey: voiceRef.current.languageKey, persona }))
+        transition({ type: 'session_configuring' })
+        updateStatus('processing', 'Starting Aria...')
+        send(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, {
+          voice: voiceRef.current.voice,
+          languageKey: voiceRef.current.languageKey,
+          persona,
+          autoCreateResponse: false,
+        }))
         // Start native PCM capture -> stream frames upstream.
         const audio = createPcmAudioBridge()
         audioRef.current = audio
-        // Push-to-talk: capture starts muted; the mic only opens while the user holds "speak".
-        if (pushToTalk) { audio.setCaptureMuted(true); updateStatus('listening', '按住说话') }
+        // Capture stays muted through the opening response and its local playback drain.
+        audio.setCaptureMuted(true)
         audio
-          .start((base64Pcm16) => send({ type: 'input_audio_buffer.append', audio: base64Pcm16 }))
-          .catch((e: unknown) => updateStatus('error', e instanceof Error ? e.message : 'audio start failed'))
+          .start(handleCaptureChunk)
+          .then(() => audio.setCaptureMuted(true))
+          .catch((e: unknown) => {
+            if (!hadResponseRef.current) { reportUnavailable('audio_start_failed'); cleanup() }
+            else failClosed(e instanceof Error ? e.message : 'Audio start failed.')
+          })
+
+        // Local MuMu acceptance can inject silent, pre-recorded PCM frames into the exact same
+        // JS VAD/Qwen pipeline. This endpoint is compiled out unless explicitly configured in a
+        // development bundle; it is never enabled in production or by default.
+        const injectorUrl = __DEV__ ? process.env.EXPO_PUBLIC_PHASE1_AUDIO_INJECTOR_URL?.trim() : ''
+        if (injectorUrl) {
+          const injector = new WebSocket(injectorUrl)
+          phase1InjectorRef.current = injector
+          injector.onmessage = (event) => {
+            const raw = String(event.data || '')
+            try {
+              const command = JSON.parse(raw) as { type?: string; frames?: unknown; stopAt?: unknown }
+              if (command.type === 'phase1.pcm' && Array.isArray(command.frames)) {
+                const frames = command.frames.filter((frame): frame is string => typeof frame === 'string')
+                const allowedStopPhases: TurnTakingPhase[] = [
+                  'user_speaking', 'assistant_generating', 'assistant_playing', 'playback_guard',
+                ]
+                phase1StopAtRef.current = allowedStopPhases.includes(command.stopAt as TurnTakingPhase)
+                  ? command.stopAt as TurnTakingPhase
+                  : null
+                const injectionEpoch = phase1InjectionEpochRef.current
+                phase1InjectionChainRef.current = phase1InjectionChainRef.current.then(async () => {
+                  // Avoid interleaving the simulator's native 100 ms silence frames with injected
+                  // 100 ms speech frames; real capture has only one source. The canonical state
+                  // remains listening, so the injected frames still traverse the production VAD.
+                  audioRef.current?.setCaptureMuted(true)
+                  console.info(
+                    `[phase1-injector] replaying ${frames.length} frames ` +
+                      `phase=${turnTakingRef.current.phase} muted=${turnTakingRef.current.captureMuted} ` +
+                      `requested=${responseRequestedRef.current} active=${responseActiveRef.current} ptt=${pushToTalk}`,
+                  )
+                  for (const frame of frames) {
+                    if (phase1InjectionEpochRef.current !== injectionEpoch) return
+                    handleCaptureChunk(frame)
+                    await new Promise<void>((resolve) => setTimeout(resolve, 100))
+                  }
+                  console.info('[phase1-injector] replay complete')
+                  if (
+                    turnTakingRef.current.phase === 'listening' &&
+                    !responseRequestedRef.current &&
+                    !responseActiveRef.current
+                  ) {
+                    audioRef.current?.setCaptureMuted(false)
+                  }
+                })
+                return
+              }
+            } catch {
+              // Backward-compatible single-frame mode for local debugging.
+            }
+            handleCaptureChunk(raw)
+          }
+          injector.onopen = () => console.info('[phase1-injector] connected')
+          injector.onerror = () => console.warn('[phase1-injector] unavailable')
+        }
       }
       socket.onmessage = (event) => {
         try { handleMessage(JSON.parse(String(event.data))) } catch { /* ignore malformed */ }
       }
       socket.onerror = () => {
         // Before any response: omni is unreachable -> let the supervisor fall back (onclose cleans up).
-        if (!hadResponseRef.current) { reportUnavailable('ws_error'); return }
-        updateStatus('error', 'Realtime WS error (check token / region).')
+        if (!hadResponseRef.current) { reportUnavailable('ws_error'); cleanup(); return }
+        failClosed('Realtime connection error.')
       }
       socket.onclose = () => {
         // Closed before it ever opened (region block / handshake reject / connect fail): fall back.
         if (!openedRef.current && !hadResponseRef.current) {
           reportUnavailable('ws_closed_before_open')
-        } else if (hadResponseRef.current && !closingRef.current) {
-          // Provider closed a LIVE session (e.g. the 120-min / turn cap) after real turns — don't
-          // silently drop the check-in: drive finalize so assessCheckin + saveCheckin still run.
-          updateStatus('idle', 'Conversation ended')
-          endedRef.current = true
-          setEnded(true)
-        } else if (sessionActive) {
+        } else if (hadResponseRef.current && !endedRef.current) {
+          // A live provider close is not proof that queued audio played. Fail closed and preserve the
+          // captured session instead of reopening capture or pretending the goodbye completed.
+          failClosed('Realtime connection closed before the turn completed.')
+        } else if (openedRef.current && !endedRef.current) {
           updateStatus('idle', 'Conversation ended')
         }
         cleanup()
@@ -428,45 +951,88 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     } catch (e) {
       cleanup()
       if (!hadResponseRef.current) { reportUnavailable('ws_start_failed'); return }
-      updateStatus('error', `Error: ${e instanceof Error ? e.message : 'unknown'}`)
+      failClosed(`Error: ${e instanceof Error ? e.message : 'unknown'}`)
     }
-  }, [cleanup, handleMessage, language, patientId, persona, reportUnavailable, send, sessionActive, updateStatus])
+  }, [cleanup, failClosed, handleCaptureChunk, handleMessage, language, patientId, persona, reportUnavailable, send, transition, updateStatus])
 
   const stopConversation = useCallback(async () => {
-    // If an auto wrap-up (goodbye) is already in flight (the natural-ending path), don't request a
-    // SECOND goodbye — just latch mute + teardown. Otherwise ask for the graceful goodbye now.
-    // (requestGoodbye is guarded by closingRef, so it also latches wrap-up state.)
-    if (!closingRef.current) {
-      requestGoodbye()
-    } else {
-      wrappingUpRef.current = true
-      clearDrain()
-      audioRef.current?.setCaptureMuted(true)
-    }
-    updateStatus('idle', 'Wrapping up...')
-    // Wait for the queued goodbye to finish PLAYING before teardown (cap ~10s), instead of a fixed
-    // 4s that could clip a longer goodbye. Give it a moment to start producing audio, then drain.
-    const startedAt = Date.now()
-    if (wrapupTimerRef.current) clearTimeout(wrapupTimerRef.current)
-    const waitDrain = () => {
-      const backlogMs = audioRef.current?.getPlaybackBacklogMs?.() ?? 0
-      if (backlogMs <= 20 || Date.now() - startedAt > 10000) { cleanup(); return }
-      wrapupTimerRef.current = setTimeout(waitDrain, Math.min(Math.max(backlogMs, 60), 300))
-    }
-    wrapupTimerRef.current = setTimeout(waitDrain, 1500)
-  }, [cleanup, clearDrain, requestGoodbye, updateStatus])
+    // Auto-close already observed the complete goodbye playback; teardown is now safe.
+    if (endedRef.current) { cleanup(); return }
+    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) { cleanup(); return }
 
-  // Push-to-talk control: tap to open the mic ("speaking"), tap again to send — muting ends the turn
-  // so server-VAD generates Aria's reply. No-op unless pushToTalk is enabled.
+    let stopPromise = stopPromiseRef.current
+    if (!stopPromise) {
+      stopPromise = new Promise<void>((resolve) => { stopResolveRef.current = resolve })
+      stopPromiseRef.current = stopPromise
+    }
+
+    manualCloseRequestedRef.current = true
+    wrappingUpRef.current = true
+    audioRef.current?.setCaptureMuted(true)
+    transition({ type: 'close_requested' })
+    updateStatus('processing', 'Wrapping up. Aria will say goodbye in a moment...')
+
+    // If nothing owns the turn, start the goodbye now. If generation/playback is active, its
+    // post-playback policy will start the goodbye exactly once.
+    if (
+      !closingRef.current &&
+      !responseRequestedRef.current &&
+      !responseActiveRef.current &&
+      !turnTakingRef.current.awaitingPlayback
+    ) {
+      clearDrain()
+      requestGoodbye()
+    }
+
+    // Safety bound only. Normal completion is driven by closing response.done + native drain.
+    if (wrapupTimerRef.current) clearTimeout(wrapupTimerRef.current)
+    wrapupTimerRef.current = setTimeout(() => {
+      wrapupTimerRef.current = null
+      failClosed('Graceful close timed out; session ended with capture muted.')
+    }, 30_000)
+
+    await stopPromise
+    cleanup()
+  }, [cleanup, clearDrain, failClosed, requestGoodbye, transition, updateStatus])
+  phase1StopConversationRef.current = () => { void stopConversation() }
+
+  const beginPushToTalk = useCallback(() => {
+    if (
+      !pushToTalk || wrappingUpRef.current || !runtimeLeaseRef.current?.isCurrent() ||
+      socketRef.current?.readyState !== WebSocket.OPEN || !audioRef.current ||
+      responseRequestedRef.current || responseActiveRef.current || drainInProgressRef.current
+    ) return
+    const token = pushToTalkGestureRef.current.begin()
+    if (token === null || !pushToTalkGestureRef.current.ready(token)) return
+
+    // Each physical hold owns a fresh provider buffer. This also prevents a cancelled/empty prior
+    // gesture from being committed with the next utterance.
+    send({ type: 'input_audio_buffer.clear' })
+    recordingRef.current = true
+    setRecording(true)
+    vadRef.current.reset()
+    vadSpeakingRef.current = true
+    audioPreRollRef.current = []
+    audioRef.current.setCaptureMuted(false)
+    if (turnTakingRef.current.captureMuted) transition({ type: 'mic_reopened' })
+    transition({ type: 'user_speech_started' })
+    setUserSpeaking(true)
+    updateStatus('listening', 'Listening… release to send')
+  }, [pushToTalk, send, transition, updateStatus])
+
+  const endPushToTalk = useCallback(() => {
+    if (!pushToTalk) return
+    const release = pushToTalkGestureRef.current.release()
+    if (release !== 'send' || !recordingRef.current) return
+    recordingRef.current = false
+    finishUserTurn()
+  }, [finishUserTurn, pushToTalk])
+
+  // Retained for automated diagnostics and callers that cannot expose press-in/press-out events.
   const toggleRecording = useCallback(() => {
-    if (!pushToTalk || wrappingUpRef.current) return
-    setRecording((r) => {
-      const next = !r
-      audioRef.current?.setCaptureMuted(!next)
-      setUserSpeaking(next)
-      return next
-    })
-  }, [pushToTalk])
+    if (recordingRef.current) endPushToTalk()
+    else beginPushToTalk()
+  }, [beginPushToTalk, endPushToTalk])
 
   useEffect(() => cleanup, [cleanup])
 
@@ -480,9 +1046,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     connecting,
     sessionActive,
     userSpeaking,
+    turnState,
     ended,
     recording: pushToTalk ? recording : undefined,
+    beginPushToTalk: pushToTalk ? beginPushToTalk : undefined,
+    endPushToTalk: pushToTalk ? endPushToTalk : undefined,
     toggleRecording: pushToTalk ? toggleRecording : undefined,
   }
 }
-

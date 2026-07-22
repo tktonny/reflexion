@@ -40,8 +40,8 @@ function eventId() {
   return `event_${randomUUID().replace(/-/g, '').slice(0, 12)}`
 }
 
-function buildLiveSessionUpdate(patientId, language, { voice, wrapUp = false } = {}) {
-  let instructions = buildLiveInstructions(patientId, language, {})
+function buildLiveSessionUpdate(patientId, language, { voice, wrapUp = false, persona = 'screening' } = {}) {
+  let instructions = buildLiveInstructions(patientId, language, { persona })
   if (wrapUp) {
     const goodbye = closingGoodbyeSentence(language)
     instructions +=
@@ -122,7 +122,7 @@ function connectUpstream(url) {
   })
 }
 
-export async function runLiveQwen(clientWs, { patientId, language }) {
+export async function runLiveQwen(clientWs, { patientId, language, persona = 'screening' }) {
   if (!qwenConfig.apiKey) {
     throw new Error('missing_qwen_api_key (set QWEN_API_KEY or DASHSCOPE_API_KEY)')
   }
@@ -136,7 +136,7 @@ export async function runLiveQwen(clientWs, { patientId, language }) {
     try {
       const upstream = await connectUpstream(url)
       log(`upstream connected url=${urls[i]}`)
-      await relaySession(clientWs, upstream, { patientId, language, selectedVoiceProfile })
+      await relaySession(clientWs, upstream, { patientId, language, persona, selectedVoiceProfile })
       return
     } catch (err) {
       lastError = err
@@ -151,7 +151,7 @@ export async function runLiveQwen(clientWs, { patientId, language }) {
   if (lastError) throw lastError
 }
 
-function relaySession(clientWs, upstream, { patientId, language, selectedVoiceProfile }) {
+function relaySession(clientWs, upstream, { patientId, language, persona, selectedVoiceProfile }) {
   return new Promise((resolve, reject) => {
     let selected = selectedVoiceProfile
     let deferredVoiceProfile = null
@@ -174,7 +174,7 @@ function relaySession(clientWs, upstream, { patientId, language, selectedVoicePr
     }
     const sendSessionUpdate = (profile, reason) => {
       log(`session.update flow_id=${flowId} steps=${promptStepCount} voice=${profile.voice} language=${profile.languageLabel} reason=${reason}`)
-      sendUpstream(buildLiveSessionUpdate(patientId, profile.languageLabel, { voice: profile.voice }))
+      sendUpstream(buildLiveSessionUpdate(patientId, profile.languageLabel, { voice: profile.voice, persona }))
     }
     const applyVoiceProfile = (profile, reason) => {
       sendSessionUpdate(profile, reason)
@@ -190,7 +190,7 @@ function relaySession(clientWs, upstream, { patientId, language, selectedVoicePr
     }
     const sendWrapUp = () => {
       log(`wrap-up patient_id=${patientId} voice=${selected.voice} language=${selected.languageLabel}`)
-      sendUpstream(buildLiveSessionUpdate(patientId, selected.languageLabel, { voice: selected.voice, wrapUp: true }))
+      sendUpstream(buildLiveSessionUpdate(patientId, selected.languageLabel, { voice: selected.voice, wrapUp: true, persona }))
       sendUpstream({ type: 'response.create' })
     }
 

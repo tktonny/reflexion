@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 
 import { useConversation } from '../src/hooks/useConversation'
+import { VERSION_LABELS } from '../src/config/conversationMode'
 import {
   assessConversation,
   transcriptFromMessages,
@@ -11,6 +12,7 @@ import {
 } from '../src/api/assess'
 import { resolveOwnerIds, saveCheckin } from '../src/api/saveCheckin'
 import { MirrorCameraPanel, type MirrorCameraHandle } from '../src/components/MirrorCameraPanel'
+import { isCognitiveAssessmentEligible } from '../src/orchestration/conversationPurpose'
 
 // Standalone test screen: real voice interaction + live transcript + a post-session
 // cognitive-screening JUDGMENT. No pairing/MongoDB required (demo patient).
@@ -29,8 +31,11 @@ export default function RealtimeTestScreen() {
     connecting,
     sessionActive,
     userSpeaking,
+    turnState,
     ended,
     recording,
+    beginPushToTalk,
+    endPushToTalk,
     toggleRecording,
   } = useConversation({ patientId: 'demo-patient', language: 'en', persona, pushToTalk })
 
@@ -41,6 +46,8 @@ export default function RealtimeTestScreen() {
   const sessionStartRef = useRef<Date | null>(null)
   const cameraRef = useRef<MirrorCameraHandle | null>(null)
   const finalizingRef = useRef(false)
+  const messagesRef = useRef(messages)
+  messagesRef.current = messages
 
   const busy = connecting || sessionActive
   const hasTurns = messages.some((m) => m.role === 'user' || m.role === 'assistant')
@@ -84,10 +91,20 @@ export default function RealtimeTestScreen() {
     if (finalizingRef.current) return
     finalizingRef.current = true
     await stopConversation()
-    const a = await runAssessment()
+    const finalMessages = messagesRef.current
+    const transcript = transcriptFromMessages(finalMessages)
+    let a: ScreeningAssessment | null = null
+    if (isCognitiveAssessmentEligible(persona, finalMessages)) {
+      setAssessing(true)
+      setAssessError('')
+      const result = await assessConversation(transcript, 'en', cameraRef.current?.getFrames() ?? [])
+      setAssessing(false)
+      if (result.success) { a = result.assessment; setAssessment(result.assessment) }
+      else setAssessError(`评估失败: ${result.reason}`)
+    }
     const ids = await resolveOwnerIds()
     const res = await saveCheckin({
-      messages,
+      messages: finalMessages,
       startedAt: sessionStartRef.current ?? new Date(),
       endedAt: new Date(),
       nurseId: ids.nurseId,
@@ -98,7 +115,7 @@ export default function RealtimeTestScreen() {
       assessment: a,
     })
     setSaveNote(res.saved ? '✓ 已保存到后台(Conversation + 判断)' : `未入库: ${res.reason}(已进离线队列)`)
-  }, [messages, runAssessment, stopConversation])
+  }, [persona, stopConversation])
 
   const onEnd = finalize
 
@@ -119,7 +136,7 @@ export default function RealtimeTestScreen() {
         <Text style={styles.title}>Reflexion 检查 · 测试</Text>
         <View style={styles.statusRow}>
           <Text style={[styles.status, { color: statusColor }]}>{statusText}{userSpeaking ? ' 🎤' : ''}</Text>
-          <Text style={styles.modeTag}>版本: {mode} · {persona === 'companion' ? '日常助手' : '认知检查'}</Text>
+          <Text style={styles.modeTag}>版本: {VERSION_LABELS[mode] ?? mode} · {persona === 'companion' ? '日常助手' : '认知检查'}{turnState ? ` · ${turnState}` : ''}</Text>
         </View>
         <Pressable onPress={() => router.push('/hardware-check')}>
           <Text style={styles.linkText}>🔧 硬件自检</Text>
@@ -129,7 +146,7 @@ export default function RealtimeTestScreen() {
 
         {busy ? (
           <Pressable onPress={() => void onEnd()} style={[styles.button, styles.stopButton]}>
-            <Text style={styles.buttonText}>结束并评估</Text>
+            <Text style={styles.buttonText}>{persona === 'screening' ? '结束并评估' : '结束对话'}</Text>
           </Pressable>
         ) : (
           <View style={{ gap: 10 }}>
@@ -151,13 +168,18 @@ export default function RealtimeTestScreen() {
           </View>
         )}
 
-        {busy && toggleRecording ? (
-          <Pressable onPress={toggleRecording} style={[styles.button, recording ? styles.stopButton : styles.talkButton]}>
-            <Text style={styles.buttonText}>{recording ? '发送（结束说话）' : '🎤 开始说话'}</Text>
+        {busy && beginPushToTalk && endPushToTalk ? (
+          <Pressable
+            disabled={!recording && statusKind !== 'listening'}
+            onPressIn={beginPushToTalk}
+            onPressOut={endPushToTalk}
+            style={[styles.button, recording ? styles.stopButton : styles.talkButton]}
+          >
+            <Text style={styles.buttonText}>{recording ? '🎙 正在听 · 松开发送' : '🎤 按住说话'}</Text>
           </Pressable>
         ) : null}
 
-        {!busy && hasTurns ? (
+        {!busy && hasTurns && persona === 'screening' ? (
           <Pressable onPress={() => void runAssessment()} style={[styles.button, styles.assessButton]} disabled={assessing}>
             <Text style={styles.assessButtonText}>{assessing ? '评估中…' : '重新评估这段对话'}</Text>
           </Pressable>
@@ -165,7 +187,11 @@ export default function RealtimeTestScreen() {
 
         <ScrollView style={styles.transcript} contentContainerStyle={styles.transcriptInner}>
           {messages.length === 0 ? (
-            <Text style={styles.hint}>点"开始对话",允许麦克风,然后说话。Aria 会先开场,按 4 阶段推进。结束后给出判断。</Text>
+            <Text style={styles.hint}>
+              {persona === 'screening'
+                ? '开始认知检查后，Aria 会用 7 个自然问题推进，结束后生成研究筛查判断。'
+                : '开始日常对话后，可以询问天气、日程、用药提醒或随意聊天；不会生成认知风险判断。'}
+            </Text>
           ) : (
             messages.map((m) => (
               <View key={m.id} style={styles.msgRow}>

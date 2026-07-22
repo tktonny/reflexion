@@ -9,11 +9,27 @@
 // isn't linked in the running build, create() returns null and callers fall back to tap-to-start.
 
 import { Asset } from 'expo-asset'
-import { Platform } from 'react-native'
+import { NativeModules, Platform } from 'react-native'
 
 // Static import is safe for bundling (the JS package is installed); the NATIVE calls throw if the
 // module isn't linked into this build, which we catch in createWakeWordEngine().
-import { InferenceSession, Tensor } from 'onnxruntime-react-native'
+type OrtModule = typeof import('onnxruntime-react-native')
+type InferenceSession = import('onnxruntime-react-native').InferenceSession
+
+let ortModule: OrtModule | null | undefined
+
+/** The package can be bundled while its native JSI install is unavailable (notably emulators). */
+function getOrtModule(): OrtModule | null {
+  if (ortModule !== undefined) return ortModule
+  try {
+    // Keep this out of module initialization: onnxruntime-react-native can throw before callers get
+    // a chance to apply the documented tap-to-start fallback.
+    ortModule = require('onnxruntime-react-native') as OrtModule
+  } catch {
+    ortModule = null
+  }
+  return ortModule
+}
 
 const MEL_BINS = 32
 const EMB_WINDOW = 76 // mel frames per embedding window
@@ -32,7 +48,9 @@ const MODEL_MODULES = {
 }
 
 export function isWakeWordRuntimeAvailable(): boolean {
-  return Platform.OS !== 'web' && !!InferenceSession
+  // The package's own binding dereferences NativeModules.Onnxruntime.install() during import, so
+  // check that bridge first instead of using an exception as routine emulator feature detection.
+  return Platform.OS !== 'web' && NativeModules.Onnxruntime != null && getOrtModule() !== null
 }
 
 /** Resolve a bundled ONNX asset to a local filesystem path for InferenceSession.create. */
@@ -46,12 +64,15 @@ export type WakeWordEngine = { feed: (pcm16: Int16Array) => Promise<void>; reset
 
 /** Build the engine, or null if the runtime/models are unavailable (caller then uses tap-to-start). */
 export async function createWakeWordEngine(onDetected: () => void): Promise<WakeWordEngine | null> {
-  if (!isWakeWordRuntimeAvailable()) return null
+  if (Platform.OS === 'web' || NativeModules.Onnxruntime == null) return null
+  const ort = getOrtModule()
+  if (!ort) return null
+  const OrtTensor = ort.Tensor
   let mel: InferenceSession, emb: InferenceSession, ww: InferenceSession
   try {
-    mel = await InferenceSession.create(await assetPath(MODEL_MODULES.mel))
-    emb = await InferenceSession.create(await assetPath(MODEL_MODULES.emb))
-    ww = await InferenceSession.create(await assetPath(MODEL_MODULES.ww))
+    mel = await ort.InferenceSession.create(await assetPath(MODEL_MODULES.mel))
+    emb = await ort.InferenceSession.create(await assetPath(MODEL_MODULES.emb))
+    ww = await ort.InferenceSession.create(await assetPath(MODEL_MODULES.ww))
   } catch {
     return null // native onnxruntime not linked, or model load failed
   }
@@ -77,7 +98,7 @@ export async function createWakeWordEngine(onDetected: () => void): Promise<Wake
     while (audio.length >= CHUNK) {
       const chunk = audio.slice(0, CHUNK)
       audio = audio.slice(CHUNK)
-      const out = await mel.run({ [melIn]: new Tensor('float32', Float32Array.from(chunk), [1, chunk.length]) })
+      const out = await mel.run({ [melIn]: new OrtTensor('float32', Float32Array.from(chunk), [1, chunk.length]) })
       const data = out[melOut].data as Float32Array
       const frames = Math.floor(data.length / MEL_BINS)
       for (let f = 0; f < frames; f += 1) {
@@ -93,7 +114,7 @@ export async function createWakeWordEngine(onDetected: () => void): Promise<Wake
         const row = melFrames[nextEmbStart + i]
         for (let b = 0; b < MEL_BINS; b += 1) flat[i * MEL_BINS + b] = row[b]
       }
-      const out = await emb.run({ [embIn]: new Tensor('float32', flat, [1, EMB_WINDOW, MEL_BINS, 1]) })
+      const out = await emb.run({ [embIn]: new OrtTensor('float32', flat, [1, EMB_WINDOW, MEL_BINS, 1]) })
       const e = out[embOut].data as Float32Array
       embeds.push(Array.from(e)) // 96-dim (drop leading singleton dims)
       nextEmbStart += EMB_STRIDE
@@ -102,7 +123,7 @@ export async function createWakeWordEngine(onDetected: () => void): Promise<Wake
         const win = embeds.slice(embeds.length - WW_WINDOW)
         const wflat = new Float32Array(WW_WINDOW * win[0].length)
         for (let i = 0; i < WW_WINDOW; i += 1) wflat.set(win[i], i * win[0].length)
-        const s = await ww.run({ [wwIn]: new Tensor('float32', wflat, [1, WW_WINDOW, win[0].length]) })
+        const s = await ww.run({ [wwIn]: new OrtTensor('float32', wflat, [1, WW_WINDOW, win[0].length]) })
         const score = (s[wwOut].data as Float32Array)[0]
         if (score > THRESHOLD) { hits += 1; if (hits >= TRIGGER_HITS) { hits = 0; reset(); onDetected() } }
         else hits = 0

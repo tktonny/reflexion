@@ -69,6 +69,7 @@ httpServer.on('upgrade', async (req, socket, head) => {
   }
   const patientId = url.searchParams.get('patient_id') || 'demo-patient'
   const language = url.searchParams.get('language') || 'en'
+  const persona = url.searchParams.get('persona') === 'companion' ? 'companion' : 'screening'
   if (process.env.RELAY_ENFORCE_AUTH === 'true') {
     const ok = await relayVerify(url.searchParams.get('device_id') || undefined, url.searchParams.get('auth_token') || undefined)
     if (!ok) { socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); socket.destroy(); return }
@@ -77,11 +78,11 @@ httpServer.on('upgrade', async (req, socket, head) => {
     console.warn('[relay] WARNING: WS upgrade auth is OFF (dev). Set RELAY_ENFORCE_AUTH=true in production.')
   }
   wss.handleUpgrade(req, socket, head, (clientWs) => {
-    void handleSession(clientWs, { patientId, language })
+    void handleSession(clientWs, { patientId, language, persona })
   })
 })
 
-async function handleSession(clientWs, { patientId, language }) {
+async function handleSession(clientWs, { patientId, language, persona }) {
   const voice = voiceProfileForSession(language)
   const status = {
     session_mode: 'live_qwen',
@@ -90,13 +91,14 @@ async function handleSession(clientWs, { patientId, language }) {
     live_relay_available: Boolean(qwenConfig.apiKey),
     selected_voice: voice.voice,
     selected_language: voice.languageLabel,
+    persona,
     max_session_seconds: qwenConfig.maxSessionSeconds,
   }
-  console.log(`[relay] session accepted patient_id=${patientId} language=${language} voice=${voice.voice}`)
+  console.log(`[relay] session accepted patient_id=${patientId} language=${language} persona=${persona} voice=${voice.voice}`)
   send(clientWs, { type: 'reflexion.session.ready', session: status })
 
   try {
-    await runLiveQwen(clientWs, { patientId, language })
+    await runLiveQwen(clientWs, { patientId, language, persona })
   } catch (err) {
     console.error('[relay] live relay degraded:', err?.message)
     send(clientWs, {

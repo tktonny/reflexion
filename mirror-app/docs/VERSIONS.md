@@ -1,14 +1,17 @@
-# 对话三版本(一套代码库,开关切换)
+# 对话版本(一套代码库,开关切换)
 
-镜子端的对话链路有三种实现,靠 `EXPO_PUBLIC_CONVERSATION_MODE` 切换,三版对 UI 暴露同一接口(`ConversationApi`),`conversation.tsx` / `realtime-test.tsx` 经 `useConversation` 选择器零改动复用。
+镜子端的对话链路有多种实现,靠 `EXPO_PUBLIC_CONVERSATION_MODE` 切换,各版对 UI 暴露同一接口(`ConversationApi`),`conversation.tsx` / `realtime-test.tsx` 经 `useConversation` 选择器零改动复用。命名按**传输方式**(见 `VERSION_LABELS`)。
 
-| 版本 | mode | 传输 | 平台 | 后端 | 验证脚本 |
+| 版本 | mode | 传输 | 回声处理 | 平台 | 验证 |
 |---|---|---|---|---|---|
-| **v1 中继** | `relay` | 客户端 ↔ Node 中继 ↔ Qwen 实时 WS | web + 原生 | 需 `server/` 常驻 | `server/smoke.mjs` ✅ |
-| **v2 本地回合制** | `http` | 设备直调 ASR→chat→TTS(HTTPS) | web + 原生* | 无(kiosk)/token 端点 | `server/smoke-turnbased.mjs` + `smoke-turnloop.mjs` ✅ |
-| **v3 原生直连** | `ws` | 原生 RN WebSocket 直连 Qwen 实时(header 鉴权) | 仅原生(web 回退 relay) | 仅 token 端点 | `server/smoke-direct-ws.mjs` ✅ |
+| relay-v0.0.0 | `relay` | 客户端 ↔ Node 中继 ↔ Qwen 实时 WS | 浏览器 AEC(web) | web + 原生 | `server/smoke.mjs` ✅ |
+| http-v0.0.0 | `http` | 设备直调 ASR→chat→TTS(HTTPS,回合制) | 半双工(回合制天然无回声) | web + 原生* | `smoke-turnbased/turnloop.mjs` ✅ |
+| **websocket-v0.0.0** | `ws` | 原生 RN WebSocket 直连 Qwen 实时(header 鉴权) | 半双工静音 + 转写级回声抑制(软件,模拟器仍会漏) | 仅原生(web 回退 relay) | `smoke-direct-ws.mjs` ✅ |
+| **webrtc-v0.0.0** | `webrtc` | 原生 WebRTC 直连 Qwen(SDP 握手 + `oai-events` DataChannel) | **内置硬件级 AEC + 降噪(回声正解)** | 仅原生(web 回退 relay) | 真机验收 |
 
-\* v2 原生音频用 expo-audio;**v3 原生流式音频已由本地模块 `modules/expo-pcm-audio` 实现(代码完整,待真机验收)**。三版的 **API/编排链路均已用真实 Qwen 实测通过**。
+\* v2 原生音频用 expo-audio;websocket-v0.0.0 原生流式音频由本地模块 `modules/expo-pcm-audio` 实现。
+
+**websocket vs webrtc**:两者都直连 Qwen 实时、编排逻辑(开场/四阶段/回忆floor/收尾)完全共用。区别只在**音频传输层**——WebSocket 需客户端自己处理回声(无 AEC,模拟器上 Aria 会听到自己→自问自答/答两次);**WebRTC 的音频走 RTP,libwebrtc 自带回声消除,从根上消除自问自答**。WebRTC 端点需 workspace 专属域名:设 `EXPO_PUBLIC_QWEN_WORKSPACE_ID`(+可选 `EXPO_PUBLIC_QWEN_WEBRTC_REGION`)或整串 `EXPO_PUBLIC_QWEN_WEBRTC_URL`。
 
 ## 切换与运行
 

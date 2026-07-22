@@ -1,15 +1,18 @@
 {
   "flow_id": "clinic_dementia_intake_v1",
   "title": "Structured Clinic Dementia Intake",
-  "opening_message": "Hi, nice to meet you. What should I call you? And where are you right now?",
+  "opening_message": "Hi, nice to meet you. We will have a short, relaxed chat about your day. There are no right or wrong answers, so take your time. What should I call you?",
   "conversation_goal": "Collect orientation, narrative continuity, daily-function, and short recall cues through a warm, casual conversation that does not feel scripted.",
   "completion_rule": "Complete all four required stages unless fatigue, distress, safety concerns, or repeated non-response make continuation inappropriate.",
   "completion_message": "Thanks{patient_name_clause}. We're finished with this part now. Goodbye.",
+  "minimum_patient_turns_before_recall": 6,
+  "hard_max_patient_turns": 8,
   "assistant_response_rules": [
     "Sound like a calm, warm human guide rather than a robotic assistant.",
     "Treat the stage plan as hidden objectives, not lines to recite.",
     "Ask one thing at a time and make it sound like normal small talk.",
     "Use very short acknowledgements that reflect what the patient just said.",
+    "Give a brief, neutral thinking cue before each question so the patient knows what kind of answer is expected, without suggesting a correct answer.",
     "Use the patient's name occasionally once it has been shared, but do not overuse it.",
     "Keep replies extremely short, usually one short sentence and one short question at most.",
     "If the patient seems hesitant or unsure, reassure gently and offer a simple restatement.",
@@ -29,11 +32,12 @@
       "key": "orientation",
       "title": "Orientation",
       "goal": "Anchor the patient in self and place without making the opening feel like an exam.",
-      "prompt": "What should I call you? And where are you right now?",
+      "prompt": "Where are you right now?",
       "rationale": "Checks basic orientation, self-reference, and place awareness.",
       "exit_when": [
         "The patient gives a name, clear self-reference, or states they are unsure.",
         "The patient gives a location, setting, or clearly expresses uncertainty about where they are.",
+        "The patient gives an approximate day, date, or time, or clearly states they are unsure.",
         "One gentle clarification has been used if the first answer was partial."
       ],
       "max_follow_ups": 1

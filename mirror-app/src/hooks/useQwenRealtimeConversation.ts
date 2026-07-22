@@ -8,7 +8,7 @@ import {
   getRealtimeWsUrl,
 } from '../constants/realtime'
 import { DEVICE_AUTH_TOKEN_STORAGE_KEY, DEVICE_ID_STORAGE_KEY } from '../constants/nursePatientConfig'
-import { looksLikeGoodbye } from '../orchestration/orchestrator'
+import { looksLikeGoodbye, looksLikeUserGoodbye } from '../orchestration/orchestrator'
 import { randomId } from '../utils/id'
 
 export type ChatRole = 'system' | 'user' | 'assistant'
@@ -24,6 +24,7 @@ export type ChatMessage = {
 type Options = {
   patientId?: string
   language?: string
+  persona?: 'screening' | 'companion'
 }
 
 /**
@@ -34,6 +35,7 @@ type Options = {
  */
 export function useQwenRealtimeConversation(options: Options = {}) {
   const patientId = options.patientId ?? 'demo-patient'
+  const persona = options.persona ?? 'screening'
   const [language] = useState(options.language ?? 'en')
 
   const [statusKind, setStatusKind] = useState<StatusKind>('idle')
@@ -58,6 +60,7 @@ export function useQwenRealtimeConversation(options: Options = {}) {
   const holdUntilRef = useRef(0)
   const assistantStreamIdRef = useRef<string | null>(null)
   const assistantTextRef = useRef('')
+  const userGoodbyeRequestedRef = useRef(false)
 
   const updateStatus = useCallback((kind: StatusKind, text: string) => {
     setStatusKind(kind)
@@ -148,7 +151,12 @@ export function useQwenRealtimeConversation(options: Options = {}) {
           break
         case 'conversation.item.input_audio_transcription.completed': {
           const transcript = String(payload?.transcript || '').trim()
-          if (transcript) setMessages((prev) => [...prev, { id: randomId('user'), role: 'user', text: transcript }])
+          if (transcript) {
+            setMessages((prev) => [...prev, { id: randomId('user'), role: 'user', text: transcript }])
+            if (persona === 'companion' && looksLikeUserGoodbye(transcript)) {
+              userGoodbyeRequestedRef.current = true
+            }
+          }
           break
         }
         case 'response.created':
@@ -167,7 +175,10 @@ export function useQwenRealtimeConversation(options: Options = {}) {
         case 'response.text.done': {
           const finalText = String(payload?.transcript ?? payload?.text ?? assistantTextRef.current)
           finalizeAssistant(finalText)
-          if (looksLikeGoodbye(finalText)) scheduleEnd()
+          if (
+            looksLikeGoodbye(finalText) &&
+            (persona === 'screening' || userGoodbyeRequestedRef.current)
+          ) scheduleEnd()
           break
         }
         case 'response.done':
@@ -177,7 +188,7 @@ export function useQwenRealtimeConversation(options: Options = {}) {
           break
       }
     },
-    [appendAssistantStreaming, finalizeAssistant, playAssistantAudio, scheduleEnd, updateStatus],
+    [appendAssistantStreaming, finalizeAssistant, persona, playAssistantAudio, scheduleEnd, updateStatus],
   )
 
   const cleanup = useCallback(() => {
@@ -259,6 +270,7 @@ export function useQwenRealtimeConversation(options: Options = {}) {
     setMessages([])
     setEnded(false)
     endedRef.current = false
+    userGoodbyeRequestedRef.current = false
 
     try {
       const stream = await (navigator as any).mediaDevices.getUserMedia({ audio: true, video: false })
@@ -268,7 +280,7 @@ export function useQwenRealtimeConversation(options: Options = {}) {
         AsyncStorage.getItem(DEVICE_ID_STORAGE_KEY),
         AsyncStorage.getItem(DEVICE_AUTH_TOKEN_STORAGE_KEY),
       ])
-      const url = getRealtimeWsUrl(patientId, language, { deviceId, authToken })
+      const url = getRealtimeWsUrl(patientId, language, { deviceId, authToken, persona })
       const socket = new WebSocket(url)
       socketRef.current = socket
 
@@ -290,7 +302,7 @@ export function useQwenRealtimeConversation(options: Options = {}) {
       cleanup()
       updateStatus('error', `Error: ${message}`)
     }
-  }, [cleanup, handleMessage, initAudioPipeline, language, patientId, updateStatus])
+  }, [cleanup, handleMessage, initAudioPipeline, language, patientId, persona, updateStatus])
 
   const stopConversation = useCallback(async () => {
     cleanup()

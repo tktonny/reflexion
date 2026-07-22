@@ -4,6 +4,7 @@ import { Platform } from 'react-native'
 import { CONVERSATION_MODE } from '../config/conversationMode'
 import type { ConversationApi } from './conversationTypes'
 import { useDirectRealtimeConversation } from './useDirectRealtimeConversation'
+import { useWebRtcRealtimeConversation } from './useWebRtcRealtimeConversation'
 import { useQwenRealtimeConversation } from './useQwenRealtimeConversation'
 import { useTurnBasedConversation } from './useTurnBasedConversation'
 import { useTurnBasedConversationNative } from './useTurnBasedConversationNative'
@@ -26,12 +27,16 @@ export function useConversation(opts: Options = {}): ConversationApi {
     return Platform.OS === 'web' ? useTurnBasedConversation(opts) : useTurnBasedConversationNative(opts)
   }
   if (CONVERSATION_MODE === 'ws' && Platform.OS !== 'web') {
-    // omni realtime (v3) primary, turn-based (v2) automatic fallback.
+    // websocket-v0.0.0: omni realtime (v3) primary, turn-based (v2) automatic fallback.
     return useResilientConversation(opts)
   }
-  // relay (default); also the web fallback for 'ws' (browser WS can't set the auth header).
+  if (CONVERSATION_MODE === 'webrtc' && Platform.OS !== 'web') {
+    // webrtc-v0.0.0: native WebRTC realtime (built-in AEC). Direct, no auto-fallback in v0.0.0.
+    return useWebRtcRealtimeConversation(opts)
+  }
+  // relay (default); also the web fallback for 'ws'/'webrtc' (browser WS/WebRTC-auth constraints).
   const api = useQwenRealtimeConversation(opts)
-  return { ...api, mode: CONVERSATION_MODE === 'ws' ? 'ws' : 'relay' }
+  return { ...api, mode: CONVERSATION_MODE === 'ws' || CONVERSATION_MODE === 'webrtc' ? CONVERSATION_MODE : 'relay' }
   /* eslint-enable react-hooks/rules-of-hooks */
 }
 

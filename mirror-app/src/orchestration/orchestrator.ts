@@ -8,12 +8,12 @@ import { normalizeLanguageKey } from './voice'
 import flow from './conversationFlow.json'
 
 const OPENING_MESSAGES: Record<string, string> = {
-  english: 'Hi, nice to meet you. What should I call you? And where are you right now?',
-  mandarin: '你好，很高兴见到你。我该怎么称呼你？你现在在哪里？',
-  cantonese: '你好，好高兴见到你。我应该点称呼你？你而家喺边度？',
-  minnan: '你好，很欢喜见着你。我欲按怎称呼你？你这马佇佗位？',
-  malay: 'Hai, gembira bertemu dengan anda. Saya patut panggil anda apa? Dan sekarang anda berada di mana?',
-  tamil: 'வணக்கம், உங்களை சந்தித்ததில் மகிழ்ச்சி. நான் உங்களை எப்படி அழைக்கலாம்? நீங்கள் இப்போது எங்கே இருக்கிறீர்கள்?',
+  english: 'Hi, nice to meet you. We will have a short, relaxed chat about your day. There are no right or wrong answers, so take your time. What should I call you?',
+  mandarin: '你好，很高兴见到你。接下来我们轻松聊聊你今天的情况，没有标准答案，你慢慢说就好。我该怎么称呼你？',
+  cantonese: '你好，好高興見到你。跟住我哋輕鬆傾下你今日嘅情況，冇標準答案，你慢慢講就得。我應該點稱呼你？',
+  minnan: '你好，真歡喜見著你。接落來咱輕鬆講一下你今仔日的情形，無標準答案，你慢慢講就好。我欲按怎稱呼你？',
+  malay: 'Hai, gembira bertemu dengan anda. Kita akan berbual secara santai tentang hari anda. Tiada jawapan betul atau salah, jadi luangkan masa anda. Saya patut panggil anda apa?',
+  tamil: 'வணக்கம், உங்களைச் சந்தித்ததில் மகிழ்ச்சி. உங்கள் நாளைப் பற்றி சிறிது நேரம் நிதானமாகப் பேசலாம். சரி அல்லது தவறு என்ற பதில் இல்லை, எனவே அவசரப்பட வேண்டாம். நான் உங்களை எப்படி அழைக்கலாம்?',
 }
 
 const GOODBYE_SENTENCES: Record<string, string> = {
@@ -27,19 +27,22 @@ type FlowShape = {
   opening_message: string
   conversation_goal: string
   completion_message: string
+  minimum_patient_turns_before_recall: number
+  hard_max_patient_turns: number
   assistant_response_rules: string[]
   steps: FlowStep[]
 }
 const FLOW = flow as FlowShape
 
 export const flowId = FLOW.flow_id
-export const promptStepCount = 4
+export const promptStepCount = FLOW.steps.length
 
 // --- Layer 2: shared deterministic recall floor (single source of truth for all 3 versions) ---
-// Kept deliberately short so the check-in doesn't drag: force the recall step by the 3rd patient
-// turn, and hard-cap the whole conversation at 5 turns before wrapping up.
-export const RECALL_DEADLINE_TURN = 3
-export const HARD_MAX_TURN = 5
+// Four clinical collection domains are not four questions. The first six patient responses cover
+// self/place/time orientation, a recent narrative with one detail probe, and daily function. Only
+// then may the seventh question perform delayed recall. The hard cap remains a failure bound.
+export const RECALL_DEADLINE_TURN = FLOW.minimum_patient_turns_before_recall
+export const HARD_MAX_TURN = FLOW.hard_max_patient_turns
 
 export const RECALL_DIRECTIVE =
   'PRIORITY RIGHT NOW: You have spent enough time on the earlier topics. In your very next reply, do the gentle recall step now: warmly bring back one specific thing the patient actually said earlier in this same conversation, name that real detail, and ask them in one short sentence to tell you about it again. Do not open any new topic and do not say goodbye yet; wait for their answer.'
@@ -76,6 +79,22 @@ export function looksLikeGoodbye(text: string | null | undefined): boolean {
   const t = String(text || '')
   if (/(再见|再會|拜拜|回头见|回頭見|下次見|下次见|保重)/.test(t)) return true
   return /\b(bye[-\s]?bye|good\s?bye|see you (soon|again|next time|later)|take care( of yourself| now)?|until next time|talk (to you )?(soon|again)|have a (good|great|wonderful) (day|one|rest))\b/i.test(t)
+}
+
+/**
+ * Explicit USER intent to end a companion chat. This is deliberately narrower than
+ * looksLikeGoodbye(): an assistant saying "Have a good day" or "Take care" after an ordinary
+ * answer must not close the session by itself.
+ */
+export function looksLikeUserGoodbye(text: string | null | undefined): boolean {
+  const value = String(text || '').trim()
+  if (!value) return false
+  if (/(再见|再會|拜拜|下次再聊|下次再傾|先这样|先這樣|不聊了|結束對話|结束对话|我要走了)/.test(value)) {
+    return true
+  }
+  if (/(selamat tinggal|jumpa lagi|itu sahaja|sampai jumpa)/i.test(value)) return true
+  if (/(பிரியாவிடை|மீண்டும் சந்திப்போம்|அவ்வளவுதான்)/.test(value)) return true
+  return /\b(good\s?bye|bye(?:[-\s]?bye)?|see you(?: again| later| next time)?|talk to you later|that(?:'s| is) all|nothing else|i(?:'m| am) done|(?:end|stop) (?:the )?(?:chat|conversation))\b/i.test(value)
 }
 
 export function openingMessageForLanguage(language: string | null | undefined): string {
@@ -141,7 +160,7 @@ How to help:
 The patient identifier is ${patientId}.
 Respond in ${languageName} unless the patient clearly switches languages; if they switch language or dialect, continue in that language on your very next reply.
 ${memoryBlock}
-Your goal is to gently reach these HIDDEN objectives through natural conversation — treat them as things to get to warmly and casually, NOT a checklist to recite and NOT a fixed order to march through:
+Your goal is to gently reach these HIDDEN objectives through natural conversation. Move through them in the listed order, but make the transitions warm and casual rather than reciting a checklist. If the patient already volunteered the needed detail, acknowledge it and advance without repeating the same question:
 ${goalList}
 
 For your very first turn only, open with exactly this in ${languageName}, then stop and wait for their answer: "${openingMessage}"
@@ -149,5 +168,5 @@ For your very first turn only, open with exactly this in ${languageName}, then s
 How to talk:
 ${rules}
 
-Near the end, do the wrap-up recall gently: warmly bring back one real thing the patient actually mentioned earlier in this same chat and invite them to say a little more about it — refer only to a real detail they gave, never an invented one, and never make it feel like a memory test. Accept whatever they recall, full, partial, or none, with warmth. Once they have responded to that, close naturally: one short, warm thank-you and a brief goodbye sentence, and do not ask any new question after that.${steerBlock}`
+Do not begin wrap-up recall or say goodbye before at least ${RECALL_DEADLINE_TURN} completed patient responses. Before recall, cover self/place/time orientation, a recent story with one sequence/detail follow-up, and daily-function/reminder support. Near the end, do the wrap-up recall gently: warmly bring back one real thing the patient actually mentioned earlier in this same chat and invite them to say a little more about it — refer only to a real detail they gave, never an invented one, and never make it feel like a memory test. Accept whatever they recall, full, partial, or none, with warmth. Once they have responded to that, close naturally: one short, warm thank-you and a brief goodbye sentence, and do not ask any new question after that.${steerBlock}`
 }

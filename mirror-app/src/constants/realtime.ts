@@ -15,12 +15,17 @@ export const PLAYBACK_SAMPLE_RATE = 24000
 export function getRealtimeWsUrl(
   patientId: string,
   language: string,
-  auth?: { deviceId?: string | null; authToken?: string | null },
+  auth?: {
+    deviceId?: string | null
+    authToken?: string | null
+    persona?: 'screening' | 'companion'
+  },
 ): string {
   const base = resolveRelayBase()
   let query = `patient_id=${encodeURIComponent(patientId)}&language=${encodeURIComponent(language)}`
   if (auth?.deviceId) query += `&device_id=${encodeURIComponent(auth.deviceId)}`
   if (auth?.authToken) query += `&auth_token=${encodeURIComponent(auth.authToken)}`
+  if (auth?.persona) query += `&persona=${encodeURIComponent(auth.persona)}`
   return `${base}${REALTIME_WS_PATH}?${query}`
 }
 

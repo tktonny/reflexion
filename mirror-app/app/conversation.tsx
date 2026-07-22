@@ -32,6 +32,10 @@ import { assessCheckin, transcriptFromMessages, type ScreeningAssessment } from 
 import { resolveOwnerIds, saveCheckin } from '../src/api/saveCheckin'
 import { MirrorCameraPanel, type MirrorCameraHandle } from '../src/components/MirrorCameraPanel'
 import { useWakeWord } from '../src/hooks/useWakeWord'
+import { SCREENING_TOTAL_QUESTIONS } from '../src/orchestration/deterministicSpeech'
+import { isCognitiveAssessmentEligible } from '../src/orchestration/conversationPurpose'
+import { looksLikeGoodbye } from '../src/orchestration/orchestrator'
+import { normalizeLanguageKey } from '../src/orchestration/voice'
 import { getStoredMirrorProfile, persistNursePatientIds } from '../src/storage/mirrorStorage'
 
 type DevicePairingStatus =
@@ -49,7 +53,8 @@ type DevicePairingStatus =
   | { success: true; paired: false }
   | { success: false; reason: string }
 
-type MirrorState = 'idle' | 'starting' | 'listening' | 'response' | 'error'
+type MirrorState = 'idle' | 'starting' | 'listening' | 'response' | 'closing' | 'error'
+type ClosingStage = 'idle' | 'buffering' | 'goodbye' | 'saving'
 
 type SpeechRecognitionResultLike = {
   isFinal: boolean
@@ -128,8 +133,11 @@ export default function ConversationScreen() {
     connecting,
     sessionActive,
     userSpeaking,
+    turnState,
     ended,
     recording,
+    beginPushToTalk,
+    endPushToTalk,
     toggleRecording,
   } = useConversation({ language, persona })
 
@@ -138,6 +146,7 @@ export default function ConversationScreen() {
   const [nurseName, setNurseName] = useState('your nurse')
   const [visibleAssistantText, setVisibleAssistantText] = useState('')
   const [endingConversation, setEndingConversation] = useState(false)
+  const [closingStage, setClosingStage] = useState<ClosingStage>('idle')
   const [checkingPairing, setCheckingPairing] = useState(true)
   const [wakeListening, setWakeListening] = useState(false)
   const [wakeError, setWakeError] = useState('')
@@ -148,18 +157,33 @@ export default function ConversationScreen() {
   const shouldRunWakeListenerRef = useRef(false)
   const cameraRef = useRef<MirrorCameraHandle | null>(null)
   const sessionStartRef = useRef<Date | null>(null)
+  const messagesRef = useRef(messages)
+  messagesRef.current = messages
 
   const assistantText = latestAssistantMessage(messages)
+  const completedPatientTurns = messages.filter((message) => message.role === 'user').length
+  const currentScreeningQuestion = Math.min(completedPatientTurns + 1, SCREENING_TOTAL_QUESTIONS)
   const greeting = getGreeting(now)
   const busy = connecting || sessionActive
 
   const mirrorState: MirrorState = useMemo(() => {
+    if (endingConversation || turnState === 'closing') return 'closing'
     if (statusKind === 'error' && !endingConversation) return 'error'
     if (connecting) return 'starting'
-    if (visibleAssistantText || statusKind === 'speaking') return 'response'
+    // The last assistant transcript intentionally remains available as the current question, but it
+    // must not pin the screen in the speaking state after native playback has drained and the mic has
+    // reopened. Status is the turn-taking authority; the retained transcript is display content.
+    if (statusKind === 'speaking') return 'response'
     if (sessionActive || statusKind === 'listening' || statusKind === 'processing') return 'listening'
+    if (visibleAssistantText) return 'response'
     return 'idle'
-  }, [connecting, endingConversation, sessionActive, statusKind, visibleAssistantText])
+  }, [connecting, endingConversation, sessionActive, statusKind, turnState, visibleAssistantText])
+
+  useEffect(() => {
+    if (!endingConversation && turnState !== 'closing') return
+    if (closingStage === 'idle') setClosingStage('buffering')
+    if (assistantText && looksLikeGoodbye(assistantText)) setClosingStage('goodbye')
+  }, [assistantText, closingStage, endingConversation, turnState])
 
   useEffect(() => {
     const timerId = setInterval(() => setNow(new Date()), 1000)
@@ -245,18 +269,21 @@ export default function ConversationScreen() {
     if (endingRef.current) return
     endingRef.current = true
     setEndingConversation(true)
+    setClosingStage((current) => current === 'goodbye' ? current : 'buffering')
     try {
       await stopConversation()
-      const transcript = transcriptFromMessages(messages)
+      setClosingStage('saving')
+      const finalMessages = messagesRef.current
+      const transcript = transcriptFromMessages(finalMessages)
       let assessment: ScreeningAssessment | null = null
-      if (transcript.trim()) {
+      if (isCognitiveAssessmentEligible(persona, finalMessages)) {
         const frames = cameraRef.current?.getFrames() ?? []
         const r = await assessCheckin(transcript, language, frames)
         if (r.success) assessment = r.assessment
       }
       const ids = await resolveOwnerIds()
       await saveCheckin({
-        messages,
+        messages: finalMessages,
         startedAt: sessionStartRef.current ?? new Date(),
         endedAt: new Date(),
         nurseId: ids.nurseId,
@@ -270,8 +297,9 @@ export default function ConversationScreen() {
     } catch {
       endingRef.current = false
       setEndingConversation(false)
+      setClosingStage('idle')
     }
-  }, [language, messages, nurseName, stopConversation])
+  }, [language, nurseName, persona, stopConversation])
 
   const handleEnd = finalize
 
@@ -406,7 +434,16 @@ export default function ConversationScreen() {
           ) : null}
 
           {mirrorState === 'listening' ? (
-            <ListeningScreen userSpeaking={userSpeaking} />
+            <ListeningScreen
+              assistantText={assistantText}
+              currentQuestion={currentScreeningQuestion}
+              disabled={endingConversation}
+              language={language}
+              onEnd={() => void handleEnd()}
+              raiseEnd={!!toggleRecording}
+              screening={persona === 'screening'}
+              userSpeaking={userSpeaking}
+            />
           ) : null}
 
           {mirrorState === 'response' ? (
@@ -420,19 +457,32 @@ export default function ConversationScreen() {
             />
           ) : null}
 
+          {mirrorState === 'closing' ? (
+            <ClosingGuideScreen assistantText={assistantText} stage={closingStage} />
+          ) : null}
+
           {mirrorState === 'error' ? (
             <ErrorScreen message={statusText} onRetry={() => void handleStart()} />
           ) : null}
 
           {/* Fallback (v2 turn-based) is push-to-talk — show a record control so the degraded path
               is usable on the hands-free screen. Absent in the omni (v3) path (no toggleRecording). */}
-          {toggleRecording && busy && !endingConversation && mirrorState !== 'error' ? (
+          {beginPushToTalk && endPushToTalk && busy && !endingConversation && mirrorState !== 'error' ? (
             <Pressable
-              style={[styles.recordButton, recording && styles.recordButtonActive]}
-              onPress={() => toggleRecording?.()}
+              accessibilityHint="按住时录音，松开后发送"
+              accessibilityLabel="按住说话"
+              disabled={!recording && statusKind !== 'listening'}
+              onPressIn={beginPushToTalk}
+              onPressOut={endPushToTalk}
+              style={({ pressed }) => [
+                styles.recordButton,
+                recording && styles.recordButtonActive,
+                pressed && styles.recordButtonPressed,
+                !recording && statusKind !== 'listening' && styles.disabledButton,
+              ]}
             >
-              <Ionicons name={recording ? 'send' : 'mic'} size={22} color="#FFFFFF" />
-              <Text style={styles.recordButtonText}>{recording ? '发送（结束说话）' : '按此说话'}</Text>
+              <Ionicons name={recording ? 'radio' : 'mic'} size={22} color="#FFFFFF" />
+              <Text style={styles.recordButtonText}>{recording ? '正在听 · 松开发送' : '按住说话'}</Text>
             </Pressable>
           ) : null}
         </View>
@@ -562,19 +612,98 @@ function StartScreen({ greeting, patientName }: { greeting: string; patientName:
   )
 }
 
-function ListeningScreen({ userSpeaking }: { userSpeaking: boolean }) {
+function ListeningScreen({
+  assistantText,
+  currentQuestion,
+  disabled,
+  language,
+  onEnd,
+  raiseEnd,
+  screening,
+  userSpeaking,
+}: {
+  assistantText: string
+  currentQuestion: number
+  disabled: boolean
+  language: string
+  onEnd: () => void
+  raiseEnd: boolean
+  screening: boolean
+  userSpeaking: boolean
+}) {
+  const guide = listeningGuideCopy(language, screening, currentQuestion, userSpeaking)
   return (
-    <View style={styles.fillCenter}>
-      <View style={styles.glow}>
-        <AriaAvatar size={138} />
+    <View style={styles.listeningScreen}>
+      <View style={styles.questionGuide}>
+        <Text style={styles.questionEyebrow}>{guide.eyebrow}</Text>
+        <Text style={styles.questionGuideText}>
+          {assistantText || guide.fallbackQuestion}
+        </Text>
       </View>
-      <View style={styles.micButton}>
-        <Ionicons name="mic" size={34} color={colors.goldDark} />
+      <View style={styles.listeningAvatarRow}>
+        <View style={styles.listeningGlow}>
+          <AriaAvatar size={96} />
+        </View>
+        <View style={styles.listeningStatus}>
+          <View style={[styles.listeningMic, userSpeaking && styles.listeningMicActive]}>
+            <Ionicons name="mic" size={26} color={userSpeaking ? '#FFFFFF' : colors.goldDark} />
+          </View>
+          <View>
+            <Text style={styles.listeningText}>{guide.status}</Text>
+            <Text style={styles.answerHint}>{guide.hint}</Text>
+          </View>
+        </View>
       </View>
-      <Text style={styles.listeningText}>Listening...</Text>
       <Waveform active={userSpeaking} />
+      <Pressable
+        disabled={disabled}
+        onPress={onEnd}
+        style={[styles.endButton, raiseEnd && styles.endButtonRaised, disabled && styles.disabledButton]}
+      >
+        <Text style={styles.endButtonText}>{disabled ? 'Ending...' : 'End Chat'}</Text>
+        <Ionicons name="close" size={20} color={colors.text} />
+      </Pressable>
     </View>
   )
+}
+
+function listeningGuideCopy(
+  language: string,
+  screening: boolean,
+  currentQuestion: number,
+  userSpeaking: boolean,
+) {
+  const key = normalizeLanguageKey(language)
+  if (key === 'mandarin' || key === 'cantonese' || key === 'minnan') {
+    return {
+      eyebrow: screening ? `每日对话 · 第 ${currentQuestion} / ${SCREENING_TOTAL_QUESTIONS} 题` : 'ARIA 正在听',
+      fallbackQuestion: screening ? '不用着急，想到什么就慢慢告诉 Aria。' : '你今天想聊些什么？',
+      status: userSpeaking ? '我在听…' : '慢慢说',
+      hint: screening ? '请按自己的想法回答。' : '准备好后就可以说。',
+    }
+  }
+  if (key === 'malay') {
+    return {
+      eyebrow: screening ? `SESI HARIAN · SOALAN ${currentQuestion} / ${SCREENING_TOTAL_QUESTIONS}` : 'ARIA SEDANG MENDENGAR',
+      fallbackQuestion: screening ? 'Luangkan masa anda dan beritahu Aria apa yang terlintas.' : 'Apa yang ingin anda bincangkan?',
+      status: userSpeaking ? 'Saya sedang mendengar…' : 'Luangkan masa anda',
+      hint: screening ? 'Jawab dengan kata-kata anda sendiri.' : 'Bercakap apabila anda sudah bersedia.',
+    }
+  }
+  if (key === 'tamil') {
+    return {
+      eyebrow: screening ? `தினசரி உரையாடல் · கேள்வி ${currentQuestion} / ${SCREENING_TOTAL_QUESTIONS}` : 'ARIA கேட்கிறார்',
+      fallbackQuestion: screening ? 'அவசரப்படாமல் மனதில் தோன்றுவதை Aria-விடம் சொல்லுங்கள்.' : 'எதைப் பற்றிப் பேச விரும்புகிறீர்கள்?',
+      status: userSpeaking ? 'நான் கேட்கிறேன்…' : 'அவசரப்பட வேண்டாம்',
+      hint: screening ? 'உங்கள் சொந்த வார்த்தைகளில் பதிலளியுங்கள்.' : 'தயாரானதும் பேசுங்கள்.',
+    }
+  }
+  return {
+    eyebrow: screening ? `DAILY CHECK · ${currentQuestion} OF ${SCREENING_TOTAL_QUESTIONS}` : 'ARIA IS LISTENING',
+    fallbackQuestion: screening ? 'Take your time. Tell Aria what comes to mind.' : 'What would you like to talk about?',
+    status: userSpeaking ? 'I’m listening…' : 'Take your time',
+    hint: screening ? 'Answer in your own words.' : 'Speak when you’re ready.',
+  }
 }
 
 function ResponseScreen({
@@ -604,6 +733,36 @@ function ResponseScreen({
         <Text style={styles.endButtonText}>{disabled ? 'Ending...' : 'End Chat'}</Text>
         <Ionicons name="close" size={20} color={colors.text} />
       </Pressable>
+    </View>
+  )
+}
+
+function ClosingGuideScreen({
+  assistantText,
+  stage,
+}: {
+  assistantText: string
+  stage: ClosingStage
+}) {
+  const goodbye = stage === 'goodbye'
+  const saving = stage === 'saving'
+  return (
+    <View style={styles.fillCenter}>
+      <View style={styles.glow}>
+        <AriaAvatar size={138} />
+      </View>
+      <Text style={styles.closingEyebrow}>{saving ? 'ALL DONE' : goodbye ? 'GOODBYE FOR NOW' : 'JUST A MOMENT'}</Text>
+      <Text style={styles.closingTitle}>
+        {saving ? 'Thank you for chatting.' : goodbye ? (assistantText || 'Aria is saying goodbye.') : 'Aria is wrapping up your chat.'}
+      </Text>
+      <Text style={styles.closingCaption}>
+        {saving
+          ? 'Saving today’s conversation securely…'
+          : goodbye
+            ? 'This chat will close after Aria finishes speaking.'
+            : 'She will finish the current response, then say goodbye.'}
+      </Text>
+      {!saving ? <Waveform active cool={goodbye} muted={!goodbye} /> : <ActivityIndicator color={colors.taupe} />}
     </View>
   )
 }
@@ -885,8 +1044,109 @@ const styles = StyleSheet.create({
   },
   listeningText: {
     color: colors.secondary,
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: '900',
+  },
+  listeningScreen: {
+    flex: 1,
+    paddingBottom: 104,
+    paddingHorizontal: 30,
+    // Keep the question below the active visual-sampling preview in the top-right corner.
+    paddingTop: 150,
+  },
+  questionGuide: {
+    backgroundColor: '#FFF7E9',
+    borderColor: '#EAD8BA',
+    borderRadius: 18,
+    borderWidth: 1,
+    minHeight: 174,
+    paddingHorizontal: 24,
+    paddingVertical: 22,
+    shadowColor: '#D8C6A8',
+    shadowOffset: { height: 8, width: 0 },
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+  },
+  questionEyebrow: {
+    color: colors.goldDark,
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+    marginBottom: 13,
+  },
+  questionGuideText: {
+    color: colors.text,
+    fontSize: 24,
+    fontWeight: '800',
+    lineHeight: 33,
+  },
+  listeningAvatarRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 22,
+    marginTop: 34,
+  },
+  listeningGlow: {
+    alignItems: 'center',
+    backgroundColor: '#FDF6EC',
+    borderColor: '#FFFFFF',
+    borderRadius: 64,
+    borderWidth: 6,
+    height: 122,
+    justifyContent: 'center',
+    shadowColor: '#C8D8F0',
+    shadowOpacity: 0.5,
+    shadowRadius: 18,
+    width: 122,
+  },
+  listeningStatus: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    gap: 13,
+  },
+  listeningMic: {
+    alignItems: 'center',
+    backgroundColor: '#FFFDF9',
+    borderColor: '#EAD8BA',
+    borderRadius: 27,
+    borderWidth: 1,
+    height: 54,
+    justifyContent: 'center',
+    width: 54,
+  },
+  listeningMicActive: {
+    backgroundColor: '#4D9668',
+    borderColor: '#4D9668',
+  },
+  answerHint: {
+    color: colors.taupe,
+    fontSize: 14,
+    fontWeight: '800',
+    lineHeight: 20,
+    marginTop: 4,
+  },
+  closingEyebrow: {
+    color: colors.goldDark,
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 2,
+  },
+  closingTitle: {
+    color: colors.text,
+    fontSize: 28,
+    fontWeight: '900',
+    lineHeight: 38,
+    maxWidth: 340,
+    textAlign: 'center',
+  },
+  closingCaption: {
+    color: colors.secondary,
+    fontSize: 17,
+    fontWeight: '700',
+    lineHeight: 25,
+    maxWidth: 320,
+    textAlign: 'center',
   },
   verifyingText: {
     color: colors.secondary,
@@ -963,6 +1223,9 @@ const styles = StyleSheet.create({
   },
   recordButtonActive: {
     backgroundColor: '#C97068',
+  },
+  recordButtonPressed: {
+    transform: [{ scale: 0.98 }],
   },
   recordButtonText: {
     color: '#FFFFFF',

@@ -13,10 +13,13 @@
     "relay": "npm run build:orch && node --env-file=.env server/index.mjs",
     "seed": "node --env-file=.env server/seed-demo-patient.mjs",
     "smoke:hwcheck": "node server/smoke-hwcheck.mjs",
+    "smoke:turn-taking-provider": "esbuild server/smoke-turn-taking-provider.ts --bundle --platform=node --format=esm --packages=external --outfile=server/generated/smoke-turn-taking-provider.mjs && node --env-file=.env server/generated/smoke-turn-taking-provider.mjs",
     "smoke:vision": "node --env-file=.env server/smoke-vision.mjs",
+    "test:turn-taking": "esbuild server/turn-taking.test.ts --bundle --platform=node --format=esm --sourcemap --outfile=server/generated/turn-taking.test.mjs && node --test --experimental-test-coverage server/generated/turn-taking.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@config-plugins/react-native-webrtc": "^15.0.1",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@types/qrcode-generator": "^0.0.16",
@@ -40,6 +43,7 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "4.25.2",
     "react-native-web": "^0.21.2",
+    "react-native-webrtc": "^124.0.8",
     "ws": "^8.18.0"
   },
   "devDependencies": {
