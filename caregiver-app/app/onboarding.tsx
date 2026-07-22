@@ -125,6 +125,16 @@ const SUMMARY_OPTIONS: { value: SummaryTime; label: string }[] = [
 
 const PLACEHOLDER_TEXT_COLOR = '#B7ACA1';
 
+// Hermes builds without full Intl timezone data throw on resolvedOptions().timeZone. blankPatient runs
+// at mount (useState initializer), so an unguarded throw crashes the whole onboarding/sign-up screen.
+function deviceTimeZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Singapore';
+  } catch {
+    return 'Asia/Singapore';
+  }
+}
+
 const blankPatient = (index: number): PatientForm => ({
   name: '',
   phoneNumber: '',
@@ -138,7 +148,7 @@ const blankPatient = (index: number): PatientForm => ({
   keyTopicsOtherText: '',
   mirrorName: `Mirror ${index + 1}`,
   mirrorPairingCode: '',
-  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Singapore',
+  timezone: deviceTimeZone(),
 });
 
 export default function OnboardingScreen() {
