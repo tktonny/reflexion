@@ -3,6 +3,7 @@
 // via server/smoke-turnbased.mjs: chat=qwen-plus, tts=qwen-tts, asr=qwen3-asr-flash.
 
 import { QWEN } from '../config/conversationMode'
+import { secureQwenAssetUrl } from '../orchestration/networkSecurity'
 import { getBearer } from './qwenToken'
 
 export type QwenChatMessage = { role: 'system' | 'user' | 'assistant'; content: string }
@@ -90,7 +91,11 @@ export async function qwenTTS(
   const body = await res.json()
   if (!res.ok) throw new Error(`qwen tts ${res.status}: ${JSON.stringify(body).slice(0, 200)}`)
   const audio = body?.output?.audio ?? {}
-  return { audioBase64: audio.data ?? null, url: audio.url ?? null, format: 'wav' }
+  return {
+    audioBase64: typeof audio.data === 'string' ? audio.data : null,
+    url: secureQwenAssetUrl(audio.url),
+    format: 'wav',
+  }
 }
 
 /**

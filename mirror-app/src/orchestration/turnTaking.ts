@@ -22,6 +22,7 @@ export type TurnTakingEvent =
   | { type: 'response_requested'; closing?: boolean }
   | { type: 'response_created' }
   | { type: 'audio_delta' }
+  | { type: 'assistant_interrupted' }
   | { type: 'input_rejected' }
   | { type: 'response_done' }
   | { type: 'playback_drained' }
@@ -41,19 +42,14 @@ export type TurnTakingState = {
   violations: string[]
 }
 
-export type PostPlaybackAction = 'listen' | 'steer_recall' | 'request_goodbye' | 'finish'
+export type PostPlaybackAction = 'listen' | 'request_goodbye' | 'finish'
 
 export type PostPlaybackContext = {
   persona: 'screening' | 'companion'
   closingResponse: boolean
   manualCloseRequested: boolean
   spontaneousGoodbye: boolean
-  recallAnswered: boolean
-  recallProbeIssued: boolean
-  recallForced: boolean
-  turnCount: number
-  recallDeadlineTurn: number
-  hardMaxTurn: number
+  dailyFlowComplete: boolean
 }
 
 export type PlaybackDrainDecision = {
@@ -131,6 +127,19 @@ export function reduceTurnTaking(state: TurnTakingState, event: TurnTakingEvent)
         captureMuted: true,
         audioReceived: true,
       }
+    case 'assistant_interrupted':
+      if (!state.responseInFlight && !state.awaitingPlayback) {
+        return withViolation(state, 'assistant interruption arrived without an owned assistant turn')
+      }
+      return {
+        ...next,
+        phase: 'user_speaking',
+        responseInFlight: false,
+        awaitingPlayback: false,
+        captureMuted: false,
+        closingRequested: false,
+        audioReceived: false,
+      }
     case 'input_rejected':
       if (!state.responseInFlight) return withViolation(state, 'input was rejected without a pending turn')
       return {
@@ -190,18 +199,7 @@ export function choosePostPlaybackAction(context: PostPlaybackContext): PostPlay
   if (context.closingResponse) return 'finish'
   if (context.persona === 'companion' && context.spontaneousGoodbye) return 'finish'
   if (context.manualCloseRequested) return 'request_goodbye'
-  if (context.persona === 'screening') {
-    if (context.recallAnswered) return 'request_goodbye'
-    const recallIsDue =
-      context.turnCount >= context.recallDeadlineTurn || context.turnCount >= context.hardMaxTurn
-    if (
-      !context.recallProbeIssued &&
-      !context.recallForced &&
-      recallIsDue
-    ) {
-      return 'steer_recall'
-    }
-  }
+  if (context.persona === 'screening' && context.dailyFlowComplete) return 'request_goodbye'
   return 'listen'
 }
 

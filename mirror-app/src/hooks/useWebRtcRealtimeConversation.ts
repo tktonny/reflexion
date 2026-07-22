@@ -3,13 +3,10 @@ import { Platform } from 'react-native'
 
 import { getBearer } from '../api/qwenToken'
 import {
-  HARD_MAX_TURN,
-  RECALL_DEADLINE_TURN,
-  RECALL_DIRECTIVE,
   looksLikeGoodbye,
-  looksLikeRecallProbe,
 } from '../orchestration/orchestrator'
 import { buildLiveSessionUpdate, hasWebrtcHost, realtimeWebrtcUrl } from '../orchestration/realtime'
+import { createDailyConversationPlan, dailyConversationPatientTurns } from '../orchestration/deterministicSpeech'
 import {
   detectLanguageSignal,
   voiceProfileForLanguageKey,
@@ -17,7 +14,7 @@ import {
   type VoiceProfile,
 } from '../orchestration/voice'
 import { randomId } from '../utils/id'
-import type { ChatMessage, ConversationApi, StatusKind } from './conversationTypes'
+import type { ChatMessage, ConversationApi, ConversationOptions, StatusKind } from './conversationTypes'
 
 /**
  * webrtc-v0.0.0 — native WebRTC realtime to Qwen-Omni.
@@ -27,7 +24,7 @@ import type { ChatMessage, ConversationApi, StatusKind } from './conversationTyp
  * root cause of the mirror's self-conversation, so this hook needs NO half-duplex mic-muting, NO
  * playback-drain guard, and NO transcript-level echo suppressor. Only the non-audio protocol events
  * (session.update, transcripts, response lifecycle) travel over the `oai-events` data channel; the
- * shared orchestration (opening, deterministic recall floor, natural goodbye) is reused verbatim.
+ * shared orchestration (daily stage order and natural goodbye) is reused verbatim.
  *
  * Connection: create RTCPeerConnection + local mic track + data channel, createOffer, POST the offer
  * SDP to the workspace-scoped Qwen WebRTC endpoint (Bearer auth, Content-Type application/sdp), apply
@@ -37,10 +34,7 @@ import type { ChatMessage, ConversationApi, StatusKind } from './conversationTyp
  * react-native-webrtc is loaded lazily so the web bundle (which never selects this hook) doesn't need it.
  */
 
-type Options = {
-  patientId?: string
-  language?: string
-  persona?: 'screening' | 'companion'
+type Options = ConversationOptions & {
   onUnavailable?: (reason: string) => void
 }
 
@@ -65,6 +59,8 @@ export function useWebRtcRealtimeConversation(options: Options = {}): Conversati
   const patientId = options.patientId ?? 'demo-patient'
   const language = options.language ?? 'en'
   const persona = options.persona ?? 'screening'
+  const dailyPlan = options.dailyPlan ?? createDailyConversationPlan({ patientName: options.patientName, reminiscenceWeekdays: [] })
+  const requiredPatientTurns = dailyConversationPatientTurns(dailyPlan)
 
   const [statusKind, setStatusKind] = useState<StatusKind>('idle')
   const [statusText, setStatusText] = useState('Ready to start')
@@ -91,11 +87,8 @@ export function useWebRtcRealtimeConversation(options: Options = {}): Conversati
   const reportedUnavailableRef = useRef(false)
   const wrappingUpRef = useRef(false)
 
-  // Deterministic recall floor + natural ending (parity with websocket-v0.0.0).
+  // Daily Conversation v2 turn budget + natural ending.
   const turnCountRef = useRef(0)
-  const recallProbeIssuedRef = useRef(false)
-  const recallAnsweredRef = useRef(false)
-  const recallForcedRef = useRef(false)
   const closingRef = useRef(false)
 
   const onUnavailableRef = useRef(options.onUnavailable)
@@ -142,8 +135,8 @@ export function useWebRtcRealtimeConversation(options: Options = {}): Conversati
 
   const applyVoice = useCallback((profile: VoiceProfile) => {
     voiceRef.current = profile
-    send(buildLiveSessionUpdate(patientId, profile.languageLabel, { voice: profile.voice, languageKey: profile.languageKey, persona }))
-  }, [patientId, persona, send])
+    send(buildLiveSessionUpdate(patientId, profile.languageLabel, { voice: profile.voice, languageKey: profile.languageKey, persona, patientName: dailyPlan.patientName }))
+  }, [dailyPlan.patientName, patientId, persona, send])
 
   // Aria delivered her closing goodbye — auto-finalize. WebRTC keeps playing her goodbye over the RTP
   // track; give it a moment, then flip `ended` so the screen runs the screening + save.
@@ -160,17 +153,9 @@ export function useWebRtcRealtimeConversation(options: Options = {}): Conversati
     if (closingRef.current) return
     closingRef.current = true
     wrappingUpRef.current = true
-    send(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, { voice: voiceRef.current.voice, languageKey: voiceRef.current.languageKey, persona, wrapUp: true }))
+    send(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, { voice: voiceRef.current.voice, languageKey: voiceRef.current.languageKey, persona, patientName: dailyPlan.patientName, wrapUp: true }))
     send({ type: 'response.create' })
-  }, [patientId, persona, send])
-
-  const steerRecall = useCallback((): boolean => {
-    if (recallForcedRef.current || closingRef.current) return false
-    recallForcedRef.current = true
-    send(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, { voice: voiceRef.current.voice, languageKey: voiceRef.current.languageKey, persona, steer: RECALL_DIRECTIVE }))
-    send({ type: 'response.create' })
-    return true
-  }, [patientId, persona, send])
+  }, [dailyPlan.patientName, patientId, persona, send])
 
   const handleMessage = useCallback(
     (payload: any) => {
@@ -196,7 +181,6 @@ export function useWebRtcRealtimeConversation(options: Options = {}): Conversati
         if (transcript) {
           setMessages((prev) => [...prev, { id: randomId('user'), role: 'user', text: transcript }])
           turnCountRef.current += 1
-          if (recallProbeIssuedRef.current && !recallAnsweredRef.current) recallAnsweredRef.current = true
           const signal = detectLanguageSignal(transcript)
           if (signal && signal.confidence >= 0.8 && signal.languageKey !== voiceRef.current.languageKey) {
             applyVoice(voiceProfileForLanguageKey(signal.languageKey, 'transcript_reassessment'))
@@ -217,24 +201,17 @@ export function useWebRtcRealtimeConversation(options: Options = {}): Conversati
       if (type === 'response.audio_transcript.done' || type === 'response.output_audio_transcript.done') {
         const finalText = String(payload?.transcript ?? assistantTextRef.current)
         finalizeAssistant(finalText)
-        if (looksLikeRecallProbe(finalText) && (recallForcedRef.current || turnCountRef.current >= RECALL_DEADLINE_TURN)) {
-          recallProbeIssuedRef.current = true
-        }
         if (persona === 'screening' && looksLikeGoodbye(finalText)) scheduleEnd()
         return
       }
       if (type === 'response.done') {
         updateStatus('listening', 'Listening...')
         if (wrappingUpRef.current) return
-        // Screening-only deterministic recall floor + wrap-up (companion ends naturally on goodbye).
-        if (persona === 'screening' && !closingRef.current) {
-          if (recallAnsweredRef.current || turnCountRef.current >= HARD_MAX_TURN) { requestGoodbye(); return }
-          if (!recallProbeIssuedRef.current && turnCountRef.current >= RECALL_DEADLINE_TURN) steerRecall()
-        }
+        if (persona === 'screening' && !closingRef.current && turnCountRef.current >= requiredPatientTurns) requestGoodbye()
         return
       }
     },
-    [appendAssistantStreaming, applyVoice, finalizeAssistant, persona, reportUnavailable, requestGoodbye, scheduleEnd, send, steerRecall, updateStatus],
+    [appendAssistantStreaming, applyVoice, finalizeAssistant, persona, reportUnavailable, requestGoodbye, requiredPatientTurns, scheduleEnd, send, updateStatus],
   )
 
   const cleanup = useCallback(() => {
@@ -296,9 +273,6 @@ export function useWebRtcRealtimeConversation(options: Options = {}): Conversati
     reportedUnavailableRef.current = false
     wrappingUpRef.current = false
     turnCountRef.current = 0
-    recallProbeIssuedRef.current = false
-    recallAnsweredRef.current = false
-    recallForcedRef.current = false
     closingRef.current = false
     voiceRef.current = voiceProfileForSession(language)
 
@@ -340,7 +314,7 @@ export function useWebRtcRealtimeConversation(options: Options = {}): Conversati
         setConnecting(false)
         setSessionActive(true)
         updateStatus('listening', 'Listening...')
-        send(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, { voice: voiceRef.current.voice, languageKey: voiceRef.current.languageKey, persona }))
+        send(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, { voice: voiceRef.current.voice, languageKey: voiceRef.current.languageKey, persona, patientName: dailyPlan.patientName }))
         // Kick the opening turn even if session.created doesn't arrive first.
         if (!openingRequestedRef.current) { openingRequestedRef.current = true; send({ type: 'response.create' }) }
       })
@@ -375,7 +349,7 @@ export function useWebRtcRealtimeConversation(options: Options = {}): Conversati
       if (!hadResponseRef.current) { reportUnavailable('webrtc_start_failed'); cleanup(); return }
       updateStatus('error', `Error: ${e instanceof Error ? e.message : 'unknown'}`)
     }
-  }, [cleanup, handleMessage, language, patientId, persona, reportUnavailable, send, updateStatus, waitForIceGathering])
+  }, [cleanup, dailyPlan.patientName, handleMessage, language, patientId, persona, reportUnavailable, send, updateStatus, waitForIceGathering])
 
   const stopConversation = useCallback(() => {
     // Ask for a graceful goodbye if the session is live and we haven't started closing; otherwise tear down.

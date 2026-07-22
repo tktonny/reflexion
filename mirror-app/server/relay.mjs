@@ -41,14 +41,15 @@ function eventId() {
 }
 
 function buildLiveSessionUpdate(patientId, language, { voice, wrapUp = false, persona = 'screening' } = {}) {
-  let instructions = buildLiveInstructions(patientId, language, { persona })
+  let instructions
   if (wrapUp) {
     const goodbye = closingGoodbyeSentence(language)
-    instructions +=
-      '\nThe live capture is ending now. In your next reply, briefly thank the patient, ' +
+    instructions =
+      `You are Aria, a calm and warm voice companion. Respond only in ${language}. ` +
+      'The live capture is ending now. In your next reply, briefly thank the patient, ' +
       'say the conversation is ending, and end with exactly this goodbye sentence: ' +
-      `"${goodbye}" The goodbye must be the final sentence. Do not ask another question after that goodbye.`
-  }
+      `"${goodbye}" The goodbye must be the final sentence. Do not ask another question, continue the daily flow, or write anything after that goodbye.`
+  } else instructions = buildLiveInstructions(patientId, language, { persona })
   return {
     event_id: eventId(),
     type: 'session.update',

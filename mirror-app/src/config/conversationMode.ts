@@ -33,12 +33,11 @@ export const DEFAULT_LANGUAGE = process.env.EXPO_PUBLIC_DEFAULT_LANGUAGE || 'man
 // EXPO_PUBLIC_OMNI_JUDGMENT=false to force the two-stage path only.
 export const OMNI_JUDGMENT = (process.env.EXPO_PUBLIC_OMNI_JUDGMENT ?? 'true') !== 'false'
 
-// Client-reachable Qwen config. Used ONLY by the local modes (http / ws).
-// SECURITY: in http/ws modes the API key is reachable by the client — acceptable for a
-// self-owned kiosk/demo only. For production, leave apiKey empty and fetch a short-lived
-// token from the /api/qwen-token endpoint (see docs/ON_DEVICE_LLM.md §4).
+// Client-reachable Qwen endpoint/model identifiers. Credentials always come from the authenticated
+// `/api/v1/sessions/:sessionId/realtime-tickets` backend route and are never compiled into the APK.
 export const QWEN = {
-  apiKey: process.env.EXPO_PUBLIC_QWEN_API_KEY || '',
+  // Production credentials are issued per backend session and never compiled into the APK.
+  apiKey: '',
   // China-region host (our key is China-region: relay showed intl 401 -> china OK).
   base: process.env.EXPO_PUBLIC_QWEN_BASE || 'https://dashscope.aliyuncs.com',
   chatModel: process.env.EXPO_PUBLIC_QWEN_CHAT_MODEL || 'qwen-plus',
@@ -63,12 +62,4 @@ export const QWEN = {
   englishVoice: 'Cherry',
   minnanVoice: 'Roy',
   cantoneseVoice: 'Kiki',
-}
-
-// Fallback nurse/patient ObjectIds for saving check-ins when the device isn't paired
-// (testing without the caregiver app). Seed a matching NursePatientConfig with
-// server/seed-demo-patient.mjs so the caregiver app can display them.
-export const DEMO_IDS = {
-  nurseId: process.env.EXPO_PUBLIC_DEMO_NURSE_ID || '64f0000000000000000000a1',
-  patientId: process.env.EXPO_PUBLIC_DEMO_PATIENT_ID || '65f0000000000000000000b2',
 }

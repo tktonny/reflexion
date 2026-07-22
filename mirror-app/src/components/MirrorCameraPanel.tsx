@@ -17,9 +17,9 @@ const MAX_FRAMES = 6
 const FRAME_WIDTH = 512
 const JPEG_QUALITY = 0.4
 
-type Props = { active: boolean }
+type Props = { active: boolean; autoRequestPermission?: boolean }
 
-export const MirrorCameraPanel = forwardRef<MirrorCameraHandle, Props>(function MirrorCameraPanel({ active }, ref) {
+export const MirrorCameraPanel = forwardRef<MirrorCameraHandle, Props>(function MirrorCameraPanel({ active, autoRequestPermission = true }, ref) {
   const [permission, requestPermission] = useCameraPermissions()
   const camRef = useRef<CameraView | null>(null)
   const framesRef = useRef<string[]>([])
@@ -62,6 +62,12 @@ export const MirrorCameraPanel = forwardRef<MirrorCameraHandle, Props>(function 
   }, [])
 
   useEffect(() => {
+    if (active && autoRequestPermission && permission && !permission.granted && permission.canAskAgain) {
+      void requestPermission()
+    }
+  }, [active, autoRequestPermission, permission, requestPermission])
+
+  useEffect(() => {
     if (!active || !permission?.granted) {
       if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
       return
@@ -77,9 +83,9 @@ export const MirrorCameraPanel = forwardRef<MirrorCameraHandle, Props>(function 
   if (!permission.granted) {
     return (
       <View style={[styles.panel, styles.centered]}>
-        <Text style={styles.hint}>视觉筛查需要摄像头</Text>
+        <Text style={styles.hint}>Today’s conversation needs camera access</Text>
         <Pressable style={styles.btn} onPress={() => void requestPermission()}>
-          <Text style={styles.btnText}>允许摄像头</Text>
+          <Text style={styles.btnText}>Allow camera</Text>
         </Pressable>
       </View>
     )
@@ -87,7 +93,7 @@ export const MirrorCameraPanel = forwardRef<MirrorCameraHandle, Props>(function 
   return (
     <View style={styles.panel}>
       <CameraView ref={camRef} style={styles.cam} facing="front" animateShutter={false} />
-      {active ? <Text style={styles.rec}>● 视觉采样中</Text> : <Text style={styles.idle}>镜面预览</Text>}
+      {active ? <Text style={styles.rec}>● CAMERA ACTIVE</Text> : <Text style={styles.idle}>Mirror preview</Text>}
     </View>
   )
 })

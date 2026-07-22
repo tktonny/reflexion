@@ -1,88 +1,85 @@
 {
-  "flow_id": "clinic_dementia_intake_v1",
-  "title": "Structured Clinic Dementia Intake",
-  "opening_message": "Hi, nice to meet you. We will have a short, relaxed chat about your day. There are no right or wrong answers, so take your time. What should I call you?",
-  "conversation_goal": "Collect orientation, narrative continuity, daily-function, and short recall cues through a warm, casual conversation that does not feel scripted.",
-  "completion_rule": "Complete all four required stages unless fatigue, distress, safety concerns, or repeated non-response make continuation inappropriate.",
-  "completion_message": "Thanks{patient_name_clause}. We're finished with this part now. Goodbye.",
-  "minimum_patient_turns_before_recall": 6,
-  "hard_max_patient_turns": 8,
+  "flow_id": "daily_companion_checkin_v2",
+  "title": "Daily Conversation — Core Product Loop",
+  "opening_message": "Good morning there, it's lovely to see you. How are you feeling today?",
+  "conversation_goal": "Collect reliable speech and cognitive signals during a warm three-to-five-minute morning conversation that feels like a kind friend checking in, never a test.",
+  "completion_rule": "Complete the four daily stages, include a due configured medication reminder when present, and include reminiscence twice per week unless fatigue, distress, safety concerns, or repeated non-response make continuation inappropriate.",
+  "completion_message": "That sounds lovely, thank you so much for chatting with me today. Enjoy your morning! Goodbye.",
+  "base_patient_turns": 5,
+  "hard_max_patient_turns": 7,
   "assistant_response_rules": [
-    "Sound like a calm, warm human guide rather than a robotic assistant.",
-    "Treat the stage plan as hidden objectives, not lines to recite.",
-    "Ask one thing at a time and make it sound like normal small talk.",
-    "Use very short acknowledgements that reflect what the patient just said.",
-    "Give a brief, neutral thinking cue before each question so the patient knows what kind of answer is expected, without suggesting a correct answer.",
-    "Use the patient's name occasionally once it has been shared, but do not overuse it.",
-    "Keep replies extremely short, usually one short sentence and one short question at most.",
-    "If the patient seems hesitant or unsure, reassure gently and offer a simple restatement.",
-    "Use at most one gentle clarification question per stage unless the local clinician explicitly overrides.",
-    "Do not use markdown, asterisks, underscores, bullets, numbered lists, or stage directions. Speak in plain conversational sentences only.",
-    "Do not diagnose, score risk, or discuss dementia probability during the live conversation.",
-    "After the final stage is complete, close naturally and end with a brief goodbye sentence."
+    "Sound like a kind friend who checks in every morning, not a clinician, interviewer, or examiner.",
+    "Treat the stage plan as hidden objectives and never name a cognitive ability or signal.",
+    "Ask one short question at a time and wait fully for the patient to finish.",
+    "Use a brief acknowledgement before moving to the next natural question.",
+    "Never use remember, memory test, correct, incorrect, score, dementia, diagnosis, or assessment framing.",
+    "If the patient is unsure, reassure them gently without supplying an answer.",
+    "Do not repeat a question already answered and do not add unrelated screening questions.",
+    "Medication language may only refer to a caregiver/provider-configured occurrence supplied in session context; never invent or change a medicine, dose, or schedule.",
+    "Keep replies short and easy to follow in speech; do not use markdown or stage directions.",
+    "After the last required response, give the fixed warm close and ask no further question."
   ],
   "processing_steps": [
-    "Audio and webcam frames are captured turn by turn.",
-    "The conversation follows a configurable goal-driven plan with natural bridges instead of a rigid script.",
-    "Speech and face-stream proxies are converted into compact feature embeddings.",
-    "The full recorded session is uploaded for formal multimodal assessment after the live conversation."
+    "Capture each accepted patient speech turn with its protocol stage and signal tags.",
+    "Upload the transcript and available media as session evidence.",
+    "Run quality and identity gates before downstream clinical feature extraction.",
+    "Keep live conversation collection separate from diagnosis and caregiver status generation."
   ],
   "steps": [
     {
-      "key": "orientation",
-      "title": "Orientation",
-      "goal": "Anchor the patient in self and place without making the opening feel like an exam.",
-      "prompt": "Where are you right now?",
-      "rationale": "Checks basic orientation, self-reference, and place awareness.",
-      "exit_when": [
-        "The patient gives a name, clear self-reference, or states they are unsure.",
-        "The patient gives a location, setting, or clearly expresses uncertainty about where they are.",
-        "The patient gives an approximate day, date, or time, or clearly states they are unsure.",
-        "One gentle clarification has been used if the first answer was partial."
-      ],
-      "max_follow_ups": 1
+      "key": "warm_up",
+      "title": "Warm-up",
+      "duration_seconds": 30,
+      "goal": "Create a low-stakes welcome and invite an open description of how the patient feels.",
+      "prompt": "Good morning [Name], it's lovely to see you. How are you feeling today?",
+      "signals": ["mood", "speech_initiation", "response_latency"],
+      "rationale": "A friendly opening lowers pressure while naturally orienting the patient to the morning."
     },
     {
-      "key": "recent_story",
-      "title": "Recent Story",
-      "goal": "Elicit a sequenced recent narrative with enough detail to assess continuity and recall.",
-      "guided_transition": "Thanks{patient_name_clause}.",
-      "prompt": "How's your day been so far?",
-      "rationale": "Looks for narrative continuity, sequencing, and conversational detail.",
-      "exit_when": [
-        "The patient describes at least two events, activities, or time-linked details from the day.",
-        "The patient gives a clearly limited answer after one brief prompt for more detail.",
-        "The patient cannot continue after one gentle clarification."
-      ],
-      "max_follow_ups": 1
+      "key": "yesterday_recall",
+      "title": "Yesterday recall",
+      "duration_seconds": 60,
+      "goal": "Invite a natural account of yesterday evening and last night's sleep without memory-test framing.",
+      "prompts": ["What did you have for dinner yesterday?", "Did you sleep well?"],
+      "signals": ["episodic_memory", "temporal_orientation", "narrative_coherence"],
+      "rationale": "Recall is disguised as ordinary conversation; never ask the patient to prove that they remember."
     },
     {
-      "key": "daily_function",
-      "title": "Daily Function",
-      "goal": "Surface whether daily routines are self-managed or rely on reminders, supervision, or help.",
-      "guided_transition": "Got it.",
-      "prompt": "On a usual day, how do you keep track of meals, medicines, or appointments?",
-      "rationale": "Surfaces independence cues and whether routine tasks require support.",
-      "exit_when": [
-        "The patient describes how they handle at least one daily routine.",
-        "The answer clarifies whether another person helps, reminds, or supervises.",
-        "One gentle clarification has been used if the first answer was vague."
-      ],
-      "max_follow_ups": 1
+      "key": "present_planning",
+      "title": "Present and planning",
+      "duration_seconds": 60,
+      "goal": "Talk about today's plans and expected social contact.",
+      "prompts": ["What are you planning to do today?", "Is anyone visiting you this week?"],
+      "signals": ["executive_function", "prospective_memory", "social_connectedness"],
+      "rationale": "Natural planning conversation captures executive and social-engagement signals."
     },
     {
-      "key": "delayed_recall",
-      "title": "Wrap-up Recall",
-      "goal": "Check short recall near the end of the conversation by briefly returning to something the patient already mentioned.",
-      "guided_transition": "Thanks, that helps.",
-      "prompt": "Before we finish, tell me one thing you mentioned earlier today.",
-      "rationale": "Creates a natural short-recall checkpoint without introducing an artificial word list.",
-      "exit_when": [
-        "The patient attempts recall of an earlier detail, whether specific, partial, or uncertain.",
-        "One brief repetition of the request has been used if the patient did not respond.",
-        "The stage ends after the recall attempt so the conversation can close cleanly."
-      ],
-      "max_follow_ups": 1
+      "key": "medication_reminder",
+      "title": "Medication reminder",
+      "conditional": "Only when a caregiver/provider-configured medication occurrence is currently due.",
+      "goal": "Confirm a configured medication occurrence without generating medical instructions.",
+      "prompt": "Good afternoon [Name] — have you taken your afternoon medication yet?",
+      "signals": ["memory", "caregiver_adjunct"],
+      "rationale": "The mirror supports the care plan but never creates or changes medication or dosage."
+    },
+    {
+      "key": "reminiscence",
+      "title": "Reminiscence",
+      "duration_seconds": 90,
+      "frequency": "twice_weekly",
+      "goal": "Invite an enjoyable, longer autobiographical story.",
+      "prompts": ["Tell me about a holiday you loved.", "What was your favourite food as a child?"],
+      "signals": ["semantic_memory", "language_richness", "lexical_diversity", "speech_fluency"],
+      "rationale": "Pleasant reminiscence creates the richest natural speech sample and helps build habit."
+    },
+    {
+      "key": "close",
+      "title": "Close",
+      "duration_seconds": 30,
+      "goal": "End positively and clearly so the patient knows the session is complete.",
+      "prompt": "That sounds lovely, thank you so much for chatting with me today. Enjoy your morning!",
+      "signals": ["session_completion"],
+      "rationale": "A consistent positive close supports return the next day."
     }
   ]
 }

@@ -3,27 +3,22 @@ import { Platform } from 'react-native'
 
 import { QWEN } from '../config/conversationMode'
 import {
-  RECALL_DEADLINE_TURN,
-  RECALL_DIRECTIVE,
-  WRAPUP_DIRECTIVE,
   buildLiveInstructions,
-  looksLikeRecallProbe,
   looksLikeUserGoodbye,
   openingMessageForLanguage,
-  recallBudgetStep,
 } from '../orchestration/orchestrator'
 import {
   companionClosingTextForLanguage,
+  closingTextForLanguage,
+  createDailyConversationPlan,
   screeningQuestionForTurn,
 } from '../orchestration/deterministicSpeech'
 import { detectLanguageSignal, voiceProfileForLanguageKey, voiceProfileForSession, type VoiceProfile } from '../orchestration/voice'
 import { qwenASR, qwenChat, qwenTTS, type QwenChatMessage } from '../api/qwenClient'
 import { randomId } from '../utils/id'
-import type { ChatMessage, ConversationApi, StatusKind } from './conversationTypes'
+import type { ChatMessage, ConversationApi, ConversationOptions, StatusKind } from './conversationTypes'
 
 const CAPTURE_SAMPLE_RATE = 16000
-
-type Options = { patientId?: string; language?: string; persona?: 'screening' | 'companion' }
 
 /**
  * Version 2 (Flavor B): fully on-device turn-based voice loop over plain HTTPS —
@@ -31,10 +26,11 @@ type Options = { patientId?: string; language?: string; persona?: 'screening' | 
  * No relay. Web path uses the browser Web Audio stack (capture PCM -> WAV).
  * Native path needs a recorder module (expo-audio) — TODO; throws a clear message for now.
  */
-export function useTurnBasedConversation(options: Options = {}): ConversationApi {
+export function useTurnBasedConversation(options: ConversationOptions = {}): ConversationApi {
   const patientId = options.patientId ?? 'demo-patient'
   const language = options.language ?? 'en'
   const persona = options.persona ?? 'screening'
+  const dailyPlan = options.dailyPlan ?? createDailyConversationPlan({ patientName: options.patientName, reminiscenceWeekdays: [] })
 
   const [statusKind, setStatusKind] = useState<StatusKind>('idle')
   const [statusText, setStatusText] = useState('Ready to start')
@@ -54,8 +50,6 @@ export function useTurnBasedConversation(options: Options = {}): ConversationApi
   const playbackCursorRef = useRef(0)
   const sessionActiveRef = useRef(false)
   const turnCountRef = useRef(0)
-  const recallProbeIssuedRef = useRef(false)
-  const recallAnsweredRef = useRef(false)
   const closingRef = useRef(false)
 
   const updateStatus = useCallback((kind: StatusKind, text: string) => {
@@ -123,10 +117,8 @@ export function useTurnBasedConversation(options: Options = {}): ConversationApi
     updateStatus('processing', 'Starting...')
     setMessages([])
     voiceRef.current = voiceProfileForSession(language)
-    llmRef.current = [{ role: 'system', content: buildLiveInstructions(patientId, language, { persona }) }]
+    llmRef.current = [{ role: 'system', content: buildLiveInstructions(patientId, language, { persona, patientName: dailyPlan.patientName }) }]
     turnCountRef.current = 0
-    recallProbeIssuedRef.current = false
-    recallAnsweredRef.current = false
     closingRef.current = false
 
     try {
@@ -135,7 +127,7 @@ export function useTurnBasedConversation(options: Options = {}): ConversationApi
       setSessionActive(true)
       setConnecting(false)
       // Assistant speaks the scripted opening first.
-      const opening = openingMessageForLanguage(language)
+      const opening = openingMessageForLanguage(language, dailyPlan.patientName)
       llmRef.current.push({ role: 'assistant', content: opening })
       addMessage('assistant', opening)
       await speakAssistant(opening)
@@ -144,7 +136,7 @@ export function useTurnBasedConversation(options: Options = {}): ConversationApi
       cleanup()
       updateStatus('error', `Error: ${e instanceof Error ? e.message : 'unknown'}`)
     }
-  }, [addMessage, ensureAudio, language, patientId, persona, speakAssistant, updateStatus])
+  }, [addMessage, dailyPlan.patientName, ensureAudio, language, patientId, persona, speakAssistant, updateStatus])
 
   const runTurn = useCallback(async () => {
     updateStatus('processing', 'Transcribing...')
@@ -164,37 +156,23 @@ export function useTurnBasedConversation(options: Options = {}): ConversationApi
         voiceRef.current = voiceProfileForLanguageKey(signal.languageKey, 'transcript_reassessment')
       }
 
-      // Layer 2: deterministic recall floor — inject a one-turn steering directive if needed.
-      let directive: string | null = null
       let scriptedQuestion: string | null = null
       const companionGoodbyeRequested = persona === 'companion' && looksLikeUserGoodbye(transcript)
       if (persona === 'screening') {
-        const step = recallBudgetStep({
-          turnCount: turnCountRef.current,
-          recallProbeIssued: recallProbeIssuedRef.current,
-          recallAnswered: recallAnsweredRef.current,
-        })
-        if (step.action === 'force_recall') { recallProbeIssuedRef.current = true; directive = RECALL_DIRECTIVE }
-        else if (step.action === 'wrap_up') { recallAnsweredRef.current = true; directive = WRAPUP_DIRECTIVE; closingRef.current = true }
-        else scriptedQuestion = screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current)
+        scriptedQuestion = screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current, dailyPlan)
+        if (!scriptedQuestion) closingRef.current = true
       }
       if (companionGoodbyeRequested) closingRef.current = true
 
       updateStatus('processing', 'Thinking...')
-      // Ephemeral directive: passed for this one turn only, NOT pushed into history.
-      const msgs = directive ? [...llmRef.current, { role: 'system' as const, content: directive }] : llmRef.current
       const reply = companionGoodbyeRequested
         ? companionClosingTextForLanguage(voiceRef.current.languageKey)
-        : scriptedQuestion ?? await qwenChat(msgs, { maxTokens: 120, temperature: 0.4 })
+        : closingRef.current
+          ? closingTextForLanguage(voiceRef.current.languageKey)
+          : scriptedQuestion ?? await qwenChat(llmRef.current, { maxTokens: 120, temperature: 0.4 })
       if (reply) {
         llmRef.current.push({ role: 'assistant', content: reply })
         addMessage('assistant', reply)
-        if (
-          persona === 'screening' &&
-          !recallProbeIssuedRef.current &&
-          turnCountRef.current >= RECALL_DEADLINE_TURN &&
-          looksLikeRecallProbe(reply)
-        ) recallProbeIssuedRef.current = true
         await speakAssistant(reply)
       }
       if (closingRef.current) {
@@ -207,7 +185,7 @@ export function useTurnBasedConversation(options: Options = {}): ConversationApi
     } catch (e) {
       updateStatus('error', `Error: ${e instanceof Error ? e.message : 'unknown'}`)
     }
-  }, [addMessage, persona, speakAssistant, updateStatus])
+  }, [addMessage, dailyPlan, persona, speakAssistant, updateStatus])
 
   const beginPushToTalk = useCallback(() => {
     if (!sessionActiveRef.current) return

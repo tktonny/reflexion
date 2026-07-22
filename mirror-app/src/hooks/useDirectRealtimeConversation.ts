@@ -4,10 +4,7 @@ import { Platform } from 'react-native'
 import { getBearer } from '../api/qwenToken'
 import { qwenTTS } from '../api/qwenClient'
 import {
-  HARD_MAX_TURN,
-  RECALL_DEADLINE_TURN,
   looksLikeGoodbye,
-  looksLikeRecallProbe,
   looksLikeUserGoodbye,
 } from '../orchestration/orchestrator'
 import { buildLiveSessionUpdate, realtimeWsUrl } from '../orchestration/realtime'
@@ -16,8 +13,8 @@ import {
   base64ToBytes,
   closingTextForLanguage,
   companionClosingTextForLanguage,
+  createDailyConversationPlan,
   qwenWavToPcm24kChunks,
-  recallQuestionForLanguage,
   screeningQuestionForTurn,
 } from '../orchestration/deterministicSpeech'
 import {
@@ -41,15 +38,9 @@ import {
 } from '../orchestration/voice'
 import { createPcmAudioBridge, type PcmAudioBridge } from '../native/pcmAudio'
 import { randomId } from '../utils/id'
-import type { ChatMessage, ConversationApi, StatusKind } from './conversationTypes'
+import type { ChatMessage, ConversationApi, ConversationOptions, StatusKind } from './conversationTypes'
 
-type Options = {
-  patientId?: string
-  language?: string
-  persona?: 'screening' | 'companion'
-  // Manual push-to-talk: mic stays muted except while the user holds "speak". Kills the echo loop on
-  // devices with no hardware AEC (e.g. an emulator sharing the host mic + speaker).
-  pushToTalk?: boolean
+type Options = ConversationOptions & {
   onUnavailable?: (reason: string) => void
 }
 
@@ -85,9 +76,18 @@ function looksLikeEchoOfAria(userText: string, ariaLines: string[]): boolean {
   return false
 }
 
+function providerResponseId(payload: any): string | null {
+  const value = payload?.response_id ?? payload?.response?.id
+  return typeof value === 'string' && value ? value : null
+}
+
+function isCancelledProviderEvent(payload: any, cancelledResponseId: string | null): boolean {
+  return Boolean(cancelledResponseId && providerResponseId(payload) === cancelledResponseId)
+}
+
 /**
  * Version 3 (Flavor A): NATIVE device opens a direct realtime WebSocket to Qwen (header auth
- * with a short-lived token minted by /api/qwen-token), running the on-device orchestration
+ * with a short-lived ticket minted for an authenticated `/api/v1/sessions/:id` session), running the on-device orchestration
  * (session.update / server-VAD / dynamic voice / wrap-up). No relay.
  *
  * Verified headlessly by server/smoke-direct-ws.mjs (token → direct WS → orchestration →
@@ -99,6 +99,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const language = options.language ?? 'en'
   const persona = options.persona ?? 'screening'
   const pushToTalk = options.pushToTalk ?? false
+  const dailyPlan = options.dailyPlan ?? createDailyConversationPlan({ patientName: options.patientName, reminiscenceWeekdays: [] })
 
   const [statusKind, setStatusKind] = useState<StatusKind>('idle')
   const [statusText, setStatusText] = useState('Ready to start')
@@ -106,6 +107,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const [connecting, setConnecting] = useState(false)
   const [sessionActive, setSessionActive] = useState(false)
   const [userSpeaking, setUserSpeaking] = useState(false)
+  const [bargeInActive, setBargeInActive] = useState(false)
   const [ended, setEnded] = useState(false)
   const [recording, setRecording] = useState(false)
   const [turnState, setTurnState] = useState<TurnTakingPhase>('idle')
@@ -125,11 +127,22 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const startAttemptRef = useRef(0)
   const audioRef = useRef<PcmAudioBridge | null>(null)
   const vadRef = useRef(createEnergyVad())
+  // Barge-in is intentionally more conservative than ordinary turn VAD. Android/iOS voice-chat
+  // processing removes most speaker echo; the higher floor and three-frame confirmation reject the
+  // remaining room tail without making an older adult repeat a genuine interruption.
+  const bargeInVadRef = useRef(createEnergyVad({
+    speechStartRms: 0.025,
+    speechContinueRms: 0.01,
+    minSpeechMs: 300,
+    silenceMs: 1200,
+  }))
   const vadSpeakingRef = useRef(false)
   const audioPreRollRef = useRef<string[]>([])
+  const bargeInPreRollRef = useRef<string[]>([])
+  const bargeInActiveRef = useRef(false)
   const voiceRef = useRef<VoiceProfile>(voiceProfileForSession(language))
   const openingRequestedRef = useRef(false)
-  const responseAfterSessionUpdateRef = useRef<'normal' | 'recall' | 'closing' | null>(null)
+  const responseAfterSessionUpdateRef = useRef<'normal' | 'closing' | null>(null)
   const streamIdRef = useRef<string | null>(null)
   const assistantTextRef = useRef('')
   const recentAriaRef = useRef<string[]>([]) // Aria's last few finalized lines, for echo suppression
@@ -143,6 +156,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const responseActiveRef = useRef(false)
   const responseAudioReceivedRef = useRef(false)
   const responseCompletedRef = useRef(false)
+  const activeProviderResponseIdRef = useRef<string | null>(null)
+  const cancelledProviderResponseIdRef = useRef<string | null>(null)
+  const currentResponseSourceRef = useRef<'realtime' | 'local' | null>(null)
   const currentResponseClosingRef = useRef(false)
   const goodbyeDetectedRef = useRef(false)
   const drainInProgressRef = useRef(false)
@@ -158,13 +174,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const openedRef = useRef(false)
   const connectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const reportedUnavailableRef = useRef(false)
-  // Deterministic recall floor + natural ending (parity with v2). The realtime model auto-responds
-  // via server-VAD, so we drive the mandatory recall + goodbye from the turn counter instead of
-  // relying on the model to conclude on its own (which it doesn't — it keeps asking follow-ups).
+  // Deterministic Daily Conversation v2 stage order and natural ending.
   const turnCountRef = useRef(0)
-  const recallProbeIssuedRef = useRef(false)
-  const recallAnsweredRef = useRef(false)
-  const recallForcedRef = useRef(false)
   const closingRef = useRef(false)
   const recordingRef = useRef(false)
   const pushToTalkGestureRef = useRef(createPushToTalkGesture())
@@ -256,7 +267,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
 
   const configureNextResponse = useCallback((
     sessionUpdate: Record<string, unknown>,
-    intent: 'normal' | 'recall' | 'closing',
+    intent: 'normal' | 'closing',
   ) => {
     if (responseAfterSessionUpdateRef.current) {
       failClosed('A second response configuration was queued before the first was acknowledged.')
@@ -288,6 +299,25 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     recentAriaRef.current = [clean, ...recentAriaRef.current].slice(0, 4)
     if (id) setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, text: clean, streaming: false } : m)))
     else setMessages((prev) => [...prev, { id: randomId('assistant'), role: 'assistant', text: clean }])
+  }, [])
+
+  const markAssistantInterrupted = useCallback(() => {
+    const streamingId = streamIdRef.current
+    const partialText = assistantTextRef.current.trim()
+    streamIdRef.current = null
+    assistantTextRef.current = ''
+    setMessages((previous) => {
+      if (streamingId) {
+        return previous.map((message) => message.id === streamingId
+          ? { ...message, text: partialText || message.text, streaming: false, interrupted: true }
+          : message)
+      }
+      const lastAssistantIndex = previous.findLastIndex((message) => message.role === 'assistant')
+      if (lastAssistantIndex < 0) return previous
+      return previous.map((message, index) => index === lastAssistantIndex
+        ? { ...message, interrupted: true }
+        : message)
+    })
   }, [])
 
   const applyVoice = useCallback((profile: VoiceProfile) => {
@@ -339,6 +369,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       responseCompletedRef.current = false
       responseAudioReceivedRef.current = false
       currentResponseClosingRef.current = closing
+      currentResponseSourceRef.current = 'local'
       goodbyeDetectedRef.current = closing
       audioRef.current?.setCaptureMuted(true)
       transition({ type: 'response_created' })
@@ -367,19 +398,18 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
 
       responseCompletedRef.current = true
       responseActiveRef.current = false
-      audioRef.current?.setCaptureMuted(true)
+      // Keep capture frames local while the speaker is active. JS sends nothing upstream unless
+      // conservative barge-in VAD confirms that the person has actually started speaking.
+      bargeInVadRef.current.reset()
+      bargeInPreRollRef.current = []
+      audioRef.current?.setCaptureMuted(pushToTalk || manualCloseRequestedRef.current)
       transition({ type: 'response_done' })
       updateStatus('speaking', 'Finishing playback...')
       waitForPlaybackDrain(() => handlePlaybackCompleteRef.current(closing))
     } catch (error) {
       failClosed(error instanceof Error ? error.message : 'Deterministic assistant speech failed.')
     }
-  }, [failClosed, finalizeAssistant, transition, updateStatus, waitForPlaybackDrain])
-
-  const recallDetail = useCallback(() => {
-    const turns = userTranscriptsRef.current
-    return turns.length > 1 ? turns[turns.length - 2] : turns[0] || 'what you were doing earlier'
-  }, [])
+  }, [failClosed, finalizeAssistant, pushToTalk, transition, updateStatus, waitForPlaybackDrain])
 
   // Ask for exactly one closing response. This is called only while no response or local playback
   // owns the turn, so the goodbye can never overlap the sentence that came before it.
@@ -403,25 +433,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     return true
   }, [clearDrain, persona, playDeterministicResponse, send, transition])
 
-  // The model reached the recall deadline without asking it — steer it to do the recall step now.
-  const steerRecall = useCallback((): boolean => {
-    if (recallForcedRef.current || closingRef.current) return false
-    if (responseRequestedRef.current || responseActiveRef.current || drainInProgressRef.current) return false
-    recallForcedRef.current = true
-    // The deterministic steering response is the recall probe even if transcript heuristics fail to
-    // recognize its wording. The next completed patient turn may then close the screening.
-    recallProbeIssuedRef.current = true
-    responseRequestedRef.current = true
-    audioRef.current?.setCaptureMuted(true)
-    transition({ type: 'response_requested' })
-    void playDeterministicResponse(
-      recallQuestionForLanguage(voiceRef.current.languageKey, recallDetail()),
-      false,
-    )
-    return true
-  }, [playDeterministicResponse, recallDetail, transition])
-
   const resumeListening = useCallback(() => {
+    bargeInActiveRef.current = false
+    setBargeInActive(false)
     updateStatus('listening', pushToTalk ? '按住说话' : 'Listening...')
     if (pushToTalk) return
 
@@ -464,6 +478,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const finishUserTurn = useCallback(() => {
     if (turnTakingRef.current.captureMuted || responseRequestedRef.current || responseActiveRef.current) return
     vadSpeakingRef.current = false
+    bargeInActiveRef.current = false
+    setBargeInActive(false)
     audioPreRollRef.current = []
     transition({ type: 'user_speech_stopped' })
     responseRequestedRef.current = true
@@ -479,13 +495,83 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     transcriptTimerRef.current = setTimeout(() => rejectPendingInput('timeout'), 6000)
   }, [clearTranscriptWait, rejectPendingInput, send, transition, updateStatus])
 
+  const interruptAssistant = useCallback(() => {
+    if (manualCloseRequestedRef.current || !runtimeLeaseRef.current?.isCurrent()) return false
+    const state = turnTakingRef.current
+    if (!state.responseInFlight && !state.awaitingPlayback) return false
+
+    clearDrain()
+    audioRef.current?.clearPlayback()
+    // Realtime generation must be cancelled as well as local playback. A locally synthesized
+    // deterministic question has already finished generating, so sending response.cancel there
+    // would incorrectly cancel a future provider turn.
+    if (
+      currentResponseSourceRef.current === 'realtime' &&
+      responseActiveRef.current &&
+      !responseCompletedRef.current
+    ) {
+      cancelledProviderResponseIdRef.current = activeProviderResponseIdRef.current
+      send({ type: 'response.cancel' })
+    }
+    send({ type: 'input_audio_buffer.clear' })
+
+    responseAfterSessionUpdateRef.current = null
+    responseRequestedRef.current = false
+    responseActiveRef.current = false
+    responseCompletedRef.current = false
+    responseAudioReceivedRef.current = false
+    currentResponseClosingRef.current = false
+    currentResponseSourceRef.current = null
+    goodbyeDetectedRef.current = false
+    closingRef.current = false
+    wrappingUpRef.current = false
+    markAssistantInterrupted()
+
+    transition({ type: 'assistant_interrupted' })
+    bargeInActiveRef.current = true
+    setBargeInActive(true)
+    vadSpeakingRef.current = true
+    setUserSpeaking(true)
+    updateStatus('listening', 'I heard you — Aria has paused.')
+    return true
+  }, [clearDrain, markAssistantInterrupted, send, transition, updateStatus])
+
   const handleCaptureChunk = useCallback((base64Pcm16: string) => {
     if (!runtimeLeaseRef.current?.isCurrent()) return
     if (pushToTalk) {
       if (recordingRef.current) send({ type: 'input_audio_buffer.append', audio: base64Pcm16 })
       return
     }
-    if (turnTakingRef.current.captureMuted || responseRequestedRef.current || responseActiveRef.current) return
+    if (bargeInActiveRef.current) {
+      send({ type: 'input_audio_buffer.append', audio: base64Pcm16 })
+      try {
+        const result = bargeInVadRef.current.feed(decodeBase64Pcm16(base64Pcm16))
+        if (result.event === 'speech_stopped') finishUserTurn()
+      } catch (error) {
+        failClosed(error instanceof Error ? error.message : 'Unable to inspect microphone audio.')
+      }
+      return
+    }
+
+    const state = turnTakingRef.current
+    const assistantOwnsAudio = state.responseInFlight || state.awaitingPlayback
+    if (assistantOwnsAudio && !manualCloseRequestedRef.current) {
+      try {
+        const result = bargeInVadRef.current.feed(decodeBase64Pcm16(base64Pcm16))
+        bargeInPreRollRef.current.push(base64Pcm16)
+        if (bargeInPreRollRef.current.length > 6) bargeInPreRollRef.current.shift()
+        if (result.event === 'speech_started' && interruptAssistant()) {
+          for (const chunk of bargeInPreRollRef.current) {
+            send({ type: 'input_audio_buffer.append', audio: chunk })
+          }
+          bargeInPreRollRef.current = []
+        }
+      } catch (error) {
+        failClosed(error instanceof Error ? error.message : 'Unable to inspect microphone audio.')
+      }
+      return
+    }
+    if (state.captureMuted || responseRequestedRef.current || responseActiveRef.current) return
 
     let result
     try {
@@ -520,7 +606,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       if (__DEV__) console.info(`[local-vad] speech stopped rms=${result.rms.toFixed(4)} threshold=${result.threshold.toFixed(4)}`)
       finishUserTurn()
     }
-  }, [failClosed, finishUserTurn, pushToTalk, send, transition, updateStatus])
+  }, [failClosed, finishUserTurn, interruptAssistant, pushToTalk, send, transition, updateStatus])
 
   const handlePlaybackComplete = useCallback((closingResponse: boolean) => {
     if (closingResponse && !goodbyeDetectedRef.current) {
@@ -532,12 +618,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       closingResponse,
       manualCloseRequested: manualCloseRequestedRef.current,
       spontaneousGoodbye: goodbyeDetectedRef.current,
-      recallAnswered: recallAnsweredRef.current,
-      recallProbeIssued: recallProbeIssuedRef.current,
-      recallForced: recallForcedRef.current,
-      turnCount: turnCountRef.current,
-      recallDeadlineTurn: RECALL_DEADLINE_TURN,
-      hardMaxTurn: HARD_MAX_TURN,
+      dailyFlowComplete: false,
     })
 
     if (action === 'finish') { completeConversation(); return }
@@ -545,9 +626,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       if (!requestGoodbye() && !closingRef.current) failClosed('Unable to start the closing response.')
       return
     }
-    if (action === 'steer_recall' && steerRecall()) return
     resumeListening()
-  }, [completeConversation, failClosed, persona, requestGoodbye, resumeListening, steerRecall])
+  }, [completeConversation, failClosed, persona, requestGoodbye, resumeListening])
   handlePlaybackCompleteRef.current = handlePlaybackComplete
 
   const handleMessage = useCallback(
@@ -556,6 +636,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       const type = String(payload?.type || '')
 
       if (type === 'error') {
+        const providerMessage = String(payload?.error?.message || '')
+        if (cancelledProviderResponseIdRef.current && /cancel|active response/i.test(providerMessage)) {
+          cancelledProviderResponseIdRef.current = null
+          return
+        }
         // Qwen delivers app-level errors as in-band frames over the OPEN socket (not socket.onerror).
         clearDrain()
         if (!hadResponseRef.current) {
@@ -607,21 +692,21 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         setMessages((prev) => [...prev, { id: randomId('user'), role: 'user', text: transcript }])
         userTranscriptsRef.current.push(transcript)
         turnCountRef.current += 1
-        const answeredRecall =
-          persona === 'screening' && recallProbeIssuedRef.current && !recallAnsweredRef.current
         const companionGoodbyeRequested =
           persona === 'companion' && looksLikeUserGoodbye(transcript)
-        if (answeredRecall) recallAnsweredRef.current = true
+        const scriptedQuestion = persona === 'screening'
+          ? screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current, dailyPlan)
+          : null
+        const dailyFlowComplete = persona === 'screening' && !scriptedQuestion
 
         const signal = detectLanguageSignal(transcript)
         if (signal && signal.confidence >= 0.8 && signal.languageKey !== voiceRef.current.languageKey) {
           applyVoice(voiceProfileForLanguageKey(signal.languageKey, 'transcript_reassessment'))
         }
 
-        // The response to a recall answer is itself the closing response. Likewise, a manual close
-        // requested while waiting for transcription produces one goodbye, not a normal reply plus a
-        // second assistant turn.
-        if (answeredRecall || companionGoodbyeRequested || manualCloseRequestedRef.current) {
+        // The response after the final enabled stage is the fixed positive close. A manual close
+        // requested while waiting for transcription also produces one goodbye, never two turns.
+        if (dailyFlowComplete || companionGoodbyeRequested || manualCloseRequestedRef.current) {
           closingRef.current = true
           wrappingUpRef.current = true
           transition({ type: 'close_requested' })
@@ -632,33 +717,16 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           return
         }
 
-        // Steer the CURRENT response at the recall deadline. The previous implementation generated
-        // a normal question, waited for playback, then appended another assistant-only recall turn.
-        const recallDue =
-          persona === 'screening' &&
-          !recallProbeIssuedRef.current &&
-          turnCountRef.current >= RECALL_DEADLINE_TURN
-        if (recallDue) {
-          recallForcedRef.current = true
-          recallProbeIssuedRef.current = true
-          void playDeterministicResponse(
-            recallQuestionForLanguage(voiceRef.current.languageKey, recallDetail()),
-            false,
-          )
+        if (scriptedQuestion) {
+          void playDeterministicResponse(scriptedQuestion, false)
         } else {
-          const scriptedQuestion = persona === 'screening'
-            ? screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current)
-            : null
-          if (scriptedQuestion) {
-            void playDeterministicResponse(scriptedQuestion, false)
-          } else {
-            configureNextResponse(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, {
-              voice: voiceRef.current.voice,
-              languageKey: voiceRef.current.languageKey,
-              persona,
-              autoCreateResponse: false,
-            }), 'normal')
-          }
+          configureNextResponse(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, {
+            voice: voiceRef.current.voice,
+            languageKey: voiceRef.current.languageKey,
+            persona,
+            patientName: dailyPlan.patientName,
+            autoCreateResponse: false,
+          }), 'normal')
         }
         return
       }
@@ -667,6 +735,12 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
       if (type === 'response.created') {
+        const createdResponseId = String(payload?.response?.id || '') || null
+        if (bargeInActiveRef.current) {
+          cancelledProviderResponseIdRef.current = createdResponseId
+          send({ type: 'response.cancel' })
+          return
+        }
         hadResponseRef.current = true
         if (drainInProgressRef.current) {
           transition({ type: 'response_created' })
@@ -677,6 +751,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         responseActiveRef.current = true
         responseCompletedRef.current = false
         responseAudioReceivedRef.current = false
+        currentResponseSourceRef.current = 'realtime'
+        activeProviderResponseIdRef.current = createdResponseId
         currentResponseClosingRef.current = closingRef.current
         goodbyeDetectedRef.current = false
         audioRef.current?.setCaptureMuted(true)
@@ -685,9 +761,15 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
       if (type === 'response.audio.delta') {
+        if (isCancelledProviderEvent(payload, cancelledProviderResponseIdRef.current)) return
         if (!responseAudioReceivedRef.current) {
           responseAudioReceivedRef.current = true
           transition({ type: 'audio_delta' })
+          if (!pushToTalk && !manualCloseRequestedRef.current) {
+            bargeInVadRef.current.reset()
+            bargeInPreRollRef.current = []
+            audioRef.current?.setCaptureMuted(false)
+          }
         }
         try {
           audioRef.current?.play(String(payload?.delta || ''))
@@ -697,26 +779,30 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
       if (type === 'response.audio.done') {
+        if (isCancelledProviderEvent(payload, cancelledProviderResponseIdRef.current)) return
         // Qwen has finished generating audio, but the native speaker may still have a backlog.
         return
       }
       if (type === 'response.audio_transcript.delta' || type === 'response.output_audio_transcript.delta') {
+        if (isCancelledProviderEvent(payload, cancelledProviderResponseIdRef.current)) return
         assistantTextRef.current += String(payload?.delta || '')
         appendAssistantStreaming(assistantTextRef.current)
         return
       }
       if (type === 'response.audio_transcript.done' || type === 'response.output_audio_transcript.done') {
+        if (isCancelledProviderEvent(payload, cancelledProviderResponseIdRef.current)) return
         const finalText = String(payload?.transcript ?? assistantTextRef.current)
         finalizeAssistant(finalText)
-        // Only latch recall once we're actually in the recall window — otherwise an ordinary early
-        // acknowledgement ("you mentioned…") trips the auto-goodbye and ends the check-in after ~2 topics.
-        if (looksLikeRecallProbe(finalText) && (recallForcedRef.current || turnCountRef.current >= RECALL_DEADLINE_TURN)) {
-          recallProbeIssuedRef.current = true
-        }
         goodbyeDetectedRef.current = looksLikeGoodbye(finalText)
         return
       }
       if (type === 'response.done') {
+        if (isCancelledProviderEvent(payload, cancelledProviderResponseIdRef.current)) {
+          cancelledProviderResponseIdRef.current = null
+          activeProviderResponseIdRef.current = null
+          currentResponseSourceRef.current = null
+          return
+        }
         if (responseCompletedRef.current) {
           transition({ type: 'response_done' })
           return
@@ -724,7 +810,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         responseCompletedRef.current = true
         responseRequestedRef.current = false
         responseActiveRef.current = false
-        audioRef.current?.setCaptureMuted(true)
+        audioRef.current?.setCaptureMuted(
+          pushToTalk || manualCloseRequestedRef.current || !responseAudioReceivedRef.current,
+        )
         transition({ type: 'response_done' })
         updateStatus('speaking', 'Finishing playback...')
         const closingResponse = currentResponseClosingRef.current
@@ -732,7 +820,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
     },
-    [appendAssistantStreaming, applyVoice, clearDrain, clearTranscriptWait, configureNextResponse, failClosed, finalizeAssistant, handlePlaybackComplete, patientId, persona, playDeterministicResponse, recallDetail, rejectPendingInput, reportUnavailable, send, transition, updateStatus, waitForPlaybackDrain],
+    [appendAssistantStreaming, applyVoice, clearDrain, clearTranscriptWait, configureNextResponse, dailyPlan, failClosed, finalizeAssistant, handlePlaybackComplete, patientId, persona, playDeterministicResponse, pushToTalk, rejectPendingInput, reportUnavailable, send, transition, updateStatus, waitForPlaybackDrain],
   )
 
   const cleanup = useCallback(() => {
@@ -748,8 +836,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     drainInProgressRef.current = false
     wrappingUpRef.current = false
     vadRef.current.reset()
+    bargeInVadRef.current.reset()
     vadSpeakingRef.current = false
     audioPreRollRef.current = []
+    bargeInPreRollRef.current = []
+    bargeInActiveRef.current = false
     recordingRef.current = false
     pushToTalkGestureRef.current.reset()
     void audioRef.current?.stop()
@@ -767,6 +858,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     responseActiveRef.current = false
     responseCompletedRef.current = false
     responseAudioReceivedRef.current = false
+    activeProviderResponseIdRef.current = null
+    cancelledProviderResponseIdRef.current = null
+    currentResponseSourceRef.current = null
     currentResponseClosingRef.current = false
     streamIdRef.current = null
     assistantTextRef.current = ''
@@ -774,6 +868,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     setSessionActive(false)
     setConnecting(false)
     setUserSpeaking(false)
+    setBargeInActive(false)
     setRecording(false)
     resolveStop()
   }, [resolveStop])
@@ -804,26 +899,30 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     openedRef.current = false
     reportedUnavailableRef.current = false
     turnCountRef.current = 0
-    recallProbeIssuedRef.current = false
-    recallAnsweredRef.current = false
-    recallForcedRef.current = false
     closingRef.current = false
     manualCloseRequestedRef.current = false
     responseRequestedRef.current = false
     responseActiveRef.current = false
     responseCompletedRef.current = false
     responseAudioReceivedRef.current = false
+    activeProviderResponseIdRef.current = null
+    cancelledProviderResponseIdRef.current = null
+    currentResponseSourceRef.current = null
     currentResponseClosingRef.current = false
     goodbyeDetectedRef.current = false
     drainInProgressRef.current = false
     recentAriaRef.current = []
     userTranscriptsRef.current = []
     vadRef.current.reset()
+    bargeInVadRef.current.reset()
     vadSpeakingRef.current = false
     audioPreRollRef.current = []
+    bargeInPreRollRef.current = []
+    bargeInActiveRef.current = false
     recordingRef.current = false
     pushToTalkGestureRef.current.reset()
     setRecording(false)
+    setBargeInActive(false)
 
     try {
       // Short-lived server-minted token (secure) or, if explicitly enabled, the kiosk client key.
@@ -857,6 +956,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           voice: voiceRef.current.voice,
           languageKey: voiceRef.current.languageKey,
           persona,
+          patientName: dailyPlan.patientName,
           autoCreateResponse: false,
         }))
         // Start native PCM capture -> stream frames upstream.
@@ -953,7 +1053,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       if (!hadResponseRef.current) { reportUnavailable('ws_start_failed'); return }
       failClosed(`Error: ${e instanceof Error ? e.message : 'unknown'}`)
     }
-  }, [cleanup, failClosed, handleCaptureChunk, handleMessage, language, patientId, persona, reportUnavailable, send, transition, updateStatus])
+  }, [cleanup, dailyPlan.patientName, failClosed, handleCaptureChunk, handleMessage, language, patientId, persona, reportUnavailable, send, transition, updateStatus])
 
   const stopConversation = useCallback(async () => {
     // Auto-close already observed the complete goodbye playback; teardown is now safe.
@@ -1046,6 +1146,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     connecting,
     sessionActive,
     userSpeaking,
+    bargeInActive,
     turnState,
     ended,
     recording: pushToTalk ? recording : undefined,

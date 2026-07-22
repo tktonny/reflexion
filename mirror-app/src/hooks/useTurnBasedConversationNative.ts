@@ -9,17 +9,14 @@ import {
 import * as FileSystem from 'expo-file-system/legacy'
 
 import {
-  RECALL_DEADLINE_TURN,
-  RECALL_DIRECTIVE,
   buildLiveInstructions,
-  looksLikeRecallProbe,
   looksLikeUserGoodbye,
   openingMessageForLanguage,
-  recallBudgetStep,
 } from '../orchestration/orchestrator'
 import {
   closingTextForLanguage,
   companionClosingTextForLanguage,
+  createDailyConversationPlan,
   screeningQuestionForTurn,
 } from '../orchestration/deterministicSpeech'
 import {
@@ -34,9 +31,7 @@ import { createPushToTalkGesture } from '../orchestration/pushToTalkGesture'
 import { detectLanguageSignal, voiceProfileForLanguageKey, voiceProfileForSession, type VoiceProfile } from '../orchestration/voice'
 import { qwenASR, qwenChat, qwenTTS, type QwenChatMessage } from '../api/qwenClient'
 import { randomId } from '../utils/id'
-import type { ChatMessage, ConversationApi, StatusKind } from './conversationTypes'
-
-type Options = { patientId?: string; language?: string; persona?: 'screening' | 'companion' }
+import type { ChatMessage, ConversationApi, ConversationOptions, StatusKind } from './conversationTypes'
 
 /**
  * Version 2 (Flavor B) — NATIVE build. Turn-based voice loop using expo-audio:
@@ -46,10 +41,11 @@ type Options = { patientId?: string; language?: string; persona?: 'screening' | 
  * NOTE: needs on-device verification (built via EAS dev/preview build; Expo Go cannot record).
  * If ASR rejects the m4a clip, adjust the format hint / recording preset.
  */
-export function useTurnBasedConversationNative(options: Options = {}): ConversationApi {
+export function useTurnBasedConversationNative(options: ConversationOptions = {}): ConversationApi {
   const patientId = options.patientId ?? 'demo-patient'
   const language = options.language ?? 'en'
   const persona = options.persona ?? 'screening'
+  const dailyPlan = options.dailyPlan ?? createDailyConversationPlan({ patientName: options.patientName, reminiscenceWeekdays: [] })
 
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY)
 
@@ -75,8 +71,6 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
   const startingRef = useRef(false)
   const sessionActiveRef = useRef(false)
   const turnCountRef = useRef(0)
-  const recallProbeIssuedRef = useRef(false)
-  const recallAnsweredRef = useRef(false)
   const closingRef = useRef(false)
   const endedRef = useRef(false)
   const manualCloseRequestedRef = useRef(false)
@@ -167,10 +161,8 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
     updateStatus('processing', 'Starting...')
     setMessages([])
     voiceRef.current = voiceProfileForSession(language)
-    llmRef.current = [{ role: 'system', content: buildLiveInstructions(patientId, language, { persona }) }]
+    llmRef.current = [{ role: 'system', content: buildLiveInstructions(patientId, language, { persona, patientName: dailyPlan.patientName }) }]
     turnCountRef.current = 0
-    recallProbeIssuedRef.current = false
-    recallAnsweredRef.current = false
     closingRef.current = false
     endedRef.current = false
     manualCloseRequestedRef.current = false
@@ -185,7 +177,7 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
       sessionActiveRef.current = true
       setSessionActive(true)
       setConnecting(false)
-      const opening = openingMessageForLanguage(language)
+      const opening = openingMessageForLanguage(language, dailyPlan.patientName)
       llmRef.current.push({ role: 'assistant', content: opening })
       addMessage('assistant', opening)
       const spoken = await speak(opening, 'Speaking...', epoch)
@@ -199,7 +191,7 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
     } finally {
       if (lifecycleEpochRef.current === epoch) startingRef.current = false
     }
-  }, [addMessage, isCurrentSession, language, patientId, speak, updateStatus])
+  }, [addMessage, dailyPlan.patientName, isCurrentSession, language, patientId, persona, speak, updateStatus])
 
   const runTurn = useCallback(async () => {
     const epoch = lifecycleEpochRef.current
@@ -225,40 +217,26 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
         voiceRef.current = voiceProfileForLanguageKey(signal.languageKey, 'transcript_reassessment')
       }
 
-      // Recall floor + forced wrap-up is SCREENING-only. Companion is open chat with no agenda.
-      let directive: string | null = null
       let scriptedQuestion: string | null = null
       const companionGoodbyeRequested = persona === 'companion' && looksLikeUserGoodbye(transcript)
       if (persona === 'screening') {
-        const step = recallBudgetStep({
-          turnCount: turnCountRef.current,
-          recallProbeIssued: recallProbeIssuedRef.current,
-          recallAnswered: recallAnsweredRef.current,
-        })
-        if (step.action === 'force_recall') { recallProbeIssuedRef.current = true; directive = RECALL_DIRECTIVE }
-        else if (step.action === 'wrap_up') { recallAnsweredRef.current = true; closingRef.current = true }
-        else scriptedQuestion = screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current)
+        scriptedQuestion = screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current, dailyPlan)
+        if (!scriptedQuestion) closingRef.current = true
       }
       if (companionGoodbyeRequested) closingRef.current = true
 
       updateStatus('processing', 'Thinking...')
-      const msgs = directive ? [...llmRef.current, { role: 'system' as const, content: directive }] : llmRef.current
       // The screening close is deterministic. Relying on a one-turn LLM directive occasionally
       // produced another question or no goodbye at all on the fallback transport.
       const reply = closingRef.current
         ? persona === 'companion'
           ? companionClosingTextForLanguage(voiceRef.current.languageKey)
           : closingTextForLanguage(voiceRef.current.languageKey)
-        : scriptedQuestion ?? await qwenChat(msgs, { maxTokens: 120, temperature: 0.4 })
+        : scriptedQuestion ?? await qwenChat(llmRef.current, { maxTokens: 120, temperature: 0.4 })
       if (!isCurrentSession(epoch)) return
       if (reply) {
         llmRef.current.push({ role: 'assistant', content: reply })
         addMessage('assistant', reply)
-        if (
-          !recallProbeIssuedRef.current &&
-          turnCountRef.current >= RECALL_DEADLINE_TURN &&
-          looksLikeRecallProbe(reply)
-        ) recallProbeIssuedRef.current = true
         const spoken = await speak(reply, 'Speaking...', epoch)
         if (!spoken || !isCurrentSession(epoch)) return
       }
@@ -277,7 +255,7 @@ export function useTurnBasedConversationNative(options: Options = {}): Conversat
       if (!isCurrentSession(epoch)) return
       updateStatus('error', `Error: ${e instanceof Error ? e.message : 'unknown'}`)
     }
-  }, [addMessage, isCurrentSession, persona, recorder, speak, updateStatus])
+  }, [addMessage, dailyPlan, isCurrentSession, persona, recorder, speak, updateStatus])
 
   const beginPushToTalk = useCallback(() => {
     if (

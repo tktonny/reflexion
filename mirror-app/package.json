@@ -28,6 +28,7 @@
     "expo-audio": "~56.0.12",
     "expo-camera": "~56.0.8",
     "expo-constants": "~56.0.17",
+    "expo-crypto": "~56.0.4",
     "expo-file-system": "~56.0.8",
     "expo-image-manipulator": "~56.0.22",
     "expo-linking": "~56.0.15",

@@ -15,6 +15,8 @@ export type PcmAudioBridge = {
   start: (onChunk: (base64Pcm16: string) => void) => Promise<void>
   /** Enqueue base64 PCM16 mono @24kHz for gapless playback. */
   play: (base64Pcm16: string) => void
+  /** Immediately discard queued speaker audio when the user interrupts Aria. */
+  clearPlayback: () => void
   /** Suppress mic capture during assistant playback (half-duplex). */
   setCaptureMuted: (muted: boolean) => void
   /** Unplayed playback backlog in ms; used to un-mute the mic only after playback drains. */
@@ -42,6 +44,7 @@ export function createPcmAudioBridge(): PcmAudioBridge {
     return {
       start: async () => notWired(),
       play: () => notWired(),
+      clearPlayback: () => {},
       setCaptureMuted: () => {},
       getPlaybackBacklogMs: () => 0,
       stop: async () => {},
@@ -59,6 +62,7 @@ export function createPcmAudioBridge(): PcmAudioBridge {
       await native.start(CAPTURE_SAMPLE_RATE)
     },
     play: (base64Pcm16) => native.play(base64Pcm16),
+    clearPlayback: () => native.clearPlayback(),
     setCaptureMuted: (muted) => native.setCaptureMuted(muted),
     getPlaybackBacklogMs: () => native.getPlaybackBacklogMs?.() ?? 0,
     stop: async () => {

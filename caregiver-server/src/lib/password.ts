@@ -1,4 +1,4 @@
-import { pbkdf2Sync, randomBytes } from 'node:crypto'
+import { pbkdf2Sync, randomBytes, timingSafeEqual } from 'node:crypto'
 
 export function hashPassword(password: string) {
   const salt = randomBytes(16).toString('hex')
@@ -13,6 +13,7 @@ export function verifyPassword(password: string, storedHash: string) {
     return false
   }
 
-  const actualHash = pbkdf2Sync(password, salt, iterations, 32, 'sha256').toString('hex')
-  return actualHash === expectedHash
+  const actualHash = pbkdf2Sync(password, salt, iterations, 32, 'sha256')
+  const expected = Buffer.from(expectedHash, 'hex')
+  return actualHash.length === expected.length && timingSafeEqual(actualHash, expected)
 }

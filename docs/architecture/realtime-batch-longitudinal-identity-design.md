@@ -1,5 +1,7 @@
 # Realtime, Batch, Longitudinal, And Identity Design
 
+> This document preserves the four-layer product model. The production API, persistence, personal-baseline, and vector-anomaly contracts are superseded by [Platform v2 API and domain architecture](./platform-v2-api-and-domain-architecture.md), [Platform v2 database design](./platform-v2-database-design.md), and [longitudinal vector anomaly design](./longitudinal-vector-anomaly-design.md).
+
 ## 1. Purpose
 
 This design defines the target four-layer product architecture for Reflexion's patient-conversation and dementia-analysis platform.

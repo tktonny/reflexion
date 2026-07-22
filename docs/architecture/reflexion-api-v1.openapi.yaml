@@ -1,0 +1,2276 @@
+openapi: 3.1.0
+info:
+  title: Reflexion Platform API
+  version: 1.0.0
+  description: >-
+    Implemented unified contract for Mirror, Caregiver, Provider, device pairing,
+    session ingestion, care plans, longitudinal monitoring, and review workflows.
+    Long-running media and ML processing is asynchronous.
+servers:
+  - url: https://api.example.com
+    description: Self-hosted production API origin
+  - url: http://localhost:3001
+    description: Local development
+tags:
+  - name: Identity
+  - name: Patients
+  - name: Devices
+  - name: Sessions
+  - name: CarePlan
+  - name: Monitoring
+  - name: Review
+  - name: Notifications
+  - name: Tools
+
+paths:
+  /health:
+    get:
+      summary: Health Check
+      operationId: healthCheck
+      security: []
+      responses:
+        "200":
+          description: Service is accepting requests.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok:
+                    type: boolean
+
+  /api/v1/auth/sessions:
+    post:
+      tags: [Identity]
+      summary: Create Auth Session
+      operationId: createAuthSession
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, writeOnly: true }
+      responses:
+        "201":
+          description: Human access and rotating refresh credentials.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthSessionResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/auth/session-refreshes:
+    post:
+      tags: [Identity]
+      summary: Refresh Auth Session
+      operationId: refreshAuthSession
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string, writeOnly: true }
+      responses:
+        "201":
+          description: Rotated human credentials.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthSessionResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/auth/password-reset-requests:
+    post:
+      tags: [Identity]
+      summary: Request Password Reset
+      operationId: requestPasswordReset
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        "202": { description: Accepted without disclosing account existence. }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/auth/password-resets:
+    post:
+      tags: [Identity]
+      summary: Reset Password
+      operationId: resetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, newPassword]
+              properties:
+                token: { type: string, writeOnly: true }
+                newPassword: { type: string, minLength: 12, writeOnly: true }
+      responses:
+        "200": { description: Password changed and prior sessions revoked. }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/auth/sessions/current:
+    delete:
+      tags: [Identity]
+      summary: Delete Current Auth Session
+      operationId: deleteCurrentAuthSession
+      security:
+        - bearerAuth: []
+      responses:
+        "204": { description: Current login session revoked. }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/me:
+    get:
+      tags: [Identity]
+      summary: Get Current Actor
+      operationId: getCurrentActor
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current authenticated user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActorResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/patients:
+    get:
+      tags: [Patients]
+      summary: List Authorized Patients
+      operationId: listAuthorizedPatients
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Patients visible through active relationships and scopes.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Patient"
+                  meta:
+                    $ref: "#/components/schemas/PageMeta"
+        default:
+          $ref: "#/components/responses/Error"
+    post:
+      tags: [Patients]
+      summary: Create Patient
+      operationId: createPatient
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePatientRequest"
+      responses:
+        "201":
+          description: Patient created and current actor relationship established.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Patient"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/patients/{patientId}:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    get:
+      tags: [Patients]
+      summary: Get Patient
+      operationId: getPatient
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Authorized patient profile.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Patient"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+    patch:
+      tags: [Patients]
+      summary: Update Patient
+      operationId: updatePatient
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: "#/components/schemas/UpdatePatientRequest"
+      responses:
+        "200":
+          description: Updated patient.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Patient"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/patients/{patientId}/care-relationships:
+    get:
+      tags: [Patients]
+      summary: List Care Relationships
+      operationId: listCareRelationships
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/patients/{patientId}/consents:
+    post:
+      tags: [Patients]
+      summary: Record Patient Consent
+      operationId: recordPatientConsent
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purpose, documentVersion, status]
+              properties:
+                purpose: { type: string }
+                documentVersion: { type: string }
+                status: { type: string, enum: [granted, withdrawn] }
+      responses:
+        "201": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/patients/{patientId}/program-enrollments/current:
+    get:
+      tags: [Patients]
+      summary: Get Current Program Enrollment
+      operationId: getCurrentProgramEnrollment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/device-pairings:
+    post:
+      tags: [Devices]
+      summary: Create Device Pairing
+      operationId: createDevicePairing
+      description: Create a short-lived pairing code from an installed device.
+      security:
+        - deviceBootstrap: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePairingRequest"
+      responses:
+        "201":
+          description: Pairing session created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/PairingSession"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/device-pairings/{pairingId}:
+    get:
+      tags: [Devices]
+      summary: Get Device Pairing
+      operationId: getDevicePairing
+      security:
+        - deviceBootstrap: []
+      parameters:
+        - name: pairingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Pairing status. A paired response may include a one-time exchange ticket.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/PairingStatus"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/device-pairing-claims:
+    post:
+      tags: [Devices]
+      summary: Claim Device Pairing
+      operationId: claimDevicePairing
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pairingCode, patientId]
+              properties:
+                pairingCode:
+                  type: string
+                  pattern: "^[0-9]{6}$"
+                patientId:
+                  type: string
+                mirrorName:
+                  type: string
+                  maxLength: 80
+      responses:
+        "200":
+          description: Pairing claimed and active assignment created atomically.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/DeviceAssignment"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/device-credentials/exchange:
+    post:
+      tags: [Devices]
+      summary: Exchange Device Credential
+      operationId: exchangeDeviceCredential
+      security:
+        - deviceBootstrap: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pairingId, exchangeTicket]
+              properties:
+                pairingId:
+                  type: string
+                exchangeTicket:
+                  type: string
+                  writeOnly: true
+      responses:
+        "200":
+          description: Short-lived device access token and rotating refresh credential.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/DeviceCredential"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/devices/{deviceId}:
+    get:
+      tags: [Devices]
+      summary: Get Device
+      operationId: getDevice
+      security:
+        - bearerAuth: []
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/DeviceId"
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/devices/{deviceId}/credential-rotations:
+    post:
+      tags: [Devices]
+      summary: Rotate Device Credential
+      operationId: rotateDeviceCredential
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DeviceId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [credentialId, refreshCredential]
+              properties:
+                credentialId: { type: string }
+                refreshCredential: { type: string, writeOnly: true }
+      responses:
+        "201": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/devices/{deviceId}/revocations:
+    post:
+      tags: [Devices]
+      summary: Revoke Device
+      operationId: revokeDevice
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/DeviceId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 500 }
+      responses:
+        "202": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/devices/{deviceId}/configuration:
+    get:
+      tags: [Devices]
+      summary: Get Device Configuration
+      operationId: getDeviceConfiguration
+      security:
+        - bearerAuth: []
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/DeviceId"
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/devices/{deviceId}/heartbeats:
+    post:
+      tags: [Devices]
+      summary: Record Device Heartbeat
+      operationId: recordDeviceHeartbeat
+      description: >-
+        Records raw device reachability and component health. The device does not
+        interpret the heartbeat or compute caregiver status.
+      security:
+        - deviceBearer: []
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceHeartbeat"
+      responses:
+        "202":
+          description: Heartbeat accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/sessions:
+    post:
+      tags: [Sessions]
+      summary: Create Session
+      operationId: createSession
+      security:
+        - deviceBearer: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        "201":
+          description: Session created with frozen protocol and consent context.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Session"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/sessions/{sessionId}:
+    get:
+      tags: [Sessions]
+      summary: Get Session
+      operationId: getSession
+      security:
+        - deviceBearer: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Session status and safe processing summary.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Session"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/sessions/{sessionId}/processing-status:
+    get:
+      tags: [Sessions]
+      summary: Get Session Processing Status
+      operationId: getSessionProcessingStatus
+      description: Stable polling contract for asynchronous artifact verification and session processing.
+      security:
+        - deviceBearer: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Current asynchronous processing stage and safe result summary.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/SessionProcessingStatus"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/sessions/{sessionId}/realtime-tickets:
+    post:
+      tags: [Sessions]
+      summary: Create Realtime Ticket
+      operationId: createRealtimeTicket
+      description: Ticket is short-lived and scoped to one session and provider policy.
+      security:
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "201":
+          description: Realtime connection parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/RealtimeTicket"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/sessions/{sessionId}/event-batches:
+    post:
+      tags: [Sessions]
+      summary: Append Session Events
+      operationId: appendSessionEvents
+      security:
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [events]
+              properties:
+                events:
+                  type: array
+                  minItems: 1
+                  maxItems: 100
+                  items:
+                    $ref: "#/components/schemas/SessionEvent"
+      responses:
+        "202":
+          description: Events accepted idempotently.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: object
+                    required: [accepted, duplicates]
+                    properties:
+                      accepted:
+                        type: integer
+                      duplicates:
+                        type: integer
+                      nextExpectedSequence:
+                        type: integer
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/sessions/{sessionId}/artifact-upload-plans:
+    post:
+      tags: [Sessions]
+      summary: Prepare Artifact Upload
+      operationId: prepareArtifactUpload
+      security:
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [artifacts]
+              properties:
+                artifacts:
+                  type: array
+                  minItems: 1
+                  maxItems: 20
+                  items:
+                    $ref: "#/components/schemas/ArtifactIntent"
+      responses:
+        "200":
+          description: Pre-signed upload parts. Media bytes do not pass through this API.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PreparedArtifactUpload"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/sessions/{sessionId}/artifacts/commit:
+    post:
+      tags: [Sessions]
+      summary: Commit Artifact Uploads
+      operationId: commitArtifactUploads
+      security:
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [artifacts]
+              properties:
+                artifacts:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [artifactId, hash, sizeBytes]
+                    properties:
+                      artifactId:
+                        type: string
+                      hash:
+                        type: string
+                      sizeBytes:
+                        type: integer
+                        minimum: 1
+      responses:
+        "202":
+          description: Artifact verification queued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/sessions/{sessionId}/complete:
+    post:
+      tags: [Sessions]
+      summary: Complete Session
+      operationId: completeSession
+      security:
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompleteSessionRequest"
+      responses:
+        "202":
+          description: Session accepted for asynchronous ingestion and analysis.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/sessions/{sessionId}/upload-retries:
+    post:
+      tags: [Sessions]
+      summary: Retry Artifact Uploads
+      operationId: retryArtifactUploads
+      security:
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [artifactIds]
+              properties:
+                artifactIds: { type: array, maxItems: 20, items: { type: string } }
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/sessions/{sessionId}/abandon:
+    post:
+      tags: [Sessions]
+      summary: Abandon Session
+      operationId: abandonSession
+      security:
+        - deviceBearer: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, enum: [client_restart, user_cancelled, transport_failed, superseded] }
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/sessions/{sessionId}/tool-invocations:
+    post:
+      tags: [Tools]
+      summary: Invoke Session Tool
+      operationId: invokeSessionTool
+      security:
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tool, arguments]
+              properties:
+                tool: { type: string, enum: [weather.get, web.search, medication.list, reminders.upcoming] }
+                arguments: { type: object, additionalProperties: true }
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/patients/{patientId}/care-plan:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    get:
+      tags: [CarePlan]
+      summary: Get Care Plan
+      operationId: getCarePlan
+      security:
+        - bearerAuth: []
+        - deviceBearer: []
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      tags: [CarePlan]
+      summary: Replace Care Plan
+      operationId: replaceCarePlan
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/patients/{patientId}/medication-plans:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    get:
+      tags: [CarePlan]
+      summary: List Medication Plans
+      operationId: listMedicationPlans
+      security:
+        - bearerAuth: []
+        - deviceBearer: []
+      responses:
+        "200":
+          description: Active medication plans visible to the actor.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/MedicationPlan"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+    post:
+      tags: [CarePlan]
+      summary: Create Medication Plan
+      operationId: createMedicationPlan
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMedicationPlanRequest"
+      responses:
+        "201":
+          description: Medication plan created by an authorized human actor.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/MedicationPlan"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/patients/{patientId}/reminder-occurrences:
+    get:
+      tags: [CarePlan]
+      summary: List Reminder Occurrences
+      operationId: listReminderOccurrences
+      security:
+        - bearerAuth: []
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Reminder occurrences in the requested time window.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ReminderOccurrence"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/medication-plans/{planId}:
+    patch:
+      tags: [CarePlan]
+      summary: Update Medication Plan
+      operationId: updateMedicationPlan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/patients/{patientId}/caregiver-tasks:
+    post:
+      tags: [CarePlan]
+      summary: Create Caregiver Task
+      operationId: createCaregiverTask
+      security:
+        - bearerAuth: []
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [category, priority, title]
+              properties:
+                category: { type: string, enum: [follow_up, appointment, medication_review, technical, custom] }
+                priority: { type: string, enum: [routine, elevated, urgent] }
+                title: { type: string, maxLength: 160 }
+                details: { type: string, maxLength: 1000 }
+                dueAt: { type: string, format: date-time }
+      responses:
+        "201": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/reminder-occurrences/{occurrenceId}/responses:
+    post:
+      tags: [CarePlan]
+      summary: Record Reminder Response
+      operationId: recordReminderResponse
+      security:
+        - bearerAuth: []
+        - deviceBearer: []
+      parameters:
+        - name: occurrenceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status, respondedAt]
+              properties:
+                status:
+                  type: string
+                  enum: [taken, skipped, snoozed, unknown]
+                respondedAt:
+                  type: string
+                  format: date-time
+                note:
+                  type: string
+                  maxLength: 500
+      responses:
+        "200":
+          description: Response recorded idempotently.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ReminderOccurrence"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/patients/{patientId}/status:
+    get:
+      tags: [Monitoring]
+      summary: Get Caregiver Status
+      operationId: getCaregiverStatus
+      description: Returns the deterministic, caregiver-facing reassurance status.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+      responses:
+        "200":
+          description: Current status computed by the backend status engine.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/CaregiverStatus"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/patients/{patientId}/away-periods:
+    post:
+      tags: [Monitoring]
+      summary: Create Away Period
+      operationId: createAwayPeriod
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAwayPeriodRequest"
+      responses:
+        "201":
+          description: Away period created and excluded from missed-session streaks.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/AwayPeriod"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/patients/{patientId}/manual-flags:
+    post:
+      tags: [Monitoring]
+      summary: Create Manual Flag
+      operationId: createManualFlag
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateManualFlagRequest"
+      responses:
+        "201":
+          description: Manual caregiver/provider concern recorded for backend evaluation.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ManualFlag"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/patients/{patientId}/monitoring/summary:
+    get:
+      tags: [Monitoring]
+      summary: Get Monitoring Summary
+      operationId: getMonitoringSummary
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+      responses:
+        "200":
+          description: Role-filtered longitudinal summary.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/MonitoringSummary"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/patients/{patientId}/monitoring/timeline:
+    get:
+      tags: [Monitoring]
+      summary: Get Monitoring Timeline
+      operationId: getMonitoringTimeline
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Role-filtered monitoring windows and session inclusion markers.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/MonitoringPoint"
+                  meta:
+                    $ref: "#/components/schemas/PageMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/review-cases:
+    get:
+      tags: [Review]
+      summary: List Review Cases
+      operationId: listReviewCases
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [open, assigned, awaiting_follow_up, closed]
+        - name: patientId
+          in: query
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Provider/reviewer work queue.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ReviewCase"
+                  meta:
+                    $ref: "#/components/schemas/PageMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/patients/{patientId}/monitoring/baseline:
+    get:
+      tags: [Monitoring]
+      summary: Get Monitoring Baseline
+      operationId: getMonitoringBaseline
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/review-cases/{caseId}:
+    get:
+      tags: [Review]
+      summary: Get Review Case
+      operationId: getReviewCase
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/review-cases/{caseId}/dispositions:
+    post:
+      tags: [Review]
+      summary: Create Review Disposition
+      operationId: createReviewDisposition
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDispositionRequest"
+      responses:
+        "201":
+          description: Append-only reviewer disposition recorded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ReviewDisposition"
+                  meta:
+                    $ref: "#/components/schemas/ResponseMeta"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /api/v1/notifications:
+    get:
+      tags: [Notifications]
+      summary: List My Notifications
+      operationId: listNotifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: state
+          in: query
+          schema: { type: string, enum: [unread, read] }
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Notifications addressed to the authenticated caregiver.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Notification" }
+                  meta: { $ref: "#/components/schemas/PageMeta" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/notifications/{notificationId}/read:
+    post:
+      tags: [Notifications]
+      summary: Mark Notification Read
+      operationId: markNotificationRead
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Notification state updated idempotently.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data: { $ref: "#/components/schemas/Notification" }
+                  meta: { $ref: "#/components/schemas/ResponseMeta" }
+        default: { $ref: "#/components/responses/Error" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Caregiver/provider access token.
+    deviceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Device-scoped short-lived access token.
+    deviceBootstrap:
+      type: apiKey
+      in: header
+      name: X-Device-Bootstrap
+      description: Installation credential used only before device pairing.
+
+  parameters:
+    PatientId:
+      name: patientId
+      in: path
+      required: true
+      schema:
+        type: string
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+    DeviceId:
+      name: deviceId
+      in: path
+      required: true
+      schema:
+        type: string
+    Cursor:
+      name: cursor
+      in: query
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 128
+    IfMatch:
+      name: If-Match
+      in: header
+      required: true
+      schema:
+        type: string
+
+  responses:
+    DataResponse:
+      description: Standard Reflexion data envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data, meta]
+            properties:
+              data:
+                description: Route-specific response data.
+              meta:
+                $ref: "#/components/schemas/ResponseMeta"
+    Error:
+      description: Structured API error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    AuthSessionResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt]
+          properties:
+            accessToken: { type: string, writeOnly: true }
+            accessTokenExpiresAt: { type: string, format: date-time }
+            refreshToken: { type: string, writeOnly: true }
+            refreshTokenExpiresAt: { type: string, format: date-time }
+            actor: { type: object, additionalProperties: true }
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+    ResponseMeta:
+      type: object
+      required: [requestId]
+      properties:
+        requestId:
+          type: string
+    PageMeta:
+      allOf:
+        - $ref: "#/components/schemas/ResponseMeta"
+        - type: object
+          properties:
+            nextCursor:
+              type: [string, "null"]
+    ErrorResponse:
+      type: object
+      required: [error, meta]
+      properties:
+        error:
+          type: object
+          required: [code, message, retryable]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            details:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+    ActorResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [userId, tenantId, roles]
+          properties:
+            userId:
+              type: string
+            tenantId:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+              format: email
+            roles:
+              type: array
+              items:
+                type: string
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+    Patient:
+      type: object
+      required: [patientId, displayName, preferredLanguage, timezone, status, version]
+      properties:
+        patientId:
+          type: string
+        displayName:
+          type: string
+        preferredLanguage:
+          type: string
+        timezone:
+          type: string
+        ageBand:
+          type: [string, "null"]
+        status:
+          type: string
+          enum: [active, inactive, archived]
+        version:
+          type: integer
+    CreatePatientRequest:
+      type: object
+      required: [displayName, preferredLanguage, timezone]
+      properties:
+        displayName:
+          type: string
+          maxLength: 120
+        preferredLanguage:
+          type: string
+        timezone:
+          type: string
+        ageBand:
+          type: string
+        relationshipType:
+          type: string
+    UpdatePatientRequest:
+      type: object
+      minProperties: 1
+      properties:
+        displayName:
+          type: string
+        preferredLanguage:
+          type: string
+        timezone:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive]
+    CreatePairingRequest:
+      type: object
+      required: [hardwareRevision, softwareVersion, timezone]
+      properties:
+        hardwareRevision:
+          type: string
+        softwareVersion:
+          type: string
+        timezone:
+          type: string
+        deviceNonce:
+          type: string
+    PairingSession:
+      type: object
+      required: [pairingId, displayCode, state, expiresAt]
+      properties:
+        pairingId:
+          type: string
+        displayCode:
+          type: string
+          pattern: "^[0-9]{6}$"
+        state:
+          type: string
+          enum: [pending]
+        expiresAt:
+          type: string
+          format: date-time
+        pollAfterSeconds:
+          type: integer
+          minimum: 1
+    PairingStatus:
+      type: object
+      required: [pairingId, state, expiresAt]
+      properties:
+        pairingId:
+          type: string
+        state:
+          type: string
+          enum: [pending, paired, expired, cancelled]
+        expiresAt:
+          type: string
+          format: date-time
+        patientDisplayName:
+          type: string
+        exchangeTicket:
+          type: string
+          writeOnly: true
+        exchangeTicketExpiresAt:
+          type: string
+          format: date-time
+    DeviceAssignment:
+      type: object
+      required: [assignmentId, deviceId, patientId, status, assignedAt]
+      properties:
+        assignmentId:
+          type: string
+        deviceId:
+          type: string
+        patientId:
+          type: string
+        mirrorName:
+          type: string
+        status:
+          type: string
+          enum: [active, revoked, replaced]
+        assignedAt:
+          type: string
+          format: date-time
+    DeviceCredential:
+      type: object
+      required: [accessToken, accessTokenExpiresAt, refreshCredential]
+      properties:
+        accessToken:
+          type: string
+          writeOnly: true
+        accessTokenExpiresAt:
+          type: string
+          format: date-time
+        refreshCredential:
+          type: string
+          writeOnly: true
+    DeviceHeartbeat:
+      type: object
+      required:
+        - heartbeatId
+        - recordedAt
+        - appVersion
+        - networkStatus
+        - micStatus
+        - backendReachable
+      properties:
+        heartbeatId:
+          type: string
+        recordedAt:
+          type: string
+          format: date-time
+        appVersion:
+          type: string
+        networkStatus:
+          type: string
+          enum: [online, degraded, offline]
+        micStatus:
+          type: string
+          enum: [ok, unavailable, permission_denied, error]
+        speakerStatus:
+          type: string
+          enum: [ok, unavailable, error]
+        backendReachable:
+          type: boolean
+        diagnostics:
+          type: object
+          additionalProperties: true
+    CreateSessionRequest:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [companion, daily_checkin, clinic_assessment, device_test]
+        patientId:
+          type: string
+          description: Required for human actors; resolved from assignment for a device.
+        clientSessionId:
+          type: string
+        requestedLanguage:
+          type: string
+        clientContext:
+          type: object
+          additionalProperties: true
+    Session:
+      type: object
+      required: [sessionId, patientId, type, state, stateVersion, protocolContext, createdAt]
+      properties:
+        sessionId:
+          type: string
+        patientId:
+          type: string
+        deviceId:
+          type: [string, "null"]
+        type:
+          type: string
+          enum: [companion, daily_checkin, clinic_assessment, device_test]
+        state:
+          type: string
+          enum:
+            - created
+            - active
+            - local_complete
+            - ingesting
+            - processing
+            - ingested
+            - qc_pending
+            - feature_pending
+            - scored
+            - review_pending
+            - completed
+            - excluded
+            - failed
+            - processing_failed
+        stateVersion:
+          type: integer
+        protocolContext:
+          type: object
+          required: [protocolVersion, promptVersion, featureSchemaVersion]
+          properties:
+            protocolVersion:
+              type: string
+            promptVersion:
+              type: string
+            toolPolicyVersion:
+              type: string
+            featureSchemaVersion:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        operationId:
+          type: string
+    RealtimeTicket:
+      type: object
+      required: [provider, endpoint, ticket, expiresAt, sessionPolicy]
+      properties:
+        provider:
+          type: string
+          enum: [qwen]
+        endpoint:
+          type: string
+          format: uri
+        ticket:
+          type: string
+          writeOnly: true
+        expiresAt:
+          type: string
+          format: date-time
+        sessionPolicy:
+          type: object
+          additionalProperties: true
+    SessionEvent:
+      type: object
+      required: [eventId, sequence, occurredAt, kind, payload]
+      properties:
+        eventId:
+          type: string
+        sequence:
+          type: integer
+          minimum: 0
+        occurredAt:
+          type: string
+          format: date-time
+        kind:
+          type: string
+          enum:
+            - transcript_turn
+            - tool_call
+            - tool_result
+            - capture_metric
+            - lifecycle
+            - user_correction
+        payload:
+          type: object
+          additionalProperties: true
+    ArtifactIntent:
+      type: object
+      required: [clientArtifactId, kind, contentType, sizeBytes, hash]
+      properties:
+        clientArtifactId:
+          type: string
+        kind:
+          type: string
+          enum: [audio, video, transcript, image, sidecar]
+        contentType:
+          type: string
+        sizeBytes:
+          type: integer
+          minimum: 1
+        hash:
+          type: string
+    PreparedArtifactUpload:
+      type: object
+      required: [artifactId]
+      properties:
+        artifactId:
+          type: string
+        uploadUrl:
+          type: string
+          format: uri
+        expiresAt:
+          type: string
+          format: date-time
+        requiredHeaders:
+          type: object
+          additionalProperties:
+            type: string
+        alreadyUploaded:
+          type: boolean
+          description: True when this clientArtifactId was already committed and no PUT or commit is required.
+    SessionProcessingStatus:
+      type: object
+      required: [sessionId, state, stage, retryable, updatedAt]
+      properties:
+        sessionId: { type: string }
+        operationId: { type: [string, "null"] }
+        state:
+          type: string
+          enum: [accepted, queued, processing, completed, failed]
+        stage: { type: string }
+        retryable: { type: boolean }
+        result:
+          type: [object, "null"]
+          additionalProperties: true
+        updatedAt: { type: string, format: date-time }
+    Notification:
+      type: object
+      required: [notificationId, patientId, type, state, title, body, source, createdAt]
+      properties:
+        notificationId: { type: string }
+        patientId: { type: string }
+        type: { type: string, enum: [worth_checking, needs_attention] }
+        state: { type: string, enum: [unread, read] }
+        title: { type: string }
+        body: { type: string }
+        source:
+          type: object
+          required: [type, id]
+          properties:
+            type: { type: string, enum: [review_case] }
+            id: { type: string }
+        createdAt: { type: string, format: date-time }
+        readAt: { type: [string, "null"], format: date-time }
+    CompleteSessionRequest:
+      type: object
+      required: [localCompletedAt, finalSequence, artifactIds]
+      properties:
+        localCompletedAt:
+          type: string
+          format: date-time
+        finalSequence:
+          type: integer
+          minimum: 0
+        artifactIds:
+          type: array
+          items:
+            type: string
+        acquisitionSummary:
+          type: object
+          properties:
+            durationMs:
+              type: integer
+              minimum: 0
+            patientSpeechMs:
+              type: integer
+              minimum: 0
+            patientTurns:
+              type: integer
+              minimum: 0
+    OperationResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [operationId, state]
+          properties:
+            operationId:
+              type: string
+            state:
+              type: string
+              enum: [accepted, queued, processing, completed, failed]
+        meta:
+          $ref: "#/components/schemas/ResponseMeta"
+    MedicationPlan:
+      type: object
+      required: [planId, patientId, displayName, schedule, status, version]
+      properties:
+        planId:
+          type: string
+        patientId:
+          type: string
+        displayName:
+          type: string
+        instructions:
+          type: string
+        schedule:
+          type: object
+          required: [timezone, times]
+          properties:
+            timezone:
+              type: string
+            times:
+              type: array
+              items:
+                type: string
+                pattern: "^[0-2][0-9]:[0-5][0-9]$"
+            recurrence:
+              type: string
+        source:
+          type: string
+          enum: [caregiver, provider]
+        status:
+          type: string
+          enum: [active, paused, ended]
+        version:
+          type: integer
+    CreateMedicationPlanRequest:
+      type: object
+      required: [displayName, schedule, source]
+      properties:
+        displayName:
+          type: string
+          maxLength: 160
+        instructions:
+          type: string
+          maxLength: 1000
+        schedule:
+          type: object
+          required: [timezone, times]
+          properties:
+            timezone:
+              type: string
+            times:
+              type: array
+              minItems: 1
+              items:
+                type: string
+                pattern: "^[0-2][0-9]:[0-5][0-9]$"
+            recurrence:
+              type: string
+        source:
+          type: string
+          enum: [caregiver, provider]
+    ReminderOccurrence:
+      type: object
+      required: [occurrenceId, patientId, scheduledAt, type, status]
+      properties:
+        occurrenceId:
+          type: string
+        patientId:
+          type: string
+        scheduledAt:
+          type: string
+          format: date-time
+        type:
+          type: string
+          enum: [medication, appointment, activity, custom]
+        displayText:
+          type: string
+        status:
+          type: string
+          enum: [scheduled, delivered, taken, skipped, snoozed, missed, cancelled, unknown]
+        respondedAt:
+          type: [string, "null"]
+          format: date-time
+    CaregiverStatus:
+      type: object
+      required:
+        - patientId
+        - baselineState
+        - status
+        - primaryReason
+        - lastInteractionAt
+        - updatedAt
+      properties:
+        patientId:
+          type: string
+        baselineState:
+          type: string
+          enum: [establishing, complete, stale]
+        baselineProgress:
+          type: object
+          properties:
+            completedSessions:
+              type: integer
+              minimum: 0
+            requiredSessions:
+              type: integer
+              const: 7
+            windowDays:
+              type: integer
+              const: 14
+        status:
+          type: [string, "null"]
+          enum: [establishing, doing_well, worth_checking, needs_attention, null]
+        primaryReason:
+          type: [string, "null"]
+        secondaryReasons:
+          type: array
+          items:
+            type: string
+        completedToday:
+          type: boolean
+        technicalState:
+          type: string
+          enum: [ok, possible_issue, unreachable, unknown]
+        lastInteractionAt:
+          type: [string, "null"]
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreateAwayPeriodRequest:
+      type: object
+      required: [startsOn, endsOn, timezone]
+      properties:
+        startsOn:
+          type: string
+          format: date
+        endsOn:
+          type: string
+          format: date
+        timezone:
+          type: string
+        reason:
+          type: string
+          maxLength: 500
+    AwayPeriod:
+      type: object
+      required: [awayPeriodId, patientId, startsOn, endsOn, timezone, state]
+      properties:
+        awayPeriodId:
+          type: string
+        patientId:
+          type: string
+        startsOn:
+          type: string
+          format: date
+        endsOn:
+          type: string
+          format: date
+        timezone:
+          type: string
+        state:
+          type: string
+          enum: [active, cancelled, completed]
+    CreateManualFlagRequest:
+      type: object
+      required: [severity, reason]
+      properties:
+        severity:
+          type: string
+          enum: [worth_checking, needs_attention]
+        reason:
+          type: string
+          maxLength: 1000
+    ManualFlag:
+      type: object
+      required: [manualFlagId, patientId, severity, reason, state, createdAt]
+      properties:
+        manualFlagId:
+          type: string
+        patientId:
+          type: string
+        severity:
+          type: string
+          enum: [worth_checking, needs_attention]
+        reason:
+          type: string
+        state:
+          type: string
+          enum: [active, resolved, dismissed]
+        createdAt:
+          type: string
+          format: date-time
+    MonitoringSummary:
+      type: object
+      required: [patientId, baselineState, displayState, coverage, updatedAt]
+      properties:
+        patientId:
+          type: string
+        baselineState:
+          type: string
+          enum: [not_started, building, complete, stale]
+        displayState:
+          type: string
+          enum: [building, on_track, repeat_needed, review_pending]
+        coverage:
+          type: object
+          required: [usableSessions, requiredSessions, distinctWeeks, spanDays]
+          properties:
+            usableSessions:
+              type: integer
+            requiredSessions:
+              type: integer
+            distinctWeeks:
+              type: integer
+            spanDays:
+              type: integer
+            qualityCoverage:
+              type: number
+              minimum: 0
+              maximum: 1
+        providerDetail:
+          type: object
+          description: Present only for provider/reviewer scopes.
+          additionalProperties: true
+        updatedAt:
+          type: string
+          format: date-time
+    MonitoringPoint:
+      type: object
+      required: [recordedAt, inclusion, displayState]
+      properties:
+        sessionId:
+          type: string
+        recordedAt:
+          type: string
+          format: date-time
+        inclusion:
+          type: string
+          enum: [include, include_with_caveats, repeat_requested, manual_review, exclude]
+        displayState:
+          type: string
+          enum: [building, on_track, repeat_needed, review_pending]
+        providerDetail:
+          type: object
+          additionalProperties: true
+    ReviewCase:
+      type: object
+      required: [caseId, patientId, reason, priority, state, createdAt]
+      properties:
+        caseId:
+          type: string
+        patientId:
+          type: string
+        reason:
+          type: string
+        priority:
+          type: string
+          enum: [routine, elevated, urgent]
+        state:
+          type: string
+          enum: [open, assigned, awaiting_follow_up, closed]
+        sourceRefs:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+    CreateDispositionRequest:
+      type: object
+      required: [outcome]
+      properties:
+        outcome:
+          type: string
+          enum:
+            - confirmed_meaningful_change
+            - no_meaningful_change
+            - acute_or_reversible_context
+            - poor_quality
+            - wrong_identity
+            - protocol_issue
+            - follow_up_ordered
+            - insufficient_information
+        notes:
+          type: string
+          maxLength: 5000
+        closeCase:
+          type: boolean
+          default: false
+    ReviewDisposition:
+      type: object
+      required: [dispositionId, caseId, reviewerId, outcome, createdAt]
+      properties:
+        dispositionId:
+          type: string
+        caseId:
+          type: string
+        reviewerId:
+          type: string
+        outcome:
+          type: string
+        createdAt:
+          type: string
+          format: date-time

@@ -1,59 +1,71 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Alert, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import {
-  ACTIVE_MIRROR_ID_STORAGE_KEY,
-  ACTIVE_NURSE_ID_STORAGE_KEY,
-  ACTIVE_PATIENT_ID_STORAGE_KEY,
-  DEVICE_AUTH_TOKEN_STORAGE_KEY,
-  DEVICE_ID_STORAGE_KEY,
-  MIRROR_LANGUAGE_STORAGE_KEY,
-  NURSE_PATIENT_CONFIG_STORAGE_KEY,
-} from '../src/constants/nursePatientConfig'
-import { generateMirrorId } from '../src/utils/id'
+  clearDeviceCredential,
+  getBootstrapCredential,
+  getDeviceCredential,
+} from '../src/storage/deviceCredentials'
 
+type DeviceStatus = {
+  deviceId: string
+  provisioned: boolean
+  paired: boolean
+  patientId: string
+  accessExpiresAt: string
+}
+
+const EMPTY_STATUS: DeviceStatus = {
+  deviceId: 'None',
+  provisioned: false,
+  paired: false,
+  patientId: 'None',
+  accessExpiresAt: 'None',
+}
+
+/** Development diagnostics only. Device identity is server-provisioned and cannot be typed here. */
 export default function TestDeviceScreen() {
-  const [deviceId, setDeviceId] = useState('')
-  const [currentDeviceId, setCurrentDeviceId] = useState('')
-  const [saving, setSaving] = useState(false)
+  const [status, setStatus] = useState<DeviceStatus>(EMPTY_STATUS)
+  const [clearing, setClearing] = useState(false)
 
-  useEffect(() => {
-    void loadDeviceId()
-  }, [])
+  useEffect(() => { void loadStatus() }, [])
 
-  async function loadDeviceId() {
-    const storedDeviceId = await AsyncStorage.getItem(DEVICE_ID_STORAGE_KEY)
-    setCurrentDeviceId(storedDeviceId || 'None')
-    setDeviceId(storedDeviceId || '')
-  }
-
-  function generateDeviceId() {
-    setDeviceId(generateMirrorId())
-  }
-
-  async function applyDeviceId() {
-    const normalizedDeviceId = deviceId.trim().toLowerCase()
-    if (!isValidMongoObjectId(normalizedDeviceId)) {
-      Alert.alert('Invalid device ID', 'Use a valid 24 character MongoDB ObjectId.')
-      return
-    }
-
-    setSaving(true)
-    await AsyncStorage.multiRemove([
-      ACTIVE_MIRROR_ID_STORAGE_KEY,
-      ACTIVE_NURSE_ID_STORAGE_KEY,
-      ACTIVE_PATIENT_ID_STORAGE_KEY,
-      DEVICE_AUTH_TOKEN_STORAGE_KEY,
-      MIRROR_LANGUAGE_STORAGE_KEY,
-      NURSE_PATIENT_CONFIG_STORAGE_KEY,
+  async function loadStatus() {
+    const [bootstrap, credential] = await Promise.all([
+      getBootstrapCredential(),
+      getDeviceCredential(),
     ])
-    await AsyncStorage.setItem(DEVICE_ID_STORAGE_KEY, normalizedDeviceId)
-    setSaving(false)
-    router.replace('/')
+    setStatus({
+      deviceId: credential?.deviceId || bootstrap?.deviceId || 'None',
+      provisioned: Boolean(bootstrap),
+      paired: Boolean(credential),
+      patientId: credential?.patientId || 'None',
+      accessExpiresAt: credential?.accessTokenExpiresAt || 'None',
+    })
+  }
+
+  async function restartPairing() {
+    setClearing(true)
+    try {
+      await clearDeviceCredential({ preserveBootstrap: true })
+      router.replace('/')
+    } finally {
+      setClearing(false)
+    }
+  }
+
+  function confirmRestart() {
+    Alert.alert(
+      'Restart pairing?',
+      'This clears this device’s local access and refresh credentials. The server provisioning identity is preserved.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Restart', style: 'destructive', onPress: () => void restartPairing() },
+      ],
+    )
   }
 
   return (
@@ -63,43 +75,28 @@ export default function TestDeviceScreen() {
           <View style={styles.iconWrap}>
             <Ionicons name="hardware-chip-outline" size={38} color={colors.goldDark} />
           </View>
-          <Text style={styles.title}>Testing device ID</Text>
+          <Text style={styles.title}>Device identity</Text>
           <Text style={styles.note}>
-            Temporary web feature for simulating multiple mirror devices. This clears local pairing state, then the normal
-            pairing screen will request a code for the selected device.
+            Identity is issued by the backend during provisioning. This screen can inspect it, but cannot create or replace it.
           </Text>
 
-          <View style={styles.currentBlock}>
-            <Text style={styles.label}>Current device ID</Text>
-            <Text style={styles.currentValue}>{currentDeviceId}</Text>
-          </View>
+          <StatusRow label="Device ID" value={status.deviceId} />
+          <StatusRow label="Provisioned" value={status.provisioned ? 'Yes' : 'No'} />
+          <StatusRow label="Paired" value={status.paired ? 'Yes' : 'No'} />
+          <StatusRow label="Patient ID" value={status.patientId} />
+          <StatusRow label="Access expires" value={status.accessExpiresAt} />
 
-          <View style={styles.formBlock}>
-            <Text style={styles.label}>Set device ID</Text>
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              maxLength={24}
-              onChangeText={(value) => setDeviceId(value.replace(/[^0-9a-fA-F]/g, '').slice(0, 24))}
-              placeholder="24 character MongoDB ObjectId"
-              placeholderTextColor={colors.taupe}
-              style={styles.input}
-              value={deviceId}
-            />
-          </View>
-
-          <View style={styles.actions}>
-            <Pressable disabled={saving} onPress={generateDeviceId} style={[styles.secondaryButton, saving && styles.disabledButton]}>
-              <Text style={styles.secondaryButtonText}>Generate ID</Text>
-            </Pressable>
-            <Pressable disabled={saving} onPress={() => void applyDeviceId()} style={[styles.primaryButton, saving && styles.disabledButton]}>
-              <Text style={styles.primaryButtonText}>{saving ? 'Saving...' : 'Use ID'}</Text>
-            </Pressable>
-          </View>
+          <Pressable
+            disabled={clearing || !status.provisioned}
+            onPress={confirmRestart}
+            style={[styles.primaryButton, (clearing || !status.provisioned) && styles.disabledButton]}
+          >
+            <Text style={styles.primaryButtonText}>{clearing ? 'Clearing…' : 'Clear pairing and restart'}</Text>
+          </Pressable>
 
           <Pressable onPress={() => router.replace('/')} style={styles.backButton}>
             <Ionicons name="arrow-back" size={18} color={colors.secondary} />
-            <Text style={styles.backButtonText}>Back to pairing</Text>
+            <Text style={styles.backButtonText}>Back</Text>
           </Pressable>
         </View>
       </View>
@@ -107,15 +104,19 @@ export default function TestDeviceScreen() {
   )
 }
 
-function isValidMongoObjectId(value: string) {
-  return /^[0-9a-f]{24}$/i.test(value)
+function StatusRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.currentBlock}>
+      <Text style={styles.label}>{label}</Text>
+      <Text selectable style={styles.currentValue}>{value}</Text>
+    </View>
+  )
 }
 
 const colors = {
   background: '#FFF9F1',
   card: '#FFFBF4',
   line: '#F1E5D2',
-  gold: '#E7CFA6',
   goldDark: '#C89755',
   taupe: '#BBAFA0',
   text: '#282828',
@@ -123,136 +124,34 @@ const colors = {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    backgroundColor: colors.background,
-    flex: 1,
-  },
-  stage: {
-    alignItems: 'center',
-    backgroundColor: colors.background,
-    flex: 1,
-    justifyContent: 'center',
-    padding: 18,
-  },
+  safeArea: { backgroundColor: colors.background, flex: 1 },
+  stage: { alignItems: 'center', backgroundColor: colors.background, flex: 1, justifyContent: 'center', padding: 18 },
   card: {
-    alignItems: 'stretch',
-    backgroundColor: colors.card,
-    borderColor: colors.line,
-    borderRadius: 8,
-    borderWidth: 1,
-    gap: 20,
-    maxWidth: 430,
-    padding: 28,
-    shadowColor: '#D8C6A8',
-    shadowOffset: { height: 10, width: 0 },
-    shadowOpacity: 0.22,
-    shadowRadius: 22,
-    width: '100%',
+    alignItems: 'stretch', backgroundColor: colors.card, borderColor: colors.line, borderRadius: 8,
+    borderWidth: 1, gap: 14, maxWidth: 430, padding: 28, shadowColor: '#D8C6A8',
+    shadowOffset: { height: 10, width: 0 }, shadowOpacity: 0.22, shadowRadius: 22, width: '100%',
   },
   iconWrap: {
-    alignItems: 'center',
-    alignSelf: 'center',
-    backgroundColor: '#FFF2DF',
-    borderRadius: 36,
-    height: 72,
-    justifyContent: 'center',
-    width: 72,
+    alignItems: 'center', alignSelf: 'center', backgroundColor: '#FFF2DF', borderRadius: 36,
+    height: 72, justifyContent: 'center', width: 72,
   },
-  title: {
-    color: colors.text,
-    fontSize: 30,
-    fontWeight: '900',
-    textAlign: 'center',
-  },
-  note: {
-    color: colors.secondary,
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 23,
-    textAlign: 'center',
-  },
+  title: { color: colors.text, fontSize: 30, fontWeight: '900', textAlign: 'center' },
+  note: { color: colors.secondary, fontSize: 16, fontWeight: '700', lineHeight: 23, textAlign: 'center' },
   currentBlock: {
-    backgroundColor: '#FFF6EA',
-    borderColor: colors.line,
-    borderRadius: 8,
-    borderWidth: 1,
-    gap: 8,
-    padding: 14,
+    backgroundColor: '#FFF6EA', borderColor: colors.line, borderRadius: 8, borderWidth: 1, gap: 6, padding: 12,
   },
-  formBlock: {
-    gap: 8,
-  },
-  label: {
-    color: colors.secondary,
-    fontSize: 13,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-  },
+  label: { color: colors.secondary, fontSize: 12, fontWeight: '900', textTransform: 'uppercase' },
   currentValue: {
-    color: colors.text,
-    fontFamily: Platform.select({ web: 'monospace', default: undefined }),
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  input: {
-    backgroundColor: '#FFFFFF',
-    borderColor: colors.line,
-    borderRadius: 8,
-    borderWidth: 1,
-    color: colors.text,
-    fontFamily: Platform.select({ web: 'monospace', default: undefined }),
-    fontSize: 16,
-    fontWeight: '800',
-    letterSpacing: 0,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 10,
+    color: colors.text, fontFamily: Platform.select({ web: 'monospace', default: undefined }),
+    fontSize: 14, fontWeight: '800',
   },
   primaryButton: {
-    alignItems: 'center',
-    backgroundColor: colors.goldDark,
-    borderRadius: 8,
-    flex: 1,
-    justifyContent: 'center',
-    minHeight: 48,
+    alignItems: 'center', backgroundColor: colors.goldDark, borderRadius: 8, justifyContent: 'center', minHeight: 48,
   },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '900',
-  },
-  secondaryButton: {
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: colors.line,
-    borderRadius: 8,
-    borderWidth: 1,
-    flex: 1,
-    justifyContent: 'center',
-    minHeight: 48,
-  },
-  secondaryButtonText: {
-    color: colors.text,
-    fontSize: 15,
-    fontWeight: '900',
-  },
-  disabledButton: {
-    opacity: 0.62,
-  },
+  primaryButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '900' },
+  disabledButton: { opacity: 0.48 },
   backButton: {
-    alignItems: 'center',
-    alignSelf: 'center',
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    paddingVertical: 6,
+    alignItems: 'center', alignSelf: 'center', flexDirection: 'row', gap: 8, justifyContent: 'center', paddingVertical: 6,
   },
-  backButtonText: {
-    color: colors.secondary,
-    fontSize: 15,
-    fontWeight: '800',
-  },
+  backButtonText: { color: colors.secondary, fontSize: 15, fontWeight: '800' },
 })

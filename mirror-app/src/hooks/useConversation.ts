@@ -2,14 +2,12 @@ import { useCallback, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
 import { CONVERSATION_MODE } from '../config/conversationMode'
-import type { ConversationApi } from './conversationTypes'
+import type { ConversationApi, ConversationOptions } from './conversationTypes'
 import { useDirectRealtimeConversation } from './useDirectRealtimeConversation'
 import { useWebRtcRealtimeConversation } from './useWebRtcRealtimeConversation'
 import { useQwenRealtimeConversation } from './useQwenRealtimeConversation'
 import { useTurnBasedConversation } from './useTurnBasedConversation'
 import { useTurnBasedConversationNative } from './useTurnBasedConversationNative'
-
-type Options = { patientId?: string; language?: string; persona?: 'screening' | 'companion'; pushToTalk?: boolean }
 
 /**
  * Version selector. Picks the conversation implementation from EXPO_PUBLIC_CONVERSATION_MODE:
@@ -20,7 +18,7 @@ type Options = { patientId?: string; language?: string; persona?: 'screening' | 
  * CONVERSATION_MODE and Platform.OS are build-time constants, so exactly one branch runs for the
  * app's lifetime — the conditional hook calls are stable (rules-of-hooks safe in practice).
  */
-export function useConversation(opts: Options = {}): ConversationApi {
+export function useConversation(opts: ConversationOptions = {}): ConversationApi {
   /* eslint-disable react-hooks/rules-of-hooks */
   if (CONVERSATION_MODE === 'http') {
     // web uses the Web-Audio pipeline; native uses expo-audio (record file -> ASR).
@@ -48,7 +46,7 @@ export function useConversation(opts: Options = {}): ConversationApi {
  * same options (language carried through). The post-conversation screening (qwen-vl-max + qwen-plus)
  * is transport-agnostic, so it runs identically whichever engine produced the transcript.
  */
-function useResilientConversation(opts: Options): ConversationApi {
+function useResilientConversation(opts: ConversationOptions): ConversationApi {
   const [usingFallback, setUsingFallback] = useState(false)
   const fellBackRef = useRef(false)
   const swapRef = useRef<() => void>(() => {})
