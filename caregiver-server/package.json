@@ -15,6 +15,7 @@
     "reminders:materialize": "tsx src/jobs/reminderScheduler.ts",
     "bootstrap:admin": "tsx src/scripts/bootstrapAdmin.ts",
     "provision:device": "tsx src/scripts/provisionDevice.ts",
+    "migrate:legacy-v1": "tsx src/scripts/migrateLegacyToV1.ts",
     "smoke:deployment": "node dist/scripts/smokeDeployment.js",
     "smoke:authenticated-deployment": "tsx src/scripts/smokeAuthenticatedDeployment.ts",
     "typecheck": "tsc --noEmit",
