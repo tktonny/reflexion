@@ -1,15 +1,11 @@
 import { Router } from 'express'
 import { ObjectId, type Db } from 'mongodb'
 import { asyncHandler } from '../../lib/asyncHandler.js'
-import {
-  CONVERSATION_COLLECTION,
-  CONVERSATION_MAP_COLLECTION,
-  DB_NAME,
-  NURSE_CONFIG_COLLECTION,
-} from '../../lib/constants.js'
+import { DB_NAME, NURSE_CONFIG_COLLECTION } from '../../lib/constants.js'
 import { getMissedDays } from '../../lib/dates.js'
 import { withMongo } from '../../lib/mongo.js'
-import type { Conversation, ConversationMap, StoredPatient } from '../../lib/types.js'
+import { getLatestV1SessionByPatientIds } from '../../lib/v1Conversations.js'
+import type { StoredPatient } from '../../lib/types.js'
 
 type PatientStatus = 'doing_well' | 'worth_checking' | 'needs_attention'
 
@@ -83,40 +79,20 @@ async function returnPatientsWithStatuses(db: Db, storedPatients: StoredPatient[
   })
 }
 
+// Per-patient "last conversation" now comes from the v1 `sessions` pipeline (the mirror no longer writes
+// the legacy Conversation collection). lastSpoken = localCompletedAt (conversation end) ?? createdAt;
+// duration = acquisition.durationMs / 1000 (seconds, matching the app's formatter).
 async function getLatestConversationByPatientId(db: Db, patientIds: ObjectId[]) {
   const latestByPatientId = new Map<string, { id: string; duration: number; createdAt: Date | null }>()
   if (!patientIds.length) return latestByPatientId
 
-  const maps = await db.collection<ConversationMap>(CONVERSATION_MAP_COLLECTION)
-    .find({ patientId: { $in: patientIds } })
-    .sort({ createdAt: -1, updatedAt: -1 })
-    .toArray()
-
-  const latestMaps = new Map<string, ConversationMap>()
-  for (const map of maps) {
-    const patientId = map.patientId?.toHexString()
-    if (patientId && !latestMaps.has(patientId)) {
-      latestMaps.set(patientId, map)
-    }
-  }
-
-  const conversationIds = Array.from(latestMaps.values())
-    .map((map) => map.conversationId)
-    .filter((conversationId): conversationId is ObjectId => Boolean(conversationId))
-  const conversations = conversationIds.length
-    ? await db.collection<Conversation>(CONVERSATION_COLLECTION).find({ _id: { $in: conversationIds } }).toArray()
-    : []
-  const conversationById = new Map(
-    conversations.map((conversation) => [conversation._id?.toHexString?.() || '', conversation]),
-  )
-
-  for (const [patientId, map] of latestMaps) {
-    const conversationId = map.conversationId?.toHexString?.() || ''
-    const conversation = conversationById.get(conversationId)
+  const latestSessions = await getLatestV1SessionByPatientIds(db, patientIds.map((patientId) => patientId.toHexString()))
+  for (const [patientId, session] of latestSessions) {
+    const durationMs = session.acquisition?.durationMs
     latestByPatientId.set(patientId, {
-      id: conversationId,
-      duration: conversation?.duration || 0,
-      createdAt: conversation?.createdAt || map.createdAt || null,
+      id: session._id,
+      duration: durationMs ? Math.round(durationMs / 1000) : 0,
+      createdAt: session.localCompletedAt || session.createdAt || null,
     })
   }
 

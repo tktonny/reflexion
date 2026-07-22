@@ -1,12 +1,15 @@
 import { Router } from 'express'
 import { ObjectId, type Db } from 'mongodb'
 import { asyncHandler } from '../lib/asyncHandler.js'
-import { DB_NAME } from '../lib/constants.js'
-import { getDailyStatusesForRange, refreshDailyStatusForDate } from '../lib/dailyStatus.js'
-import { getSingaporeDateKey } from '../lib/dates.js'
+import { DB_NAME, NURSE_CONFIG_COLLECTION, TIME_ZONE } from '../lib/constants.js'
+import { getSingaporeDateKey, getSingaporeDayBoundsFromKey } from '../lib/dates.js'
 import { withMongo } from '../lib/mongo.js'
-import { getDailyConversationStats } from '../lib/statusEngine.js'
-import type { DailyPatientStatus } from '../lib/types.js'
+import { getV1DailyStats } from '../lib/v1Conversations.js'
+
+// Trend/daily-status are now derived live from the v1 `sessions` pipeline. There is no v1 `daily_statuses`
+// collection and the legacy `DailyPatientStatus` cache no longer receives mirror data, so we recompute
+// each day from v1 on read. Status policy mirrors the legacy statusEngine: a completed conversation that
+// day → green, otherwise → red/missed. (See LEGACY_V1_ADAPTER.md §7.)
 
 type TrendDay = {
   date: string
@@ -36,12 +39,13 @@ patientTrendRouter.get('/', asyncHandler(async (request, response) => {
     return
   }
 
-  const patientId = new ObjectId(id)
+  const patientHex = new ObjectId(id).toHexString()
   const cacheDate = getSingaporeDateKey(new Date())
 
   await withMongo(async (client) => {
     const db = client.db(DB_NAME)
-    const trend = await buildTrend(db, patientId, days)
+    const dates = getRecentLocalDateKeys(days)
+    const trend = await Promise.all(dates.map((date) => buildTrendDay(db, patientHex, date)))
     response.json({ cacheDate, days, trend })
   })
 }))
@@ -64,20 +68,53 @@ patientTrendRouter.post('/daily-status', asyncHandler(async (request, response) 
   const patientId = new ObjectId(id)
 
   await withMongo(async (client) => {
-    const status = await refreshDailyStatusForDate(client.db(DB_NAME), patientId, date)
-    response.json({ dailyStatus: serializeDailyStatus(status) })
+    const db = client.db(DB_NAME)
+    const dailyStatus = await computeDailyStatus(db, patientId, date)
+    response.json({ dailyStatus })
   })
 }))
 
-async function buildTrend(db: Db, patientId: ObjectId, days: number) {
-  const dates = getRecentLocalDateKeys(days)
-  const statuses = await getDailyStatusesForRange(db, patientId, dates)
-  const statusByDate = new Map(statuses.map((status) => [status.date, status]))
+async function buildTrendDay(db: Db, patientHex: string, date: string): Promise<TrendDay> {
+  const { start, end } = getSingaporeDayBoundsFromKey(date)
+  const stats = await getV1DailyStats(db, patientHex, start, end)
+  const missed = stats.completedSessionCount === 0
+  return {
+    date,
+    duration: stats.duration,
+    status: missed ? 'red' : 'green',
+    missed,
+  }
+}
 
-  return Promise.all(dates.map((date) => {
-    const dailyStatus = statusByDate.get(date)
-    return dailyStatus ? toTrendDay(db, patientId, dailyStatus) : getEmptyTrendDay(date)
-  }))
+// Recompute-and-return the legacy DailyPatientStatus shape from v1 (no persistence — the real recompute
+// happens inside the v1 session pipeline on check-in completion).
+async function computeDailyStatus(db: Db, patientId: ObjectId, date: string) {
+  const { start, end } = getSingaporeDayBoundsFromKey(date)
+  const [stats, config] = await Promise.all([
+    getV1DailyStats(db, patientId.toHexString(), start, end),
+    db.collection(NURSE_CONFIG_COLLECTION).findOne(
+      { 'patients._id': patientId },
+      { projection: { _id: 1, preferredDailySummaryTime: 1 } },
+    ),
+  ])
+  const missed = stats.completedSessionCount === 0
+  const now = new Date()
+  return {
+    id: '',
+    patientId: patientId.toHexString(),
+    nurseId: config?._id?.toHexString?.() || null,
+    date,
+    timezone: TIME_ZONE,
+    preferredDailySummaryTime: typeof config?.preferredDailySummaryTime === 'string'
+      ? config.preferredDailySummaryTime
+      : '19:00',
+    status: missed ? 'red' : 'green',
+    missed,
+    sessionCount: stats.sessionCount,
+    completedSessionCount: stats.completedSessionCount,
+    createdAt: now.toISOString(),
+    updatedAt: now.toISOString(),
+  }
 }
 
 function getRecentLocalDateKeys(days: number) {
@@ -92,40 +129,4 @@ function getRecentLocalDateKeys(days: number) {
   }
 
   return dates
-}
-
-async function toTrendDay(db: Db, patientId: ObjectId, dailyStatus: DailyPatientStatus) {
-  const stats = await getDailyConversationStats(db, patientId, dailyStatus.date)
-  return {
-    date: dailyStatus.date,
-    duration: stats.duration,
-    status: dailyStatus.status || 'red',
-    missed: dailyStatus.missed,
-  } satisfies TrendDay
-}
-
-function getEmptyTrendDay(date: string) {
-  return {
-    date,
-    duration: 0,
-    status: 'red',
-    missed: true,
-  } satisfies TrendDay
-}
-
-function serializeDailyStatus(dailyStatus: DailyPatientStatus) {
-  return {
-    id: dailyStatus._id?.toHexString?.() || '',
-    patientId: dailyStatus.patientId.toHexString(),
-    nurseId: dailyStatus.nurseId?.toHexString?.() || null,
-    date: dailyStatus.date,
-    timezone: dailyStatus.timezone,
-    preferredDailySummaryTime: dailyStatus.preferredDailySummaryTime,
-    status: dailyStatus.status,
-    missed: dailyStatus.missed,
-    sessionCount: dailyStatus.sessionCount,
-    completedSessionCount: dailyStatus.completedSessionCount,
-    createdAt: dailyStatus.createdAt?.toISOString?.() || null,
-    updatedAt: dailyStatus.updatedAt?.toISOString?.() || null,
-  }
 }

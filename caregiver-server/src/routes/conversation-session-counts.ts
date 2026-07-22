@@ -1,18 +1,14 @@
 import { Router } from 'express'
 import { ObjectId } from 'mongodb'
 import { asyncHandler } from '../lib/asyncHandler.js'
-import {
-  CONVERSATION_COLLECTION,
-  CONVERSATION_MAP_COLLECTION,
-  DB_NAME,
-} from '../lib/constants.js'
+import { DB_NAME } from '../lib/constants.js'
 import {
   getSingaporeDayOfMonth,
   getSingaporeMonthBounds,
   getSingaporeMonthKey,
 } from '../lib/dates.js'
 import { withMongo } from '../lib/mongo.js'
-import type { Conversation, ConversationMap } from '../lib/types.js'
+import { getV1SessionsForPatientRange, isV1SessionCompleted } from '../lib/v1Conversations.js'
 
 export const conversationSessionCountsRouter = Router()
 
@@ -30,32 +26,12 @@ conversationSessionCountsRouter.get('/', asyncHandler(async (request, response) 
   }
 
   const patientId = new ObjectId(id)
+  const patientHex = patientId.toHexString()
   const { start, end, daysInMonth } = getSingaporeMonthBounds(month)
 
   await withMongo(async (client) => {
     const db = client.db(DB_NAME)
-    const maps = await db.collection<ConversationMap>(CONVERSATION_MAP_COLLECTION).find({
-      patientId,
-      createdAt: { $gte: start, $lt: end },
-    }).project({ conversationId: 1, createdAt: 1 }).toArray()
-    const conversationIds = maps
-      .map((map) => map.conversationId)
-      .filter((conversationId): conversationId is ObjectId => Boolean(conversationId))
-    const conversations = conversationIds.length
-      ? await db.collection<Conversation>(CONVERSATION_COLLECTION).find({
-          $or: [
-            { _id: { $in: conversationIds } },
-            { conversationId: { $in: conversationIds } },
-          ],
-        }).project({ _id: 1, conversationId: 1, sessionStatus: 1 }).toArray()
-      : []
-    const conversationById = new Map(
-      conversations.flatMap((conversation) => {
-        const keys = [conversation._id?.toHexString?.(), conversation.conversationId?.toHexString?.()]
-          .filter((key): key is string => Boolean(key))
-        return keys.map((key) => [key, conversation] as const)
-      }),
-    )
+    const sessions = await getV1SessionsForPatientRange(db, patientHex, start, end)
 
     const counts: Record<string, number> = {}
     const completedCounts: Record<string, number> = {}
@@ -64,14 +40,12 @@ conversationSessionCountsRouter.get('/', asyncHandler(async (request, response) 
       completedCounts[String(day)] = 0
     }
 
-    for (const map of maps) {
-      if (!map.createdAt) continue
-      const day = getSingaporeDayOfMonth(map.createdAt)
+    for (const session of sessions) {
+      if (!session.createdAt) continue
+      const day = getSingaporeDayOfMonth(session.createdAt)
       if (day >= 1 && day <= daysInMonth) {
         counts[String(day)] = (counts[String(day)] || 0) + 1
-        const conversationId = map.conversationId?.toHexString?.() || ''
-        const conversation = conversationById.get(conversationId)
-        if (conversation?.sessionStatus === 'completed') {
+        if (isV1SessionCompleted(session)) {
           completedCounts[String(day)] = (completedCounts[String(day)] || 0) + 1
         }
       }
@@ -89,7 +63,7 @@ conversationSessionCountsRouter.get('/', asyncHandler(async (request, response) 
     })
 
     response.json({
-      patientId: patientId.toHexString(),
+      patientId: patientHex,
       month,
       counts,
       days,
