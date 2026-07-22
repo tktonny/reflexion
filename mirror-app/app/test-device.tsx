@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons'
+import { CameraView, useCameraPermissions } from 'expo-camera'
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Alert, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Alert, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import {
@@ -36,6 +37,8 @@ export default function TestDeviceScreen() {
   const [bootstrapToken, setBootstrapToken] = useState('')
   const [importing, setImporting] = useState(false)
   const [importError, setImportError] = useState('')
+  const [scanning, setScanning] = useState(false)
+  const [permission, requestPermission] = useCameraPermissions()
 
   useEffect(() => { void loadStatus() }, [])
 
@@ -63,12 +66,14 @@ export default function TestDeviceScreen() {
     }
   }
 
-  async function importBootstrapCredential() {
+  async function importBootstrapCredential(tokenOverride?: string) {
     if (!INSTALLER_SETUP_ENABLED || importing) return
+    const token = (tokenOverride ?? bootstrapToken).trim()
+    if (!token) return
     setImporting(true)
     setImportError('')
     try {
-      await persistBootstrapCredential(bootstrapToken)
+      await persistBootstrapCredential(token)
       setBootstrapToken('')
       router.replace('/')
     } catch (error) {
@@ -79,6 +84,37 @@ export default function TestDeviceScreen() {
     } finally {
       setImporting(false)
     }
+  }
+
+  // Enrollment QR payload: a raw bootstrap token, or JSON { bootstrapToken } / { token }.
+  function extractBootstrapToken(data: string): string {
+    const raw = data.trim()
+    try {
+      const parsed = JSON.parse(raw)
+      if (parsed && typeof parsed === 'object') {
+        return String((parsed as Record<string, unknown>).bootstrapToken || (parsed as Record<string, unknown>).token || '').trim()
+      }
+    } catch {}
+    return raw
+  }
+
+  async function openScanner() {
+    if (!INSTALLER_SETUP_ENABLED) return
+    if (!permission?.granted) {
+      const res = await requestPermission()
+      if (!res.granted) { setImportError('Camera permission is required to scan the enrollment QR.'); return }
+    }
+    setImportError('')
+    setScanning(true)
+  }
+
+  function onBarcodeScanned(result: { data: string }) {
+    if (!scanning) return
+    setScanning(false)
+    const token = extractBootstrapToken(result.data)
+    if (!token) { setImportError('That QR did not contain a bootstrap credential.'); return }
+    setBootstrapToken(token)
+    void importBootstrapCredential(token)
   }
 
   function confirmRestart() {
@@ -125,6 +161,14 @@ export default function TestDeviceScreen() {
               >
                 <Text style={styles.importButtonText}>{importing ? 'Importing…' : 'Import and start pairing'}</Text>
               </Pressable>
+              <Pressable
+                disabled={importing}
+                onPress={() => void openScanner()}
+                style={[styles.scanButton, importing && styles.disabledButton]}
+              >
+                <Ionicons name="qr-code-outline" size={18} color={colors.goldDark} />
+                <Text style={styles.scanButtonText}>Scan enrollment QR</Text>
+              </Pressable>
             </View>
           ) : null}
 
@@ -148,6 +192,22 @@ export default function TestDeviceScreen() {
           </Pressable>
         </View>
       </View>
+      <Modal visible={scanning} animationType="slide" onRequestClose={() => setScanning(false)}>
+        <View style={styles.scannerWrap}>
+          <CameraView
+            style={StyleSheet.absoluteFill}
+            facing="back"
+            barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+            onBarcodeScanned={onBarcodeScanned}
+          />
+          <View style={styles.scannerOverlay}>
+            <Text style={styles.scannerHint}>Point the camera at the device enrollment QR</Text>
+            <Pressable onPress={() => setScanning(false)} style={styles.scannerCancel}>
+              <Text style={styles.scannerCancelText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   )
 }
@@ -199,6 +259,19 @@ const styles = StyleSheet.create({
     alignItems: 'center', backgroundColor: colors.goldDark, borderRadius: 8, justifyContent: 'center', minHeight: 46,
   },
   importButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
+  scanButton: {
+    alignItems: 'center', backgroundColor: '#FFFFFF', borderColor: colors.goldDark, borderRadius: 8,
+    borderWidth: 1, flexDirection: 'row', gap: 8, justifyContent: 'center', minHeight: 44,
+  },
+  scanButtonText: { color: colors.goldDark, fontSize: 14, fontWeight: '900' },
+  scannerWrap: { backgroundColor: '#000000', flex: 1 },
+  scannerOverlay: { alignItems: 'center', bottom: 48, gap: 16, left: 0, position: 'absolute', right: 0 },
+  scannerHint: {
+    backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 8, color: '#FFFFFF', fontSize: 15,
+    fontWeight: '800', overflow: 'hidden', paddingHorizontal: 14, paddingVertical: 8,
+  },
+  scannerCancel: { backgroundColor: '#FFFFFF', borderRadius: 8, paddingHorizontal: 28, paddingVertical: 12 },
+  scannerCancelText: { color: colors.text, fontSize: 15, fontWeight: '900' },
   errorText: { color: '#CC766E', fontSize: 13, fontWeight: '700', lineHeight: 18 },
   label: { color: colors.secondary, fontSize: 12, fontWeight: '900', textTransform: 'uppercase' },
   currentValue: {
