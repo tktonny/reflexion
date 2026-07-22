@@ -57,6 +57,8 @@ export async function getStoredPatientName() {
   ])
 
   if (!mirrorId || !config || typeof config !== 'object') return null
+  const v1Patient = (config as { patient?: { displayName?: unknown } }).patient
+  if (typeof v1Patient?.displayName === 'string' && v1Patient.displayName.trim()) return v1Patient.displayName.trim()
   const patients = (config as { patients?: Array<{ mirrorId?: unknown; name?: unknown }> })
     .patients
   const patient = findStoredPatient(patients, mirrorId, patientId)
@@ -78,6 +80,7 @@ export async function getStoredMirrorProfile() {
   }
 
   const root = config as {
+    patient?: { displayName?: unknown }
     nurseName?: unknown
     caregiverName?: unknown
     name?: unknown
@@ -92,7 +95,9 @@ export async function getStoredMirrorProfile() {
 
   return {
     patientName:
-      typeof patient?.name === 'string' && patient.name.trim()
+      typeof root.patient?.displayName === 'string' && root.patient.displayName.trim()
+        ? root.patient.displayName.trim()
+        : typeof patient?.name === 'string' && patient.name.trim()
         ? patient.name.trim()
         : null,
     nurseName:
@@ -111,6 +116,11 @@ export async function getStoredMirrorSessionMetadata() {
 
   if (!activeMirrorId || !config || typeof config !== 'object') {
     return { deviceId: activeMirrorId || null, language: null }
+  }
+
+  const v1Patient = (config as { patient?: { preferredLanguage?: unknown } }).patient
+  if (typeof v1Patient?.preferredLanguage === 'string' && v1Patient.preferredLanguage.trim()) {
+    return { deviceId: activeMirrorId, language: v1Patient.preferredLanguage.trim() }
   }
 
   const patients = (config as { patients?: Array<{ _id?: unknown; mirrorId?: unknown; preferredLanguage?: unknown }> })

@@ -11,6 +11,7 @@ import {
   type ScreeningAssessment,
 } from '../src/api/assess'
 import { resolveOwnerIds, saveCheckin } from '../src/api/saveCheckin'
+import { beginMirrorSession } from '../src/api/sessionSync'
 import { MirrorCameraPanel, type MirrorCameraHandle } from '../src/components/MirrorCameraPanel'
 import { isCognitiveAssessmentEligible } from '../src/orchestration/conversationPurpose'
 
@@ -75,15 +76,16 @@ export default function RealtimeTestScreen() {
     return null
   }, [messages])
 
-  const onStart = useCallback(() => {
+  const onStart = useCallback(async () => {
     setAssessment(null)
     setAssessError('')
     setSaveNote('')
     finalizingRef.current = false
     cameraRef.current?.reset()
     sessionStartRef.current = new Date()
-    void startConversation()
-  }, [startConversation])
+    await beginMirrorSession(persona === 'screening' ? 'daily_checkin' : 'companion', 'en')
+    await startConversation()
+  }, [persona, startConversation])
 
   // Finalize once: stop the session, run the screening (transcript + frames), save. Shared by the
   // manual 结束并评估 button AND the auto-end path (Aria's goodbye -> `ended`), guarded so it runs once.
@@ -110,7 +112,6 @@ export default function RealtimeTestScreen() {
       nurseId: ids.nurseId,
       patientId: ids.patientId,
       deviceId: ids.deviceId,
-      authToken: ids.authToken,
       language: ids.language,
       assessment: a,
     })

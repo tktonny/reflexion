@@ -9,7 +9,9 @@ import {
 } from '../constants/realtime'
 import { DEVICE_AUTH_TOKEN_STORAGE_KEY, DEVICE_ID_STORAGE_KEY } from '../constants/nursePatientConfig'
 import { looksLikeGoodbye, looksLikeUserGoodbye } from '../orchestration/orchestrator'
+import { createDailyConversationPlan, dailyConversationPatientTurns } from '../orchestration/deterministicSpeech'
 import { randomId } from '../utils/id'
+import type { ConversationOptions } from './conversationTypes'
 
 export type ChatRole = 'system' | 'user' | 'assistant'
 export type StatusKind = 'idle' | 'listening' | 'processing' | 'speaking' | 'error'
@@ -21,21 +23,17 @@ export type ChatMessage = {
   streaming?: boolean
 }
 
-type Options = {
-  patientId?: string
-  language?: string
-  persona?: 'screening' | 'companion'
-}
-
 /**
  * Realtime voice conversation against the Qwen Omni relay (server/*.mjs), replacing
  * the old OpenAI WebRTC hook. Web-first: uses the browser Web Audio pipeline ported
  * from REFLEXION's clinic browser client (convertTo16kPcm capture, gapless 24k
  * playback, half-duplex capture hold). Native audio (MirrorAudio module) is TODO.
  */
-export function useQwenRealtimeConversation(options: Options = {}) {
+export function useQwenRealtimeConversation(options: ConversationOptions = {}) {
   const patientId = options.patientId ?? 'demo-patient'
   const persona = options.persona ?? 'screening'
+  const dailyPlan = options.dailyPlan ?? createDailyConversationPlan({ patientName: options.patientName, reminiscenceWeekdays: [] })
+  const requiredPatientTurns = dailyConversationPatientTurns(dailyPlan)
   const [language] = useState(options.language ?? 'en')
 
   const [statusKind, setStatusKind] = useState<StatusKind>('idle')
@@ -61,6 +59,8 @@ export function useQwenRealtimeConversation(options: Options = {}) {
   const assistantStreamIdRef = useRef<string | null>(null)
   const assistantTextRef = useRef('')
   const userGoodbyeRequestedRef = useRef(false)
+  const turnCountRef = useRef(0)
+  const wrapupRequestedRef = useRef(false)
 
   const updateStatus = useCallback((kind: StatusKind, text: string) => {
     setStatusKind(kind)
@@ -153,6 +153,7 @@ export function useQwenRealtimeConversation(options: Options = {}) {
           const transcript = String(payload?.transcript || '').trim()
           if (transcript) {
             setMessages((prev) => [...prev, { id: randomId('user'), role: 'user', text: transcript }])
+            turnCountRef.current += 1
             if (persona === 'companion' && looksLikeUserGoodbye(transcript)) {
               userGoodbyeRequestedRef.current = true
             }
@@ -182,13 +183,22 @@ export function useQwenRealtimeConversation(options: Options = {}) {
           break
         }
         case 'response.done':
-          updateStatus('listening', 'Listening...')
+          if (
+            persona === 'screening' && !endedRef.current && !wrapupRequestedRef.current &&
+            turnCountRef.current >= requiredPatientTurns && socketRef.current?.readyState === WebSocket.OPEN
+          ) {
+            wrapupRequestedRef.current = true
+            updateStatus('processing', 'Wrapping up...')
+            socketRef.current.send(JSON.stringify({ type: 'reflexion.wrap_up' }))
+          } else {
+            updateStatus('listening', 'Listening...')
+          }
           break
         default:
           break
       }
     },
-    [appendAssistantStreaming, finalizeAssistant, persona, playAssistantAudio, scheduleEnd, updateStatus],
+    [appendAssistantStreaming, finalizeAssistant, persona, playAssistantAudio, requiredPatientTurns, scheduleEnd, updateStatus],
   )
 
   const cleanup = useCallback(() => {
@@ -271,6 +281,8 @@ export function useQwenRealtimeConversation(options: Options = {}) {
     setEnded(false)
     endedRef.current = false
     userGoodbyeRequestedRef.current = false
+    turnCountRef.current = 0
+    wrapupRequestedRef.current = false
 
     try {
       const stream = await (navigator as any).mediaDevices.getUserMedia({ audio: true, video: false })

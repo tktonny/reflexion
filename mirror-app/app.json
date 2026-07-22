@@ -6,17 +6,27 @@
     "orientation": "portrait",
     "scheme": "reflexionmirror",
     "userInterfaceStyle": "light",
+    "androidStatusBar": {
+      "backgroundColor": "#FFF9F1",
+      "barStyle": "dark-content",
+      "translucent": false
+    },
+    "androidNavigationBar": {
+      "backgroundColor": "#FFF9F1",
+      "barStyle": "dark-content"
+    },
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "Reflexion uses the camera to scan or verify the mirror ID.",
+        "NSCameraUsageDescription": "Reflexion uses the camera only for diagnostics or future consented features. Daily voice check-ins do not use it.",
         "NSMicrophoneUsageDescription": "Reflexion uses the microphone for realtime AI conversations."
       }
     },
     "android": {
       "package": "com.reflexion.mirror",
       "versionCode": 2,
+      "allowBackup": false,
       "permissions": [
         "CAMERA",
         "RECORD_AUDIO",

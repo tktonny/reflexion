@@ -1,5 +1,4 @@
-import { getApiUrl } from '../../app/apiUrl'
-import { qwenChat, qwenVisionChat, fetchWithTimeout, type QwenContentPart } from './qwenClient'
+import { qwenChat, qwenVisionChat, type QwenContentPart } from './qwenClient'
 import { QWEN, OMNI_JUDGMENT } from '../config/conversationMode'
 import type { ChatMessage } from '../hooks/conversationTypes'
 
@@ -46,40 +45,18 @@ export function transcriptFromMessages(messages: ChatMessage[]): string {
 }
 
 /**
- * Return the screening judgment. Prefers the server endpoint /api/assess (key + patient frames
- * stay server-side). On a RESOLVED-but-failed server response we retry the SAME route text-only
- * (dropping frames) so a frames-induced failure never wipes out the primary transcript screening —
- * and we never fall back to the client-direct path there, since that would send the patient's face
- * frames straight to DashScope and defeat the relay's PII/key isolation. Only a genuine fetch
- * failure (no reachable backend — e.g. a standalone APK) uses the client-direct path.
+ * Developer-only screening preview. Production observations are computed by the backend pipeline
+ * from uploaded session evidence; the Mirror must never publish its own LLM label as clinical data.
+ * The preview still uses the active session's short-lived Qwen ticket, never an account API key.
  */
 export async function assessConversation(
   transcript: string,
   language = 'en',
   frames: string[] = [],
 ): Promise<AssessResponse> {
-  const capped = frames.slice(-MAX_ASSESS_FRAMES)
-  const attempts = capped.length ? [capped, [] as string[]] : [[] as string[]]
-  try {
-    for (const payload of attempts) {
-      const res = await fetchWithTimeout(getApiUrl('/api/assess'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript, language, frames: payload }),
-      })
-      if (res.ok) {
-        const body = (await res.json()) as AssessResponse
-        if (body.success) return body
-      }
-      // reachable but non-OK / unsuccessful (e.g. 413 from frames, 502 from the model):
-      // the loop retries text-only; if that also fails we surface a server error below.
-    }
-    return { success: false, reason: 'assess_server_failed' }
-  } catch {
-    // Genuine fetch failure = no reachable backend (offline / standalone APK). Client-direct is the
-    // intended path there; frames going direct is acceptable because there is no relay to protect.
-    return assessDirect(transcript, capped)
-  }
+  void language
+  if (!__DEV__) return { success: false, reason: 'client_assessment_disabled' }
+  return assessDirect(transcript, frames.slice(-MAX_ASSESS_FRAMES))
 }
 
 async function assessDirect(transcript: string, frames: string[]): Promise<AssessResponse> {
@@ -118,6 +95,7 @@ Return STRICT JSON with the shape above plus an added "visual_observations": [".
  * Runs client-direct (frames go to DashScope) — intended for the standalone/kiosk build.
  */
 export async function assessViaOmni(transcript: string, frames: string[] = []): Promise<AssessResponse> {
+  if (!__DEV__) return { success: false, reason: 'client_assessment_disabled' }
   try {
     const parts: QwenContentPart[] = [{ type: 'text', text: `Transcript of the check-in:\n${transcript}` }]
     for (const url of frames.slice(-MAX_ASSESS_FRAMES)) parts.push({ type: 'image_url', image_url: { url } })

@@ -9,20 +9,19 @@ import {
   type TurnTakingPhase,
 } from '../src/orchestration/turnTaking'
 import {
-  HARD_MAX_TURN,
-  RECALL_DEADLINE_TURN,
-  RECALL_DIRECTIVE,
+  BASE_DAILY_PATIENT_TURNS,
   looksLikeUserGoodbye,
   openingMessageForLanguage,
-  recallBudgetStep,
 } from '../src/orchestration/orchestrator'
 import { buildLiveSessionUpdate } from '../src/orchestration/realtime'
 import { createEnergyVad } from '../src/orchestration/energyVad'
 import {
   closingTextForLanguage,
   companionClosingTextForLanguage,
+  createDailyConversationPlan,
+  dailyConversationMetadataForPatientTurn,
+  dailyConversationPatientTurns,
   qwenWavToPcm24kChunks,
-  recallQuestionForLanguage,
   SCREENING_TOTAL_QUESTIONS,
   screeningQuestionForTurn,
 } from '../src/orchestration/deterministicSpeech'
@@ -34,6 +33,7 @@ import {
 } from '../src/orchestration/playbackCompletion'
 import { acquireConversationRuntime } from '../src/orchestration/conversationRuntime'
 import { createPushToTalkGesture } from '../src/orchestration/pushToTalkGesture'
+import { secureQwenAssetUrl } from '../src/orchestration/networkSecurity'
 
 const ready: TurnTakingEvent[] = [
   { type: 'connect_started' },
@@ -77,10 +77,11 @@ const replays: ReplayCase[] = [
   { name: 'duplicate response done is rejected', events: [...ready, ...normalResponse.slice(0, 4), { type: 'response_done' }], phase: 'playback_guard', muted: true, violations: 1 },
   { name: 'duplicate playback drain is rejected', events: [...ready, ...normalResponse, { type: 'playback_drained' }], phase: 'playback_guard', muted: true, violations: 1 },
   { name: 'speech during playback is rejected', events: [...ready, ...normalResponse.slice(0, 3), { type: 'user_speech_started' }], phase: 'assistant_playing', muted: true, violations: 1 },
+  { name: 'explicit barge-in transfers the audio turn to the user', events: [...ready, ...normalResponse.slice(0, 3), { type: 'assistant_interrupted' }], phase: 'user_speaking', muted: false },
 ]
 
-test('20 deterministic lifecycle replays preserve turn ownership', () => {
-  assert.equal(replays.length, 20)
+test('21 deterministic lifecycle replays preserve turn ownership', () => {
+  assert.equal(replays.length, 21)
   for (const replay of replays) {
     const state = replayTurnTaking(replay.events)
     assert.equal(state.phase, replay.phase, replay.name)
@@ -95,55 +96,64 @@ test('post-playback policy preserves screening order and graceful closing', () =
     closingResponse: false,
     manualCloseRequested: false,
     spontaneousGoodbye: false,
-    recallAnswered: false,
-    recallProbeIssued: false,
-    recallForced: false,
-    turnCount: 1,
-    recallDeadlineTurn: RECALL_DEADLINE_TURN,
-    hardMaxTurn: HARD_MAX_TURN,
+    dailyFlowComplete: false,
   }
 
   assert.equal(choosePostPlaybackAction(base), 'listen')
-  assert.equal(choosePostPlaybackAction({ ...base, turnCount: RECALL_DEADLINE_TURN - 1 }), 'listen')
-  assert.equal(choosePostPlaybackAction({ ...base, turnCount: RECALL_DEADLINE_TURN }), 'steer_recall')
-  assert.equal(choosePostPlaybackAction({ ...base, turnCount: RECALL_DEADLINE_TURN, recallForced: true }), 'listen')
-  assert.equal(choosePostPlaybackAction({ ...base, turnCount: RECALL_DEADLINE_TURN + 1, recallProbeIssued: true }), 'listen')
-  assert.equal(choosePostPlaybackAction({ ...base, recallAnswered: true }), 'request_goodbye')
-  assert.equal(choosePostPlaybackAction({ ...base, turnCount: HARD_MAX_TURN }), 'steer_recall')
-  assert.equal(choosePostPlaybackAction({ ...base, turnCount: HARD_MAX_TURN, recallProbeIssued: true }), 'listen')
+  assert.equal(choosePostPlaybackAction({ ...base, dailyFlowComplete: true }), 'request_goodbye')
   assert.equal(choosePostPlaybackAction({ ...base, manualCloseRequested: true }), 'request_goodbye')
   assert.equal(choosePostPlaybackAction({ ...base, closingResponse: true }), 'finish')
   assert.equal(choosePostPlaybackAction({ ...base, persona: 'companion', spontaneousGoodbye: true }), 'finish')
-  assert.equal(choosePostPlaybackAction({ ...base, persona: 'companion', turnCount: 20 }), 'listen')
+  assert.equal(choosePostPlaybackAction({ ...base, persona: 'companion', dailyFlowComplete: true }), 'listen')
 })
 
-test('screening collects six pre-recall answers before the seventh-question recall', () => {
-  assert.equal(RECALL_DEADLINE_TURN, 6)
-  assert.equal(HARD_MAX_TURN, 8)
-  assert.equal(SCREENING_TOTAL_QUESTIONS, 7)
-  assert.match(openingMessageForLanguage('english'), /no right or wrong answers, so take your time/i)
-  assert.match(screeningQuestionForTurn('english', 1) ?? '', /at home, at a clinic, or somewhere else/i)
-  assert.match(screeningQuestionForTurn('english', 2) ?? '', /morning, afternoon, or evening/i)
-  assert.match(screeningQuestionForTurn('english', 3) ?? '', /from when you woke up until now/i)
-  assert.match(screeningQuestionForTurn('english', 4) ?? '', /Take your time/i)
-  assert.match(screeningQuestionForTurn('english', 5) ?? '', /meals, medicines, or appointments/)
-  assert.equal(screeningQuestionForTurn('english', 6), null)
+test('daily conversation follows warm-up, yesterday recall, planning, then closes', () => {
+  const plan = createDailyConversationPlan({ patientName: 'Margaret', now: new Date('2026-07-22T08:00:00Z'), reminiscenceWeekdays: [] })
+  assert.equal(BASE_DAILY_PATIENT_TURNS, 5)
+  assert.equal(SCREENING_TOTAL_QUESTIONS, 5)
+  assert.equal(dailyConversationPatientTurns(plan), 5)
+  assert.equal(openingMessageForLanguage('english', plan.patientName), "Good morning Margaret, it's lovely to see you. How are you feeling today?")
+  assert.match(screeningQuestionForTurn('english', 1, plan) ?? '', /dinner yesterday/i)
+  assert.match(screeningQuestionForTurn('english', 2, plan) ?? '', /sleep well last night/i)
+  assert.match(screeningQuestionForTurn('english', 3, plan) ?? '', /planning to do today/i)
+  assert.match(screeningQuestionForTurn('english', 4, plan) ?? '', /visiting you this week/i)
+  assert.equal(screeningQuestionForTurn('english', 5, plan), null)
+  const allSpeech = [openingMessageForLanguage('english', plan.patientName), 1, 2, 3, 4]
+    .map((item) => typeof item === 'number' ? screeningQuestionForTurn('english', item, plan) : item)
+    .join(' ')
+  assert.doesNotMatch(allSpeech, /\bremember\b|right or wrong|clinic|assessment/i)
+})
 
-  for (let turnCount = 1; turnCount < RECALL_DEADLINE_TURN; turnCount += 1) {
-    assert.equal(
-      recallBudgetStep({ turnCount, recallProbeIssued: false, recallAnswered: false }).action,
-      'none',
-      `turn ${turnCount} must not end or recall early`,
-    )
-  }
-  assert.equal(
-    recallBudgetStep({ turnCount: RECALL_DEADLINE_TURN, recallProbeIssued: false, recallAnswered: false }).action,
-    'force_recall',
-  )
-  assert.equal(
-    recallBudgetStep({ turnCount: RECALL_DEADLINE_TURN + 1, recallProbeIssued: true, recallAnswered: false }).action,
-    'wrap_up',
-  )
+test('medication and twice-weekly reminiscence are conditional and ordered', () => {
+  const medication = { occurrenceId: 'occ-1', displayText: 'afternoon heart tablet', scheduledAt: '2026-07-21T06:00:00.000Z' }
+  const tuesday = createDailyConversationPlan({ patientName: 'Margaret', now: new Date('2026-07-21T08:00:00Z'), medicationReminder: medication })
+  const wednesday = createDailyConversationPlan({ patientName: 'Margaret', now: new Date('2026-07-22T08:00:00Z'), medicationReminder: medication })
+  const friday = createDailyConversationPlan({ patientName: 'Margaret', now: new Date('2026-07-24T08:00:00Z') })
+
+  assert.equal(tuesday.includeReminiscence, true)
+  assert.equal(wednesday.includeReminiscence, false)
+  assert.equal(friday.includeReminiscence, true)
+  assert.equal(dailyConversationPatientTurns(tuesday), 7)
+  assert.match(screeningQuestionForTurn('english', 5, tuesday) ?? '', /caregiver has scheduled/i)
+  assert.match(screeningQuestionForTurn('english', 5, tuesday) ?? '', /afternoon heart tablet/i)
+  assert.doesNotMatch(screeningQuestionForTurn('english', 5, tuesday) ?? '', /dose|mg|milligram/i)
+  assert.match(screeningQuestionForTurn('english', 6, tuesday) ?? '', /holiday you loved/i)
+  assert.equal(screeningQuestionForTurn('english', 7, tuesday), null)
+  assert.match(screeningQuestionForTurn('english', 5, friday) ?? '', /favourite food as a child/i)
+})
+
+test('patient speech turns carry protocol stage and signal tags', () => {
+  const plan = createDailyConversationPlan({
+    now: new Date('2026-07-21T08:00:00Z'),
+    medicationReminder: { occurrenceId: 'occ-1', displayText: 'tablet', scheduledAt: '2026-07-21T08:00:00Z' },
+  })
+  assert.deepEqual(dailyConversationMetadataForPatientTurn(1, plan), {
+    protocolStage: 'warm_up', cognitiveSignals: ['mood', 'speech_initiation', 'response_latency'],
+  })
+  assert.equal(dailyConversationMetadataForPatientTurn(2, plan).protocolStage, 'yesterday_recall')
+  assert.equal(dailyConversationMetadataForPatientTurn(4, plan).protocolStage, 'present_planning')
+  assert.equal(dailyConversationMetadataForPatientTurn(6, plan).protocolStage, 'medication_reminder')
+  assert.equal(dailyConversationMetadataForPatientTurn(7, plan).protocolStage, 'reminiscence')
 })
 
 test('playback timeout never masquerades as a safe drain', () => {
@@ -168,24 +178,18 @@ test('rejected empty or echo input returns ownership without creating a response
   assert.equal(state.violations.length, 0)
 })
 
-test('recall and closing updates replace the competing screening agenda', () => {
+test('daily flow prompt and closing update cannot compete', () => {
   const normal = buildLiveSessionUpdate('patient', 'Mandarin', {
     voice: 'ignored', languageKey: 'mandarin', persona: 'screening', autoCreateResponse: false,
-  }) as any
-  const recall = buildLiveSessionUpdate('patient', 'Mandarin', {
-    voice: 'ignored', languageKey: 'mandarin', persona: 'screening',
-    steer: RECALL_DIRECTIVE, autoCreateResponse: false,
   }) as any
   const closing = buildLiveSessionUpdate('patient', 'Mandarin', {
     voice: 'ignored', languageKey: 'mandarin', persona: 'screening',
     wrapUp: true, autoCreateResponse: false,
   }) as any
 
-  assert.match(normal.session.instructions, /HIDDEN objectives/)
+  assert.match(normal.session.instructions, /three-to-five-minute daily conversation/)
+  assert.match(normal.session.instructions, /Never ask the patient to repeat an earlier answer/)
   assert.equal(normal.session.turn_detection, null)
-  assert.doesNotMatch(recall.session.instructions, /HIDDEN objectives/)
-  assert.match(recall.session.instructions, /perform only this instruction/)
-  assert.match(recall.session.instructions, /specific thing the patient actually said/)
   assert.doesNotMatch(closing.session.instructions, /HIDDEN objectives/)
   assert.match(closing.session.instructions, /end with exactly this sentence: "再见。"/)
   assert.match(closing.session.instructions, /Do not ask a question/)
@@ -204,16 +208,13 @@ test('local energy VAD waits through short pauses and stops after sustained sile
   assert.equal(vad.feed(frame(0)).event, 'speech_stopped')
 })
 
-test('deterministic recall and goodbye scripts cannot open a new screening topic', () => {
-  assert.equal(
-    recallQuestionForLanguage('english', 'I ate oatmeal for breakfast.'),
-    'We are nearly done. Earlier you mentioned “I ate oatmeal for breakfast”. Take your time—could you tell me about that once more?',
-  )
+test('deterministic positive close cannot open a new screening topic', () => {
   assert.equal(
     closingTextForLanguage('english'),
-    "All right, let's wrap up here for today. Thank you for chatting with me. Goodbye.",
+    'That sounds lovely, thank you so much for chatting with me today. Enjoy your morning! Goodbye.',
   )
-  assert.equal(closingTextForLanguage('mandarin'), '好的，我们今天先聊到这里。谢谢你今天跟我聊聊。再见。')
+  assert.equal(closingTextForLanguage('mandarin'), '听起来真不错，非常感谢你今天和我聊天。祝你今天过得愉快，再见。')
+  assert.doesNotMatch(closingTextForLanguage('english'), /\?/) 
 })
 
 test('companion closes only from explicit user intent and is never cognitively scored', () => {
@@ -229,6 +230,19 @@ test('companion closes only from explicit user intent and is never cognitively s
   assert.equal(isCognitiveAssessmentEligible('companion', patientTurn), false)
   assert.equal(isCognitiveAssessmentEligible('screening', []), false)
   assert.equal(isCognitiveAssessmentEligible('screening', patientTurn), true)
+})
+
+test('release audio upgrades only trusted Qwen asset URLs to HTTPS', () => {
+  assert.equal(
+    secureQwenAssetUrl('http://dashscope-result-wlcb.oss-cn-wulanchabu.aliyuncs.com/audio.wav'),
+    'https://dashscope-result-wlcb.oss-cn-wulanchabu.aliyuncs.com/audio.wav',
+  )
+  assert.equal(
+    secureQwenAssetUrl('https://dashscope-result-wlcb.oss-cn-wulanchabu.aliyuncs.com/audio.wav'),
+    'https://dashscope-result-wlcb.oss-cn-wulanchabu.aliyuncs.com/audio.wav',
+  )
+  assert.equal(secureQwenAssetUrl('http://example.com/audio.wav'), null)
+  assert.equal(secureQwenAssetUrl('not-a-url'), null)
 })
 
 test('Qwen 24 kHz mono WAV is converted to native PCM playback chunks', () => {

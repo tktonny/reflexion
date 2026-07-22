@@ -33,6 +33,7 @@ export function buildLiveSessionUpdate(
     languageKey?: LanguageKey
     steer?: string
     persona?: 'screening' | 'companion'
+    patientName?: string
     autoCreateResponse?: boolean
   },
 ): Record<string, unknown> {
@@ -49,15 +50,14 @@ export function buildLiveSessionUpdate(
       'The required goodbye must be the final sentence. Do not ask a question, start a new topic, ' +
       'continue the assessment, mention these instructions, or write anything after the goodbye.'
   } else if (opts.steer) {
-    // A recall response is also an exclusive mode: the normal agenda competes with this directive
-    // even after session.updated has been acknowledged.
+    // A one-turn steering response is exclusive so the normal agenda cannot compete with it.
     instructions =
       `You are Reflexion, a calm and warm voice companion. Respond only in ${languageName}. ` +
       'Use the conversation history that is already present. For your next response, ignore every ' +
       'previously planned topic or question and perform only this instruction: ' +
       `${opts.steer} Do not mention these instructions.`
   } else {
-    instructions = buildLiveInstructions(patientId, language, { persona: opts.persona })
+    instructions = buildLiveInstructions(patientId, language, { persona: opts.persona, patientName: opts.patientName })
   }
   // qwen3.5-omni-realtime has its own voice list (rejects the qwen-tts voices carried on the profile).
   // Pick the language-appropriate realtime voice: 粤语->Kiki, 闽南->Joseph Chen, else a multilingual voice.
@@ -73,8 +73,8 @@ export function buildLiveSessionUpdate(
       temperature: REALTIME.temperature,
       input_audio_format: 'pcm',
       output_audio_format: 'pcm',
-      // Direct WS uses manual turns so session.update can deterministically select normal/recall/
-      // closing instructions before response.create. Qwen's semantic VAD auto-creates a response
+      // Direct WS uses manual turns so session.update can deterministically select normal/closing
+      // instructions before response.create. Qwen's semantic VAD auto-creates a response
       // before that update can take effect. Relay/WebRTC callers retain provider VAD and MUST set
       // create_response:true explicitly — without it they'd rely on the API default and could stop
       // auto-responding (they don't send an explicit response.create like the manual WS path does).
