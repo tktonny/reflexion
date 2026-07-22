@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -11,10 +12,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getApiUrl } from '../src/lib/apiUrl';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiGet, apiSend } from '../src/lib/apiClient';
 import { getStoredAuthSession, setStoredAuthSession } from '../src/lib/authSession';
+import {
+  getPushNotificationDeviceRegistration,
+  registerPushNotificationDevice,
+} from '../src/lib/pushNotifications';
 
 type Relationship = 'parent' | 'sibling' | 'spouse' | 'inlaw' | 'grandpa' | 'grandma' | 'other';
 type Gender = 'male' | 'female' | 'other';
@@ -54,6 +61,25 @@ type NotificationForm = {
   pushNotificationsEnabled: boolean;
   alertSensitivity: AlertSensitivity;
   preferredDailySummaryTime: SummaryTime;
+};
+
+type LatestConfigResponse = {
+  patients?: unknown[];
+};
+
+type CreateConfigResponse = {
+  nurseId?: string;
+  email?: string;
+  name?: string;
+  patientCount?: number;
+};
+
+type AddPatientsResponse = {
+  patientCount?: number;
+};
+
+type CreateConfigVariables = {
+  pushDeviceRegistration: Awaited<ReturnType<typeof getPushNotificationDeviceRegistration>> | null;
 };
 
 const RELATIONSHIP_OPTIONS: { value: Relationship; label: string }[] = [
@@ -117,10 +143,14 @@ const blankPatient = (index: number): PatientForm => ({
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { mode } = useLocalSearchParams<{ mode?: string }>();
+  const queryClient = useQueryClient();
+  const { mode, returnTo } = useLocalSearchParams<{ mode?: string; returnTo?: string }>();
   const isAddPatientMode = mode === 'add-patient';
+  const addPatientReturnPath = returnTo === 'settings' ? '/(tabs)/settings' : '/(tabs)';
+  const storedSession = getStoredAuthSession();
   const [step, setStep] = useState(isAddPatientMode ? 2 : 1);
   const [selectedPatientIndex, setSelectedPatientIndex] = useState(0);
+  const [existingPatientCount, setExistingPatientCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [account, setAccount] = useState<AccountForm>({
@@ -138,16 +168,79 @@ export default function OnboardingScreen() {
   });
 
   const selectedPatient = patients[selectedPatientIndex];
+  const displayedPatientNumber = existingPatientCount + selectedPatientIndex + 1;
+  const displayedTotalPatientCount = existingPatientCount + patients.length;
   const canGoBack = isAddPatientMode || step > 1;
   const totalSteps = isAddPatientMode ? 2 : 4;
   const displayStep = isAddPatientMode ? step - 1 : step;
   const stepTitle = useMemo(() => {
-    if (isAddPatientMode && step === 2) return `Add elderly profile ${selectedPatientIndex + 1}`;
+    if (isAddPatientMode && step === 2) return `Add elderly profile ${displayedPatientNumber}`;
     if (step === 1) return 'Account creation';
     if (step === 2) return `Elderly profile ${selectedPatientIndex + 1}`;
     if (step === 3) return 'Mirror linking';
     return 'Notification setup';
-  }, [isAddPatientMode, selectedPatientIndex, step]);
+  }, [displayedPatientNumber, isAddPatientMode, selectedPatientIndex, step]);
+
+  const existingConfigQuery = useQuery({
+    enabled: isAddPatientMode && Boolean(storedSession?.nurseId),
+    queryKey: ['latestConfig', storedSession?.nurseId || 'latest'],
+    queryFn: () =>
+      apiGet<LatestConfigResponse>(
+        `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(storedSession?.nurseId || '')}`,
+      ),
+  });
+  const { refetch: refetchExistingConfig } = existingConfigQuery;
+
+  useFocusEffect(
+    useCallback(() => {
+      if (isAddPatientMode && storedSession?.nurseId) {
+        void refetchExistingConfig();
+      }
+    }, [isAddPatientMode, refetchExistingConfig, storedSession?.nurseId]),
+  );
+
+  useEffect(() => {
+    if (!existingConfigQuery.data) return;
+    setExistingPatientCount(
+      Array.isArray(existingConfigQuery.data.patients) ? existingConfigQuery.data.patients.length : 0,
+    );
+  }, [existingConfigQuery.data]);
+
+  useEffect(() => {
+    if (existingConfigQuery.error) {
+      console.warn('[Onboarding] load existing patient count failed', existingConfigQuery.error);
+    }
+  }, [existingConfigQuery.error]);
+
+  const createConfigMutation = useMutation({
+    mutationFn: ({ pushDeviceRegistration }: CreateConfigVariables) =>
+      apiSend<CreateConfigResponse>('/api/nurse-patient-config/create', {
+        method: 'POST',
+        body: JSON.stringify({
+          account,
+          patients: patients.map((patient) => ({
+            ...patient,
+            age: Number(patient.age),
+          })),
+          notifications,
+          caregiverDevice: pushDeviceRegistration?.device,
+        }),
+      }),
+  });
+
+  const addPatientsMutation = useMutation({
+    mutationFn: () =>
+      apiSend<AddPatientsResponse>('/api/nurse-patient-config/add-patients', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          nurseId: getStoredAuthSession()?.nurseId,
+          patients: patients.map((patient) => ({
+            ...patient,
+            age: Number(patient.age),
+          })),
+        }),
+      }),
+  });
 
   function updatePatient(index: number, updates: Partial<PatientForm>) {
     setPatients((current) =>
@@ -252,25 +345,14 @@ export default function OnboardingScreen() {
     setIsSubmitting(true);
     setNotice(null);
     try {
-      const response = await fetch(getApiUrl('/api/nurse-patient-config/create'), {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          account,
-          patients: patients.map((patient) => ({
-            ...patient,
-            age: Number(patient.age),
-          })),
-          notifications,
-        }),
-      });
-      const body = await response.json();
-
-      if (!response.ok) {
-        throw new Error(body?.error || 'Unable to create onboarding profile.');
+      const pushDeviceRegistration = notifications.pushNotificationsEnabled
+        ? await getPushNotificationDeviceRegistration()
+        : null;
+      if (pushDeviceRegistration && !pushDeviceRegistration.ok) {
+        console.warn('[Onboarding] push registration preparation failed', pushDeviceRegistration.reason);
       }
+
+      const body = await createConfigMutation.mutateAsync({ pushDeviceRegistration });
 
       if (body?.nurseId && body?.email) {
         await setStoredAuthSession({
@@ -278,11 +360,20 @@ export default function OnboardingScreen() {
           name: body.name || account.name.trim(),
           email: body.email,
         });
+
+        if (notifications.pushNotificationsEnabled && !pushDeviceRegistration?.device) {
+          const registration = await registerPushNotificationDevice({ nurseId: body.nurseId });
+          if (!registration.ok) {
+            console.warn('[Onboarding] push registration failed', registration.reason);
+          }
+        }
       }
 
+      await queryClient.invalidateQueries({ queryKey: ['latestConfig'] });
+      await queryClient.refetchQueries({ queryKey: ['latestConfig'], type: 'all' });
       setNotice({
         type: 'success',
-        message: `Created caregiver profile with ${body.patientCount} elderly profile${body.patientCount === 1 ? '' : 's'}.`,
+        message: `Created caregiver profile with ${body.patientCount || patients.length} elderly profile${body.patientCount === 1 ? '' : 's'}.`,
       });
       setTimeout(() => router.replace('/(tabs)'), 900);
     } catch (err) {
@@ -301,30 +392,15 @@ export default function OnboardingScreen() {
     setIsSubmitting(true);
     setNotice(null);
     try {
-      const response = await fetch(getApiUrl('/api/nurse-patient-config/add-patients'), {
-        method: 'PATCH',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          nurseId: getStoredAuthSession()?.nurseId,
-          patients: patients.map((patient) => ({
-            ...patient,
-            age: Number(patient.age),
-          })),
-        }),
-      });
-      const body = await response.json();
+      const body = await addPatientsMutation.mutateAsync();
 
-      if (!response.ok) {
-        throw new Error(body?.error || 'Unable to add loved one.');
-      }
-
+      await queryClient.invalidateQueries({ queryKey: ['latestConfig'] });
+      await queryClient.refetchQueries({ queryKey: ['latestConfig'], type: 'all' });
       setNotice({
         type: 'success',
-        message: `Added ${body.patientCount} loved one${body.patientCount === 1 ? '' : 's'}.`,
+        message: `Added ${body.patientCount || patients.length} loved one${body.patientCount === 1 ? '' : 's'}.`,
       });
-      setTimeout(() => router.replace('/(tabs)/settings'), 900);
+      setTimeout(() => router.replace(addPatientReturnPath), 900);
     } catch (err) {
       setNotice({
         type: 'error',
@@ -345,7 +421,7 @@ export default function OnboardingScreen() {
           <View style={styles.header}>
             <Text style={styles.eyebrow}>Step {displayStep} of {totalSteps}</Text>
             <Text style={styles.title}>{stepTitle}</Text>
-            <Text style={styles.subtitle}>{getStepSubtitle(step, patients.length)}</Text>
+            <Text style={styles.subtitle}>{getStepSubtitle(step, displayedTotalPatientCount)}</Text>
           </View>
 
           <View style={styles.progressTrack}>
@@ -378,6 +454,7 @@ export default function OnboardingScreen() {
               addPatient={addPatient}
               patient={selectedPatient}
               patientIndex={selectedPatientIndex}
+              patientNumberOffset={existingPatientCount}
               patients={patients}
               removePatient={removePatient}
               selectedPatientIndex={selectedPatientIndex}
@@ -400,7 +477,7 @@ export default function OnboardingScreen() {
             disabled={!canGoBack || isSubmitting}
             onPress={() => {
               if (isAddPatientMode && step === 2) {
-                router.replace('/(tabs)/settings');
+                router.replace(addPatientReturnPath);
                 return;
               }
 
@@ -498,6 +575,7 @@ function ElderlyStep({
   addPatient,
   patient,
   patientIndex,
+  patientNumberOffset,
   patients,
   removePatient,
   selectedPatientIndex,
@@ -507,6 +585,7 @@ function ElderlyStep({
   addPatient: () => void;
   patient: PatientForm;
   patientIndex: number;
+  patientNumberOffset: number;
   patients: PatientForm[];
   removePatient: (index: number) => void;
   selectedPatientIndex: number;
@@ -526,12 +605,12 @@ function ElderlyStep({
               style={styles.patientTabLabel}
             >
               <Text style={[styles.patientTabText, selectedPatientIndex === index && styles.patientTabTextActive]}>
-                {item.name.trim() || `Person ${index + 1}`}
+                {item.name.trim() || `Person ${patientNumberOffset + index + 1}`}
               </Text>
             </TouchableOpacity>
             {patients.length > 1 ? (
               <TouchableOpacity
-                accessibilityLabel={`Remove ${item.name.trim() || `Person ${index + 1}`}`}
+                accessibilityLabel={`Remove ${item.name.trim() || `Person ${patientNumberOffset + index + 1}`}`}
                 onPress={() => removePatient(index)}
                 style={[styles.patientTabRemove, selectedPatientIndex === index && styles.patientTabRemoveActive]}
               >
@@ -758,9 +837,31 @@ function NotificationStep({
 }
 
 function PhotoInput({ photoUrl, onChange }: { photoUrl: string; onChange: (value: string) => void }) {
+  async function pickImage() {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Photo access needed', 'Allow photo library access to choose a profile photo.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets[0]?.uri) {
+      onChange(result.assets[0].uri);
+    }
+  }
+
   if (Platform.OS === 'web') {
     return (
       <View style={styles.uploadBox}>
+        {photoUrl ? (
+          <Image source={{ uri: photoUrl }} style={styles.photoPreview} />
+        ) : null}
         {React.createElement('input', {
           accept: 'image/*',
           type: 'file',
@@ -785,14 +886,23 @@ function PhotoInput({ photoUrl, onChange }: { photoUrl: string; onChange: (value
   }
 
   return (
-    <TextInput
-      autoCapitalize="none"
-      onChangeText={onChange}
-      placeholder="Photo URL for now"
-      placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-      style={styles.input}
-      value={photoUrl}
-    />
+    <View style={styles.uploadBox}>
+      {photoUrl ? (
+        <Image source={{ uri: photoUrl }} style={styles.photoPreview} />
+      ) : (
+        <View style={styles.photoPlaceholder}>
+          <Text style={styles.photoPlaceholderText}>No photo selected</Text>
+        </View>
+      )}
+      <TouchableOpacity activeOpacity={0.8} onPress={() => void pickImage()} style={styles.photoButton}>
+        <Text style={styles.photoButtonText}>{photoUrl ? 'Change photo' : 'Choose photo'}</Text>
+      </TouchableOpacity>
+      {photoUrl ? (
+        <TouchableOpacity activeOpacity={0.8} onPress={() => onChange('')} style={styles.clearPhotoButton}>
+          <Text style={styles.clearPhotoText}>Remove photo</Text>
+        </TouchableOpacity>
+      ) : null}
+    </View>
   );
 }
 
@@ -1047,6 +1157,49 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 10,
     padding: 14,
+  },
+  photoPreview: {
+    alignSelf: 'center',
+    backgroundColor: '#F4F0EA',
+    borderRadius: 12,
+    height: 132,
+    width: 132,
+  },
+  photoPlaceholder: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: '#F4F0EA',
+    borderColor: '#E7DED2',
+    borderRadius: 12,
+    borderWidth: 1,
+    height: 132,
+    justifyContent: 'center',
+    width: 132,
+  },
+  photoPlaceholderText: {
+    color: '#A69C92',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  photoButton: {
+    alignItems: 'center',
+    backgroundColor: '#87566A',
+    borderRadius: 8,
+    paddingVertical: 11,
+  },
+  photoButtonText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  clearPhotoButton: {
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  clearPhotoText: {
+    color: '#87566A',
+    fontSize: 12,
+    fontWeight: '800',
   },
   uploadText: {
     color: '#756C64',

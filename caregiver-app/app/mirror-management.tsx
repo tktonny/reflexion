@@ -1,6 +1,7 @@
 import { Feather } from '@expo/vector-icons';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -13,7 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getApiUrl } from '../src/lib/apiUrl';
+import { apiGet, apiSend } from '../src/lib/apiClient';
 import { getStoredAuthSession } from '../src/lib/authSession';
 
 type MirrorPatient = {
@@ -31,40 +32,51 @@ type MirrorPatient = {
 
 export default function MirrorManagementScreen() {
   const router = useRouter();
-  const [patients, setPatients] = useState<MirrorPatient[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [savingPatientId, setSavingPatientId] = useState('');
+  const queryClient = useQueryClient();
   const session = getStoredAuthSession();
-
-  const loadMirrors = useCallback(async () => {
-    if (!session?.nurseId) {
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        getApiUrl(`/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session.nurseId)}`),
+  const mirrorsQuery = useQuery({
+    enabled: Boolean(session?.nurseId),
+    queryKey: ['mirrors', session?.nurseId || ''],
+    queryFn: async () => {
+      const body = await apiGet<{ patients?: MirrorPatient[] }>(
+        `/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session?.nurseId || '')}`,
       );
-      const body = await response.json();
-
-      if (!response.ok) {
-        throw new Error(body?.error || 'Unable to load linked mirrors.');
-      }
-
-      setPatients(Array.isArray(body?.patients) ? body.patients : []);
-    } catch (err) {
-      showMessage('Unable to load mirrors', err instanceof Error ? err.message : 'Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [session?.nurseId]);
+      return Array.isArray(body?.patients) ? body.patients : [];
+    },
+  });
+  const patchMirrorMutation = useMutation({
+    mutationFn: (body: { action: 'unlink'; patientId: string }) => apiSend<{
+      deletedMirrorMapCount?: number;
+      deletedPairingSessionCount?: number;
+    }>('/api/nurse-patient-config/mirrors', {
+      method: 'PATCH',
+      body: JSON.stringify({
+        ...body,
+        nurseId: session?.nurseId,
+      }),
+    }),
+    onSuccess: async (result) => {
+      await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.nurseId || ''] });
+      await queryClient.invalidateQueries({ queryKey: ['latestConfig'] });
+      showMessage(
+        'Mirror unlinked',
+        `Removed ${result?.deletedMirrorMapCount ?? 0} mirror map and ${result?.deletedPairingSessionCount ?? 0} pairing session(s). You can add a new connection for this patient.`,
+      );
+    },
+    onError: (err) => {
+      showMessage('Unable to update mirror', err instanceof Error ? err.message : 'Please try again.');
+    },
+  });
+  const patients = mirrorsQuery.data || [];
+  const savingPatientId = patchMirrorMutation.variables?.patientId || '';
+  const { refetch: refetchMirrors } = mirrorsQuery;
 
   useFocusEffect(
     useCallback(() => {
-      void loadMirrors();
-    }, [loadMirrors]),
+      if (session?.nurseId) {
+        void refetchMirrors();
+      }
+    }, [refetchMirrors, session?.nurseId]),
   );
 
   function confirmUnlink(patient: MirrorPatient) {
@@ -98,34 +110,8 @@ export default function MirrorManagementScreen() {
     action: 'unlink';
     patientId: string;
   }) {
-    if (!session?.nurseId || savingPatientId) return;
-
-    setSavingPatientId(body.patientId);
-    try {
-      const response = await fetch(getApiUrl('/api/nurse-patient-config/mirrors'), {
-        method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          ...body,
-          nurseId: session.nurseId,
-        }),
-      });
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result?.error || 'Unable to update mirror connection.');
-      }
-
-      await loadMirrors();
-      showMessage(
-        'Mirror unlinked',
-        `Removed ${result?.deletedMirrorMapCount ?? 0} mirror map and ${result?.deletedPairingSessionCount ?? 0} pairing session(s). You can add a new connection for this patient.`,
-      );
-    } catch (err) {
-      showMessage('Unable to update mirror', err instanceof Error ? err.message : 'Please try again.');
-    } finally {
-      setSavingPatientId('');
-    }
+    if (!session?.nurseId || patchMirrorMutation.isPending) return;
+    patchMirrorMutation.mutate(body);
   }
 
   function goBack() {
@@ -150,7 +136,7 @@ export default function MirrorManagementScreen() {
           </View>
         </View>
 
-        {isLoading ? (
+        {mirrorsQuery.isLoading ? (
           <View style={styles.loadingCard}>
             <ActivityIndicator color="#87566A" />
             <Text style={styles.loadingText}>Loading mirror connections.</Text>

@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import React, { useCallback } from 'react';
 import {
   ActivityIndicator,
-  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import { getApiUrl } from '../../src/lib/apiUrl';
+import { apiGet } from '../../src/lib/apiClient';
 import { getStoredAuthSession } from '../../src/lib/authSession';
 
 const STATUS_DOT: Record<string, string> = {
@@ -46,54 +47,29 @@ type LatestConfigResponse = {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [configuredPatients, setConfiguredPatients] = useState<DashboardPatient[]>([]);
-  const [caregiverName, setCaregiverName] = useState('');
-  const [isLoadingConfig, setIsLoadingConfig] = useState(true);
+  const session = getStoredAuthSession();
+  const latestConfigQuery = useQuery({
+    queryKey: ['latestConfig', session?.nurseId || 'latest'],
+    queryFn: () => apiGet<LatestConfigResponse>(
+      `/api/nurse-patient-config/latest${session?.nurseId ? `?nurseId=${encodeURIComponent(session.nurseId)}` : ''}`,
+    ),
+  });
+  const { refetch: refetchLatestConfig } = latestConfigQuery;
+
+  useFocusEffect(
+    useCallback(() => {
+      void refetchLatestConfig();
+    }, [refetchLatestConfig]),
+  );
+  const configuredPatients = Array.isArray(latestConfigQuery.data?.patients) ? latestConfigQuery.data.patients : [];
+  const caregiverName = typeof latestConfigQuery.data?.caregiverName === 'string' ? latestConfigQuery.data.caregiverName : '';
+  const isLoadingConfig = latestConfigQuery.isLoading;
   const today = new Date().toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const displayName = getFirstName(caregiverName) || 'there';
 
-  const doingWell = configuredPatients.filter((patient) => patient.status === 'doing_well').length;
-  const checkIn = configuredPatients.filter((patient) => patient.status === 'worth_checking').length;
-  const attention = configuredPatients.filter((patient) => patient.status === 'needs_attention').length;
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadLatestConfig = async () => {
-      setIsLoadingConfig(true);
-      try {
-        const session = getStoredAuthSession();
-        const query = session?.nurseId ? `?nurseId=${encodeURIComponent(session.nurseId)}` : '';
-        const url = getApiUrl(`/api/nurse-patient-config/latest${query}`);
-        const response = await fetch(url);
-        const body = await readJsonResponse<LatestConfigResponse>(response, url);
-
-        if (!response.ok) {
-          throw new Error(body?.error || 'Unable to load configured patients.');
-        }
-
-        if (isMounted) {
-          setConfiguredPatients(Array.isArray(body?.patients) ? body.patients : []);
-          setCaregiverName(typeof body?.caregiverName === 'string' ? body.caregiverName : '');
-        }
-      } catch (err) {
-        console.warn('[HomeScreen] load configured patients failed', err);
-        if (isMounted) {
-          setConfiguredPatients([]);
-          setCaregiverName('');
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingConfig(false);
-        }
-      }
-    };
-
-    void loadLatestConfig();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const doingWell = configuredPatients.filter((patient) => getPatientStatus(patient.status) === 'doing_well').length;
+  const checkIn = configuredPatients.filter((patient) => getPatientStatus(patient.status) === 'worth_checking').length;
+  const attention = configuredPatients.filter((patient) => getPatientStatus(patient.status) === 'needs_attention').length;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -104,7 +80,7 @@ export default function HomeScreen() {
             <Text style={styles.greeting}>Good morning, {displayName}</Text>
             <Text style={styles.date}>{today}</Text>
           </View>
-          <TouchableOpacity onPress={() => router.push('/onboarding?mode=add-patient')} style={styles.addBtn}>
+          <TouchableOpacity onPress={() => router.push('/onboarding?mode=add-patient&returnTo=home')} style={styles.addBtn}>
             <Feather name="plus" size={16} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
@@ -124,6 +100,8 @@ export default function HomeScreen() {
           <LoadingCard />
         ) : configuredPatients.length ? (
           configuredPatients.map((patient) => {
+            const patientStatus = getPatientStatus(patient.status);
+            const patientStatusMeta = STATUS_COPY[patientStatus];
             return (
               <TouchableOpacity
                 activeOpacity={0.8}
@@ -140,13 +118,17 @@ export default function HomeScreen() {
                 style={styles.patientCard}
               >
                 <View style={styles.patientAvatar}>
-                  <Text style={styles.patientAvatarText}>{getInitials(patient.name)}</Text>
+                  {patient.photoUrl ? (
+                    <Image source={{ uri: patient.photoUrl }} style={styles.patientAvatarImage} />
+                  ) : (
+                    <Text style={styles.patientAvatarText}>{getInitials(patient.name)}</Text>
+                  )}
                 </View>
                 <View style={styles.patientInfo}>
                   <Text style={styles.patientName}>{patient.name}</Text>
                   <View style={styles.patientStatusRow}>
-                    <View style={[styles.patientStatusDot, { backgroundColor: STATUS_COPY[patient.status].color }]} />
-                    <Text style={styles.patientStatusText}>{patient.statusLabel}</Text>
+                    <View style={[styles.patientStatusDot, { backgroundColor: patientStatusMeta.color }]} />
+                    <Text style={styles.patientStatusText}>{patient.statusLabel || patientStatusMeta.label}</Text>
                   </View>
                   <Text style={styles.patientMeta}>{patient.lastSpokenLabel}</Text>
                 </View>
@@ -189,19 +171,6 @@ function EmptyCard() {
   );
 }
 
-async function readJsonResponse<T>(response: Response, url: string): Promise<T> {
-  const text = await response.text();
-
-  try {
-    return text ? JSON.parse(text) as T : {} as T;
-  } catch {
-    const preview = text.replace(/\s+/g, ' ').trim().slice(0, 120);
-    throw new Error(
-      `Expected JSON from ${url}, received ${response.status} ${response.statusText}: ${preview}`,
-    );
-  }
-}
-
 function getFirstName(name: string) {
   return name.trim().split(/\s+/)[0] || '';
 }
@@ -213,25 +182,32 @@ function getInitials(name: string) {
 }
 
 function toProfileRoutePatient(patient: DashboardPatient) {
+  const status = getPatientStatus(patient.status);
   return {
     name: patient.name,
     phoneNumber: patient.phoneNumber,
-    status: patient.status,
-    statusLabel: patient.statusLabel,
+    photoUrl: patient.photoUrl,
+    status,
+    statusLabel: patient.statusLabel || STATUS_COPY[status].label,
     lastSpokenAt: patient.lastSpokenAt,
     lastSpokenLabel: patient.lastSpokenLabel,
     duration: patient.duration,
   };
 }
 
+function getPatientStatus(status: unknown): PatientStatus {
+  if (status === 'doing_well' || status === 'green') return 'doing_well';
+  if (status === 'worth_checking' || status === 'yellow' || status === 'amber') return 'worth_checking';
+  if (status === 'needs_attention' || status === 'red') return 'needs_attention';
+  return 'needs_attention';
+}
+
 function SummaryChip({ dot, count, label }: { dot: string; count: number; label: string }) {
   return (
     <View style={styles.chip}>
       <Text style={styles.chipCount}>{count}</Text>
-      <View style={styles.chipRow}>
-        <View style={[styles.chipDot, { backgroundColor: dot }]} />
-        <Text style={styles.chipLabel}>{label}</Text>
-      </View>
+      <View style={[styles.chipDot, { backgroundColor: dot }]} />
+      <Text style={styles.chipLabel} numberOfLines={2}>{label}</Text>
     </View>
   );
 }
@@ -271,12 +247,12 @@ const styles = StyleSheet.create({
   summaryStrip: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: '#E7DED2',
-    padding: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 16,
     marginBottom: 28,
-    justifyContent: 'space-around',
     alignItems: 'center',
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
@@ -284,12 +260,18 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 2,
   },
-  chip: { alignItems: 'center', gap: 6 },
-  chipCount: { fontSize: 26, fontWeight: '500', color: '#2B2522', fontFamily: 'Georgia' },
-  chipRow: { alignItems: 'center', gap: 6 },
+  chip: { alignItems: 'center', flex: 1, gap: 5, minWidth: 0 },
+  chipCount: { fontSize: 24, fontWeight: '500', color: '#2B2522', fontFamily: 'Georgia', lineHeight: 29 },
   chipDot: { width: 7, height: 7, borderRadius: 999 },
-  chipLabel: { color: '#756C64', fontSize: 12, textAlign: 'center' },
-  divider: { width: 1, height: 36, backgroundColor: '#E7DED2' },
+  chipLabel: {
+    color: '#756C64',
+    fontSize: 11,
+    lineHeight: 14,
+    maxWidth: 82,
+    minHeight: 28,
+    textAlign: 'center',
+  },
+  divider: { width: 1, height: 46, backgroundColor: '#E7DED2', marginHorizontal: 4 },
 
   sectionTitle: {
     fontSize: 17,
@@ -320,7 +302,12 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     height: 56,
     justifyContent: 'center',
+    overflow: 'hidden',
     width: 56,
+  },
+  patientAvatarImage: {
+    height: '100%',
+    width: '100%',
   },
   patientAvatarText: {
     color: '#756C64',

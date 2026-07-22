@@ -1,15 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import StatusBadge from '../../src/components/StatusBadge';
 import MiniSparkline from '../../src/components/MiniSparkline';
 import type { Status } from '../../src/data/mockData';
 import { fetchPatientTrend } from '../../src/lib/patientTrendClient';
-import { getApiUrl } from '../../src/lib/apiUrl';
+import { apiSend } from '../../src/lib/apiClient';
 
 const AVATAR_BG: Record<Status, string> = {
   green: '#F0F3ED',
@@ -26,6 +27,7 @@ const AVATAR_TEXT: Record<Status, string> = {
 type RealPatientProfile = {
   name: string;
   phoneNumber: string;
+  photoUrl?: string;
   status: 'doing_well' | 'worth_checking' | 'needs_attention';
   statusLabel: string;
   lastSpokenAt: string | null;
@@ -43,34 +45,40 @@ type RealTrendDay = {
 export default function ProfileScreen() {
   const { id, patient } = useLocalSearchParams<{ id: string; patient?: string }>();
   const router = useRouter();
-  const [realTrend, setRealTrend] = useState<RealTrendDay[]>([]);
+  const queryClient = useQueryClient();
   const [generatedSummary, setGeneratedSummary] = useState('');
-  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const shouldLoadRealProfile = Boolean(id && !id.startsWith('el-'));
   const realProfile = useMemo(() => parsePatientParam(patient), [patient]);
-
-  useEffect(() => {
-    if (!shouldLoadRealProfile) {
-      return;
-    }
-
-    let isMounted = true;
-    const loadTrend = async () => {
-      try {
-        const trend = await fetchPatientTrend(id, 7, { forceRefresh: true });
-        if (isMounted) {
-          setRealTrend(trend);
-        }
-      } catch (err) {
-        console.error('[ProfileScreen] load patient trend failed', err);
+  const trendQuery = useQuery({
+    enabled: shouldLoadRealProfile,
+    queryKey: ['patientTrend', id, 7],
+    queryFn: () => fetchPatientTrend(id, 7),
+  });
+  const { refetch: refetchTrend } = trendQuery;
+  useFocusEffect(
+    useCallback(() => {
+      if (shouldLoadRealProfile) {
+        void refetchTrend();
       }
-    };
-
-    void loadTrend();
-    return () => {
-      isMounted = false;
-    };
-  }, [id, shouldLoadRealProfile]);
+    }, [refetchTrend, shouldLoadRealProfile]),
+  );
+  const realTrend = trendQuery.data || [];
+  const summaryMutation = useMutation({
+    mutationFn: () => apiSend<{ summary?: string }>('/api/patient-summary', {
+      method: 'POST',
+      body: JSON.stringify({ patientId: id }),
+    }),
+    onSuccess: async (body) => {
+      setGeneratedSummary(body?.summary || 'No summary generated.');
+      await queryClient.invalidateQueries({ queryKey: ['sessionDay', id] });
+    },
+    onError: (err) => {
+      Alert.alert(
+        'Unable to generate summary',
+        err instanceof Error ? err.message : 'Unable to generate summary.',
+      );
+    },
+  });
 
   const realInitials = useMemo(
     () => (realProfile ? getNameInitials(realProfile.name) : ''),
@@ -93,7 +101,11 @@ export default function ProfileScreen() {
             <View style={styles.bannerTop}>
               <StatusBadge status={status} label={realProfile.statusLabel} />
               <View style={[styles.avatar, { backgroundColor: AVATAR_BG[status] }]}>
-                <Text style={[styles.avatarText, { color: AVATAR_TEXT[status] }]}>{realInitials}</Text>
+                {realProfile.photoUrl ? (
+                  <Image source={{ uri: realProfile.photoUrl }} style={styles.avatarImage} />
+                ) : (
+                  <Text style={[styles.avatarText, { color: AVATAR_TEXT[status] }]}>{realInitials}</Text>
+                )}
               </View>
             </View>
             <Text style={styles.bannerName}>{realProfile.name}</Text>
@@ -110,13 +122,13 @@ export default function ProfileScreen() {
             <View style={styles.summaryHeader}>
               <Text style={styles.cardTitle}>Today's summary</Text>
               <TouchableOpacity
-                disabled={isGeneratingSummary}
-                onPress={() => generateSummary(id, setGeneratedSummary, setIsGeneratingSummary)}
-                style={[styles.summaryBtn, isGeneratingSummary && styles.summaryBtnDisabled]}
+                disabled={summaryMutation.isPending}
+                onPress={() => summaryMutation.mutate()}
+                style={[styles.summaryBtn, summaryMutation.isPending && styles.summaryBtnDisabled]}
               >
                 <Feather name="cpu" size={14} color="#87566A" />
                 <Text style={styles.summaryBtnText}>
-                  {isGeneratingSummary ? 'Generating...' : 'Generate summary'}
+                  {summaryMutation.isPending ? 'Generating...' : 'Generate'}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -184,6 +196,7 @@ function parsePatientParam(value?: string): RealPatientProfile | null {
     return {
       name: parsed.name,
       phoneNumber: parsed.phoneNumber || '',
+      photoUrl: parsed.photoUrl || '',
       status: parsed.status || 'needs_attention',
       statusLabel: parsed.statusLabel || 'Needs attention',
       lastSpokenAt: parsed.lastSpokenAt || null,
@@ -206,37 +219,6 @@ async function callPatient(profile: RealPatientProfile) {
     await Linking.openURL(`tel:${phoneNumber}`);
   } catch {
     Alert.alert('Unable to call', `Could not open the phone app for ${profile.phoneNumber}.`);
-  }
-}
-
-async function generateSummary(
-  patientId: string,
-  setGeneratedSummary: (value: string) => void,
-  setIsGeneratingSummary: (value: boolean) => void,
-) {
-  setIsGeneratingSummary(true);
-  try {
-    const response = await fetch(getApiUrl('/api/patient-summary'), {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ patientId }),
-    });
-    const body = await response.json();
-
-    if (!response.ok) {
-      throw new Error(body?.error || 'Unable to generate summary.');
-    }
-
-    setGeneratedSummary(body?.summary || 'No summary generated.');
-  } catch (err) {
-    Alert.alert(
-      'Unable to generate summary',
-      err instanceof Error ? err.message : 'Unable to generate summary.',
-    );
-  } finally {
-    setIsGeneratingSummary(false);
   }
 }
 
@@ -305,7 +287,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
+  avatarImage: { height: '100%', width: '100%' },
   avatarText: { fontSize: 18, fontWeight: '500', fontFamily: 'Georgia' },
   bannerName: { fontSize: 22, fontWeight: '500', color: '#2B2522', fontFamily: 'Georgia', marginBottom: 4 },
   lastSeen: { fontSize: 14, color: '#756C64' },
@@ -340,8 +324,9 @@ const styles = StyleSheet.create({
   summaryHeader: {
     alignItems: 'center',
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: 8,
     marginBottom: 10,
   },
   summaryBtn: {
@@ -352,7 +337,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     gap: 6,
-    paddingHorizontal: 12,
+    maxWidth: '100%',
+    paddingHorizontal: 10,
     paddingVertical: 7,
   },
   summaryBtnDisabled: {
@@ -362,6 +348,7 @@ const styles = StyleSheet.create({
     color: '#87566A',
     fontSize: 12,
     fontWeight: '700',
+    flexShrink: 1,
   },
   summaryText: { fontSize: 14, color: '#756C64', lineHeight: 21 },
   emptyText: { fontSize: 14, color: '#A69C92', lineHeight: 21 },

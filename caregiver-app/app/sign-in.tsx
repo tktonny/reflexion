@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -11,18 +12,47 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { getApiUrl } from '../src/lib/apiUrl';
-import { setStoredAuthSession } from '../src/lib/authSession';
+import { apiSend } from '../src/lib/apiClient';
+import { clearStoredAuthSession, setStoredAuthSession } from '../src/lib/authSession';
+import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
+
+type SignInResponse = {
+  nurseId: string;
+  name?: string;
+  email?: string;
+};
 
 export default function SignInScreen() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const signInMutation = useMutation({
+    mutationFn: () => apiSend<SignInResponse>('/api/auth/sign-in', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+    onSuccess: async (body) => {
+      await setStoredAuthSession({
+        nurseId: body.nurseId,
+        name: body.name || '',
+        email: body.email || email.trim().toLowerCase(),
+      });
+      await queryClient.invalidateQueries({ queryKey: ['latestConfig'] });
+      const registration = await registerPushNotificationDevice({ nurseId: body.nurseId });
+      if (!registration.ok) {
+        console.warn('[SignInScreen] push registration failed', registration.reason);
+      }
+      router.replace('/(tabs)');
+    },
+    onError: (err) => {
+      setError(err instanceof Error ? err.message : 'Unable to sign in.');
+    },
+  });
 
   async function signIn() {
-    if (isSubmitting) {
+    if (signInMutation.isPending) {
       return;
     }
 
@@ -32,32 +62,13 @@ export default function SignInScreen() {
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      const response = await fetch(getApiUrl('/api/auth/sign-in'), {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      const body = await response.json();
+    signInMutation.mutate();
+  }
 
-      if (!response.ok) {
-        throw new Error(body?.error || 'Unable to sign in.');
-      }
-
-      await setStoredAuthSession({
-        nurseId: body.nurseId,
-        name: body.name || '',
-        email: body.email || email.trim().toLowerCase(),
-      });
-      router.replace('/(tabs)');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to sign in.');
-    } finally {
-      setIsSubmitting(false);
-    }
+  async function goToSignUp() {
+    setError('');
+    await clearStoredAuthSession();
+    router.replace('/onboarding');
   }
 
   return (
@@ -98,15 +109,15 @@ export default function SignInScreen() {
             value={password}
           />
 
-          <TouchableOpacity disabled={isSubmitting} onPress={signIn} style={styles.signInBtn}>
-            {isSubmitting ? (
+          <TouchableOpacity disabled={signInMutation.isPending} onPress={signIn} style={styles.signInBtn}>
+            {signInMutation.isPending ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
               <Text style={styles.signInText}>Sign in</Text>
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => router.push('/onboarding')} style={styles.signUpBtn}>
+          <TouchableOpacity onPress={() => void goToSignUp()} style={styles.signUpBtn}>
             <Text style={styles.signUpText}>If you don't have an account, sign up!</Text>
           </TouchableOpacity>
         </View>

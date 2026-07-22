@@ -1,6 +1,7 @@
 import { Feather } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -13,7 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getApiUrl } from '../../src/lib/apiUrl';
+import { apiGet, apiSend } from '../../src/lib/apiClient';
 import { getStoredAuthSession } from '../../src/lib/authSession';
 
 type MirrorPatient = {
@@ -25,14 +26,45 @@ type MirrorPatient = {
 
 export default function AddMirrorConnectionScreen() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const params = useLocalSearchParams<{ patientId?: string }>();
   const session = getStoredAuthSession();
-  const [patients, setPatients] = useState<MirrorPatient[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [mirrorName, setMirrorName] = useState('');
   const [pairingCode, setPairingCode] = useState('');
   const [timezone, setTimezone] = useState('Asia/Singapore');
+  const mirrorsQuery = useQuery({
+    enabled: Boolean(session?.nurseId),
+    queryKey: ['mirrors', session?.nurseId || ''],
+    queryFn: async () => {
+      const body = await apiGet<{ patients?: MirrorPatient[] }>(
+        `/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session?.nurseId || '')}`,
+      );
+      return Array.isArray(body?.patients) ? body.patients : [];
+    },
+  });
+  const { refetch: refetchMirrors } = mirrorsQuery;
+  useFocusEffect(
+    useCallback(() => {
+      if (session?.nurseId) {
+        void refetchMirrors();
+      }
+    }, [refetchMirrors, session?.nurseId]),
+  );
+  const connectMirrorMutation = useMutation({
+    mutationFn: (body: unknown) => apiSend('/api/nurse-patient-config/mirrors/connect', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.nurseId || ''] });
+      await queryClient.invalidateQueries({ queryKey: ['latestConfig'] });
+      router.replace('/mirror-management');
+    },
+    onError: (err) => {
+      Alert.alert('Unable to connect mirror', err instanceof Error ? err.message : 'Please try again.');
+    },
+  });
+  const patients = mirrorsQuery.data || [];
 
   const patient = useMemo(
     () => patients.find((candidate) => candidate.patientId === params.patientId) || null,
@@ -40,37 +72,10 @@ export default function AddMirrorConnectionScreen() {
   );
 
   useEffect(() => {
-    void loadPatient();
-  }, [session?.nurseId]);
-
-  useEffect(() => {
     if (!patient) return;
     setMirrorName(patient.mirrorName || `Mirror for ${patient.patientName}`);
     setTimezone(patient.timezone || 'Asia/Singapore');
   }, [patient]);
-
-  async function loadPatient() {
-    if (!session?.nurseId) {
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        getApiUrl(`/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session.nurseId)}`),
-      );
-      const body = await response.json();
-      if (!response.ok) {
-        throw new Error(body?.error || 'Unable to load patient.');
-      }
-      setPatients(Array.isArray(body?.patients) ? body.patients : []);
-    } catch (err) {
-      Alert.alert('Unable to load patient', err instanceof Error ? err.message : 'Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  }
 
   function goBack() {
     if (router.canGoBack()) {
@@ -82,7 +87,7 @@ export default function AddMirrorConnectionScreen() {
   }
 
   async function saveConnection() {
-    if (!session?.nurseId || !patient || isSaving) return;
+    if (!session?.nurseId || !patient || connectMirrorMutation.isPending) return;
 
     const normalizedPairingCode = pairingCode.replace(/\D/g, '');
     if (normalizedPairingCode.length !== 6) {
@@ -90,30 +95,13 @@ export default function AddMirrorConnectionScreen() {
       return;
     }
 
-    setIsSaving(true);
-    try {
-      const response = await fetch(getApiUrl('/api/nurse-patient-config/mirrors/connect'), {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          nurseId: session.nurseId,
-          patientId: patient.patientId,
-          mirrorName: mirrorName.trim() || `Mirror for ${patient.patientName}`,
-          pairingCode: normalizedPairingCode,
-          timezone: timezone.trim() || 'Asia/Singapore',
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result?.error || 'Unable to add mirror connection.');
-      }
-
-      router.replace('/mirror-management');
-    } catch (err) {
-      Alert.alert('Unable to connect mirror', err instanceof Error ? err.message : 'Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
+    connectMirrorMutation.mutate({
+      nurseId: session.nurseId,
+      patientId: patient.patientId,
+      mirrorName: mirrorName.trim() || `Mirror for ${patient.patientName}`,
+      pairingCode: normalizedPairingCode,
+      timezone: timezone.trim() || 'Asia/Singapore',
+    });
   }
 
   return (
@@ -129,7 +117,7 @@ export default function AddMirrorConnectionScreen() {
           </View>
         </View>
 
-        {isLoading ? (
+        {mirrorsQuery.isLoading ? (
           <View style={styles.card}>
             <ActivityIndicator color="#87566A" />
             <Text style={styles.loadingText}>Loading pairing details.</Text>
@@ -193,11 +181,11 @@ export default function AddMirrorConnectionScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                disabled={isSaving}
+                disabled={connectMirrorMutation.isPending}
                 onPress={() => void saveConnection()}
-                style={[styles.primaryButton, isSaving && styles.disabledButton]}
+                style={[styles.primaryButton, connectMirrorMutation.isPending && styles.disabledButton]}
               >
-                {isSaving ? (
+                {connectMirrorMutation.isPending ? (
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
                   <>

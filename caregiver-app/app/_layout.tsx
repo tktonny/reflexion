@@ -1,13 +1,16 @@
 import type { ReactNode } from 'react';
+import { QueryClientProvider, useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Stack, useGlobalSearchParams, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { loadStoredAuthSession } from '../src/lib/authSession';
+import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
+import { queryClient } from '../src/lib/queryClient';
 
 export default function RootLayout() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <StatusBar style="dark" />
       <AuthGate>
         <Stack screenOptions={{ headerShown: false }}>
@@ -27,7 +30,7 @@ export default function RootLayout() {
           <Stack.Screen name="chatbot" options={{ headerShown: true, title: 'Support', headerBackTitle: 'Back' }} />
         </Stack>
       </AuthGate>
-    </>
+    </QueryClientProvider>
   );
 }
 
@@ -36,6 +39,9 @@ function AuthGate({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { mode } = useGlobalSearchParams<{ mode?: string }>();
   const [hasCheckedSession, setHasCheckedSession] = useState(false);
+  const { mutate: registerDevice } = useMutation({
+    mutationFn: registerPushNotificationDevice,
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -55,6 +61,9 @@ function AuthGate({ children }: { children: ReactNode }) {
       } else if (session && pathname === '/sign-in') {
         router.replace('/(tabs)');
       }
+      if (session?.nurseId && pathname !== '/sign-in' && !isSignUpRoute) {
+        registerDevice({ nurseId: session.nurseId });
+      }
 
       setHasCheckedSession(true);
     };
@@ -63,7 +72,7 @@ function AuthGate({ children }: { children: ReactNode }) {
     return () => {
       isMounted = false;
     };
-  }, [mode, pathname, router]);
+  }, [mode, pathname, registerDevice, router]);
 
   if (!hasCheckedSession) {
     return <View style={{ flex: 1 }} />;

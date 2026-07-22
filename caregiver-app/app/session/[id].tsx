@@ -1,12 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import StatusBadge from '../../src/components/StatusBadge';
-import { getApiUrl } from '../../src/lib/apiUrl';
+import { apiGet } from '../../src/lib/apiClient';
 
 type ConversationLog = {
   sentence: string;
@@ -38,67 +39,41 @@ type TodaySessionsResponse = {
 
 export default function SessionReplayScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [todaySessions, setTodaySessions] = useState<TodaySessionsResponse | null>(null);
   const [selectedSessionIndex, setSelectedSessionIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasLoadedRealSession, setHasLoadedRealSession] = useState(false);
   const [showTranscript, setShowTranscript] = useState(true);
   const shouldLoadRealSession = Boolean(id && /^[0-9a-f]{24}$/i.test(id));
+  const today = getSingaporeDateKey(new Date());
+  const todaySessionsQuery = useQuery({
+    enabled: shouldLoadRealSession,
+    queryKey: ['sessionDay', id, today],
+    queryFn: async () => {
+      const body = await apiGet<Partial<TodaySessionsResponse>>(
+        `/api/conversation-sessions-by-day?id=${encodeURIComponent(id)}&date=${encodeURIComponent(today)}`,
+      );
+      return {
+        date: body?.date || today,
+        patientId: body?.patientId || id,
+        patientName: body?.patientName || 'Patient',
+        sessions: Array.isArray(body?.sessions) ? body.sessions : [],
+      } satisfies TodaySessionsResponse;
+    },
+  });
+  const { refetch: refetchTodaySessions } = todaySessionsQuery;
+  useFocusEffect(
+    useCallback(() => {
+      if (shouldLoadRealSession) {
+        void refetchTodaySessions();
+      }
+    }, [refetchTodaySessions, shouldLoadRealSession]),
+  );
+  const todaySessions = todaySessionsQuery.data || null;
   const realSession = todaySessions?.sessions[selectedSessionIndex] || null;
   const realTranscript = useMemo(
     () => buildTranscript(realSession?.logs || []),
     [realSession?.logs],
   );
 
-  useEffect(() => {
-    if (!shouldLoadRealSession) {
-      return;
-    }
-
-    let isMounted = true;
-    const loadSession = async () => {
-      setIsLoading(true);
-      setHasLoadedRealSession(false);
-      try {
-        const today = getSingaporeDateKey(new Date());
-        const response = await fetch(
-          getApiUrl(
-            `/api/conversation-sessions-by-day?id=${encodeURIComponent(id)}&date=${encodeURIComponent(today)}`,
-          ),
-        );
-        const body = await response.json();
-
-        if (!response.ok) {
-          throw new Error(body?.error || 'Unable to load conversation.');
-        }
-
-        if (isMounted) {
-          const sessions = Array.isArray(body?.sessions) ? body.sessions : [];
-          setTodaySessions({
-            date: body?.date || today,
-            patientId: body?.patientId || id,
-            patientName: body?.patientName || 'Patient',
-            sessions,
-          });
-          setSelectedSessionIndex(0);
-        }
-      } catch (err) {
-        console.error('[SessionReplayScreen] load conversation failed', err);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-          setHasLoadedRealSession(true);
-        }
-      }
-    };
-
-    void loadSession();
-    return () => {
-      isMounted = false;
-    };
-  }, [id, shouldLoadRealSession]);
-
-  if (!todaySessions && (isLoading || (shouldLoadRealSession && !hasLoadedRealSession))) return (
+  if (!todaySessions && todaySessionsQuery.isLoading) return (
     <SafeAreaView style={styles.safe}>
       <Text style={styles.notFound}>Loading session...</Text>
     </SafeAreaView>
@@ -152,25 +127,13 @@ export default function SessionReplayScreen() {
               <StatChip icon="clock" label="Duration" value={formatDuration(selectedSession.duration)} />
               <StatChip icon="message-circle" label="Words" value={String(selectedSession.words)} />
               <StatChip icon="repeat" label="Exchanges" value={String(selectedSession.exchanges)} />
-              <StatChip icon="zap" label="Avg latency" value={`${selectedSession.avgLatency.toFixed(1)}s`} />
+              <StatChip icon="zap" label="Speech lag" value={`${selectedSession.avgLatency.toFixed(1)}s`} highlight />
             </View>
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Audio Recording</Text>
-            <TouchableOpacity
-              style={styles.playBtn}
-              onPress={() => Alert.alert('Audio', 'Audio playback will be connected later.')}
-            >
-              <Feather name="play" size={15} color="#FFFFFF" />
-              <Text style={styles.playBtnText}>Play recording</Text>
-            </TouchableOpacity>
-            <Text style={styles.audioNote}>Only your loved one's voice is recorded - Aria's responses are excluded.</Text>
-          </View>
-
-          <View style={styles.card}>
             <TouchableOpacity style={styles.transcriptHeader} onPress={() => setShowTranscript(v => !v)}>
-              <Text style={styles.cardTitle}>Full Transcript</Text>
+              <Text style={styles.cardTitle}>View the full conversation with {todaySessions.patientName} below</Text>
               <Feather name={showTranscript ? 'chevron-up' : 'chevron-down'} size={16} color="#87566A" />
             </TouchableOpacity>
 
@@ -200,12 +163,22 @@ export default function SessionReplayScreen() {
 
 }
 
-function StatChip({ icon, label, value }: { icon: any; label: string; value: string }) {
+function StatChip({
+  highlight = false,
+  icon,
+  label,
+  value,
+}: {
+  highlight?: boolean;
+  icon: any;
+  label: string;
+  value: string;
+}) {
   return (
-    <View style={styles.statChip}>
-      <Feather name={icon} size={14} color="#A69C92" />
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+    <View style={[styles.statChip, highlight && styles.statChipHighlight]}>
+      <Feather name={icon} size={14} color={highlight ? '#6E2F48' : '#A69C92'} />
+      <Text style={[styles.statValue, highlight && styles.statValueHighlight]}>{value}</Text>
+      <Text style={[styles.statLabel, highlight && styles.statLabelHighlight]}>{label}</Text>
     </View>
   );
 }
@@ -346,6 +319,9 @@ const styles = StyleSheet.create({
   },
   statValue: { fontSize: 15, fontWeight: '600', color: '#2B2522' },
   statLabel: { fontSize: 10, color: '#A69C92', textAlign: 'center' },
+  statChipHighlight: { borderColor: '#CFA7B7', backgroundColor: '#F7EEF2' },
+  statValueHighlight: { color: '#6E2F48' },
+  statLabelHighlight: { color: '#6E2F48', fontWeight: '700' },
 
   cardTitle: {
     fontSize: 12,
@@ -367,19 +343,6 @@ const styles = StyleSheet.create({
     borderColor: '#E7DED2',
   },
   topicText: { fontSize: 12, color: '#756C64', fontWeight: '600' },
-
-  playBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#87566A',
-    borderRadius: 12,
-    paddingVertical: 13,
-    marginBottom: 10,
-  },
-  playBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
-  audioNote: { fontSize: 12, color: '#A69C92', textAlign: 'center', lineHeight: 17 },
 
   transcriptHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
   transcript: { gap: 10, marginTop: 10 },
