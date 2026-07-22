@@ -15,7 +15,7 @@ const PATIENT = process.env.EXPO_PUBLIC_DEMO_PATIENT_ID || '65f00000000000000000
 const client = new MongoClient(uri)
 await client.connect()
 try {
-  const db = client.db('ref')
+  const db = client.db(process.env.MONGODB_DB || 'ref')
   const now = new Date()
   await db.collection('NursePatientConfig').updateOne(
     { _id: new ObjectId(NURSE) },

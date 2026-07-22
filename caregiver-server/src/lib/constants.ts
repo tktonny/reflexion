@@ -1,4 +1,4 @@
-export const DB_NAME = 'ref'
+export const DB_NAME = process.env.MONGODB_DB || 'ref'
 export const NURSE_CONFIG_COLLECTION = 'NursePatientConfig'
 export const CONVERSATION_COLLECTION = 'Conversation'
 export const CONVERSATION_MAP_COLLECTION = 'ConversationIdToPatientIdMap'
