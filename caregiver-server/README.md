@@ -101,3 +101,5 @@ In production, configure HTTPS at the reverse proxy/load balancer, allow only th
 - Longitudinal monitoring design: [`../docs/architecture/longitudinal-vector-anomaly-design.md`](../docs/architecture/longitudinal-vector-anomaly-design.md)
 
 All `/api/v1` success responses use `{ data, meta: { requestId } }`. Errors use `{ error: { code, message, retryable, details }, meta }`. Mutating creation/command routes accept `Idempotency-Key`; versioned resources use `If-Match` where required.
+
+
