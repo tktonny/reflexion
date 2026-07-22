@@ -2,7 +2,7 @@
   "expo": {
     "name": "Reflexion Mirror",
     "slug": "reflexion-mobile-mirror-interface-app",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "scheme": "reflexionmirror",
     "userInterfaceStyle": "light",
@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.reflexion.mirror",
-      "versionCode": 3,
+      "versionCode": 4,
       "allowBackup": false,
       "permissions": [
         "CAMERA",

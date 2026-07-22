@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store'
 import { Platform } from 'react-native'
 
 import { getApiUrl } from '../config/apiUrl'
+import { validateBootstrapCredential } from '../orchestration/deviceBootstrap'
 import {
   ACTIVE_MIRROR_ID_STORAGE_KEY,
   ACTIVE_PATIENT_ID_STORAGE_KEY,
@@ -31,17 +32,36 @@ export type StoredDeviceCredential = {
 export async function getBootstrapCredential() {
   const stored = await secureGet(SECURE_BOOTSTRAP)
   const configured = process.env.EXPO_PUBLIC_DEVICE_BOOTSTRAP_TOKEN?.trim()
-  const token = stored || configured || ''
-  if (!token) return null
-  if (!stored && configured) await secureSet(SECURE_BOOTSTRAP, configured)
-  const claims = decodeJwtPayload(token)
-  const deviceId = typeof claims?.did === 'string' ? claims.did : ''
-  if (!deviceId) return null
-  await AsyncStorage.multiSet([
-    [DEVICE_ID_STORAGE_KEY, deviceId],
-    [DEVICE_BOOTSTRAP_TOKEN_STORAGE_KEY, 'secure-store'],
+  for (const candidate of [stored, configured]) {
+    if (!candidate) continue
+    try {
+      const { deviceId } = validateBootstrapCredential(candidate)
+      if (candidate !== stored) await secureSet(SECURE_BOOTSTRAP, candidate)
+      await AsyncStorage.multiSet([
+        [DEVICE_ID_STORAGE_KEY, deviceId],
+        [DEVICE_BOOTSTRAP_TOKEN_STORAGE_KEY, 'secure-store'],
+      ])
+      return { token: candidate, deviceId }
+    } catch {
+      if (candidate === stored) await secureDelete(SECURE_BOOTSTRAP)
+    }
+  }
+  await AsyncStorage.multiRemove([DEVICE_BOOTSTRAP_TOKEN_STORAGE_KEY])
+  return null
+}
+
+export async function persistBootstrapCredential(token: string) {
+  const normalized = token.trim()
+  const { deviceId } = validateBootstrapCredential(normalized)
+  await clearDeviceCredential({ preserveBootstrap: false })
+  await Promise.all([
+    secureSet(SECURE_BOOTSTRAP, normalized),
+    AsyncStorage.multiSet([
+      [DEVICE_ID_STORAGE_KEY, deviceId],
+      [DEVICE_BOOTSTRAP_TOKEN_STORAGE_KEY, 'secure-store'],
+    ]),
   ])
-  return { token, deviceId }
+  return { deviceId }
 }
 
 export async function persistDeviceCredential(value: StoredDeviceCredential) {
@@ -115,16 +135,6 @@ async function rotateDeviceCredential(credential: StoredDeviceCredential) {
   if (!response.ok || !payload?.data) throw new Error(payload?.error?.code || 'device_credential_rotation_failed')
   await persistDeviceCredential(payload.data)
   return payload.data.accessToken
-}
-
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-  try {
-    const payload = token.split('.')[1]
-    if (!payload) return null
-    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/')
-    const decoded = typeof atob === 'function' ? atob(normalized) : ''
-    return JSON.parse(decoded) as Record<string, unknown>
-  } catch { return null }
 }
 
 function headersObject(headers?: HeadersInit) {

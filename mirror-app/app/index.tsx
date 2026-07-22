@@ -41,6 +41,8 @@ type PairingDetails = {
   expiresAt?: string
 }
 
+const INSTALLER_SETUP_ENABLED = __DEV__ || process.env.EXPO_PUBLIC_ENABLE_INSTALLER_SETUP === 'true'
+
 export default function BootScreen() {
   const [booting, setBooting] = useState(true)
   const [checks, setChecks] = useState<BootCheck[]>([])
@@ -260,6 +262,11 @@ export function PairingScreen({ error, onRetry, pairing }: { error: string; onRe
           )}
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
           {!pairing ? <Pressable onPress={onRetry} style={styles.retryButton}><Text style={styles.retryText}>Try again</Text></Pressable> : null}
+          {!pairing && INSTALLER_SETUP_ENABLED ? (
+            <Pressable onPress={() => router.push('/test-device')} style={styles.demoLink}>
+              <Text style={styles.demoLinkText}>Installer setup</Text>
+            </Pressable>
+          ) : null}
           {__DEV__ && !pairing ? (
             <Pressable onPress={() => router.push('/realtime-test')} style={styles.demoLink}>
               <Text style={styles.demoLinkText}>Open developer conversation</Text>
