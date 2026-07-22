@@ -67,6 +67,12 @@ For a one-shot worker diagnostic:
 node dist/jobs/outboxWorker.js --once
 ```
 
+After deploying a new HTTPS origin, verify that it is the compiled v1 service rather than a legacy health-only deployment:
+
+```bash
+npm run smoke:deployment -- --base=https://api.example.com
+```
+
 ## Configuration
 
 See [`.env.example`](./.env.example). Required for the core API:
