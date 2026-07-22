@@ -20,7 +20,8 @@
     "test": "node --import tsx --test src/**/*.test.ts",
     "test:integration": "node --import tsx --test src/v1/integration/**/*.test.ts",
     "test:coverage": "node --experimental-test-coverage --test-coverage-include=src/v1/monitoring/algorithms.ts --test-coverage-include=src/v1/monitoring/features.ts --test-coverage-include=src/v1/platform/crypto.ts --test-coverage-include=src/v1/platform/tokens.ts --test-coverage-lines=90 --test-coverage-functions=90 --import tsx --test src/**/*.test.ts",
-    "test:coverage:phase3": "node --experimental-test-coverage --test-coverage-include=src/v1/routes/devices.ts --test-coverage-include=src/v1/routes/identity.ts --test-coverage-include=src/v1/routes/sessions.ts --test-coverage-include=src/v1/platform/auth.ts --test-coverage-include=src/v1/platform/idempotency.ts --test-coverage-include=src/v1/platform/objectStore.ts --test-coverage-include=src/v1/platform/qwen.ts --test-coverage-include=src/v1/workers/outboxWorker.ts --test-coverage-lines=90 --test-coverage-functions=90 --import tsx --test src/**/*.test.ts"
+    "test:coverage:phase3": "node --experimental-test-coverage --test-coverage-include=src/v1/routes/devices.ts --test-coverage-include=src/v1/routes/identity.ts --test-coverage-include=src/v1/routes/sessions.ts --test-coverage-include=src/v1/platform/auth.ts --test-coverage-include=src/v1/platform/idempotency.ts --test-coverage-include=src/v1/platform/objectStore.ts --test-coverage-include=src/v1/platform/qwen.ts --test-coverage-include=src/v1/workers/outboxWorker.ts --test-coverage-lines=90 --test-coverage-functions=90 --import tsx --test src/**/*.test.ts",
+    "test:coverage:api": "node --experimental-test-coverage --test-coverage-include=src/v1/routes/*.ts --test-coverage-include=src/v1/tools/providers.ts --test-coverage-lines=90 --test-coverage-functions=90 --import tsx --test src/**/*.test.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",

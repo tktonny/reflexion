@@ -34,10 +34,11 @@ npm run typecheck
 npm test
 npm run test:coverage
 npm run test:coverage:phase3
+npm run test:coverage:api
 npm run build
 ```
 
-`test:integration` runs the complete Phase 3 HTTP flow against an ephemeral real MongoDB replica set. It covers human and device authentication, Pairing v2, credential rotation, heartbeat, session ingestion, Qwen ticket minting, signed artifact upload plans, optimistic completion, outbox processing and retry recovery. `test:coverage:phase3` enforces at least 90% aggregate line and function coverage over the Phase 3 routes and platform boundary.
+`test:integration` runs the unified API HTTP flows against ephemeral real MongoDB replica sets. It covers the Phase 3 device/session path plus patients, care plans, medication/reminders, monitoring/review, notifications and allowlisted tools. `test:coverage:phase3` enforces the frozen device/session boundary; `test:coverage:api` enforces at least 90% aggregate line and function coverage over every `/api/v1` route module and tool provider.
 
 Initialize the database and first tenant administrator:
 

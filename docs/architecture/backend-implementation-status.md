@@ -23,10 +23,11 @@ Runtime: `caregiver-server`
 Completed on 2026-07-22:
 
 - TypeScript typecheck and production compilation pass.
-- 29 automated tests pass, including a 13-test HTTP/Mongo replica-set integration suite.
-- Phase 3 core API coverage is 93.41% lines and 93.97% functions.
+- 34 automated tests pass, including 18 HTTP/Mongo replica-set integration tests across every unified API domain.
+- Phase 3 core API coverage is 93.48% lines and 94.87% functions.
+- The complete `/api/v1` route layer and allowlisted tool providers are covered at 94.81% lines and 94.58% functions.
 - The compiled `dist/index.js` starts successfully and returns the expected security headers, health response and stable v1 error envelope.
-- The integration suite verifies auth/session rotation, relationship authorization, Pairing v2, one-time credential exchange, device credential rotation, heartbeat idempotency, Qwen ticket sealing, ordered event ingestion, artifact upload/commit/retry, optimistic session completion, outbox processing and worker retry recovery.
+- The integration suites verify auth/session rotation, relationship authorization, Pairing v2, one-time credential exchange, device credential rotation, heartbeat idempotency, Qwen ticket sealing, ordered event ingestion, artifact upload/commit/retry, optimistic session completion, outbox processing, worker retry recovery, patients, care plans, medications/reminders, monitoring/review, notifications and allowlisted tools.
 
 The suite found and fixed a root-router middleware ordering defect that previously caused the human patient router to reject later device routes. Authentication is now bound to each declared route, so unknown v1 paths reach the standard 404 handler and device routes retain their own actor policy.
 

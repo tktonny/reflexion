@@ -30,6 +30,7 @@ npm run typecheck
 npm test
 npm run test:coverage
 npm run test:coverage:phase3
+npm run test:coverage:api
 npm run build
 npm run db:indexes
 ```

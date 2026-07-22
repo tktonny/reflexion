@@ -43,7 +43,8 @@ npm run typecheck
 npm test
 npm run test:coverage
 npm run test:coverage:phase3
+npm run test:coverage:api
 npm run build
 ```
 
-Phase 3 核心路由与平台边界的聚合行覆盖率和函数覆盖率均不得低于 90%。对象存储和 Qwen 在测试中只模拟外部 provider 边界，签名、密钥封装、数据库状态机、事务、授权和 worker 使用生产代码执行。
+Phase 3 核心路由、平台边界以及完整 `/api/v1` route layer 的聚合行覆盖率和函数覆盖率均不得低于 90%。对象存储、Qwen、天气与搜索在测试中只模拟外部 provider 边界，签名、密钥封装、数据库状态机、事务、授权、工具审计和 worker 使用生产代码执行。
