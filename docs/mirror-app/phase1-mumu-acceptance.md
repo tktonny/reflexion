@@ -1,7 +1,7 @@
 # Phase 1 MuMu 验收报告
 
-> 验收日期：2026-07-22  
-> 结论：MuMu 逻辑与 Android 设备模拟门通过；目标镜面声学门待执行  
+> 验收日期：2026-07-22
+> 结论：MuMu 逻辑与 Android 设备模拟门通过；目标镜面声学门待执行
 > 范围：native Qwen realtime WebSocket 主路径的 turn-taking，不包含 Phase 5 唤醒词产品验收
 
 ## 1. 环境与方法

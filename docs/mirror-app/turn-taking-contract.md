@@ -1,7 +1,7 @@
 # Mirror Realtime Turn-taking Contract
 
-> Phase 0 baseline: 2026-07-22  
-> First production candidate: native Qwen realtime WebSocket + native PCM bridge  
+> Phase 0 baseline: 2026-07-22
+> First production candidate: native Qwen realtime WebSocket + native PCM bridge
 > Scope: the audio-turn lifecycle only; language quality, tools and longitudinal analysis are later phases
 
 ## 1. Product promise

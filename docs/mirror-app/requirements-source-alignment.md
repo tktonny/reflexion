@@ -1,10 +1,10 @@
 # 完整需求文档与 Platform v2 对齐说明
 
-> 需求源：[June-Aug 2026, Reflexion Tech Document](https://docs.google.com/document/d/1eAGXsTYmgAUYaYR-JhhNBaWkw3fopzMIodCL3CH1IgE/edit)  
-> 本地权威副本：`docs/June-Aug 2026, Reflexion Tech Document.docx`  
-> 本轮读取范围：完整 106 页正文与 7 张内嵌设计图，不再只依赖 Google Docs 单一 tab 或局部文本导出  
-> 读取 revision：`ALtnJHzbc9274UHyAb01w1RxBAr4MSTAwEzx5lk8lEXjrG6PD_vxmCap82NtBPDeZS8IbTiX0OMGC7QPBYy17A7LASyXDyEiF9a0YId8iNk`  
-> 对齐日期：2026-07-22  
+> 需求源：[June-Aug 2026, Reflexion Tech Document](https://docs.google.com/document/d/1eAGXsTYmgAUYaYR-JhhNBaWkw3fopzMIodCL3CH1IgE/edit)
+> 本地权威副本：`docs/June-Aug 2026, Reflexion Tech Document.docx`
+> 本轮读取范围：完整 106 页正文与 7 张内嵌设计图，不再只依赖 Google Docs 单一 tab 或局部文本导出
+> 读取 revision：`ALtnJHzbc9274UHyAb01w1RxBAr4MSTAwEzx5lk8lEXjrG6PD_vxmCap82NtBPDeZS8IbTiX0OMGC7QPBYy17A7LASyXDyEiF9a0YId8iNk`
+> 对齐日期：2026-07-22
 > 重点 sections：`Layer 1: short term`、`Design of the app`、`Updated metrics`、`Reflexion Signal-to-Status Algorithm`、`MIRROR APK`
 
 Mirror 前端硬件基线采用文档明确的 10.1 英寸、1080 × 1920 纵向、Android 14、4 GB RAM、32 GB ROM；交互按 no-touch assumption 设计，触摸只可作为管理员/开发 fallback，不能成为老人完成主流程的前提。

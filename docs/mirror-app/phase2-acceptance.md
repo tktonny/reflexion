@@ -1,7 +1,7 @@
 # Phase 2 Mirror 消费者前端验收
 
-日期：2026-07-22  
-权威需求源：`docs/June-Aug 2026, Reflexion Tech Document.docx`（106 页、7 张内嵌设计图，已完整读取与渲染）  
+日期：2026-07-22
+权威需求源：`docs/June-Aug 2026, Reflexion Tech Document.docx`（106 页、7 张内嵌设计图，已完整读取与渲染）
 目标设备：10.1 英寸智能镜 / Android 14 / 1080 × 1920 纵向 / 4 GB RAM / 32 GB ROM
 
 ## 1. 本轮重做结论

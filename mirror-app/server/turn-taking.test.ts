@@ -214,7 +214,7 @@ test('deterministic positive close cannot open a new screening topic', () => {
     'That sounds lovely, thank you so much for chatting with me today. Enjoy your morning! Goodbye.',
   )
   assert.equal(closingTextForLanguage('mandarin'), '听起来真不错，非常感谢你今天和我聊天。祝你今天过得愉快，再见。')
-  assert.doesNotMatch(closingTextForLanguage('english'), /\?/) 
+  assert.doesNotMatch(closingTextForLanguage('english'), /\?/)
 })
 
 test('companion closes only from explicit user intent and is never cognitively scored', () => {
