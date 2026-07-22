@@ -1,13 +1,13 @@
 // Seed a NursePatientConfig (one caregiver + one patient) with FIXED ObjectIds into DB 'ref',
 // so check-ins saved with the demo IDs (src/config/conversationMode.ts DEMO_IDS) show up in the
 // caregiver app / server. Run against YOUR Atlas:
-//   MONGODB_URI="mongodb+srv://..." node --env-file=.env server/seed-demo-patient.mjs
-// (or put MONGODB_URI in .env). Idempotent (upsert).
+//   MONGODB_URI="mongodb+srv://..." node --env-file=.env.server.local server/seed-demo-patient.mjs
+// (or put MONGODB_URI in .env.server.local). Idempotent (upsert).
 
 import { MongoClient, ObjectId } from 'mongodb'
 
 const uri = process.env.MONGODB_URI
-if (!uri) { console.error('Set MONGODB_URI (env or .env).'); process.exit(1) }
+if (!uri) { console.error('Set MONGODB_URI in the environment or .env.server.local.'); process.exit(1) }
 
 const NURSE = process.env.EXPO_PUBLIC_DEMO_NURSE_ID || '64f0000000000000000000a1'
 const PATIENT = process.env.EXPO_PUBLIC_DEMO_PATIENT_ID || '65f0000000000000000000b2'

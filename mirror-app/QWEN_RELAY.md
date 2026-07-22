@@ -22,7 +22,7 @@ implementation, ported from REFLEXION (`realtime_service.py` / `realtime_orchest
 - **Rewired:** `app/conversation.tsx` now uses `useQwenRealtimeConversation`.
 
 ## Run (web, fastest to verify)
-1. `cp .env.example .env` and set `QWEN_API_KEY` (or `DASHSCOPE_API_KEY`).
+1. `cp .env.server.example .env.server.local` and set the server-only `QWEN_API_KEY` (or `DASHSCOPE_API_KEY`). Never place it in `.env` or an `EXPO_PUBLIC_` variable.
 2. `npm install`
 3. Terminal A — relay:  `npm run relay`   (serves `ws://localhost:8787/api/clinic/realtime/ws`)
 4. Terminal B — web app: `npm run web`

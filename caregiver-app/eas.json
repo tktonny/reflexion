@@ -6,13 +6,34 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL": "https://reflexion.production.tktonny.top"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL": "https://reflexion.production.tktonny.top"
+      }
+    },
+    "release-apk": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL": "https://reflexion.production.tktonny.top"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL": "https://reflexion.production.tktonny.top"
+      }
     }
   },
   "submit": {
