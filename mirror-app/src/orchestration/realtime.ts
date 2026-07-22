@@ -75,11 +75,14 @@ export function buildLiveSessionUpdate(
       output_audio_format: 'pcm',
       // Direct WS uses manual turns so session.update can deterministically select normal/recall/
       // closing instructions before response.create. Qwen's semantic VAD auto-creates a response
-      // before that update can take effect. Relay/WebRTC callers retain provider VAD by default.
+      // before that update can take effect. Relay/WebRTC callers retain provider VAD and MUST set
+      // create_response:true explicitly — without it they'd rely on the API default and could stop
+      // auto-responding (they don't send an explicit response.create like the manual WS path does).
       turn_detection: opts.autoCreateResponse === false ? null : {
         type: 'semantic_vad',
         threshold: REALTIME.vadThreshold,
         silence_duration_ms: REALTIME.vadSilenceDurationMs,
+        create_response: true,
         interrupt_response: false,
       },
       input_audio_transcription: { model: REALTIME.transcriptionModel },
