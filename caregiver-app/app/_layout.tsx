@@ -16,6 +16,8 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="sign-in" />
+          <Stack.Screen name="forgot-password" />
+          <Stack.Screen name="reset-password" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="onboarding" />
           <Stack.Screen name="profile/[id]" options={{ headerShown: true, title: 'Profile', headerBackTitle: 'Back' }} />
@@ -50,7 +52,8 @@ function AuthGate({ children }: { children: ReactNode }) {
       setHasCheckedSession(false);
       const session = await loadStoredAuthSession();
       const isSignUpRoute = pathname === '/onboarding' && mode !== 'add-patient';
-      const isPublicRoute = pathname === '/sign-in' || isSignUpRoute;
+      const isPasswordRoute = pathname === '/forgot-password' || pathname === '/reset-password';
+      const isPublicRoute = pathname === '/sign-in' || isSignUpRoute || isPasswordRoute;
 
       if (!isMounted) {
         return;

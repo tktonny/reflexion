@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { signInRouter } from './auth/sign-in.js'
+import { passwordResetRequestRouter, passwordResetRouter } from './auth/password-reset.js'
 import { addPatientsRouter } from './nurse-patient-config/add-patients.js'
 import { createConfigRouter } from './nurse-patient-config/create.js'
 import { latestConfigRouter } from './nurse-patient-config/latest.js'
@@ -16,6 +17,8 @@ import { qwenTokenRouter } from './qwen-token.js'
 export const router = Router()
 
 router.use('/auth/sign-in', signInRouter)
+router.use('/auth/password-reset-requests', passwordResetRequestRouter)
+router.use('/auth/password-resets', passwordResetRouter)
 router.use('/nurse-patient-config/create', createConfigRouter)
 router.use('/nurse-patient-config/add-patients', addPatientsRouter)
 router.use('/nurse-patient-config/latest', latestConfigRouter)
