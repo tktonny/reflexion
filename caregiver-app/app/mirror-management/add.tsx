@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import { apiGet, apiSend } from '../../src/lib/apiClient';
 import { getStoredAuthSession } from '../../src/lib/authSession';
@@ -32,6 +34,8 @@ export default function AddMirrorConnectionScreen() {
   const [mirrorName, setMirrorName] = useState('');
   const [pairingCode, setPairingCode] = useState('');
   const [timezone, setTimezone] = useState('Asia/Singapore');
+  const [scanning, setScanning] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
   const mirrorsQuery = useQuery({
     enabled: Boolean(session?.nurseId),
     queryKey: ['mirrors', session?.nurseId || ''],
@@ -104,6 +108,41 @@ export default function AddMirrorConnectionScreen() {
     });
   }
 
+  // The mirror shows a QR of { type: 'reflexion_device_pairing_v2', pairingId, pairingCode }.
+  function extractPairingCode(data: string): string {
+    const raw = data.trim();
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        return String((parsed as Record<string, unknown>).pairingCode || (parsed as Record<string, unknown>).code || '')
+          .replace(/\D/g, '').slice(0, 6);
+      }
+    } catch {}
+    return raw.replace(/\D/g, '').slice(0, 6);
+  }
+
+  async function openScanner() {
+    if (!permission?.granted) {
+      const res = await requestPermission();
+      if (!res.granted) {
+        Alert.alert('Camera needed', 'Allow camera access to scan the mirror QR.');
+        return;
+      }
+    }
+    setScanning(true);
+  }
+
+  function onScan(result: { data: string }) {
+    if (!scanning) return;
+    setScanning(false);
+    const code = extractPairingCode(result.data);
+    if (code.length !== 6) {
+      Alert.alert('QR not recognized', 'That QR did not contain a valid 6-digit pairing code.');
+      return;
+    }
+    setPairingCode(formatPairingInput(code));
+  }
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
@@ -157,6 +196,11 @@ export default function AddMirrorConnectionScreen() {
                 value={pairingCode}
               />
 
+              <TouchableOpacity onPress={() => void openScanner()} style={styles.scanButton}>
+                <Feather name="camera" size={17} color="#87566A" />
+                <Text style={styles.scanButtonText}>Scan mirror QR</Text>
+              </TouchableOpacity>
+
               <Label>Mirror timezone</Label>
               <TextInput
                 autoCapitalize="none"
@@ -198,6 +242,22 @@ export default function AddMirrorConnectionScreen() {
           </>
         )}
       </ScrollView>
+      <Modal visible={scanning} animationType="slide" onRequestClose={() => setScanning(false)}>
+        <View style={styles.scannerWrap}>
+          <CameraView
+            style={StyleSheet.absoluteFill}
+            facing="back"
+            barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+            onBarcodeScanned={onScan}
+          />
+          <View style={styles.scannerOverlay}>
+            <Text style={styles.scannerHint}>Point at the mirror’s pairing QR</Text>
+            <TouchableOpacity onPress={() => setScanning(false)} style={styles.scannerCancel}>
+              <Text style={styles.scannerCancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -290,4 +350,17 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: { color: '#87566A', fontSize: 15, fontWeight: '700' },
   disabledButton: { opacity: 0.7 },
+  scanButton: {
+    alignItems: 'center', borderColor: '#D8CFC3', borderRadius: 12, borderWidth: 1,
+    flexDirection: 'row', gap: 8, justifyContent: 'center', minHeight: 46,
+  },
+  scanButtonText: { color: '#87566A', fontSize: 15, fontWeight: '700' },
+  scannerWrap: { backgroundColor: '#000000', flex: 1 },
+  scannerOverlay: { alignItems: 'center', bottom: 48, gap: 16, left: 0, position: 'absolute', right: 0 },
+  scannerHint: {
+    backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 10, color: '#FFFFFF', fontSize: 15,
+    fontWeight: '700', overflow: 'hidden', paddingHorizontal: 14, paddingVertical: 8,
+  },
+  scannerCancel: { backgroundColor: '#FFFFFF', borderRadius: 10, paddingHorizontal: 28, paddingVertical: 12 },
+  scannerCancelText: { color: '#2B2522', fontSize: 15, fontWeight: '800' },
 });

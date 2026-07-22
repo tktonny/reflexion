@@ -32,7 +32,8 @@
       "expo-router",
       "expo-status-bar",
       "expo-notifications",
-      "expo-image-picker"
+      "expo-image-picker",
+      "expo-camera"
     ],
     "extra": {
       "router": {},
