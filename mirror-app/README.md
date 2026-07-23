@@ -22,10 +22,10 @@ Set at minimum:
 ```bash
 EXPO_PUBLIC_API_BASE=https://reflexion.production.tktonny.top
 EXPO_PUBLIC_CONVERSATION_MODE=ws
-EXPO_PUBLIC_DEVICE_BOOTSTRAP_TOKEN=<token returned by caregiver-server provision:device>
+EXPO_PUBLIC_DEVICE_BOOTSTRAP_TOKEN=<token returned by reflexion-server provision:device>
 ```
 
-The bootstrap token must belong to this physical device. Provider credentials belong only in `caregiver-server/.env`.
+The bootstrap token must belong to this physical device. Provider credentials belong only in `reflexion-server/.env`.
 
 ## Verify
 
