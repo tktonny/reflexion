@@ -5,6 +5,7 @@ import { Stack, useGlobalSearchParams, usePathname, useRouter } from 'expo-route
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { loadStoredAuthSession } from '../src/lib/authSession';
+import { loadV1Session } from '../src/lib/v1AuthSession';
 import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { queryClient } from '../src/lib/queryClient';
 
@@ -50,7 +51,8 @@ function AuthGate({ children }: { children: ReactNode }) {
 
     const checkSession = async () => {
       setHasCheckedSession(false);
-      const session = await loadStoredAuthSession();
+      // Hydrate both the legacy session (gates routing) and the v1 token (feeds status reads) before render.
+      const [session] = await Promise.all([loadStoredAuthSession(), loadV1Session()]);
       const isSignUpRoute = pathname === '/onboarding' && mode !== 'add-patient';
       const isPasswordRoute = pathname === '/forgot-password' || pathname === '/reset-password';
       const isPublicRoute = pathname === '/sign-in' || isSignUpRoute || isPasswordRoute;

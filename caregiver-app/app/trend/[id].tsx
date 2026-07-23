@@ -165,7 +165,7 @@ export default function TrendScreen() {
         <View style={styles.v2Note}>
           <Feather name="info" size={14} color="#B2844B" />
           <Text style={styles.v2NoteText}>
-            Cognitive Stability Score with trend arrow is coming in a future update after user validation.
+            A longer-term wellbeing overview is coming in a future update, once we have validated it with families.
           </Text>
         </View>
       </ScrollView>

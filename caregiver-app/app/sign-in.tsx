@@ -15,6 +15,8 @@ import { useRouter } from 'expo-router';
 import { apiSend } from '../src/lib/apiClient';
 import { clearStoredAuthSession, setStoredAuthSession } from '../src/lib/authSession';
 import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
+import { v1Login } from '../src/lib/v1Client';
+import { clearV1Session } from '../src/lib/v1AuthSession';
 
 type SignInResponse = {
   nurseId: string;
@@ -29,10 +31,15 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const signInMutation = useMutation({
-    mutationFn: () => apiSend<SignInResponse>('/api/auth/sign-in', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    }),
+    mutationFn: async () => {
+      // Authoritative v1 status/flag/away routes need a v1 human JWT (baseline §5). Obtain it FIRST;
+      // if it fails we surface the error and never fall back to the legacy (wrong-answer) status path.
+      await v1Login(email, password);
+      return apiSend<SignInResponse>('/api/auth/sign-in', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+    },
     onSuccess: async (body) => {
       await setStoredAuthSession({
         nurseId: body.nurseId,
@@ -67,7 +74,7 @@ export default function SignInScreen() {
 
   async function goToSignUp() {
     setError('');
-    await clearStoredAuthSession();
+    await Promise.all([clearStoredAuthSession(), clearV1Session()]);
     router.replace('/onboarding');
   }
 

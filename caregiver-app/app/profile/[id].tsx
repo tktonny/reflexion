@@ -1,16 +1,30 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Linking, Image,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Alert, Linking, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import StatusBadge from '../../src/components/StatusBadge';
 import MiniSparkline from '../../src/components/MiniSparkline';
 import type { Status } from '../../src/data/mockData';
 import { fetchPatientTrend } from '../../src/lib/patientTrendClient';
 import { apiSend } from '../../src/lib/apiClient';
+import {
+  createAwayPeriodV1,
+  createManualFlagV1,
+  patientStatusQueryKey,
+  usePatientStatusV1,
+} from '../../src/lib/v1Client';
+import {
+  STATUS_META,
+  NEUTRAL_STATUS_COLOR,
+  getStatusLabel,
+  getReasonText,
+  getBaselineProgressText,
+  getTechnicalNote,
+  formatLastInteraction,
+} from '../../src/lib/v1Status';
 
 const AVATAR_BG: Record<Status, string> = {
   green: '#F0F3ED',
@@ -80,14 +94,112 @@ export default function ProfileScreen() {
     },
   });
 
+  // Authoritative status from the v1 read model (baseline §4). The route id equals the v1 patient _id
+  // (migration reuses the legacy ObjectId hex), so this is the same id the trend/session screens use.
+  const statusQuery = usePatientStatusV1(shouldLoadRealProfile ? id : null);
+  const v1Status = statusQuery.data;
+
+  const [activeForm, setActiveForm] = useState<'none' | 'flag' | 'away'>('none');
+  const [flagSeverity, setFlagSeverity] = useState<'worth_checking' | 'needs_attention'>('worth_checking');
+  const [flagReason, setFlagReason] = useState('');
+  const deviceTimezone = useMemo(() => {
+    try {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Singapore';
+    } catch {
+      return 'Asia/Singapore';
+    }
+  }, []);
+  const [awayStart, setAwayStart] = useState('');
+  const [awayEnd, setAwayEnd] = useState('');
+  const [awayTimezone, setAwayTimezone] = useState(deviceTimezone);
+  const [awayReason, setAwayReason] = useState('');
+
+  const flagMutation = useMutation({
+    mutationFn: () => createManualFlagV1(id, flagSeverity, flagReason.trim()),
+    onSuccess: async () => {
+      setFlagReason('');
+      setActiveForm('none');
+      await queryClient.invalidateQueries({ queryKey: patientStatusQueryKey(id) });
+      Alert.alert('Concern flagged', 'Thanks — this has been noted on their status.');
+    },
+    onError: (err) => {
+      Alert.alert('Could not flag', err instanceof Error ? err.message : 'Please try again.');
+    },
+  });
+
+  const awayMutation = useMutation({
+    mutationFn: () => createAwayPeriodV1(id, {
+      startsOn: awayStart.trim(),
+      endsOn: awayEnd.trim(),
+      timezone: awayTimezone.trim(),
+      reason: awayReason.trim() || undefined,
+    }),
+    onSuccess: async () => {
+      setAwayStart('');
+      setAwayEnd('');
+      setAwayReason('');
+      setActiveForm('none');
+      await queryClient.invalidateQueries({ queryKey: patientStatusQueryKey(id) });
+      Alert.alert('Marked as away', 'These days will not count against their check-in streak.');
+    },
+    onError: (err) => {
+      Alert.alert('Could not save', err instanceof Error ? err.message : 'Please try again.');
+    },
+  });
+
+  function submitFlag() {
+    if (!flagReason.trim()) {
+      Alert.alert('Add a note', 'Please add a short reason before flagging.');
+      return;
+    }
+    flagMutation.mutate();
+  }
+
+  function submitAway() {
+    const start = awayStart.trim();
+    const end = awayEnd.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end)) {
+      Alert.alert('Check the dates', 'Please enter both dates as YYYY-MM-DD.');
+      return;
+    }
+    if (end < start) {
+      Alert.alert('Check the dates', 'The end date must be on or after the start date.');
+      return;
+    }
+    if (!awayTimezone.trim()) {
+      Alert.alert('Add a timezone', 'Please provide a timezone (e.g. Asia/Singapore).');
+      return;
+    }
+    awayMutation.mutate();
+  }
+
   const realInitials = useMemo(
     () => (realProfile ? getNameInitials(realProfile.name) : ''),
     [realProfile],
   );
 
   if (realProfile) {
-    const status = getProfileBadgeStatus(realProfile.status);
-    const latestSpokenText = formatProfileLastSpoken(realProfile.lastSpokenLabel);
+    // Avatar tint is soft/decorative and reassurance-first: establishing is treated as calm (never red).
+    const avatarStatus: Status = v1Status?.status === 'needs_attention'
+      ? 'red'
+      : v1Status?.status === 'worth_checking'
+        ? 'yellow'
+        : 'green';
+    const pillColor = v1Status ? STATUS_META[v1Status.status].dot : NEUTRAL_STATUS_COLOR;
+    const pillLabel = v1Status
+      ? getStatusLabel(v1Status.status, realProfile.name)
+      : statusQuery.isLoading
+        ? 'Checking in…'
+        : 'Status updating';
+    const reasonLine = v1Status
+      ? v1Status.status === 'establishing'
+        ? getBaselineProgressText(v1Status.baselineProgress)
+        : getReasonText(v1Status.primaryReason, realProfile.name)
+      : '';
+    const technicalNote = v1Status ? getTechnicalNote(v1Status.technicalState) : null;
+    const lastInteractionText = v1Status
+      ? formatLastInteraction(v1Status.lastInteractionAt)
+      : formatProfileLastSpoken(realProfile.lastSpokenLabel);
     const durationText = formatDuration(realProfile.duration);
     const talkedDays = realTrend.filter((day) => !day.missed).length;
     const avgDuration = talkedDays
@@ -99,18 +211,28 @@ export default function ProfileScreen() {
         <ScrollView contentContainerStyle={styles.content}>
           <View style={styles.banner}>
             <View style={styles.bannerTop}>
-              <StatusBadge status={status} label={realProfile.statusLabel} />
-              <View style={[styles.avatar, { backgroundColor: AVATAR_BG[status] }]}>
+              <View style={styles.statusPill}>
+                <View style={[styles.statusPillDot, { backgroundColor: pillColor }]} />
+                <Text style={styles.statusPillText}>{pillLabel}</Text>
+              </View>
+              <View style={[styles.avatar, { backgroundColor: AVATAR_BG[avatarStatus] }]}>
                 {realProfile.photoUrl ? (
                   <Image source={{ uri: realProfile.photoUrl }} style={styles.avatarImage} />
                 ) : (
-                  <Text style={[styles.avatarText, { color: AVATAR_TEXT[status] }]}>{realInitials}</Text>
+                  <Text style={[styles.avatarText, { color: AVATAR_TEXT[avatarStatus] }]}>{realInitials}</Text>
                 )}
               </View>
             </View>
             <Text style={styles.bannerName}>{realProfile.name}</Text>
-            <Text style={styles.lastSeen}>{latestSpokenText}</Text>
+            {reasonLine ? <Text style={styles.reasonLine}>{reasonLine}</Text> : null}
+            <Text style={styles.lastSeen}>{lastInteractionText}</Text>
             <Text style={styles.duration}>Duration: {durationText}</Text>
+            {technicalNote ? (
+              <View style={styles.techNote}>
+                <Feather name="wifi-off" size={13} color="#8E877C" />
+                <Text style={styles.techNoteText}>{technicalNote}</Text>
+              </View>
+            ) : null}
           </View>
 
           <TouchableOpacity style={styles.callBtn} onPress={() => callPatient(realProfile)}>
@@ -149,6 +271,117 @@ export default function ProfileScreen() {
             ) : (
               <View style={styles.emptyChart} />
             )}
+          </View>
+
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Caregiver actions</Text>
+            <View style={styles.actionRow}>
+              <TouchableOpacity
+                style={[styles.pillBtn, activeForm === 'flag' && styles.pillBtnActive]}
+                onPress={() => setActiveForm(activeForm === 'flag' ? 'none' : 'flag')}
+              >
+                <Feather name="flag" size={14} color="#9B5F4E" />
+                <Text style={styles.pillBtnText}>Flag a concern</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.pillBtn, activeForm === 'away' && styles.pillBtnActive]}
+                onPress={() => setActiveForm(activeForm === 'away' ? 'none' : 'away')}
+              >
+                <Feather name="calendar" size={14} color="#596C56" />
+                <Text style={styles.pillBtnText}>Mark as away</Text>
+              </TouchableOpacity>
+            </View>
+
+            {activeForm === 'flag' ? (
+              <View style={styles.form}>
+                <Text style={styles.formLabel}>How would you describe it?</Text>
+                <View style={styles.segment}>
+                  {(['worth_checking', 'needs_attention'] as const).map((option) => (
+                    <TouchableOpacity
+                      key={option}
+                      style={[styles.segmentItem, flagSeverity === option && styles.segmentItemActive]}
+                      onPress={() => setFlagSeverity(option)}
+                    >
+                      <Text style={[styles.segmentText, flagSeverity === option && styles.segmentTextActive]}>
+                        {option === 'worth_checking' ? 'Worth checking' : 'Needs attention'}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <Text style={styles.formLabel}>What did you notice?</Text>
+                <TextInput
+                  style={styles.textArea}
+                  multiline
+                  placeholder="A short note for your own reference"
+                  placeholderTextColor="#A69C92"
+                  value={flagReason}
+                  onChangeText={setFlagReason}
+                />
+                <TouchableOpacity
+                  style={[styles.submitBtn, flagMutation.isPending && styles.submitBtnDisabled]}
+                  disabled={flagMutation.isPending}
+                  onPress={submitFlag}
+                >
+                  {flagMutation.isPending ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.submitBtnText}>Flag concern</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            ) : null}
+
+            {activeForm === 'away' ? (
+              <View style={styles.form}>
+                <Text style={styles.formHint}>Away days will not count against their check-in streak.</Text>
+                <Text style={styles.formLabel}>From</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor="#A69C92"
+                  autoCapitalize="none"
+                  value={awayStart}
+                  onChangeText={setAwayStart}
+                />
+                <Text style={styles.formLabel}>To</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor="#A69C92"
+                  autoCapitalize="none"
+                  value={awayEnd}
+                  onChangeText={setAwayEnd}
+                />
+                <Text style={styles.formLabel}>Timezone</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Asia/Singapore"
+                  placeholderTextColor="#A69C92"
+                  autoCapitalize="none"
+                  value={awayTimezone}
+                  onChangeText={setAwayTimezone}
+                />
+                <Text style={styles.formLabel}>Reason (optional)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. Visiting family"
+                  placeholderTextColor="#A69C92"
+                  value={awayReason}
+                  onChangeText={setAwayReason}
+                />
+                <TouchableOpacity
+                  style={[styles.submitBtn, awayMutation.isPending && styles.submitBtnDisabled]}
+                  disabled={awayMutation.isPending}
+                  onPress={submitAway}
+                >
+                  {awayMutation.isPending ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.submitBtnText}>Save away period</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </View>
 
           <View style={styles.actionGrid}>
@@ -222,12 +455,6 @@ async function callPatient(profile: RealPatientProfile) {
   }
 }
 
-function getProfileBadgeStatus(status: RealPatientProfile['status']): Status {
-  if (status === 'doing_well') return 'green';
-  if (status === 'worth_checking') return 'yellow';
-  return 'red';
-}
-
 function formatDuration(seconds: number) {
   if (!seconds) {
     return '0m 0s';
@@ -292,8 +519,97 @@ const styles = StyleSheet.create({
   avatarImage: { height: '100%', width: '100%' },
   avatarText: { fontSize: 18, fontWeight: '500', fontFamily: 'Georgia' },
   bannerName: { fontSize: 22, fontWeight: '500', color: '#2B2522', fontFamily: 'Georgia', marginBottom: 4 },
+  reasonLine: { fontSize: 14, color: '#4A433C', lineHeight: 20, marginBottom: 4 },
   lastSeen: { fontSize: 14, color: '#756C64' },
   duration: { fontSize: 13, color: '#A69C92', marginTop: 2 },
+
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: '#F4F0EA',
+    borderWidth: 1,
+    borderColor: '#E7DED2',
+  },
+  statusPillDot: { width: 9, height: 9, borderRadius: 999 },
+  statusPillText: { fontSize: 13, fontWeight: '600', color: '#4A433C' },
+  techNote: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 7,
+    marginTop: 12,
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: '#F4F0EA',
+  },
+  techNoteText: { flex: 1, fontSize: 12, color: '#6E6459', lineHeight: 17 },
+
+  actionRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
+  pillBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: '#F4F0EA',
+    borderWidth: 1,
+    borderColor: '#E7DED2',
+  },
+  pillBtnActive: { borderColor: '#C4B9AF', backgroundColor: '#EFE9E0' },
+  pillBtnText: { fontSize: 13, fontWeight: '600', color: '#4A433C' },
+  form: { marginTop: 16, gap: 8 },
+  formLabel: { fontSize: 13, fontWeight: '600', color: '#756C64', marginTop: 6 },
+  formHint: { fontSize: 13, color: '#8E877C', lineHeight: 18 },
+  segment: { flexDirection: 'row', gap: 8 },
+  segmentItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#F4F0EA',
+    borderWidth: 1,
+    borderColor: '#E7DED2',
+  },
+  segmentItemActive: { backgroundColor: '#EFE9E0', borderColor: '#C4B9AF' },
+  segmentText: { fontSize: 13, fontWeight: '600', color: '#756C64' },
+  segmentTextActive: { color: '#2B2522' },
+  input: {
+    backgroundColor: '#FBF8F4',
+    borderColor: '#E7DED2',
+    borderRadius: 10,
+    borderWidth: 1,
+    color: '#2B2522',
+    fontSize: 15,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+  },
+  textArea: {
+    backgroundColor: '#FBF8F4',
+    borderColor: '#E7DED2',
+    borderRadius: 10,
+    borderWidth: 1,
+    color: '#2B2522',
+    fontSize: 15,
+    minHeight: 72,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    textAlignVertical: 'top',
+  },
+  submitBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#87566A',
+    borderRadius: 12,
+    paddingVertical: 13,
+    marginTop: 12,
+    minHeight: 46,
+  },
+  submitBtnDisabled: { opacity: 0.65 },
+  submitBtnText: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
 
   callBtn: {
     flexDirection: 'row',

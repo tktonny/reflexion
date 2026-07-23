@@ -9,11 +9,21 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { apiGet } from '../../src/lib/apiClient';
 import { getStoredAuthSession } from '../../src/lib/authSession';
+import { usePatientStatusesV1 } from '../../src/lib/v1Client';
+import {
+  STATUS_META,
+  NEUTRAL_STATUS_COLOR,
+  getStatusLabel,
+  getReasonText,
+  getBaselineProgressText,
+  formatLastInteraction,
+} from '../../src/lib/v1Status';
 
+// Summary-strip dots use the authoritative Option-1 status palette (baseline §2.9).
 const STATUS_DOT: Record<string, string> = {
-  green: '#66735D',
-  yellow: '#B2844B',
-  red: '#87566A',
+  green: STATUS_META.doing_well.dot,
+  yellow: STATUS_META.worth_checking.dot,
+  red: STATUS_META.needs_attention.dot,
 };
 
 type PatientStatus = 'doing_well' | 'worth_checking' | 'needs_attention';
@@ -67,9 +77,16 @@ export default function HomeScreen() {
   const today = new Date().toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const displayName = getFirstName(caregiverName) || 'there';
 
-  const doingWell = configuredPatients.filter((patient) => getPatientStatus(patient.status) === 'doing_well').length;
-  const checkIn = configuredPatients.filter((patient) => getPatientStatus(patient.status) === 'worth_checking').length;
-  const attention = configuredPatients.filter((patient) => getPatientStatus(patient.status) === 'needs_attention').length;
+  // Authoritative status comes from the v1 read model (baseline §4), keyed by the same id the legacy
+  // list returns (the migration reuses the legacy ObjectId hex as the v1 patient _id). We never bucket
+  // off the legacy days-since-conversation status, which reports establishing patients as red.
+  const patientIds = configuredPatients.map((patient) => patient.patientId || patient.id);
+  const statusResults = usePatientStatusesV1(patientIds);
+  const statusValues = statusResults.map((result) => result.data?.status);
+
+  const doingWell = statusValues.filter((status) => status === 'doing_well').length;
+  const checkIn = statusValues.filter((status) => status === 'worth_checking').length;
+  const attention = statusValues.filter((status) => status === 'needs_attention').length;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -99,9 +116,20 @@ export default function HomeScreen() {
         {isLoadingConfig ? (
           <LoadingCard />
         ) : configuredPatients.length ? (
-          configuredPatients.map((patient) => {
-            const patientStatus = getPatientStatus(patient.status);
-            const patientStatusMeta = STATUS_COPY[patientStatus];
+          configuredPatients.map((patient, index) => {
+            const statusResult = statusResults[index];
+            const v1 = statusResult?.data;
+            const dotColor = v1 ? STATUS_META[v1.status].dot : NEUTRAL_STATUS_COLOR;
+            const label = v1
+              ? getStatusLabel(v1.status, patient.name)
+              : statusResult?.isLoading
+                ? 'Checking in…'
+                : 'Status updating';
+            const metaLine = v1
+              ? v1.status === 'establishing'
+                ? getBaselineProgressText(v1.baselineProgress)
+                : getReasonText(v1.primaryReason, patient.name)
+              : patient.lastSpokenLabel;
             return (
               <TouchableOpacity
                 activeOpacity={0.8}
@@ -127,10 +155,13 @@ export default function HomeScreen() {
                 <View style={styles.patientInfo}>
                   <Text style={styles.patientName}>{patient.name}</Text>
                   <View style={styles.patientStatusRow}>
-                    <View style={[styles.patientStatusDot, { backgroundColor: patientStatusMeta.color }]} />
-                    <Text style={styles.patientStatusText}>{patient.statusLabel || patientStatusMeta.label}</Text>
+                    <View style={[styles.patientStatusDot, { backgroundColor: dotColor }]} />
+                    <Text style={styles.patientStatusText}>{label}</Text>
                   </View>
-                  <Text style={styles.patientMeta}>{patient.lastSpokenLabel}</Text>
+                  <Text style={styles.patientMeta}>{metaLine}</Text>
+                  {v1 ? (
+                    <Text style={styles.patientSubMeta}>{formatLastInteraction(v1.lastInteractionAt)}</Text>
+                  ) : null}
                 </View>
                 <Text style={styles.chevron}>›</Text>
               </TouchableOpacity>
@@ -320,7 +351,8 @@ const styles = StyleSheet.create({
   patientStatusRow: { alignItems: 'center', flexDirection: 'row', gap: 7, marginTop: 7 },
   patientStatusDot: { borderRadius: 999, height: 8, width: 8 },
   patientStatusText: { color: '#756C64', fontSize: 13, fontWeight: '400' },
-  patientMeta: { color: '#A69C92', fontSize: 13, fontWeight: '700', marginTop: 7 },
+  patientMeta: { color: '#756C64', fontSize: 13, fontWeight: '500', marginTop: 7 },
+  patientSubMeta: { color: '#A69C92', fontSize: 12, fontWeight: '400', marginTop: 3 },
   chevron: { fontSize: 20, color: '#C4B9AF', fontWeight: '300' },
   stateCard: {
     alignItems: 'center',

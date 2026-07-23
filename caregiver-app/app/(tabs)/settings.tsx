@@ -20,6 +20,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiGet, apiSend } from '../../src/lib/apiClient';
 import { clearStoredAuthSession, getStoredAuthSession, setStoredAuthSession } from '../../src/lib/authSession';
+import { v1Logout } from '../../src/lib/v1Client';
 import { registerPushNotificationDevice } from '../../src/lib/pushNotifications';
 
 type AlertSensitivity =
@@ -213,7 +214,7 @@ export default function SettingsScreen() {
   }
 
   async function logout() {
-    await clearStoredAuthSession();
+    await Promise.all([clearStoredAuthSession(), v1Logout()]);
     router.replace('/sign-in');
   }
 
