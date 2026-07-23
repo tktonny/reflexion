@@ -8,8 +8,10 @@ import { dataOrThrow, type DeviceConfiguration } from '../src/api/devicePairing'
 import { loadDailyConversationPlan } from '../src/api/dailyConversationContext'
 import { sendDeviceHeartbeat, subscribeDeviceHeartbeat } from '../src/api/deviceHeartbeat'
 import { resolveOwnerIds, saveCheckin } from '../src/api/saveCheckin'
+import { setStoredSessionMemory } from '../src/storage/mirrorStorage'
 import { beginMirrorSession } from '../src/api/sessionSync'
-import { MirrorExperience, type MirrorVisualState } from '../src/components/mirror/MirrorExperience'
+import { MirrorExperience, type MirrorHomeWidget, type MirrorVisualState } from '../src/components/mirror/MirrorExperience'
+import { fetchCurrentWeather, type CurrentWeather, type WeatherLocation } from '../src/api/weather'
 import { DEFAULT_LANGUAGE } from '../src/config/conversationMode'
 import {
   ACTIVE_MIRROR_ID_STORAGE_KEY,
@@ -61,19 +63,36 @@ function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null 
   return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition ?? null
 }
 
-function formatGreeting(date: Date) {
+// Ambient clock/greeting localized to the patient's conversation language (baseline §7 Phase 2).
+// Falls back to English for languages without an explicit greeting table.
+const LANGUAGE_LOCALES: Record<string, string> = {
+  english: 'en-US', mandarin: 'zh-CN', cantonese: 'zh-HK', minnan: 'zh-Hant',
+  malay: 'ms-MY', hindi: 'hi-IN', urdu: 'ur-PK', tamil: 'ta-IN',
+}
+const GREETINGS: Record<string, [string, string, string]> = {
+  english: ['Good morning', 'Good afternoon', 'Good evening'],
+  mandarin: ['早安', '午安', '晚上好'],
+  cantonese: ['早晨', '午安', '晚上好'],
+  minnan: ['早安', '午安', '暗安'],
+  malay: ['Selamat pagi', 'Selamat petang', 'Selamat malam'],
+  hindi: ['सुप्रभात', 'नमस्कार', 'शुभ संध्या'],
+  urdu: ['صبح بخیر', 'آداب', 'شب بخیر'],
+  tamil: ['காலை வணக்கம்', 'மதிய வணக்கம்', 'மாலை வணக்கம்'],
+}
+function localeFor(language: string) { return LANGUAGE_LOCALES[language] || 'en-US' }
+
+function formatGreeting(date: Date, language: string) {
   const hour = date.getHours()
-  if (hour < 12) return 'Good morning'
-  if (hour < 18) return 'Good afternoon'
-  return 'Good evening'
+  const table = GREETINGS[language] || GREETINGS.english
+  return hour < 12 ? table[0] : hour < 18 ? table[1] : table[2]
 }
 
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'long', weekday: 'long' }).format(date)
+function formatDate(date: Date, language: string) {
+  return new Intl.DateTimeFormat(localeFor(language), { day: 'numeric', month: 'long', weekday: 'long' }).format(date)
 }
 
-function formatTime(date: Date) {
-  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(date)
+function formatTime(date: Date, language: string) {
+  return new Intl.DateTimeFormat(localeFor(language), { hour: 'numeric', minute: '2-digit' }).format(date)
 }
 
 function latestMessage(messages: ChatMessage[], role: 'assistant' | 'user') {
@@ -103,6 +122,10 @@ export default function ConversationScreen() {
   const [wakeListening, setWakeListening] = useState(false)
   const [wakeError, setWakeError] = useState('')
   const [localProblem, setLocalProblem] = useState<LocalProblem>(null)
+  const [weather, setWeather] = useState<CurrentWeather | null>(null)
+  const [weatherLocation, setWeatherLocation] = useState<WeatherLocation | null>(null)
+  const [usualWakeTime, setUsualWakeTime] = useState<string | null>(null)
+  const lastAutoStartDateRef = useRef<string>('')
 
   const {
     statusKind,
@@ -119,6 +142,8 @@ export default function ConversationScreen() {
     recording,
     beginPushToTalk,
     endPushToTalk,
+    getSessionTelemetry,
+    getSessionAudio,
   } = useConversation({ language, persona, patientName, dailyPlan })
 
   const endingRef = useRef(false)
@@ -154,6 +179,18 @@ export default function ConversationScreen() {
     return 'ambient'
   }, [checkingPairing, closingStage, connecting, endingConversation, localProblem, sessionActive, statusKind, statusText, turnState, userSpeaking])
 
+  // Ambient home widgets: real weather (open-meteo, if a location is configured) + next medication.
+  const homeWidgets = useMemo<MirrorHomeWidget[]>(() => {
+    const widgets: MirrorHomeWidget[] = []
+    if (weather) widgets.push({ icon: 'partly-sunny-outline', label: 'Weather', value: `${weather.tempC}°C ${weather.label}`.trim() })
+    const medication = dailyPlan.medicationReminder
+    if (medication?.scheduledAt) {
+      const when = new Date(medication.scheduledAt)
+      if (!Number.isNaN(when.getTime())) widgets.push({ icon: 'medkit-outline', label: 'Medication', value: formatTime(when, language) })
+    }
+    return widgets.slice(0, 2)
+  }, [weather, dailyPlan, language])
+
   useEffect(() => {
     const timerId = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(timerId)
@@ -176,6 +213,14 @@ export default function ConversationScreen() {
       setNurseName(profile.nurseName ?? 'your caregiver')
       if (pairing.configuration?.patient) {
         setPatientId(pairing.configuration.patient.patientId)
+        // Ambient-home inputs from the care plan (untyped Records): weather location + usual wake time.
+        const carePlan = pairing.configuration.patient.carePlan
+        const location = (carePlan?.communicationPreferences as { location?: WeatherLocation } | undefined)?.location
+        if (location && (location.city || (typeof location.latitude === 'number' && typeof location.longitude === 'number'))) {
+          setWeatherLocation(location)
+        }
+        const wake = (carePlan?.dailyRoutine as { usualWakeTime?: unknown } | undefined)?.usualWakeTime
+        if (typeof wake === 'string' && /^\d{1,2}:\d{2}$/.test(wake.trim())) setUsualWakeTime(wake.trim())
         const plan = await loadDailyConversationPlan({
           patientId: pairing.configuration.patient.patientId,
           patientName: nextPatientName,
@@ -229,6 +274,38 @@ export default function ConversationScreen() {
     if (heartbeatState === 'offline' && !busy && !checkingPairing) setLocalProblem('offline')
     if (heartbeatState === 'online') setLocalProblem((problem) => problem === 'offline' ? null : problem)
   }), [busy, checkingPairing])
+
+  // Fetch real weather for the ambient home widget when a location is configured; refresh every 30 min.
+  useEffect(() => {
+    if (!weatherLocation) return
+    let mounted = true
+    const load = async () => {
+      const result = await fetchCurrentWeather(weatherLocation)
+      if (mounted && result) setWeather(result)
+    }
+    void load()
+    const timerId = setInterval(load, 30 * 60 * 1000)
+    return () => { mounted = false; clearInterval(timerId) }
+  }, [weatherLocation])
+
+  // Scheduled auto-start: at the patient's usual wake time, gently begin a daily check-in — but only
+  // when idle (ambient) and not already started today. Wake word / tap still work independently.
+  useEffect(() => {
+    if (!usualWakeTime) return
+    const normalized = usualWakeTime.length === 4 ? `0${usualWakeTime}` : usualWakeTime
+    const timerId = setInterval(() => {
+      if (busy || checkingPairing || localProblem || endingConversation || visualState !== 'ambient') return
+      const current = new Date()
+      const hhmm = `${String(current.getHours()).padStart(2, '0')}:${String(current.getMinutes()).padStart(2, '0')}`
+      const today = current.toDateString()
+      if (hhmm === normalized && lastAutoStartDateRef.current !== today) {
+        lastAutoStartDateRef.current = today
+        startWith('screening')
+      }
+    }, 30_000)
+    return () => clearInterval(timerId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usualWakeTime, busy, checkingPairing, localProblem, endingConversation, visualState])
 
   const handleStart = useCallback(async () => {
     if (busy || checkingPairing) return
@@ -290,6 +367,19 @@ export default function ConversationScreen() {
     setClosingStage((stage) => stage === 'goodbye' ? stage : 'buffering')
     try {
       await stopConversation()
+      // Capture after stop: the closing goodbye turn + its playback drain are now recorded, and
+      // cleanup does not reset the telemetry recorder.
+      const telemetry = getSessionTelemetry?.() ?? null
+      const sessionAudio = getSessionAudio?.() ?? null
+      // Production telemetry breadcrumb (baseline §7 Phase 1 Req 4) — the per-turn detail rides the
+      // uploaded capture_metric events; this one summary line is intentionally NOT __DEV__-gated.
+      if (telemetry) {
+        console.info(
+          `[session-telemetry] turns=${telemetry.patientTurns} speechMs=${telemetry.patientSpeechMs} ` +
+            `ariaMs=${telemetry.ariaSpeechMs} reprompts=${telemetry.repromptCount} ` +
+            `reconnects=${telemetry.reconnectCount} medianLatencyMs=${telemetry.medianResponseLatencyMs ?? 'n/a'}`,
+        )
+      }
       setClosingStage('saving')
       const ids = await resolveOwnerIds()
       const saveResult = await saveCheckin({
@@ -300,7 +390,17 @@ export default function ConversationScreen() {
         patientId: ids.patientId,
         deviceId: ids.deviceId,
         language: ids.language ?? language,
+        telemetry,
+        sessionAudio,
       })
+      // Persist a few salient user lines as soft continuity memory for the next session.
+      if (ids.patientId) {
+        const memoryLines = messagesRef.current
+          .filter((message) => message.role === 'user' && message.text.trim().length >= 8)
+          .slice(-3)
+          .map((message) => message.text.trim().slice(0, 140))
+        await setStoredSessionMemory(ids.patientId, memoryLines).catch(() => undefined)
+      }
       router.replace({
         pathname: '/conversation-closing',
         params: { nurseName, sync: saveResult.saved ? 'synced' : 'queued' },
@@ -405,8 +505,9 @@ export default function ConversationScreen() {
       <MirrorExperience
         assistantText={assistantText}
         bargeInActive={bargeInActive}
-        date={formatDate(now)}
-        greeting={formatGreeting(now)}
+        date={formatDate(now, language)}
+        greeting={formatGreeting(now, language)}
+        homeWidgets={homeWidgets}
         microphoneActive={sessionActive}
         onBegin={() => startWith('companion')}
         onEnd={() => void finalize()}
@@ -415,7 +516,7 @@ export default function ConversationScreen() {
         progressText={progressText}
         state={visualState}
         statusText={statusText}
-        time={formatTime(now)}
+        time={formatTime(now, language)}
         userText={userText}
         wakeError={wakeError}
         wakeListening={wakeListening}

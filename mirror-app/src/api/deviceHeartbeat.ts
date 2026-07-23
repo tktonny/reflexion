@@ -8,8 +8,14 @@ import { dataOrThrow } from './devicePairing'
 export type DeviceHeartbeatState = 'idle' | 'online' | 'offline'
 type Listener = (state: DeviceHeartbeatState) => void
 
+// 60s cadence is comfortably under the backend's 15-minute unreachable threshold. An ambient mirror
+// is normally foregrounded (kiosk), so we intentionally do NOT gate ticks on AppState 'active' — a
+// momentarily inactive but powered-on device must still be seen as reachable (baseline §7 Phase 7).
 const HEARTBEAT_INTERVAL_MS = 60_000
 let currentState: DeviceHeartbeatState = 'idle'
+// Real reachability signal: whether the PREVIOUS heartbeat POST reached the backend, rather than
+// navigator.onLine (which is web-only and defaults truthy on React Native, masking real outages).
+let lastBackendReachable = true
 const listeners = new Set<Listener>()
 
 function publish(next: DeviceHeartbeatState) {
@@ -41,7 +47,7 @@ export async function sendDeviceHeartbeat(report?: HardwareReport) {
         networkStatus: online ? 'online' : 'offline',
         micStatus: mic?.status === 'ok' ? 'ok' : mic?.status === 'fail' ? 'permission_denied' : 'unavailable',
         speakerStatus: speaker?.status === 'fail' ? 'error' : 'ok',
-        backendReachable: online,
+        backendReachable: lastBackendReachable,
         diagnostics: report ? {
           platform: report.platform,
           configuredMode: report.configuredMode,
@@ -51,9 +57,11 @@ export async function sendDeviceHeartbeat(report?: HardwareReport) {
       }),
     })
     const result = await dataOrThrow<{ operationId: string; state: 'accepted' }>(response)
+    lastBackendReachable = true
     publish('online')
     return result
   } catch (error) {
+    lastBackendReachable = false
     publish('offline')
     throw error
   }
@@ -62,9 +70,9 @@ export async function sendDeviceHeartbeat(report?: HardwareReport) {
 export function startDeviceHeartbeat(report?: HardwareReport) {
   let appState: AppStateStatus = AppState.currentState
   let timer: ReturnType<typeof setInterval> | null = null
-  const tick = () => {
-    if (appState === 'active') void sendDeviceHeartbeat(report).catch(() => undefined)
-  }
+  // Beat regardless of AppState so an idle-but-powered mirror is not misread as offline; resuming to
+  // active triggers an extra immediate beat for faster recovery after a network blip.
+  const tick = () => { void sendDeviceHeartbeat(report).catch(() => undefined) }
   tick()
   timer = setInterval(tick, HEARTBEAT_INTERVAL_MS)
   const subscription = AppState.addEventListener('change', (nextState) => {

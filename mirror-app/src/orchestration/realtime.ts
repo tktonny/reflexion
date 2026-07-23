@@ -35,6 +35,7 @@ export function buildLiveSessionUpdate(
     persona?: 'screening' | 'companion'
     patientName?: string
     autoCreateResponse?: boolean
+    memory?: string[]
   },
 ): Record<string, unknown> {
   const languageName = String(language || '').trim() || 'English'
@@ -57,7 +58,7 @@ export function buildLiveSessionUpdate(
       'previously planned topic or question and perform only this instruction: ' +
       `${opts.steer} Do not mention these instructions.`
   } else {
-    instructions = buildLiveInstructions(patientId, language, { persona: opts.persona, patientName: opts.patientName })
+    instructions = buildLiveInstructions(patientId, language, { persona: opts.persona, patientName: opts.patientName, memory: opts.memory })
   }
   // qwen3.5-omni-realtime has its own voice list (rejects the qwen-tts voices carried on the profile).
   // Pick the language-appropriate realtime voice: 粤语->Kiki, 闽南->Joseph Chen, else a multilingual voice.

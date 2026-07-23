@@ -78,14 +78,21 @@ export async function qwenChat(
 /** Text-to-speech. Returns base64 audio (preferred for web playback) and/or a URL. */
 export async function qwenTTS(
   text: string,
-  opts: { apiKey?: string; model?: string; voice?: string } = {},
+  opts: { apiKey?: string; model?: string; voice?: string; rate?: number } = {},
 ): Promise<{ audioBase64: string | null; url: string | null; format: 'wav' }> {
+  // Aria's default speech is deliberately slow (doc: 0.85×) for elderly listeners. `rate` is sent
+  // best-effort: the current Qwen multimodal-TTS endpoint may ignore it, but plumbing it end-to-end
+  // means a rate-capable engine (or a future Qwen param) needs no code change, and the value is
+  // per-patient configurable. Clamp to a safe, intelligible band.
+  const rate = typeof opts.rate === 'number' && Number.isFinite(opts.rate) ? Math.min(Math.max(opts.rate, 0.5), 1.5) : undefined
+  const input: Record<string, unknown> = { text, voice: opts.voice || QWEN.defaultVoice }
+  if (rate !== undefined && rate !== 1) input.rate = rate
   const res = await fetchWithTimeout(`${QWEN.base}/api/v1/services/aigc/multimodal-generation/generation`, {
     method: 'POST',
     headers: await authHeaders(opts.apiKey),
     body: JSON.stringify({
       model: opts.model || QWEN.ttsModel,
-      input: { text, voice: opts.voice || QWEN.defaultVoice },
+      input,
     }),
   })
   const body = await res.json()

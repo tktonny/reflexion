@@ -21,6 +21,13 @@ export type PcmAudioBridge = {
   setCaptureMuted: (muted: boolean) => void
   /** Unplayed playback backlog in ms; used to un-mute the mic only after playback drains. */
   getPlaybackBacklogMs: () => number
+  /**
+   * True only when the running build can actually measure the playback backlog. When false, a
+   * getPlaybackBacklogMs() of 0 means "unknown", NOT "drained" — callers must fall back to a floor
+   * wait derived from the enqueued audio duration so the full-playback guarantee is never defeated
+   * by a stub returning 0 (implementation baseline §6).
+   */
+  isBacklogMeasurable: () => boolean
   stop: () => Promise<void>
 }
 
@@ -47,6 +54,7 @@ export function createPcmAudioBridge(): PcmAudioBridge {
       clearPlayback: () => {},
       setCaptureMuted: () => {},
       getPlaybackBacklogMs: () => 0,
+      isBacklogMeasurable: () => false,
       stop: async () => {},
     }
   }
@@ -65,6 +73,7 @@ export function createPcmAudioBridge(): PcmAudioBridge {
     clearPlayback: () => native.clearPlayback(),
     setCaptureMuted: (muted) => native.setCaptureMuted(muted),
     getPlaybackBacklogMs: () => native.getPlaybackBacklogMs?.() ?? 0,
+    isBacklogMeasurable: () => typeof native.getPlaybackBacklogMs === 'function',
     stop: async () => {
       subscription?.remove()
       subscription = null

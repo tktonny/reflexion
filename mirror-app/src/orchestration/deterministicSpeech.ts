@@ -152,6 +152,18 @@ export function closingTextForLanguage(language: LanguageKey): string {
   }
 }
 
+// A single gentle silence re-prompt (doc: wait 7–10s, then "Take your time", never rush, once only).
+export function takeYourTimeForLanguage(language: LanguageKey): string {
+  switch (language) {
+    case 'mandarin': return '别着急，慢慢来，我一直在这里。'
+    case 'cantonese': return '唔使急，慢慢嚟，我一直喺度。'
+    case 'minnan': return '免急，沓沓仔來就好，我攏佇遮。'
+    case 'malay': return 'Ambil masa anda. Saya di sini bila-bila anda sedia.'
+    case 'tamil': return 'நிதானமாக இருங்கள். நீங்கள் தயாராகும்போது நான் இங்கே இருக்கிறேன்.'
+    default: return "Take your time. I'm right here whenever you're ready."
+  }
+}
+
 export function companionClosingTextForLanguage(language: LanguageKey): string {
   switch (language) {
     case 'mandarin': return '不客气，和你聊天很开心。下次再聊，再见。'

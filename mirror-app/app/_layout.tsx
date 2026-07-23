@@ -2,7 +2,8 @@ import { useEffect } from 'react'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 
-import { startDeviceHeartbeat } from '../src/api/deviceHeartbeat'
+import { startDeviceHeartbeat, subscribeDeviceHeartbeat } from '../src/api/deviceHeartbeat'
+import { flushPendingConversations } from '../src/storage/conversationQueue'
 import { runHardwareChecks } from '../src/lib/hardwareCheck'
 import { mirrorColors } from '../src/theme/mirrorTheme'
 
@@ -16,7 +17,21 @@ export default function RootLayout() {
       for (const c of r.checks) console.log(`[hardware] ${c.status.toUpperCase().padEnd(7)} ${c.label}: ${c.detail}`)
       stopHeartbeat = startDeviceHeartbeat(r)
     })
-    return () => stopHeartbeat?.()
+    // Drain any sessions that were queued offline: once on launch, then again whenever the heartbeat
+    // reports the backend is reachable again (network reconnect), with a light guard against overlap.
+    let flushing = false
+    let lastState = ''
+    const runFlush = () => {
+      if (flushing) return
+      flushing = true
+      void flushPendingConversations().catch(() => undefined).finally(() => { flushing = false })
+    }
+    runFlush()
+    const unsubscribe = subscribeDeviceHeartbeat((state) => {
+      if (state === 'online' && lastState !== 'online') runFlush()
+      lastState = state
+    })
+    return () => { stopHeartbeat?.(); unsubscribe() }
   }, [])
 
   return (

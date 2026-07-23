@@ -1,0 +1,11 @@
+# local training/validation artifacts — do NOT commit
+.venv/
+__pycache__/
+output/
+*.aiff
+*.log
+# large downloaded data / trained models (bring in ad hoc)
+*.npy
+my_custom_model/
+incoming/
+# keep: *.py, *.ipynb, README.md, requirements.txt, .gitignore

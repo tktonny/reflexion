@@ -14,5 +14,9 @@
     "app",
     "src",
     "index.ts"
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ]
 }
