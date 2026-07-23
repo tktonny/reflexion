@@ -55,3 +55,15 @@ mirror-app/server/generated/
 
 # Office lock/temp files
 ~$*
+
+# Wake-word training data artifacts (downloaded datasets / generated clips / venv / vendored generator)
+mirror-app/wakeword-training/*.zip
+mirror-app/wakeword-training/*.bin
+mirror-app/wakeword-training/mit_raw/
+mirror-app/wakeword-training/mit_rirs/
+mirror-app/wakeword-training/local_clips/
+mirror-app/wakeword-training/pf_test/
+mirror-app/wakeword-training/pf_test2/
+mirror-app/wakeword-training/piper-sample-generator/
+mirror-app/wakeword-training/.venv/
+mirror-app/wakeword-training/output/
