@@ -9,7 +9,7 @@
 当前存在三条主要后端路径：
 
 1. `mirror-app/app/api/*`：Expo Router API 直接连接 MongoDB，负责配对、Qwen token、会话保存和 LLM 评估。
-2. `caregiver-server`：Express + MongoDB，负责 caregiver 账号、患者、配对确认、会话查询、完成状态和摘要；已部署到 `https://reflexion-caregiver-app-server.vercel.app`，`/health` 已确认返回 200。
+2. `reflexion-server`：Express + MongoDB，负责 caregiver 账号、患者、配对确认、会话查询、完成状态和摘要；已部署到 `https://reflexion-caregiver-app-server.vercel.app`，`/health` 已确认返回 200。
 3. `platform_April`：FastAPI + 文件存储，拥有更完整的 batch multimodal、identity、feature snapshot 和 longitudinal service，但没有接入前两条生产数据流。
 
 实时对话又分为：
@@ -34,7 +34,7 @@ flowchart LR
 
 这个拓扑适合快速试验，但职责重复、模型配置漂移、认证不一致，并且无法保证一条 session 从采集到纵向输出有唯一来源。
 
-Caregiver App 已通过 `EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL` 指向上述 Vercel 服务。需要特别区分：caregiver 客户端会移除调用路径开头的 `/api`，而 mirror 的 `getApiUrl()` 会保留 `/api`；同时 caregiver-server 当前没有 `mirror-pairing/request-code`、`device-status`、`qwen-token`、`conversations` 或 `assess` 路由。因此该部署是可复用的生产起点，但尚不是 mirror 的可直接使用后台。
+Caregiver App 已通过 `EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL` 指向上述 Vercel 服务。需要特别区分：caregiver 客户端会移除调用路径开头的 `/api`，而 mirror 的 `getApiUrl()` 会保留 `/api`；同时 reflexion-server 当前没有 `mirror-pairing/request-code`、`device-status`、`qwen-token`、`conversations` 或 `assess` 路由。因此该部署是可复用的生产起点，但尚不是 mirror 的可直接使用后台。
 
 ## 2. 目标原则
 
@@ -343,7 +343,7 @@ stateDiagram-v2
 ### 8.1 MVP 收敛方案
 
 - 保留 Expo mirror/caregiver 客户端。
-- 以已部署的 caregiver-server 为起点，或在同一网关后增加正式 mirror service；最终由一个稳定 API 域暴露认证、配对、session、plan、tools 和 caregiver API。
+- 以已部署的 reflexion-server 为起点，或在同一网关后增加正式 mirror service；最终由一个稳定 API 域暴露认证、配对、session、plan、tools 和 caregiver API。
 - 统一 `/api` 前缀约定，再把 mirror 的 `EXPO_PUBLIC_API_BASE` 指向正式网关；在此之前不要直接指向当前 caregiver URL。
 - Realtime Gateway 作为独立 WebSocket 服务。
 - 将 `platform_April` 的 QC/identity/feature/longitudinal 逻辑改为消费统一 session event，并迁移到共享数据库/对象存储。

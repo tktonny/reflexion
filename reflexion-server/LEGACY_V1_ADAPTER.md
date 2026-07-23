@@ -41,7 +41,7 @@ caregiver app 把 `nurseId`/`patientId` 当 **24 位 ObjectId hex** 校验(如 `
 
 ## 2. 数据迁移映射(`NursePatientConfig` → v1)
 
-一次性脚本 `caregiver-server/src/scripts/migrateLegacyToV1.ts`(建议 `npm run migrate:legacy-v1`),幂等(按 `_id` upsert)。逐护士文档:
+一次性脚本 `reflexion-server/src/scripts/migrateLegacyToV1.ts`(建议 `npm run migrate:legacy-v1`),幂等(按 `_id` upsert)。逐护士文档:
 
 ### 2.1 护士 → tenant + user
 | v1 `tenants` | 来源 |

@@ -2,7 +2,7 @@
 
 Date: 2026-07-22
 Contract: `reflexion-api-v1.openapi.yaml`
-Runtime: `caregiver-server`
+Runtime: `reflexion-server`
 
 ## Completed in code
 

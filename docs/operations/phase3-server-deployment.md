@@ -20,7 +20,7 @@ The API and worker must use the same environment, MongoDB database and object-st
 - Independent 32+ character `JWT_SECRET`, `PAIRING_PEPPER` and `CREDENTIAL_ENCRYPTION_KEY` values in a secret manager.
 - Process supervision and alerts for API failures, worker lag, retry/dead-letter events and provider failures.
 
-Use `caregiver-server/.env.example` as the variable inventory. Never copy real secrets into source control, an APK or a browser bundle.
+Use `reflexion-server/.env.example` as the variable inventory. Never copy real secrets into source control, an APK or a browser bundle.
 
 ## Release order
 

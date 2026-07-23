@@ -45,12 +45,12 @@ mirror-app/dist/
 mirror-app/android/
 mirror-app/ios/
 
-# --- caregiver-app/ (Expo/RN) + caregiver-server/ (Express) ---
+# --- caregiver-app/ (Expo/RN) + reflexion-server/ (Express) ---
 caregiver-app/node_modules/
 caregiver-app/.expo/
 caregiver-app/dist/
-caregiver-server/node_modules/
-caregiver-server/dist/
+reflexion-server/node_modules/
+reflexion-server/dist/
 mirror-app/server/generated/
 
 # Office lock/temp files

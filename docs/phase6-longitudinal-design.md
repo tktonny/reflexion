@@ -3,11 +3,11 @@
 > Status: **design, not implemented** (per direction 2026-07-23). This specifies how to close the
 > Phase-6 gaps without touching the MVP. Hard rule from `docs/reflexion-implementation-baseline.md` §4:
 > **nothing here may drive the caregiver green/amber/red** — Phase 6 is a shadow research pipeline.
-> A structural test (`caregiver-server/src/v1/monitoring/shadowIsolation.test.ts`) already enforces that
+> A structural test (`reflexion-server/src/v1/monitoring/shadowIsolation.test.ts`) already enforces that
 > `computeCaregiverStatus` reads no anomaly/longitudinal collections; every design below preserves it.
 
 ## 1. What exists today (baseline)
-Real, unit-tested pipeline in `caregiver-server/src/v1/monitoring/`:
+Real, unit-tested pipeline in `reflexion-server/src/v1/monitoring/`:
 - `pipeline.ts::processCompletedSession` — consent → identity → quality gate → feature snapshot →
   (optional) embedding → operational baseline → research baseline + anomaly score → review case, all
   driven off the outbox (`session.completed`, `artifact.committed`).
