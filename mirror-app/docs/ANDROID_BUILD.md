@@ -4,7 +4,7 @@
 
 - Android Studio with the SDK/NDK versions requested by Gradle.
 - JDK 17.
-- A reachable HTTPS deployment of `caregiver-server`.
+- A reachable HTTPS deployment of `reflexion-server`.
 - A unique device bootstrap token from `npm run provision:device` in that server project.
 - A private release keystore. Never publish an APK signed with the Android debug key.
 

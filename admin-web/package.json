@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Reflexion Admin / Onboarding web portal (doc 1.1 third component) — manage users + loved ones, reply to caregiver support conversations. Talks to caregiver-server /api/v1/admin.",
+  "description": "Reflexion Admin / Onboarding web portal (doc 1.1 third component) — manage users + loved ones, reply to caregiver support conversations. Talks to reflexion-server /api/v1/admin.",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

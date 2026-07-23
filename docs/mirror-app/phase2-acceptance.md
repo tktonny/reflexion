@@ -124,4 +124,4 @@ MuMu 模拟器已通过 `wm size 1080x1920` 设置为目标 viewport，debug 包
 - `mirror-app/android/app/build/outputs/apk/release/app-release-universal.apk`：ARM64、ARMv7、x86、x86_64 通用包，约 278 MB；
 - `mirror-app/android/app/build/outputs/apk/release/app-release.apk`：与 universal 相同的 Gradle 默认产物。
 
-通用 release 没有嵌入共享 bootstrap token。安装后如设备尚未由后端 provision，会安全地显示 `Pairing is unavailable`；正式交付前需使用 `caregiver-server` 的 device provisioning 流程为每台镜子发放唯一 bootstrap credential。
+通用 release 没有嵌入共享 bootstrap token。安装后如设备尚未由后端 provision，会安全地显示 `Pairing is unavailable`；正式交付前需使用 `reflexion-server` 的 device provisioning 流程为每台镜子发放唯一 bootstrap credential。

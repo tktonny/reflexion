@@ -1,4 +1,4 @@
-// Typed API client for the caregiver-server /api/v1 admin surface. Handles bearer auth + single-flight
+// Typed API client for the reflexion-server /api/v1 admin surface. Handles bearer auth + single-flight
 // 401 refresh. In dev the /api path is proxied by Vite; in prod set VITE_API_BASE_URL.
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')

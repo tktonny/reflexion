@@ -1,6 +1,6 @@
 # 对话结果如何和后台 + caregiver 端打通
 
-镜子端一次 check-in 的结果通过 `POST /api/conversations`(Expo Router 服务端路由)写入 MongoDB `ref`,caregiver-server / caregiver-app 直接读同一个库。这份文档说明**输出什么、caregiver 怎么消费、我们做了什么打通**。
+镜子端一次 check-in 的结果通过 `POST /api/conversations`(Expo Router 服务端路由)写入 MongoDB `ref`,reflexion-server / caregiver-app 直接读同一个库。这份文档说明**输出什么、caregiver 怎么消费、我们做了什么打通**。
 
 ## 1. 输出:两条文档
 
@@ -45,7 +45,7 @@ npm run seed                 # 建 demo nurse+patient(固定 ObjectId)
 #    → 屏上应显示 “✓ 已保存到后台”
 npm run relay & npm run web  # /realtime-test → 开始 → 对话 → 结束并评估
 # 3) 验证:在 Atlas 查 Conversation / ConversationIdToPatientIdMap(patientId=65f0…b2),
-#    或用 caregiver-server 读该 patient 的 session/trend/summary。
+#    或用 reflexion-server 读该 patient 的 session/trend/summary。
 ```
 已验证(无需 DB):`/api/conversations` 路由能加载并解析含 `assessment` 的 payload(无 URI 时返回 `missing_mongodb_uri`);typecheck 全绿。
 

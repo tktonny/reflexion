@@ -2,13 +2,13 @@
 
 > 状态：目标设计基线
 > 日期：2026-07-22
-> 适用范围：Mirror App、Caregiver App、Provider/Reviewer Console、caregiver-server、异步分析服务
+> 适用范围：Mirror App、Caregiver App、Provider/Reviewer Console、reflexion-server、异步分析服务
 > 核心目标：用一个统一控制面支撑设备配对、日常助手、每日认知采集、纵向监控和专业复核
 
 ## 1. 架构结论
 
-1. 以 `caregiver-server` 的 `/api/v1` 作为唯一 API 控制面；最终公网域名由部署时配置，Mirror 与 Caregiver 通过同一个 `EXPO_PUBLIC_API_BASE` 接入，不绑定 Vercel。
-2. caregiver-server 第一阶段保持 TypeScript/Express **模块化单体**，按领域拆模块，不立即拆成多个微服务。
+1. 以 `reflexion-server` 的 `/api/v1` 作为唯一 API 控制面；最终公网域名由部署时配置，Mirror 与 Caregiver 通过同一个 `EXPO_PUBLIC_API_BASE` 接入，不绑定 Vercel。
+2. reflexion-server 第一阶段保持 TypeScript/Express **模块化单体**，按领域拆模块，不立即拆成多个微服务。
 3. 实时语音仍由 Mirror 通过短期 ticket 直连 Qwen；统一 API 负责授权、策略、session 事实源和结果回传，不代理长时间音视频 WebSocket。
 4. API 服务只承载短请求控制面。QC、身份门控、特征提取、embedding、评估、基线和异常检测通过 transactional outbox 和长期运行的 worker 处理。
 5. MongoDB Atlas 是结构化业务和分析元数据的事实源；对象存储保存音频、视频、大转录文件；Atlas Vector Search 可保存和检索同构 embedding，但“向量库”本身不等于异常检测引擎。
@@ -41,7 +41,7 @@ flowchart LR
     end
 
     subgraph Edge["统一公网控制面"]
-      API["caregiver-server /api/v1"]
+      API["reflexion-server /api/v1"]
       AUTH["AuthN + tenant/RBAC/relationship AuthZ"]
       MOD["领域模块"]
       OUTBOX[("outbox_events")]
@@ -377,7 +377,7 @@ notification.requested
 
 ## 10. 部署边界
 
-### caregiver-server / Vercel
+### reflexion-server / Vercel
 
 - REST API、认证校验、授权、短事务、预签名上传、短期 Qwen ticket、读取聚合结果。
 - 使用复用的 MongoClient，而不是每个请求创建并关闭新连接。
@@ -414,7 +414,7 @@ notification.requested
 
 ### Phase 0：建立 v2 基础，不改变现有用户路径
 
-- 在 caregiver-server 增加 `/api/v1`、统一错误、request ID、JWT/device auth middleware。
+- 在 reflexion-server 增加 `/api/v1`、统一错误、request ID、JWT/device auth middleware。
 - 建立新 collection 和索引；不删除旧数据。
 - 把 MongoClient 改为进程级复用。
 - 添加 outbox 和 worker 的最小闭环。

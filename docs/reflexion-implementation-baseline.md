@@ -20,7 +20,7 @@ what the backend sends.
 | Component | Owns | Must never |
 |---|---|---|
 | **Mirror APK** (`mirror-app/`) | Aria conversation, raw session + per-turn signals, heartbeat, offline queue, device-level kiosk/boot | Compute or display status/score to the elderly user |
-| **Backend status engine** (`caregiver-server/`) | Store raw signals, baselines, ratios, thresholds, status, scheduled jobs, notifications, agent tools | Run the AI conversation; render UI |
+| **Backend status engine** (`reflexion-server/`) | Store raw signals, baselines, ratios, thresholds, status, scheduled jobs, notifications, agent tools | Run the AI conversation; render UI |
 | **Caregiver app** (`caregiver-app/`) | Render backend status + reasons + notifications + trends + caregiver actions | Run the conversation; independently compute status |
 
 ---
@@ -29,7 +29,7 @@ what the backend sends.
 
 These were flagged by the phase audit (2026-07-23) as ambiguous. Resolved here per the requirement doc.
 
-1. **v1 is canonical.** `caregiver-server/src/v1/**` (`/api/v1`) is the single source of truth for
+1. **v1 is canonical.** `reflexion-server/src/v1/**` (`/api/v1`) is the single source of truth for
    pairing, sessions, realtime tickets, status, tools, and monitoring. Every legacy endpoint
    (`/api/qwen-token`, `/nurse-patient-config/*`, `/nurse-patient-config/mirrors/connect`) is
    **deprecated**, gated behind `ENABLE_LEGACY_API`, and slated for removal at the 2026-12-31 Sunset.
@@ -73,7 +73,7 @@ Updated-Metrics MVP set (M1–M7, M13). Server route: `POST /api/v1/sessions/:id
 
 ### 3.1 `acquisitionSummary` (extended — both sides must match)
 
-`validateAcquisitionSummary` in `caregiver-server/src/v1/routes/sessions.ts` is extended from the current
+`validateAcquisitionSummary` in `reflexion-server/src/v1/routes/sessions.ts` is extended from the current
 `{durationMs, patientSpeechMs, patientTurns}` to the full set. Unknown keys are ignored (forward-compatible).
 
 ```

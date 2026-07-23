@@ -32,7 +32,7 @@ This workspace includes a tiered clinic demo API and UI that implement the 48-ho
 - `README.md`, `docs/` — main project description and planning documents.
 - `mirror-app/` — Android/Expo **mirror device app** (smart-mirror client). Voice check-in uses the Qwen Omni Realtime relay under `mirror-app/server/`. See `mirror-app/docs/ECOSYSTEM.md`, `mirror-app/QWEN_RELAY.md`, `mirror-app/docs/ANDROID_BUILD.md`.
 - `caregiver-app/` — caregiver / family Expo app (source repo: reflexion-native-app).
-- `caregiver-server/` — caregiver Express + MongoDB backend (source repo: reflexion-caregiver-app-server).
+- `reflexion-server/` — caregiver Express + MongoDB backend (source repo: reflexion-caregiver-app-server).
 - `platform/` — the original **clinic platform** (Python FastAPI "AI brain"). Run all Python commands from inside this folder.
 
 ### `platform/` sub-layout

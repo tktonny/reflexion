@@ -1,5 +1,5 @@
 {
-  "name": "reflexion-caregiver-app-server",
+  "name": "reflexion-server",
   "version": "1.0.0",
   "private": true,
   "type": "module",

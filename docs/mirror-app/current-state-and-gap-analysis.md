@@ -23,7 +23,7 @@
 ### 2.1 配对
 
 - Mirror 生成 device ID、请求 15 分钟配对码并轮询状态：`mirror-app/app/index.tsx:146-305`、`mirror-app/app/api/mirror-pairing/request-code+api.ts`。
-- Caregiver 可输入 6 位码并把 mirror 绑定到 patient：`caregiver-app/app/mirror-management/add.tsx:84-117`、`caregiver-server/src/routes/nurse-patient-config/mirrors/connect/index.ts`。
+- Caregiver 可输入 6 位码并把 mirror 绑定到 patient：`caregiver-app/app/mirror-management/add.tsx:84-117`、`reflexion-server/src/routes/nurse-patient-config/mirrors/connect/index.ts`。
 - 设备状态同时核验 map、pairing session 和 patient config：`mirror-app/app/api/mirror-pairing/device-status+api.ts:34-97`。
 - 双端均有解绑路径。
 
@@ -51,7 +51,7 @@
 - Caregiver App 的 `getApiUrl()` 已读取 `EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL` 并去掉请求路径中的 `/api` 前缀：`caregiver-app/src/lib/apiUrl.ts`。
 - 当前部署 `https://reflexion-caregiver-app-server.vercel.app/health` 已于 2026-07-22 验证为 HTTP 200、`{"ok":true}`。
 - Caregiver 服务可查当天会话、按天会话、月度完成数、7/30 天趋势和摘要。
-- `patientTrend` 与 daily cron 支持每日完成/缺席状态：`caregiver-server/src/lib/statusEngine.ts`、`caregiver-server/src/routes/patient-trend.ts`。
+- `patientTrend` 与 daily cron 支持每日完成/缺席状态：`reflexion-server/src/lib/statusEngine.ts`、`reflexion-server/src/routes/patient-trend.ts`。
 
 ### 2.6 Python 平台能力
 
@@ -64,9 +64,9 @@
 
 **证据**
 
-- 登录只返回 `nurseId/name/email`，不签发 token：`caregiver-server/src/routes/auth/sign-in.ts:20-44`。
+- 登录只返回 `nurseId/name/email`，不签发 token：`reflexion-server/src/routes/auth/sign-in.ts:20-44`。
 - App 把该对象保存到 localStorage/普通文件：`caregiver-app/src/lib/authSession.ts`。
-- Router 没有 auth middleware：`caregiver-server/src/routes/router.ts`。
+- Router 没有 auth middleware：`reflexion-server/src/routes/router.ts`。
 - 大量接口直接接受 query/body 中的 `nurseId` 或 `patientId`。
 
 **影响**
@@ -174,7 +174,7 @@
 ### P1-03 “上传诊断数据”没有形成消费闭环
 
 - Risk 字段已经落 Mongo。
-- `caregiver-server/src/lib/statusEngine.ts:27-48` 只根据 completed session 输出 red/green。
+- `reflexion-server/src/lib/statusEngine.ts:27-48` 只根据 completed session 输出 red/green。
 - `patientTrend` 展示的是时长/缺席，不是 baseline 或认知变化。
 - caregiver UI 多个详情/趋势页面仍有 “not ready” placeholder，alerts 页面是 coming soon。
 
