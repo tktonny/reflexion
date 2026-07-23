@@ -11,6 +11,7 @@ import { resolveOwnerIds, saveCheckin } from '../src/api/saveCheckin'
 import { setStoredSessionMemory } from '../src/storage/mirrorStorage'
 import { beginMirrorSession } from '../src/api/sessionSync'
 import { MirrorExperience, type MirrorHomeWidget, type MirrorVisualState } from '../src/components/mirror/MirrorExperience'
+import { getMirrorCopy } from '../src/components/mirror/mirrorStrings'
 import { fetchCurrentWeather, type CurrentWeather, type WeatherLocation } from '../src/api/weather'
 import { DEFAULT_LANGUAGE } from '../src/config/conversationMode'
 import {
@@ -159,7 +160,8 @@ export default function ConversationScreen() {
   const assistantText = latestMessage(messages, 'assistant')
   const userText = latestMessage(messages, 'user')
   const busy = connecting || sessionActive || endingConversation
-  const progressText = persona === 'screening' ? 'TODAY’S CONVERSATION' : 'ARIA IS LISTENING'
+  const mirrorCopy = getMirrorCopy(language)
+  const progressText = persona === 'screening' ? mirrorCopy.todaysConversation : mirrorCopy.ariaListeningHeader
 
   const visualState: MirrorVisualState = useMemo(() => {
     if (localProblem === 'offline') return 'offline'
@@ -403,7 +405,7 @@ export default function ConversationScreen() {
       }
       router.replace({
         pathname: '/conversation-closing',
-        params: { nurseName, sync: saveResult.saved ? 'synced' : 'queued' },
+        params: { nurseName, sync: saveResult.saved ? 'synced' : 'queued', language },
       })
     } catch (error) {
       endingRef.current = false
@@ -442,7 +444,7 @@ export default function ConversationScreen() {
     const SpeechRecognition = getSpeechRecognitionConstructor()
     if (!SpeechRecognition) {
       setWakeListening(false)
-      setWakeError('Tap the mirror to start')
+      setWakeError(mirrorCopy.tapToStartWake)
       return
     }
     const recognition = new SpeechRecognition()
@@ -466,7 +468,7 @@ export default function ConversationScreen() {
     }
     recognition.onerror = () => {
       setWakeListening(false)
-      setWakeError('Tap the mirror to start')
+      setWakeError(mirrorCopy.tapToStartWake)
     }
     recognition.onend = () => {
       wakeRecognitionRef.current = null
@@ -507,6 +509,7 @@ export default function ConversationScreen() {
         bargeInActive={bargeInActive}
         date={formatDate(now, language)}
         greeting={formatGreeting(now, language)}
+        language={language}
         homeWidgets={homeWidgets}
         microphoneActive={sessionActive}
         onBegin={() => startWith('companion')}
@@ -515,7 +518,6 @@ export default function ConversationScreen() {
         patientName={patientName}
         progressText={progressText}
         state={visualState}
-        statusText={statusText}
         time={formatTime(now, language)}
         userText={userText}
         wakeError={wakeError}

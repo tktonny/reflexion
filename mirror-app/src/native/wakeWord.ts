@@ -36,6 +36,12 @@ const EMB_WINDOW = 76 // mel frames per embedding window
 const EMB_STRIDE = 8 // mel-frame step between successive embeddings
 const WW_WINDOW = 16 // embeddings per wakeword prediction
 const CHUNK = 1280 // samples per melspec call (80 ms @ 16 kHz)
+// The mel model consumes 480 samples of window context per call (N samples -> (N-480)/160 frames), so
+// bare 1280-sample chunks silently DROP 3 of every 8 mel frames at chunk boundaries (~37% of the
+// timeline, time-compressing speech). Prepending the previous chunk's last 480 samples yields exactly
+// 8 new, hop-continuous frames per chunk — identical timeline to whole-clip processing, which is what
+// wakeword models are trained on. Keep in sync with wakeword-training/owwfeat.py (MEL_LOOKBACK).
+const MEL_LOOKBACK = 480
 // Detection threshold + debounce are env-tunable because a custom-trained model ("Hey Aria") almost
 // always needs a different operating point than the stock "hey jarvis" model. Retune these against the
 // trained model's ROC without shipping a new code build. See wakeword-training/README.md.
@@ -97,20 +103,23 @@ export async function createWakeWordEngine(onDetected: () => void): Promise<Wake
   const wwOut = ww.outputNames[0]
 
   let audio: number[] = [] // pending float32 samples (raw int16 values, NOT normalized)
+  let melTail: number[] = [] // last MEL_LOOKBACK samples of the previous chunk (frame continuity)
   let melFrames: number[][] = [] // rows of 32 mel bins
   let nextEmbStart = 0 // index in melFrames for the next embedding window
   let embeds: number[][] = [] // rows of 96
   let hits = 0
   let running = false
 
-  const reset = () => { audio = []; melFrames = []; nextEmbStart = 0; embeds = []; hits = 0 }
+  const reset = () => { audio = []; melTail = []; melFrames = []; nextEmbStart = 0; embeds = []; hits = 0 }
 
   async function step() {
-    // 1) audio -> mel frames, in 1280-sample chunks
+    // 1) audio -> mel frames, in 1280-sample chunks with MEL_LOOKBACK carryover (see const above)
     while (audio.length >= CHUNK) {
       const chunk = audio.slice(0, CHUNK)
       audio = audio.slice(CHUNK)
-      const out = await mel.run({ [melIn]: new OrtTensor('float32', Float32Array.from(chunk), [1, chunk.length]) })
+      const inp = melTail.length ? melTail.concat(chunk) : chunk
+      melTail = chunk.slice(CHUNK - MEL_LOOKBACK)
+      const out = await mel.run({ [melIn]: new OrtTensor('float32', Float32Array.from(inp), [1, inp.length]) })
       const data = out[melOut].data as Float32Array
       const frames = Math.floor(data.length / MEL_BINS)
       for (let f = 0; f < frames; f += 1) {

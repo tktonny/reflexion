@@ -1,10 +1,13 @@
 package expo.modules.pcmaudio
 
+import android.content.Context
 import android.media.AudioAttributes
+import android.media.AudioDeviceInfo
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioRecord
 import android.media.AudioTrack
+import android.os.Build
 import android.media.MediaRecorder
 import android.media.audiofx.AcousticEchoCanceler
 import android.media.audiofx.AutomaticGainControl
@@ -40,6 +43,15 @@ class ExpoPcmAudioModule : Module() {
   private var ns: NoiseSuppressor? = null
   private var agc: AutomaticGainControl? = null
 
+  // ---- audio routing / echo cancellation ----
+  // When true, playback uses the VOICE_COMMUNICATION path + MODE_IN_COMMUNICATION so the platform
+  // AEC (on the VOICE_COMMUNICATION capture) has the played audio as its reference and can cancel
+  // Aria's own voice out of the mic. USAGE_MEDIA (false) plays louder but gives the AEC no reference,
+  // so the assistant hears herself. Toggled from JS via start(sampleRate, communicationMode).
+  private var communicationMode = true
+  private var audioManager: AudioManager? = null
+  private var previousAudioMode = AudioManager.MODE_NORMAL
+
   // ---- playback (downstream deltas -> speaker) ----
   private var track: AudioTrack? = null
   private var playbackThread: Thread? = null
@@ -55,9 +67,10 @@ class ExpoPcmAudioModule : Module() {
 
     Events("onAudioChunk")
 
-    AsyncFunction("start") { sampleRate: Int, promise: Promise ->
+    AsyncFunction("start") { sampleRate: Int, useCommunicationMode: Boolean, promise: Promise ->
       try {
         captureSampleRate = if (sampleRate > 0) sampleRate else 16000
+        communicationMode = useCommunicationMode
         startPlayback()
         startCapture()
         promise.resolve(null)
@@ -189,10 +202,11 @@ class ExpoPcmAudioModule : Module() {
     val bufSize = maxOf(minBuf, playbackSampleRate) // ~0.5 s headroom against underrun
     val t = AudioTrack(
       AudioAttributes.Builder()
-        // USAGE_MEDIA (not VOICE_COMMUNICATION): the media path reliably routes to the mirror's
-        // main loudspeaker at an audible, user-controllable level without MODE_IN_COMMUNICATION.
-        // Feedback is prevented by half-duplex muting, not by the voice-call route.
-        .setUsage(AudioAttributes.USAGE_MEDIA)
+        // VOICE_COMMUNICATION when communicationMode is on: playback becomes the AEC downlink
+        // reference so the platform echo canceller removes Aria's own voice from the mic (fixes the
+        // "assistant hears itself" echo). Requires MODE_IN_COMMUNICATION + forced speaker (below).
+        // USAGE_MEDIA is the louder fallback but gives the AEC no reference.
+        .setUsage(if (communicationMode) AudioAttributes.USAGE_VOICE_COMMUNICATION else AudioAttributes.USAGE_MEDIA)
         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
         .build(),
       AudioFormat.Builder()
@@ -211,8 +225,40 @@ class ExpoPcmAudioModule : Module() {
     return t
   }
 
+  // Route the whole session through the voice-communication path so the platform AEC can reference the
+  // played audio. On a mirror there is no earpiece, so force the built-in loudspeaker and keep it loud.
+  private fun configureCommunicationAudio(enable: Boolean) {
+    try {
+      val am = audioManager
+        ?: (appContext.reactContext?.getSystemService(Context.AUDIO_SERVICE) as? AudioManager)?.also { audioManager = it }
+        ?: return
+      if (enable) {
+        previousAudioMode = am.mode
+        am.mode = AudioManager.MODE_IN_COMMUNICATION
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+          val speaker = am.availableCommunicationDevices.firstOrNull { it.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER }
+          if (speaker != null) am.setCommunicationDevice(speaker)
+        } else {
+          @Suppress("DEPRECATION")
+          am.isSpeakerphoneOn = true
+        }
+      } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+          am.clearCommunicationDevice()
+        } else {
+          @Suppress("DEPRECATION")
+          am.isSpeakerphoneOn = false
+        }
+        am.mode = previousAudioMode
+      }
+    } catch (_: Throwable) {
+      // Routing is best-effort; a failure must never crash the session (falls back to default route).
+    }
+  }
+
   private fun startPlayback() {
     if (playing.get()) return
+    if (communicationMode) configureCommunicationAudio(true)
     val t = buildTrack()
     track = t
     playing.set(true)
@@ -263,5 +309,6 @@ class ExpoPcmAudioModule : Module() {
     try { track?.pause(); track?.flush(); track?.stop() } catch (_: Throwable) {}
     try { track?.release() } catch (_: Throwable) {}
     track = null
+    if (communicationMode) configureCommunicationAudio(false)
   }
 }

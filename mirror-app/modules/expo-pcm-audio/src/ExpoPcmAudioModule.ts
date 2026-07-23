@@ -8,7 +8,7 @@ export type PcmAudioModuleEvents = {
 
 export declare class ExpoPcmAudioModule extends NativeModule<PcmAudioModuleEvents> {
   /** Start mic capture (PCM16 mono @ sampleRate) + open the streaming playback track. */
-  start(sampleRate: number): Promise<void>
+  start(sampleRate: number, useCommunicationMode: boolean): Promise<void>
   /** Stop capture + playback and release all native resources. */
   stop(): Promise<void>
   /** Enqueue base64 PCM16 mono @ 24 kHz for gapless playback (non-blocking; ordered). */

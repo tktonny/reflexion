@@ -35,7 +35,7 @@ export function useWakeWord(active: boolean, onDetected: () => void): void {
         onDetectedRef.current()
       })
       if (cancelled || !engine) return
-      const bridge = createPcmAudioBridge()
+      const bridge = createPcmAudioBridge({ communicationMode: false })
       bridgeRef.current = bridge
       try {
         await bridge.start((b64) => { void engine.feed(base64Pcm16ToInt16(b64)) })

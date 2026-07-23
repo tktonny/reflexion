@@ -4,9 +4,11 @@ import { useEffect } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 import { mirrorColors as c, mirrorFonts as f } from '../src/theme/mirrorTheme'
+import { getMirrorCopy } from '../src/components/mirror/mirrorStrings'
 
 export default function ConversationClosingScreen() {
-  const params = useLocalSearchParams<{ nurseName?: string; sync?: string }>()
+  const params = useLocalSearchParams<{ nurseName?: string; sync?: string; language?: string }>()
+  const t = getMirrorCopy(typeof params.language === 'string' ? params.language : undefined)
   const nurseName = typeof params.nurseName === 'string' && params.nurseName.trim()
     ? params.nurseName.trim()
     : 'your caregiver'
@@ -29,17 +31,17 @@ export default function ConversationClosingScreen() {
         <View style={styles.checkCircle}>
           <Ionicons name="checkmark" size={42} color={c.ink} />
         </View>
-        <Text style={styles.eyebrow}>CONVERSATION COMPLETE</Text>
-        <Text style={styles.title}>Thank you for chatting with me.</Text>
-        <Text style={styles.body}>I’ll let {nurseName} know you checked in today.</Text>
-        <Text style={styles.goodbye}>Have a lovely day.</Text>
+        <Text style={styles.eyebrow}>{t.closingEyebrow}</Text>
+        <Text style={styles.title}>{t.savingTitle}</Text>
+        <Text style={styles.body}>{t.closingLetCaregiverKnow(nurseName)}</Text>
+        <Text style={styles.goodbye}>{t.closingHaveLovelyDay}</Text>
         <View style={styles.syncRow}>
           <View style={[styles.syncDot, queued && styles.syncDotQueued]} />
           <Text style={styles.syncText}>
-            {queued ? 'Saved safely — will sync when connection returns' : 'Saved securely'}
+            {queued ? t.closingSavedSyncing : t.closingSavedSecurely}
           </Text>
         </View>
-        <Text style={styles.returnHint}>Returning to your home screen…</Text>
+        <Text style={styles.returnHint}>{t.closingReturningHome}</Text>
       </Pressable>
     </View>
   )
