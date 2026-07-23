@@ -3,9 +3,11 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { FAQ_ITEMS } from '../src/data/mockData';
 
 export default function FAQScreen() {
+  const router = useRouter();
   const [open, setOpen] = useState<number | null>(0);
 
   return (
@@ -32,10 +34,14 @@ export default function FAQScreen() {
           </TouchableOpacity>
         ))}
 
-        <View style={styles.bottomCard}>
+        <TouchableOpacity
+          activeOpacity={0.82}
+          onPress={() => router.push('/chatbot')}
+          style={styles.bottomCard}
+        >
           <Text style={styles.bottomTitle}>Still have questions?</Text>
-          <Text style={styles.bottomText}>Tap the Support tab below to chat directly with the Reflexion team.</Text>
-        </View>
+          <Text style={styles.bottomText}>Click here to chat with the Reflexion team.</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );

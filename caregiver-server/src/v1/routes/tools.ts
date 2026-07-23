@@ -3,7 +3,7 @@ import { asyncHandler } from '../../lib/asyncHandler.js'
 import { getDb } from '../../lib/mongo.js'
 import { getPrincipal, requireActor } from '../platform/auth.js'
 import { collections } from '../platform/collections.js'
-import { badRequest, conflict, forbidden } from '../platform/errors.js'
+import { badRequest, conflict, forbidden, notFound } from '../platform/errors.js'
 import { sendData } from '../platform/http.js'
 import { newId } from '../platform/ids.js'
 import { executeIdempotent } from '../platform/idempotency.js'
@@ -11,7 +11,14 @@ import { enumValue, objectBody, optionalString, requiredString } from '../platfo
 import { authorizedSession } from './sessions.js'
 import { getWeather, webSearch } from '../tools/providers.js'
 
-const TOOL_NAMES = ['weather.get', 'web.search', 'medication.list', 'reminders.upcoming'] as const
+// Read tools + two controlled WRITE tools (baseline §2.6): the agent may confirm a medication/reminder
+// occurrence conversationally (top-3 WTP feature) and log a caregiver task. It may NOT create or edit
+// medication schedules/dosages — those stay caregiver/provider-only via the REST care-plan routes.
+const TOOL_NAMES = ['weather.get', 'web.search', 'medication.list', 'reminders.upcoming', 'reminder.respond', 'caregiver_task.create'] as const
+const WRITE_TOOL_SCOPES: Partial<Record<typeof TOOL_NAMES[number], string>> = {
+  'reminder.respond': 'reminder:respond',
+  'caregiver_task.create': 'session:write',
+}
 
 export const toolsRouter = Router()
 const requireDevice = requireActor('device')
@@ -25,6 +32,11 @@ toolsRouter.post('/sessions/:sessionId/tool-invocations', requireDevice, asyncHa
     const args = body.arguments && typeof body.arguments === 'object' && !Array.isArray(body.arguments) ? body.arguments as Record<string, unknown> : {}
     const principal = getPrincipal(request)
     if (principal.kind !== 'device') throw forbidden()
+    // Controlled write tools require the matching device scope beyond the session:write already proven.
+    const requiredScope = WRITE_TOOL_SCOPES[tool]
+    if (requiredScope && !principal.scopes.includes(requiredScope)) {
+      throw forbidden(`This mirror is not permitted to use ${tool}.`)
+    }
     const db = await getDb()
     const invocationId = newId('op')
     const startedAt = new Date()
@@ -62,6 +74,34 @@ async function invokeTool(db: Awaited<ReturnType<typeof getDb>>, tenantId: strin
     return (await db.collection<any>(collections.medicationPlans).find({ tenantId, patientId, status: 'active' }).project({ _id: 1, displayName: 1, instructions: 1, schedule: 1, source: 1, version: 1 }).toArray())
       .map(({ _id, ...plan }) => ({ planId: _id, ...plan }))
   }
+  if (tool === 'reminder.respond') {
+    // Confirm a medication/reminder occurrence from the conversation. The occurrence MUST belong to
+    // this device's patient; the agent can only mark an existing scheduled occurrence, never invent one.
+    const occurrenceId = requiredString(args, 'occurrenceId', 100)
+    const status = enumValue(args.status, 'status', ['taken', 'skipped', 'snoozed', 'unknown'] as const)
+    const note = optionalString(args, 'note', 500)
+    const occurrence = await db.collection<any>(collections.reminderOccurrences).findOne({ _id: occurrenceId, tenantId, patientId })
+    if (!occurrence) throw notFound('Reminder occurrence')
+    const changed = await db.collection<any>(collections.reminderOccurrences).findOneAndUpdate(
+      { _id: occurrence._id, status: { $nin: ['cancelled'] } },
+      { $set: { status, respondedAt: new Date(), response: { note, actorType: 'device', channel: 'conversational' }, updatedAt: new Date() } },
+      { returnDocument: 'after' },
+    )
+    if (!changed) throw conflict('REMINDER_NOT_RESPONDABLE', 'This reminder cannot be updated.')
+    return { occurrenceId: changed._id, status: changed.status, respondedAt: changed.respondedAt }
+  }
+  if (tool === 'caregiver_task.create') {
+    const task = {
+      _id: newId('task'), tenantId, patientId,
+      category: enumValue(args.category, 'category', ['follow_up', 'appointment', 'medication_review', 'technical', 'custom'] as const),
+      priority: enumValue(args.priority, 'priority', ['routine', 'elevated', 'urgent'] as const),
+      title: requiredString(args, 'title', 160), details: optionalString(args, 'details', 1000),
+      sourceRef: `session:${session._id}`, dueAt: null,
+      status: 'open', createdBy: { type: 'device', id: session.deviceId || null }, createdAt: new Date(),
+    }
+    await db.collection<any>(collections.caregiverTasks).insertOne(task)
+    return { taskId: task._id, category: task.category, priority: task.priority, title: task.title, status: task.status }
+  }
   const now = new Date(); const to = new Date(now.getTime() + 24 * 60 * 60 * 1000)
   return (await db.collection<any>(collections.reminderOccurrences).find({ tenantId, patientId, scheduledAt: { $gte: now, $lt: to }, status: { $in: ['scheduled', 'delivered', 'snoozed'] } }).sort({ scheduledAt: 1 }).toArray())
     .map(({ _id, ...occurrence }) => ({ occurrenceId: _id, ...occurrence }))
@@ -72,5 +112,11 @@ function numberArgument(value: unknown, field: string) {
   if (typeof value !== 'number' || !Number.isFinite(value)) throw badRequest('VALIDATION_FAILED', `${field} must be a finite number.`)
   return value
 }
-function redactArguments(tool: string, args: Record<string, unknown>) { return tool === 'web.search' ? { queryHashOnly: true, freshness: args.freshness } : args }
+function redactArguments(tool: string, args: Record<string, unknown>) {
+  if (tool === 'web.search') return { queryHashOnly: true, freshness: args.freshness }
+  // Free-text notes/titles may contain personal content — persist structure, not the words.
+  if (tool === 'reminder.respond') return { occurrenceId: args.occurrenceId, status: args.status, noteProvided: Boolean(args.note) }
+  if (tool === 'caregiver_task.create') return { category: args.category, priority: args.priority, titleProvided: Boolean(args.title) }
+  return args
+}
 function summarizeOutput(tool: string, output: unknown) { return { tool, itemCount: Array.isArray(output) ? output.length : 1 } }

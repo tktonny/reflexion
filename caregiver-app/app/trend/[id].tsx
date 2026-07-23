@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import React, { useCallback, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import type { TrendDay } from '../../src/data/mockData';
 import { fetchPatientTrend } from '../../src/lib/patientTrendClient';
@@ -11,48 +12,28 @@ import { fetchPatientTrend } from '../../src/lib/patientTrendClient';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 type Range = 7 | 30 | 90;
+type ImplementedRange = 7 | 30;
 
 export default function TrendScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [range, setRange] = useState<Range>(30);
-  const [realTrend, setRealTrend] = useState<TrendDay[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const shouldLoadRealTrend = Boolean(id && /^[0-9a-f]{24}$/i.test(id));
   const realRangeImplemented = range === 7 || range === 30;
+  const trendQuery = useQuery({
+    enabled: shouldLoadRealTrend && realRangeImplemented,
+    queryKey: ['patientTrend', id, range],
+    queryFn: () => fetchPatientTrend(id, range as ImplementedRange),
+  });
+  const { refetch: refetchTrend } = trendQuery;
 
-  useEffect(() => {
-    if (!shouldLoadRealTrend || !realRangeImplemented) {
-      setRealTrend([]);
-      setIsLoading(false);
-      return;
-    }
-
-    let isMounted = true;
-    const loadTrend = async () => {
-      setIsLoading(true);
-      try {
-        const trend = await fetchPatientTrend(id, range);
-        if (isMounted) {
-          setRealTrend(trend);
-        }
-      } catch (err) {
-        console.error('[TrendScreen] load patient trend failed', err);
-        if (isMounted) {
-          setRealTrend([]);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+  useFocusEffect(
+    useCallback(() => {
+      if (shouldLoadRealTrend && realRangeImplemented) {
+        void refetchTrend();
       }
-    };
-
-    void loadTrend();
-    return () => {
-      isMounted = false;
-    };
-  }, [id, range, realRangeImplemented, shouldLoadRealTrend]);
+    }, [realRangeImplemented, refetchTrend, shouldLoadRealTrend]),
+  );
 
   if (!shouldLoadRealTrend) {
     return (
@@ -66,7 +47,7 @@ export default function TrendScreen() {
     );
   }
 
-  const trend = realTrend;
+  const trend = trendQuery.data || [];
 
   const maxDuration = Math.max(...trend.map(d => d.duration), 1);
   const talkedDays = trend.filter(d => !d.missed).length;
@@ -78,7 +59,7 @@ export default function TrendScreen() {
     if (shouldLoadRealTrend && range === 90) {
       return '3-month trend is not available yet.';
     }
-    if (isLoading) {
+    if (trendQuery.isLoading || trendQuery.isFetching) {
       return 'Loading trend...';
     }
     if (talkedDays >= range * 0.85)
@@ -184,7 +165,7 @@ export default function TrendScreen() {
         <View style={styles.v2Note}>
           <Feather name="info" size={14} color="#B2844B" />
           <Text style={styles.v2NoteText}>
-            Cognitive Stability Score with trend arrow is coming in a future update after user validation.
+            A longer-term wellbeing overview is coming in a future update, once we have validated it with families.
           </Text>
         </View>
       </ScrollView>

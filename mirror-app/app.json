@@ -30,7 +30,9 @@
       "permissions": [
         "CAMERA",
         "RECORD_AUDIO",
-        "INTERNET"
+        "INTERNET",
+        "RECEIVE_BOOT_COMPLETED",
+        "WAKE_LOCK"
       ]
     },
     "web": {
@@ -43,7 +45,8 @@
       "expo-audio",
       "onnxruntime-react-native",
       "expo-asset",
-      "@config-plugins/react-native-webrtc"
+      "@config-plugins/react-native-webrtc",
+      "./plugins/withKioskAndroid"
     ],
     "extra": {
       "router": {

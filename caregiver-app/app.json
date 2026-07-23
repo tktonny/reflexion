@@ -3,7 +3,7 @@
     "name": "Reflexion",
     "slug": "reflexion-app",
     "scheme": "reflexion",
-    "version": "1.0.1",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,8 +22,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.tarinpairor.reflexionapp",
-      "versionCode": 2
+      "package": "com.tarinpairor.reflexionapp"
     },
     "web": {
       "output": "server",
@@ -31,7 +30,10 @@
     },
     "plugins": [
       "expo-router",
-      "expo-status-bar"
+      "expo-status-bar",
+      "expo-notifications",
+      "expo-image-picker",
+      "expo-camera"
     ],
     "extra": {
       "router": {},

@@ -1,14 +1,10 @@
 import { Router } from 'express'
 import { ObjectId } from 'mongodb'
 import { asyncHandler } from '../../../../lib/asyncHandler.js'
-import {
-  DB_NAME,
-  MIRROR_MAP_COLLECTION,
-  NURSE_CONFIG_COLLECTION,
-  PAIRING_COLLECTION,
-} from '../../../../lib/constants.js'
-import { withMongo } from '../../../../lib/mongo.js'
-import { normalizePairingCode, resolveMirrorPairing } from '../../../../lib/patients.js'
+import { NURSE_CONFIG_COLLECTION } from '../../../../lib/constants.js'
+import { getDb } from '../../../../lib/mongo.js'
+import { normalizePairingCode } from '../../../../lib/patients.js'
+import { BridgeError, claimV1Pairing, ensureV1Identity } from '../../../../lib/legacyV1Bridge.js'
 
 type ConnectMirrorBody = {
   nurseId?: string
@@ -18,6 +14,10 @@ type ConnectMirrorBody = {
   timezone?: string
 }
 
+// v1-backed: the caregiver app still POSTs the legacy shape { nurseId, patientId, pairingCode, ... },
+// but we mirror the nurse/patient into v1 and claim the v1 device_pairing the mirror created (the mirror
+// now runs Pairing v2, so its code lives in v1 device_pairings, not the old MirrorPairingSessions).
+// See LEGACY_V1_ADAPTER.md §3/§4.
 export const mirrorConnectRouter = Router()
 
 mirrorConnectRouter.post('/', asyncHandler(async (request, response) => {
@@ -28,118 +28,52 @@ mirrorConnectRouter.post('/', asyncHandler(async (request, response) => {
     return
   }
 
-  await withMongo(async (client) => {
-    const db = client.db(DB_NAME)
-    const configCollection = db.collection(NURSE_CONFIG_COLLECTION)
-    const pairingCollection = db.collection(PAIRING_COLLECTION)
-    const mapCollection = db.collection(MIRROR_MAP_COLLECTION)
-    const nurseId = new ObjectId(body!.nurseId)
-    const patientId = new ObjectId(body!.patientId)
-    const now = new Date()
+  const db = await getDb()
+  const nurseId = new ObjectId(body!.nurseId!)
+  const patientId = new ObjectId(body!.patientId!)
 
-    const config = await configCollection.findOne({ _id: nurseId, 'patients._id': patientId })
-    const patient = Array.isArray(config?.patients)
-      ? config.patients.find((candidate: { _id?: ObjectId }) => candidate._id?.toHexString?.() === patientId.toHexString())
-      : null
+  const config = await db.collection<any>(NURSE_CONFIG_COLLECTION).findOne({ _id: nurseId, 'patients._id': patientId })
+  const patient = Array.isArray(config?.patients)
+    ? config.patients.find((candidate: { _id?: ObjectId }) => candidate._id?.toHexString?.() === patientId.toHexString())
+    : null
+  if (!config || !patient) {
+    response.status(404).json({ error: 'Patient was not found.' })
+    return
+  }
+  if (hasExistingMirrorConnection(patient)) {
+    response.status(409).json({ error: 'This patient already has a linked mirror. Delete the existing connection first.' })
+    return
+  }
 
-    if (!config || !patient) {
-      response.status(404).json({ error: 'Patient was not found.' })
-      return
-    }
+  // Mirror the legacy nurse/patient into v1 (idempotent even if the batch migration has not run yet).
+  const { tenantId, userId, patientId: v1PatientId } = await ensureV1Identity(db, config, patient)
+  const mirrorName =
+    body!.mirrorName?.trim() ||
+    (typeof patient.mirrorName === 'string' && patient.mirrorName.trim()) ||
+    `Mirror for ${patient.name || 'patient'}`
+  const timezone = body!.timezone?.trim() || patient.timezone || 'Asia/Singapore'
+  const pairingCode = normalizePairingCode(body!.pairingCode)!
 
-    if (hasExistingMirrorConnection(patient)) {
-      response.status(409).json({ error: 'This patient already has a linked mirror. Delete the existing connection first.' })
-      return
-    }
-
-    const existingPatientMap = await mapCollection.findOne({ nurseId, patientId })
-    if (existingPatientMap) {
-      response.status(409).json({ error: 'This patient already has a mirror map. Delete the existing connection first.' })
-      return
-    }
-
-    const pairing = await resolveMirrorPairing(pairingCollection, body!.pairingCode).catch((error: unknown) => {
-      return error instanceof Error ? error : new Error('Pairing code is not valid or has expired.')
+  try {
+    const claim = await claimV1Pairing({
+      pairingCode, tenantId, userId, patientId: v1PatientId, patientDisplayName: patient.name || '',
+      mirrorName, correlationId: (request as { requestId?: string }).requestId,
     })
-    if (pairing instanceof Error || !pairing) {
-      response.status(400).json({ error: pairing instanceof Error ? pairing.message : 'Pairing code is not valid or has expired.' })
-      return
-    }
+    const now = claim.pairedAt
 
-    const mirrorId = new ObjectId(pairing.deviceId)
-    const existingMirrorMap = await mapCollection.findOne({ mirrorId })
-    if (existingMirrorMap) {
-      response.status(409).json({ error: 'This mirror is already linked to a patient. Delete that connection first.' })
-      return
-    }
-
-    const existingMirrorPatient = await configCollection.findOne({ 'patients.mirrorId': mirrorId })
-    if (existingMirrorPatient) {
-      response.status(409).json({ error: 'This mirror is already assigned to a patient. Delete that connection first.' })
-      return
-    }
-
-    const mirrorName =
-      body!.mirrorName?.trim() ||
-      (typeof patient.mirrorName === 'string' && patient.mirrorName.trim()) ||
-      `Mirror for ${patient.name || 'patient'}`
-    const timezone = body!.timezone?.trim() || pairing.timezone || patient.timezone || 'Asia/Singapore'
-
-    await configCollection.updateOne(
+    // Transition double-write: keep the legacy patient's mirror fields in sync so the caregiver app's
+    // mirror list / dashboard still show "paired" until those read routes are adapted to v1 (#2).
+    await db.collection<any>(NURSE_CONFIG_COLLECTION).updateOne(
       { _id: nurseId, 'patients._id': patientId },
       {
         $set: {
-          'patients.$.mirrorId': mirrorId,
-          'patients.$.mirrorName': mirrorName,
+          'patients.$.mirrorId': claim.deviceId,
+          'patients.$.mirrorName': claim.mirrorName,
           'patients.$.mirrorVerified': true,
           'patients.$.mirrorPairingStatus': 'paired',
-          'patients.$.mirrorPairingCode': pairing.pairingCode,
+          'patients.$.mirrorPairingCode': pairingCode,
           'patients.$.mirrorPairedAt': now,
-          'patients.$.deviceAuthToken': pairing.authToken || '',
           'patients.$.timezone': timezone,
-          updatedAt: now,
-        },
-      },
-    )
-
-    await mapCollection.insertOne({
-      mirrorId,
-      nurseId,
-      patientId,
-      mirrorName,
-      patientName: patient.name || '',
-      pairingCode: pairing.pairingCode,
-      createdAt: now,
-      updatedAt: now,
-    })
-
-    await Promise.all([
-      mapCollection.createIndex(
-        { patientId: 1 },
-        {
-          unique: true,
-          partialFilterExpression: { patientId: { $exists: true } },
-        },
-      ),
-      mapCollection.createIndex(
-        { mirrorId: 1 },
-        {
-          unique: true,
-          partialFilterExpression: { mirrorId: { $exists: true } },
-        },
-      ),
-    ]).catch(() => {
-      // Existing duplicate test data should not prevent explicit checks above from protecting new writes.
-    })
-
-    await pairingCollection.updateOne(
-      { pairingCode: pairing.pairingCode },
-      {
-        $set: {
-          status: 'paired',
-          nurseId,
-          patientId,
-          pairedAt: now,
           updatedAt: now,
         },
       },
@@ -148,12 +82,17 @@ mirrorConnectRouter.post('/', asyncHandler(async (request, response) => {
     response.json({
       success: true,
       patientId: patientId.toHexString(),
-      mirrorId: mirrorId.toHexString(),
-      mirrorName,
+      mirrorId: claim.deviceId,
+      mirrorName: claim.mirrorName,
       mirrorPairingStatus: 'paired',
       mirrorPairedAt: now.toISOString(),
     })
-  })
+  } catch (error) {
+    const status = error instanceof BridgeError ? error.status : 400
+    response.status(status).json({
+      error: error instanceof Error ? error.message : 'Pairing code is not valid or has expired.',
+    })
+  }
 }))
 
 function validateBody(body: ConnectMirrorBody | null) {
@@ -167,9 +106,7 @@ function validateBody(body: ConnectMirrorBody | null) {
 function hasExistingMirrorConnection(patient: Record<string, unknown>) {
   return Boolean(
     patient.mirrorId ||
-      patient.deviceAuthToken ||
       patient.mirrorVerified ||
-      patient.mirrorPairingStatus === 'paired' ||
-      patient.mirrorPairingCode,
+      patient.mirrorPairingStatus === 'paired',
   )
 }

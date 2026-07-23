@@ -3,7 +3,7 @@ import { collections } from '../platform/collections.js'
 import { newId } from '../platform/ids.js'
 import { getObjectStore } from '../platform/objectStore.js'
 import { appendOutbox } from '../platform/outbox.js'
-import { anomalyBand, buildStructuredBaseline, cosineDistance, mad, median, normalizedCentroid, operationalEligibility, researchEligibility, robustZ, scoreStructured } from './algorithms.js'
+import { anomalyBand, buildStructuredBaseline, cosineDistance, ewma, mad, median, normalizedCentroid, operationalEligibility, researchEligibility, robustZ, scoreStructured } from './algorithms.js'
 import { configuredEmbeddingProvider } from './embeddings.js'
 import { extractStructuredFeatures, flattenFeatureGroups, type TranscriptTurn } from './features.js'
 
@@ -153,13 +153,18 @@ async function evaluateConsent(db: Db, session: Record<string, any>) {
 }
 
 async function evaluateIdentity(db: Db, session: Record<string, any>) {
-  if (!session.deviceId) return { verdict: 'manual_review', confidence: 0.3, reasons: ['NO_DEVICE_ASSIGNMENT'] }
+  // IMPORTANT: this is NOT speaker/voiceprint/biometric verification. "linked" means only that an
+  // active device assignment exists — i.e. the session came from the mirror assigned to this patient.
+  // The `method` field labels that explicitly so reviewers never read the confidence as biometric
+  // assurance, and the modest confidence caps (not 1.0) reflect that a household member could speak.
+  // Real enrollment matching is a future Phase-6 item (implementation baseline §7 Phase 6).
+  if (!session.deviceId) return { verdict: 'manual_review', confidence: 0.3, method: 'device_assignment_only', reasons: ['NO_DEVICE_ASSIGNMENT'], enrollmentRef: null }
   const assignment = await db.collection<any>(collections.assignments).findOne({
     tenantId: session.tenantId, patientId: session.patientId, deviceId: session.deviceId, status: 'active',
   })
   return assignment
-    ? { verdict: 'linked', confidence: 0.7, reasons: ['ACTIVE_DEVICE_ASSIGNMENT'], enrollmentRef: null }
-    : { verdict: 'exclude', confidence: 0, reasons: ['DEVICE_ASSIGNMENT_INVALID'], enrollmentRef: null }
+    ? { verdict: 'linked', confidence: 0.7, method: 'device_assignment_only', reasons: ['ACTIVE_DEVICE_ASSIGNMENT_NOT_BIOMETRIC'], enrollmentRef: null }
+    : { verdict: 'exclude', confidence: 0, method: 'device_assignment_only', reasons: ['DEVICE_ASSIGNMENT_INVALID'], enrollmentRef: null }
 }
 
 export function evaluateSessionQuality(session: Record<string, any>, turns: TranscriptTurn[]) {
@@ -199,11 +204,14 @@ async function rebuildOperationalBaseline(db: Db, session: Record<string, any>, 
     tenantId: session.tenantId, patientId: session.patientId, baselineType: 'reassurance_mvp', state: { $in: ['establishing', 'complete'] },
   }, { sort: { revision: -1 } })
   const metrics = rows.slice(-14).map((row) => row.acquisition || {})
+  // Weekly session rate over the observed baseline window (doc M5 baseline), floored later by the rules.
+  const weeklyRate = eligibility.observedDays > 0 ? (eligibility.completedSessions / eligibility.observedDays) * 7 : 0
   const document = {
     _id: newId('base'), tenantId: session.tenantId, patientId: session.patientId, baselineType: 'reassurance_mvp',
     state: eligibility.eligible ? 'complete' : 'establishing', sessionCount: eligibility.completedSessions,
     window: { days: 14, requiredSessions: 7, observedDays: eligibility.observedDays },
-    metricAggregates: operationalAggregates(metrics), algorithmVersion: 'reassurance-ewma-v1', alpha: 0.1,
+    metricAggregates: operationalAggregates(metrics), weeklyRate,
+    algorithmVersion: 'reassurance-median-mad-ewma-v1', alpha: 0.1,
     revision: Number(previous?.revision || 0) + 1, sourceSessionId: session._id, createdAt: new Date(),
   }
   await db.collection<any>(collections.operationalBaselines).updateMany({
@@ -217,10 +225,14 @@ async function rebuildOperationalBaseline(db: Db, session: Record<string, any>, 
 }
 
 function operationalAggregates(rows: Array<Record<string, unknown>>) {
-  const names = ['durationMs', 'patientSpeechMs', 'patientTurns']
+  // Robust median + MAD is the operating statistic (Signal-to-Status §8.3); the EWMA trend value is
+  // additionally stored so the routine metrics carry the doc's α=0.1 exponential weighting truthfully.
+  const names = ['durationMs', 'patientSpeechMs', 'ariaSpeechMs', 'patientTurns', 'medianResponseLatencyMs', 'wordCount', 'sessionStartMinuteOfDay']
   return Object.fromEntries(names.map((name) => {
     const values = rows.map((row) => row[name]).filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
-    return [name, values.length ? { median: median(values), mad: mad(values), sampleCount: values.length } : { sampleCount: 0 }]
+    return [name, values.length
+      ? { median: median(values), mad: mad(values), ewma: ewma(values), sampleCount: values.length }
+      : { sampleCount: 0 }]
   }))
 }
 

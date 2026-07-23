@@ -1,5 +1,6 @@
 import type { ConversationMode } from '../config/conversationMode'
 import type { DailyConversationPlan } from '../orchestration/deterministicSpeech'
+import type { SessionTelemetry } from '../orchestration/sessionTelemetry'
 import type { TurnTakingPhase } from '../orchestration/turnTaking'
 
 export type ChatRole = 'system' | 'user' | 'assistant'
@@ -22,6 +23,8 @@ export type ConversationOptions = {
   persona?: 'screening' | 'companion'
   dailyPlan?: DailyConversationPlan
   pushToTalk?: boolean
+  /** Aria TTS speech rate (doc default 0.85× for elderly listeners; configurable per patient). */
+  speechRate?: number
 }
 
 /** Common shape every conversation version returns, so screens are version-agnostic. */
@@ -48,4 +51,16 @@ export interface ConversationApi {
   endPushToTalk?: () => void
   /** Legacy tap-to-toggle control retained for non-touch callers and diagnostics. */
   toggleRecording?: () => void
+  /**
+   * Structured per-turn + per-session telemetry captured during the conversation (baseline §3).
+   * Present only on transports that implement the Phase-1 turn contract; used at finalize to build
+   * the raw session-upload payload. Returns null before a session has produced any turns.
+   */
+  getSessionTelemetry?: () => SessionTelemetry | null
+  /**
+   * Raw patient-speech PCM16 frames captured this session (mono @ the given sampleRate), for the
+   * session audio artifact (transcription + Phase-6 acoustic). Only frames captured while the mic was
+   * open are recorded, so Aria's own voice is excluded. Returns null when no audio was captured.
+   */
+  getSessionAudio?: () => { base64Frames: string[]; sampleRate: number } | null
 }

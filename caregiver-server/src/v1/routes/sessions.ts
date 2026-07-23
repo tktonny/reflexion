@@ -424,12 +424,31 @@ function retentionClass(kind: typeof ARTIFACT_KINDS[number]) {
   return kind === 'audio' || kind === 'video' || kind === 'image' ? 'sensitive_media' : 'session_evidence'
 }
 
+const ACQUISITION_INT_FIELDS = [
+  'durationMs', 'patientSpeechMs', 'ariaSpeechMs', 'patientTurns', 'ariaTurns',
+  'repromptCount', 'wordCount', 'medianResponseLatencyMs', 'sessionStartMinuteOfDay',
+] as const
+
+// Raw session signals uploaded by the mirror (implementation baseline §3.1). The mirror computes
+// nothing about status — it reports observations only. Unknown keys are ignored so the contract can
+// grow without an APK redeploy; each known field is type-validated. Completion (M1) is decided by the
+// backend engine from these values, never by the mirror's advisory `sessionStatus`.
 function validateAcquisitionSummary(value: unknown) {
   const body = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
-  const result: Record<string, number> = {}
-  if (body.durationMs !== undefined) result.durationMs = positiveInteger(body.durationMs, 'acquisitionSummary.durationMs', true)
-  if (body.patientSpeechMs !== undefined) result.patientSpeechMs = positiveInteger(body.patientSpeechMs, 'acquisitionSummary.patientSpeechMs', true)
-  if (body.patientTurns !== undefined) result.patientTurns = positiveInteger(body.patientTurns, 'acquisitionSummary.patientTurns', true)
+  const result: Record<string, number | string | boolean | null> = {}
+  for (const field of ACQUISITION_INT_FIELDS) {
+    if (body[field] !== undefined && body[field] !== null) {
+      result[field] = positiveInteger(body[field], `acquisitionSummary.${field}`, true)
+    }
+  }
+  if (body.transcriptAvailable !== undefined) result.transcriptAvailable = body.transcriptAvailable === true
+  if (body.technicalError !== undefined) result.technicalError = body.technicalError === true
+  if (typeof body.technicalErrorType === 'string' && body.technicalErrorType.trim()) result.technicalErrorType = body.technicalErrorType.slice(0, 120)
+  if (body.sessionStatus !== undefined) {
+    result.sessionStatus = enumValue(body.sessionStatus, 'acquisitionSummary.sessionStatus', ['completed', 'incomplete', 'technical_error'] as const)
+  }
+  if (typeof body.timezone === 'string' && body.timezone.trim()) result.timezone = body.timezone.slice(0, 80)
+  if (typeof body.appVersion === 'string' && body.appVersion.trim()) result.appVersion = body.appVersion.slice(0, 60)
   return result
 }
 

@@ -3,7 +3,8 @@ import { ObjectId } from 'mongodb'
 import { asyncHandler } from '../lib/asyncHandler.js'
 import { DB_NAME } from '../lib/constants.js'
 import { getSingaporeDayBounds } from '../lib/dates.js'
-import { findPatient, getConversationsByMaps, getMapsForPatientRange, serializeConversation } from '../lib/conversations.js'
+import { findPatient } from '../lib/conversations.js'
+import { getV1SessionsForPatientRange, getV1TurnsBySession, serializeV1Session } from '../lib/v1Conversations.js'
 import { withMongo } from '../lib/mongo.js'
 
 export const conversationSessionRouter = Router()
@@ -16,25 +17,22 @@ conversationSessionRouter.get('/', asyncHandler(async (request, response) => {
   }
 
   const patientId = new ObjectId(id)
+  const patientHex = patientId.toHexString()
 
   await withMongo(async (client) => {
     const db = client.db(DB_NAME)
     const { start, end } = getSingaporeDayBounds(new Date())
-    const maps = await getMapsForPatientRange(db, patientId, start, end)
-    const conversationById = await getConversationsByMaps(db, maps)
+    const v1Sessions = await getV1SessionsForPatientRange(db, patientHex, start, end)
     const patient = await findPatient(db, patientId)
-    const sessions = maps
-      .map((map) => {
-        const conversationId = map.conversationId?.toHexString?.() || ''
-        const conversation = conversationById.get(conversationId)
-        if (!conversation) return null
-        return serializeConversation(conversationId, patientId, patient?.name || 'Patient', conversation, map)
-      })
-      .filter((session): session is ReturnType<typeof serializeConversation> => Boolean(session))
+    const patientName = patient?.name || 'Patient'
+    const turnsBySession = await getV1TurnsBySession(db, v1Sessions.map((session) => session._id))
+    const sessions = v1Sessions.map((session) =>
+      serializeV1Session(session, turnsBySession.get(session._id) || [], patientHex, patientName, patient?.preferredLanguage),
+    )
 
     response.json({
-      patientName: patient?.name || 'Patient',
-      patientId: patientId.toHexString(),
+      patientName,
+      patientId: patientHex,
       sessions,
     })
   })

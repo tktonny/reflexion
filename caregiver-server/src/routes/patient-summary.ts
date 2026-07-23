@@ -4,7 +4,8 @@ import { asyncHandler } from '../lib/asyncHandler.js'
 import { DB_NAME } from '../lib/constants.js'
 import { getSingaporeDateKey, getSingaporeDayBoundsFromKey } from '../lib/dates.js'
 import { getOpenAIApiKey } from '../lib/env.js'
-import { findPatient, getLogsForMaps, getMapsForPatientRange } from '../lib/conversations.js'
+import { findPatient } from '../lib/conversations.js'
+import { getV1SessionsForPatientRange, getV1TurnsBySession } from '../lib/v1Conversations.js'
 import { withMongo } from '../lib/mongo.js'
 import type { StoredPatient } from '../lib/types.js'
 
@@ -36,17 +37,13 @@ patientSummaryRouter.post('/', asyncHandler(async (request, response) => {
     const db = client.db(DB_NAME)
     const patient = await findPatient(db, patientId)
     const { start, end } = getSingaporeDayBoundsFromKey(summaryDate)
-    const maps = await getMapsForPatientRange(db, patientId, start, end)
-    maps.reverse()
-    const logs = await getLogsForMaps(db, maps)
+    // v1 sessions come back newest-first; reverse to chronological, then read turns in sequence order.
+    const sessions = (await getV1SessionsForPatientRange(db, patientId.toHexString(), start, end)).reverse()
+    const turnsBySession = await getV1TurnsBySession(db, sessions.map((session) => session._id))
 
-    if (!logs.length) {
-      response.json({ summary: `No conversation transcript is available for ${summaryDate} yet.` })
-      return
-    }
-
-    const transcript = logs
-      .map((log) => `${normalizeRole(log.role)}: ${log.sentence?.trim() || ''}`)
+    const transcript = sessions
+      .flatMap((session) => turnsBySession.get(session._id) || [])
+      .map((turn) => `${normalizeRole(turn.role)}: ${turn.text?.trim() || ''}`)
       .filter((line) => !line.endsWith(': '))
       .join('\n')
 
@@ -120,5 +117,6 @@ function formatPatientDetails(patient: StoredPatient | null) {
 }
 
 function normalizeRole(role?: string) {
-  return role?.toLowerCase() === 'ai' ? 'Aria' : 'Patient'
+  const value = role?.toLowerCase()
+  return value === 'ai' || value === 'assistant' ? 'Aria' : 'Patient'
 }

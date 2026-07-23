@@ -1,9 +1,12 @@
 import React, { useState, useRef } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import {
   View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity,
   KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { apiSend } from '../src/lib/apiClient';
+import { getStoredAuthSession } from '../src/lib/authSession';
 
 interface Message {
   id: string;
@@ -24,17 +27,10 @@ const INITIAL_MESSAGES: Message[] = [
 // Wizard-of-Oz: in MVP, messages go to a human support agent.
 // Boilerplate auto-responses simulate the flow for demo purposes.
 const AUTO_RESPONSES: Record<string, string> = {
-  default: "Thanks for your message! Our team will get back to you shortly. Typical response time is under 2 hours.",
-  mirror: "For mirror setup issues, please make sure the device is plugged in and the LED is blue before scanning the QR code. If problems persist, reply here and we'll help you remotely.",
-  notification: "You can adjust notification preferences in Settings → Notifications. If you're not receiving pushes, check that notifications are allowed for Reflexion in your phone's Settings app.",
-  billing: "For billing and subscription questions, please email billing@reflexion.sg and we'll sort it out within one business day.",
+  default: 'Thank you, we will bring you to a chat with our Reflexion team.',
 };
 
-function getAutoResponse(text: string): string {
-  const lower = text.toLowerCase();
-  if (lower.includes('mirror') || lower.includes('device') || lower.includes('qr')) return AUTO_RESPONSES.mirror;
-  if (lower.includes('notif') || lower.includes('push') || lower.includes('alert')) return AUTO_RESPONSES.notification;
-  if (lower.includes('bill') || lower.includes('payment') || lower.includes('subscri')) return AUTO_RESPONSES.billing;
+function getAutoResponse(): string {
   return AUTO_RESPONSES.default;
 }
 
@@ -46,20 +42,28 @@ export default function ChatbotScreen() {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState('');
   const listRef = useRef<FlatList>(null);
+  const feedbackMutation = useMutation({
+    mutationFn: saveFeedback,
+    onError: (error) => {
+      console.warn('[ChatbotScreen] feedback save failed', error);
+    },
+  });
 
-  function send() {
+  async function send() {
     const text = input.trim();
     if (!text) return;
     const userMsg: Message = { id: Date.now().toString(), from: 'user', text, time: now() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
 
+    feedbackMutation.mutate(text);
+
     // Simulate a support response after 1.2s
     setTimeout(() => {
       const reply: Message = {
         id: (Date.now() + 1).toString(),
         from: 'support',
-        text: getAutoResponse(text),
+        text: getAutoResponse(),
         time: now(),
       };
       setMessages(prev => [...prev, reply]);
@@ -97,16 +101,32 @@ export default function ChatbotScreen() {
             onChangeText={setInput}
             multiline
             returnKeyType="send"
-            onSubmitEditing={send}
+            onSubmitEditing={() => void send()}
             blurOnSubmit={false}
           />
-          <TouchableOpacity style={[styles.sendBtn, !input.trim() && styles.sendBtnDisabled]} onPress={send} disabled={!input.trim()}>
+          <TouchableOpacity style={[styles.sendBtn, !input.trim() && styles.sendBtnDisabled]} onPress={() => void send()} disabled={!input.trim()}>
             <Text style={styles.sendBtnText}>Send</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
+}
+
+async function saveFeedback(message: string) {
+  const session = getStoredAuthSession();
+  if (!session?.nurseId) {
+    console.warn('[ChatbotScreen] feedback skipped: missing nurse session');
+    return;
+  }
+
+  await apiSend('/api/feedback', {
+    method: 'POST',
+    body: JSON.stringify({
+      nurseId: session.nurseId,
+      message,
+    }),
+  });
 }
 
 const styles = StyleSheet.create({

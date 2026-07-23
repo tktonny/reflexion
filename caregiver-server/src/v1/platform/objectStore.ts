@@ -1,5 +1,6 @@
 import { createHash, createHmac } from 'node:crypto'
 import { ApiError } from './errors.js'
+import { LocalObjectStore } from './objectStoreLocal.js'
 
 export type UploadPlan = {
   uploadUrl: string
@@ -20,7 +21,9 @@ export interface ObjectStore {
 }
 
 export function getObjectStore(): ObjectStore {
-  if ((process.env.OBJECT_STORE_DRIVER || '').toLowerCase() === 's3') return new S3CompatibleObjectStore()
+  const driver = (process.env.OBJECT_STORE_DRIVER || '').toLowerCase()
+  if (driver === 's3') return new S3CompatibleObjectStore()
+  if (driver === 'local') return new LocalObjectStore()
   return new UnconfiguredObjectStore()
 }
 

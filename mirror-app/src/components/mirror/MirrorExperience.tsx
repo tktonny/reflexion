@@ -49,6 +49,7 @@ type Props = {
   microphoneActive?: boolean
   onEnd?: () => void
   onRetry?: () => void
+  onBegin?: () => void
 }
 
 const ARIA_AVATAR = require('../../../assets/images/aria-avatar.png')
@@ -104,12 +105,12 @@ function Ambient(props: Props) {
         </View>
       ) : null}
 
-      <View style={styles.ambientPrompt}>
+      <Pressable accessibilityRole="button" onPress={props.onBegin} style={styles.ambientPrompt}>
         <ReadyOrb active={Boolean(props.wakeListening)} />
         <Text style={styles.prompt}>Say “Hello Aria”</Text>
-        <Text style={styles.promptSub}>to begin</Text>
+        <Text style={styles.promptSub}>{props.onBegin ? 'or tap here to begin' : 'to begin'}</Text>
         {props.wakeError ? <Text style={styles.wakeNote}>{props.wakeError}</Text> : null}
-      </View>
+      </Pressable>
     </View>
   )
 }

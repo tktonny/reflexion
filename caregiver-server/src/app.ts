@@ -5,6 +5,7 @@ import { v1Router } from './v1/router.js'
 import { apiErrorHandler, requestContext, v1NotFound } from './v1/platform/http.js'
 import { rateLimit } from './v1/platform/rateLimit.js'
 import { auditAccess } from './v1/platform/audit.js'
+import { maybeMountLocalObjectStore } from './v1/platform/objectStoreLocal.js'
 
 export function createApp() {
   const app = express()
@@ -18,6 +19,10 @@ export function createApp() {
     response.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
     next()
   })
+  // Local object-store upload target (if enabled) must be registered BEFORE express.json so the raw
+  // binary artifact body is not JSON-parsed. It carries its own HMAC-signed URL token.
+  maybeMountLocalObjectStore(app)
+
   app.use(express.json({ limit: '1mb' }))
 
   app.get('/health', (_request, response) => {

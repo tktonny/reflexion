@@ -36,15 +36,27 @@ const EMB_WINDOW = 76 // mel frames per embedding window
 const EMB_STRIDE = 8 // mel-frame step between successive embeddings
 const WW_WINDOW = 16 // embeddings per wakeword prediction
 const CHUNK = 1280 // samples per melspec call (80 ms @ 16 kHz)
-const THRESHOLD = 0.5 // openWakeWord default
-const TRIGGER_HITS = 3 // frames above threshold before firing (debounce)
+// Detection threshold + debounce are env-tunable because a custom-trained model ("Hey Aria") almost
+// always needs a different operating point than the stock "hey jarvis" model. Retune these against the
+// trained model's ROC without shipping a new code build. See wakeword-training/README.md.
+const THRESHOLD = clampNumber(process.env.EXPO_PUBLIC_WAKE_WORD_THRESHOLD, 0.5, 0, 1)
+const TRIGGER_HITS = Math.round(clampNumber(process.env.EXPO_PUBLIC_WAKE_WORD_HITS, 3, 1, 10))
+/** The wake phrase this build listens for — surfaced to the ambient UI prompt so copy matches the model. */
+export const WAKE_WORD_PHRASE = (process.env.EXPO_PUBLIC_WAKE_WORD_PHRASE || 'Hello Aria').trim()
 const MEL_SCALE = (v: number) => v / 10 + 2
 
-// Bundled ONNX assets (metro.config.js registers .onnx as an asset).
+// Bundled ONNX assets (metro.config.js registers .onnx as an asset). `wakeword.onnx` is the SWAPPABLE
+// detector: the training pipeline (wakeword-training/) produces a "Hey Aria" model that replaces this
+// one file; mel + embedding models are the shared openWakeWord front-end and stay as-is.
 const MODEL_MODULES = {
   mel: require('../../assets/wakeword/melspectrogram.onnx'),
   emb: require('../../assets/wakeword/embedding_model.onnx'),
   ww: require('../../assets/wakeword/wakeword.onnx'),
+}
+
+function clampNumber(raw: string | undefined, fallback: number, min: number, max: number): number {
+  const value = Number(raw)
+  return Number.isFinite(value) ? Math.min(Math.max(value, min), max) : fallback
 }
 
 export function isWakeWordRuntimeAvailable(): boolean {

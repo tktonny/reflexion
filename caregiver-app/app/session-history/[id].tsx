@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -8,8 +9,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getApiUrl } from '../../src/lib/apiUrl';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { apiGet } from '../../src/lib/apiClient';
 
 type CalendarDay = {
   date: string;
@@ -25,46 +26,28 @@ export default function SessionHistoryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [month, setMonth] = useState(getSingaporeMonthKey(new Date()));
-  const [days, setDays] = useState<CalendarDay[]>([]);
-  const [isLoadingMonth, setIsLoadingMonth] = useState(false);
   const shouldLoadRealSession = Boolean(id && /^[0-9a-f]{24}$/i.test(id));
+  const monthQuery = useQuery({
+    enabled: shouldLoadRealSession,
+    queryKey: ['sessionCounts', id, month],
+    queryFn: async () => {
+      const body = await apiGet<{ days?: CalendarDay[] }>(
+        `/api/conversation-session-counts?id=${encodeURIComponent(id)}&month=${encodeURIComponent(month)}`,
+      );
+      return Array.isArray(body?.days) ? body.days : [];
+    },
+  });
+  const { refetch: refetchMonth } = monthQuery;
+  useFocusEffect(
+    useCallback(() => {
+      if (shouldLoadRealSession) {
+        void refetchMonth();
+      }
+    }, [refetchMonth, shouldLoadRealSession]),
+  );
+  const days = monthQuery.data || [];
   const calendarCells = useMemo(() => buildCalendarCells(month, days), [days, month]);
   const totalSessions = days.reduce((sum, day) => sum + day.count, 0);
-
-  useEffect(() => {
-    if (!shouldLoadRealSession) return;
-
-    let isMounted = true;
-    async function loadMonth() {
-      setIsLoadingMonth(true);
-      try {
-        const response = await fetch(
-          getApiUrl(`/api/conversation-session-counts?id=${encodeURIComponent(id)}&month=${encodeURIComponent(month)}`),
-        );
-        const body = await response.json();
-        if (!response.ok) {
-          throw new Error(body?.error || 'Unable to load session history.');
-        }
-        if (isMounted) {
-          setDays(Array.isArray(body?.days) ? body.days : []);
-        }
-      } catch (err) {
-        console.error('[SessionHistoryScreen] load month failed', err);
-        if (isMounted) {
-          setDays([]);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingMonth(false);
-        }
-      }
-    }
-
-    void loadMonth();
-    return () => {
-      isMounted = false;
-    };
-  }, [id, month, shouldLoadRealSession]);
 
   if (!shouldLoadRealSession) {
     return (
@@ -89,7 +72,7 @@ export default function SessionHistoryScreen() {
             <View style={styles.monthTitleWrap}>
               <Text style={styles.monthTitle}>{formatMonthTitle(month)}</Text>
               <Text style={styles.monthSubtitle}>
-                {isLoadingMonth ? 'Loading sessions...' : `${totalSessions} sessions this month`}
+                {monthQuery.isLoading ? 'Loading sessions...' : `${totalSessions} sessions this month`}
               </Text>
             </View>
             <TouchableOpacity style={styles.monthButton} onPress={() => setMonth(addMonths(month, 1))}>
@@ -197,7 +180,7 @@ const styles = StyleSheet.create({
   },
   placeholderTitle: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 24, fontWeight: '500' },
   placeholderText: { color: '#756C64', fontSize: 15, lineHeight: 22, textAlign: 'center' },
-  content: { paddingBottom: 48, paddingHorizontal: 20, paddingTop: 16 },
+  content: { paddingBottom: 48, paddingHorizontal: 12, paddingTop: 16 },
   card: {
     backgroundColor: '#FFFFFF',
     borderColor: '#E7DED2',
@@ -205,7 +188,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     elevation: 2,
     marginBottom: 14,
-    padding: 18,
+    padding: 12,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.035,
@@ -215,7 +198,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   monthButton: {
     alignItems: 'center',
@@ -223,18 +206,18 @@ const styles = StyleSheet.create({
     borderColor: '#E7DED2',
     borderRadius: 999,
     borderWidth: 1,
-    height: 36,
+    height: 32,
     justifyContent: 'center',
-    width: 36,
+    width: 32,
   },
   monthTitleWrap: { alignItems: 'center', flex: 1 },
-  monthTitle: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 20, fontWeight: '500' },
-  monthSubtitle: { color: '#A69C92', fontSize: 12, marginTop: 3 },
+  monthTitle: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 18, fontWeight: '500' },
+  monthSubtitle: { color: '#A69C92', fontSize: 11, marginTop: 3 },
   weekdayRow: { flexDirection: 'row', marginBottom: 8 },
   weekdayText: {
     color: '#A69C92',
     flex: 1,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     textAlign: 'center',
   },
@@ -243,16 +226,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     aspectRatio: 1,
     borderColor: '#F3EDE6',
-    borderRadius: 14,
+    borderRadius: 10,
     borderWidth: 1,
     justifyContent: 'space-between',
-    marginBottom: 6,
-    marginHorizontal: '0.7%',
-    maxHeight: 92,
-    minHeight: 44,
-    paddingHorizontal: 3,
-    paddingVertical: 5,
-    width: '12.88%',
+    marginBottom: 5,
+    marginHorizontal: '0.35%',
+    maxHeight: 44,
+    minHeight: 34,
+    paddingHorizontal: 2,
+    paddingVertical: 4,
+    width: '13.58%',
   },
   dayCellGood: {
     backgroundColor: '#EEF7EA',
@@ -262,8 +245,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FBEDEA',
     borderColor: '#E7B8B1',
   },
-  dayNumber: { color: '#2B2522', fontSize: 13, fontWeight: '800', textAlign: 'center' },
-  dayCount: { fontSize: 16, fontWeight: '900', lineHeight: 19, textAlign: 'center' },
+  dayNumber: { color: '#2B2522', fontSize: 11, fontWeight: '800', lineHeight: 14, textAlign: 'center' },
+  dayCount: { fontSize: 13, fontWeight: '900', lineHeight: 15, textAlign: 'center' },
   dayCountGood: { color: '#617A58' },
   dayCountNeedsAttention: { color: '#B45F56' },
   hintCard: {

@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -9,9 +10,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import StatusBadge from '../../../src/components/StatusBadge';
-import { getApiUrl } from '../../../src/lib/apiUrl';
+import { apiGet, apiSend } from '../../../src/lib/apiClient';
 
 type ConversationLog = {
   sentence: string;
@@ -38,21 +39,60 @@ type SessionsByDayResponse = {
   date: string;
   patientId: string;
   patientName: string;
+  aiSummary: string;
   sessions: RealConversationSession[];
 };
 
 export default function SessionHistoryDayScreen() {
   const { id, date } = useLocalSearchParams<{ id: string; date: string }>();
-  const [daySessions, setDaySessions] = useState<SessionsByDayResponse | null>(null);
+  const queryClient = useQueryClient();
   const [selectedSessionIndex, setSelectedSessionIndex] = useState(0);
-  const [isLoadingDay, setIsLoadingDay] = useState(false);
-  const [hasLoadedDay, setHasLoadedDay] = useState(false);
   const [generatedSummary, setGeneratedSummary] = useState('');
-  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [showTranscript, setShowTranscript] = useState(true);
   const shouldLoadRealSession = Boolean(
     id && /^[0-9a-f]{24}$/i.test(id) && date && /^\d{4}-\d{2}-\d{2}$/.test(date),
   );
+  const daySessionsQuery = useQuery({
+    enabled: shouldLoadRealSession,
+    queryKey: ['sessionDay', id, date],
+    queryFn: async () => {
+      const body = await apiGet<Partial<SessionsByDayResponse>>(
+        `/api/conversation-sessions-by-day?id=${encodeURIComponent(id)}&date=${encodeURIComponent(date)}`,
+      );
+      return {
+        date: body?.date || date,
+        patientId: body?.patientId || id,
+        patientName: body?.patientName || 'Patient',
+        aiSummary: body?.aiSummary || '',
+        sessions: Array.isArray(body?.sessions) ? body.sessions : [],
+      } satisfies SessionsByDayResponse;
+    },
+  });
+  const { refetch: refetchDaySessions } = daySessionsQuery;
+  useFocusEffect(
+    useCallback(() => {
+      if (shouldLoadRealSession) {
+        void refetchDaySessions();
+      }
+    }, [refetchDaySessions, shouldLoadRealSession]),
+  );
+  const daySessions = daySessionsQuery.data || null;
+  const summaryMutation = useMutation({
+    mutationFn: () => apiSend<{ summary?: string }>('/api/patient-summary', {
+      method: 'POST',
+      body: JSON.stringify({ patientId: id, date }),
+    }),
+    onSuccess: async (body) => {
+      setGeneratedSummary(body?.summary || 'No summary generated.');
+      await queryClient.invalidateQueries({ queryKey: ['sessionDay', id, date] });
+    },
+    onError: (err) => {
+      Alert.alert(
+        'Unable to generate summary',
+        err instanceof Error ? err.message : 'Unable to generate summary.',
+      );
+    },
+  });
 
   const selectedSession = daySessions?.sessions[selectedSessionIndex] || null;
   const transcript = useMemo(
@@ -61,50 +101,11 @@ export default function SessionHistoryDayScreen() {
   );
 
   useEffect(() => {
-    if (!shouldLoadRealSession) return;
-
-    let isMounted = true;
-    async function loadDay() {
-      setIsLoadingDay(true);
-      setHasLoadedDay(false);
-      try {
-        const response = await fetch(
-          getApiUrl(
-            `/api/conversation-sessions-by-day?id=${encodeURIComponent(id)}&date=${encodeURIComponent(date)}`,
-          ),
-        );
-        const body = await response.json();
-        if (!response.ok) {
-          throw new Error(body?.error || 'Unable to load sessions for this day.');
-        }
-        if (isMounted) {
-          setDaySessions({
-            date: body?.date || date,
-            patientId: body?.patientId || id,
-            patientName: body?.patientName || 'Patient',
-            sessions: Array.isArray(body?.sessions) ? body.sessions : [],
-          });
-          setSelectedSessionIndex(0);
-          setShowTranscript(true);
-        }
-      } catch (err) {
-        console.error('[SessionHistoryDayScreen] load day failed', err);
-        if (isMounted) {
-          setDaySessions(null);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingDay(false);
-          setHasLoadedDay(true);
-        }
-      }
-    }
-
-    void loadDay();
-    return () => {
-      isMounted = false;
-    };
-  }, [id, date, shouldLoadRealSession]);
+    if (!daySessionsQuery.data) return;
+    setGeneratedSummary(daySessionsQuery.data.aiSummary || '');
+    setSelectedSessionIndex(0);
+    setShowTranscript(true);
+  }, [daySessionsQuery.data]);
 
   if (!shouldLoadRealSession) {
     return (
@@ -123,7 +124,7 @@ export default function SessionHistoryDayScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{formatSelectedDate(date)}</Text>
-          {isLoadingDay || !hasLoadedDay ? (
+          {daySessionsQuery.isLoading ? (
             <Text style={styles.emptyText}>Loading sessions...</Text>
           ) : daySessions && daySessions.sessions.length > 0 ? (
             <View style={styles.sessionTabs}>
@@ -149,16 +150,18 @@ export default function SessionHistoryDayScreen() {
             <View style={styles.card}>
               <View style={styles.summaryHeader}>
                 <Text style={styles.cardTitle}>AI summary</Text>
-                <TouchableOpacity
-                  disabled={isGeneratingSummary}
-                  onPress={() => generateSummary(id, date, setGeneratedSummary, setIsGeneratingSummary)}
-                  style={[styles.summaryBtn, isGeneratingSummary && styles.summaryBtnDisabled]}
-                >
-                  <Feather name="cpu" size={14} color="#87566A" />
-                  <Text style={styles.summaryBtnText}>
-                    {isGeneratingSummary ? 'Generating...' : 'Generate summary'}
-                  </Text>
-                </TouchableOpacity>
+                {!generatedSummary ? (
+                  <TouchableOpacity
+                    disabled={summaryMutation.isPending}
+                    onPress={() => summaryMutation.mutate()}
+                    style={[styles.summaryBtn, summaryMutation.isPending && styles.summaryBtnDisabled]}
+                  >
+                    <Feather name="cpu" size={14} color="#87566A" />
+                    <Text style={styles.summaryBtnText}>
+                      {summaryMutation.isPending ? 'Generating...' : 'Generate'}
+                    </Text>
+                  </TouchableOpacity>
+                ) : null}
               </View>
               <Text style={generatedSummary ? styles.summaryText : styles.emptyText}>
                 {generatedSummary || 'No summary yet.'}
@@ -175,25 +178,13 @@ export default function SessionHistoryDayScreen() {
                 <StatChip icon="clock" label="Duration" value={formatDuration(selectedSession.duration)} />
                 <StatChip icon="message-circle" label="Words" value={String(selectedSession.words)} />
                 <StatChip icon="repeat" label="Exchanges" value={String(selectedSession.exchanges)} />
-                <StatChip icon="zap" label="Avg latency" value={`${selectedSession.avgLatency.toFixed(1)}s`} />
+                <StatChip icon="zap" label="Speech lag" value={`${selectedSession.avgLatency.toFixed(1)}s`} highlight />
               </View>
             </View>
 
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Audio Recording</Text>
-              <TouchableOpacity
-                style={styles.playBtn}
-                onPress={() => Alert.alert('Audio', 'Audio playback will be connected later.')}
-              >
-                <Feather name="play" size={15} color="#FFFFFF" />
-                <Text style={styles.playBtnText}>Play recording</Text>
-              </TouchableOpacity>
-              <Text style={styles.audioNote}>Only your loved one's voice is recorded - Aria's responses are excluded.</Text>
-            </View>
-
-            <View style={styles.card}>
               <TouchableOpacity style={styles.transcriptHeader} onPress={() => setShowTranscript(value => !value)}>
-                <Text style={styles.cardTitle}>Full Transcript</Text>
+                <Text style={styles.cardTitle}>View the full conversation with {daySessions.patientName} below</Text>
                 <Feather name={showTranscript ? 'chevron-up' : 'chevron-down'} size={16} color="#87566A" />
               </TouchableOpacity>
 
@@ -221,46 +212,24 @@ export default function SessionHistoryDayScreen() {
   );
 }
 
-function StatChip({ icon, label, value }: { icon: any; label: string; value: string }) {
+function StatChip({
+  highlight = false,
+  icon,
+  label,
+  value,
+}: {
+  highlight?: boolean;
+  icon: any;
+  label: string;
+  value: string;
+}) {
   return (
-    <View style={styles.statChip}>
-      <Feather name={icon} size={14} color="#A69C92" />
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+    <View style={[styles.statChip, highlight && styles.statChipHighlight]}>
+      <Feather name={icon} size={14} color={highlight ? '#6E2F48' : '#A69C92'} />
+      <Text style={[styles.statValue, highlight && styles.statValueHighlight]}>{value}</Text>
+      <Text style={[styles.statLabel, highlight && styles.statLabelHighlight]}>{label}</Text>
     </View>
   );
-}
-
-async function generateSummary(
-  patientId: string,
-  date: string,
-  setGeneratedSummary: (value: string) => void,
-  setIsGeneratingSummary: (value: boolean) => void,
-) {
-  setIsGeneratingSummary(true);
-  try {
-    const response = await fetch(getApiUrl('/api/patient-summary'), {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ patientId, date }),
-    });
-    const body = await response.json();
-
-    if (!response.ok) {
-      throw new Error(body?.error || 'Unable to generate summary.');
-    }
-
-    setGeneratedSummary(body?.summary || 'No summary generated.');
-  } catch (err) {
-    Alert.alert(
-      'Unable to generate summary',
-      err instanceof Error ? err.message : 'Unable to generate summary.',
-    );
-  } finally {
-    setIsGeneratingSummary(false);
-  }
 }
 
 function formatSelectedDate(dateKey: string) {
@@ -333,7 +302,7 @@ const styles = StyleSheet.create({
   },
   placeholderTitle: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 24, fontWeight: '500' },
   placeholderText: { color: '#756C64', fontSize: 15, lineHeight: 22, textAlign: 'center' },
-  content: { paddingBottom: 48, paddingHorizontal: 20, paddingTop: 16 },
+  content: { paddingBottom: 48, paddingHorizontal: 14, paddingTop: 16 },
   card: {
     backgroundColor: '#FFFFFF',
     borderColor: '#E7DED2',
@@ -341,7 +310,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     elevation: 2,
     marginBottom: 14,
-    padding: 18,
+    padding: 14,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.035,
@@ -357,10 +326,11 @@ const styles = StyleSheet.create({
   },
   emptyText: { color: '#A69C92', fontSize: 14, lineHeight: 21 },
   summaryHeader: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: 8,
     marginBottom: 10,
   },
   summaryBtn: {
@@ -371,7 +341,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: 'row',
     gap: 6,
-    paddingHorizontal: 12,
+    maxWidth: '100%',
+    minHeight: 36,
+    paddingHorizontal: 10,
     paddingVertical: 7,
   },
   summaryBtnDisabled: {
@@ -379,8 +351,9 @@ const styles = StyleSheet.create({
   },
   summaryBtnText: {
     color: '#87566A',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
+    flexShrink: 1,
   },
   summaryText: { color: '#756C64', fontSize: 14, lineHeight: 21 },
   sessionTabs: {
@@ -405,31 +378,24 @@ const styles = StyleSheet.create({
   metaRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
   metaName: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 18, fontWeight: '500' },
   metaDate: { color: '#A69C92', fontSize: 13, marginBottom: 16 },
-  statsRow: { flexDirection: 'row', gap: 8 },
+  statsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between' },
   statChip: {
     alignItems: 'center',
     backgroundColor: '#F8F3EC',
     borderColor: '#E7DED2',
     borderRadius: 12,
     borderWidth: 1,
-    flex: 1,
     gap: 4,
-    padding: 10,
+    minHeight: 74,
+    paddingHorizontal: 6,
+    paddingVertical: 8,
+    width: '47%',
   },
-  statValue: { color: '#2B2522', fontSize: 15, fontWeight: '600' },
-  statLabel: { color: '#A69C92', fontSize: 10, textAlign: 'center' },
-  playBtn: {
-    alignItems: 'center',
-    backgroundColor: '#87566A',
-    borderRadius: 12,
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    marginBottom: 10,
-    paddingVertical: 13,
-  },
-  playBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
-  audioNote: { color: '#A69C92', fontSize: 12, lineHeight: 17, textAlign: 'center' },
+  statValue: { color: '#2B2522', fontSize: 15, fontWeight: '600', lineHeight: 19, textAlign: 'center' },
+  statLabel: { color: '#A69C92', fontSize: 10, lineHeight: 12, textAlign: 'center' },
+  statChipHighlight: { backgroundColor: '#F7EEF2', borderColor: '#CFA7B7' },
+  statValueHighlight: { color: '#6E2F48' },
+  statLabelHighlight: { color: '#6E2F48', fontWeight: '700' },
   transcriptHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
   transcript: { gap: 10, marginTop: 10 },
   line: { borderRadius: 12, padding: 12 },
