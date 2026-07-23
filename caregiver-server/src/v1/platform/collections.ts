@@ -16,4 +16,5 @@ export const collections = {
   ruleRegistry: 'rule_registry', outboxEvents: 'outbox_events', eventConsumptions: 'event_consumptions',
   auditEvents: 'audit_events', idempotencyRecords: 'idempotency_records',
   toolInvocations: 'tool_invocations',
+  supportThreads: 'support_threads', supportMessages: 'support_messages',
 } as const

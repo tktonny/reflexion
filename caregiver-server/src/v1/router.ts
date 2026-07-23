@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { adminRouter } from './routes/admin.js'
 import { carePlanRouter } from './routes/carePlan.js'
 import { devicesRouter } from './routes/devices.js'
 import { identityRouter } from './routes/identity.js'
@@ -18,3 +19,4 @@ v1Router.use(toolsRouter)
 v1Router.use(carePlanRouter)
 v1Router.use(monitoringRouter)
 v1Router.use(notificationsRouter)
+v1Router.use(adminRouter)
