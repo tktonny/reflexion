@@ -30,7 +30,9 @@ public class ExpoPcmAudioModule: Module {
 
     Events("onAudioChunk")
 
-    AsyncFunction("start") { (sampleRate: Int, promise: Promise) in
+    // useCommunicationMode is honored on Android (voice-comm playback route for AEC). iOS keeps its
+    // existing AVAudioEngine path for now; the parameter is accepted to keep the JS contract identical.
+    AsyncFunction("start") { (sampleRate: Int, useCommunicationMode: Bool, promise: Promise) in
       do {
         try self.startAudio()
         promise.resolve(nil)

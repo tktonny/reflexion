@@ -37,8 +37,16 @@ export function isNativePcmAvailable(): boolean {
 }
 
 const CAPTURE_SAMPLE_RATE = 16000
+// Route playback through the voice-communication path so the platform AEC cancels Aria's own voice
+// (fixes the "assistant hears itself" echo). Set EXPO_PUBLIC_AUDIO_COMM_MODE=false to fall back to the
+// louder USAGE_MEDIA path (no echo cancellation) if a device routes voice-comm too quietly.
+const USE_COMMUNICATION_MODE = process.env.EXPO_PUBLIC_AUDIO_COMM_MODE !== 'false'
 
-export function createPcmAudioBridge(): PcmAudioBridge {
+export function createPcmAudioBridge(options: { communicationMode?: boolean } = {}): PcmAudioBridge {
+  // The conversation defaults to communication mode (playback on the voice path so AEC cancels Aria's
+  // echo). The wake-word listener passes false: it never plays audio, and call-tuned AGC/NS on an idle
+  // mic can attenuate a far-field wake utterance.
+  const communicationMode = options.communicationMode ?? USE_COMMUNICATION_MODE
   const native = ExpoPcmAudio
   if (!native) {
     const notWired = () => {
@@ -67,7 +75,7 @@ export function createPcmAudioBridge(): PcmAudioBridge {
       subscription = native.addListener('onAudioChunk', (event: { data: string }) => {
         if (event?.data) onChunk(event.data)
       })
-      await native.start(CAPTURE_SAMPLE_RATE)
+      await native.start(CAPTURE_SAMPLE_RATE, communicationMode)
     },
     play: (base64Pcm16) => native.play(base64Pcm16),
     clearPlayback: () => native.clearPlayback(),

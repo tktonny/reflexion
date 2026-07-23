@@ -12,6 +12,9 @@ import {
 } from 'react-native'
 
 import { mirrorColors as c, mirrorFonts as f } from '../../theme/mirrorTheme'
+import { getMirrorCopy } from './mirrorStrings'
+
+const WAKE_PHRASE = (process.env.EXPO_PUBLIC_WAKE_WORD_PHRASE || 'Hello Aria').trim()
 
 export type MirrorVisualState =
   | 'ambient'
@@ -42,6 +45,8 @@ type Props = {
   userText?: string
   statusText?: string
   progressText?: string
+  /** Patient language (from the caregiver-app setting via device config) — localizes all UI chrome. */
+  language?: string
   homeWidgets?: MirrorHomeWidget[]
   wakeListening?: boolean
   wakeError?: string
@@ -76,12 +81,13 @@ export function MirrorExperience(props: Props) {
 }
 
 function Ambient(props: Props) {
+  const t = getMirrorCopy(props.language)
   const widgets = props.homeWidgets?.slice(0, 2) ?? []
   return (
     <View style={styles.ambient}>
       <View style={styles.homeHeader}>
         <Brand lockup />
-        {props.wakeListening ? <MicPill label="WAKE PHRASE READY" /> : null}
+        {props.wakeListening ? <MicPill label={t.wakePhraseReady} /> : null}
       </View>
 
       <View style={styles.ambientGreeting}>
@@ -107,8 +113,8 @@ function Ambient(props: Props) {
 
       <Pressable accessibilityRole="button" onPress={props.onBegin} style={styles.ambientPrompt}>
         <ReadyOrb active={Boolean(props.wakeListening)} />
-        <Text style={styles.prompt}>Say “Hello Aria”</Text>
-        <Text style={styles.promptSub}>{props.onBegin ? 'or tap here to begin' : 'to begin'}</Text>
+        <Text style={styles.prompt}>{t.sayHello(WAKE_PHRASE)}</Text>
+        <Text style={styles.promptSub}>{props.onBegin ? t.tapToBegin : t.toBegin}</Text>
         {props.wakeError ? <Text style={styles.wakeNote}>{props.wakeError}</Text> : null}
       </Pressable>
     </View>
@@ -116,14 +122,15 @@ function Ambient(props: Props) {
 }
 
 function Connecting(props: Props) {
+  const t = getMirrorCopy(props.language)
   return (
     <View style={styles.conversationScene}>
-      <ConversationHeader label="STARTING YOUR CHAT" />
+      <ConversationHeader label={t.startingChat} />
       <View style={styles.centerContent}>
         <AriaPortrait active mode="thinking" size={210} />
-        <Text style={styles.sceneTitle}>Hi {props.patientName},</Text>
-        <Text style={styles.sceneTitleCompact}>{greetingLower(props.greeting)}.</Text>
-        <Text style={styles.sceneCaption}>{props.statusText || 'Let’s have a short chat.'}</Text>
+        <Text style={styles.sceneTitle}>{t.hi(props.patientName)}</Text>
+        <Text style={styles.sceneTitleCompact}>{props.greeting}.</Text>
+        <Text style={styles.sceneCaption}>{props.statusText || t.connectingCaption}</Text>
         <ActivityIndicator color={c.goldDeep} size="small" style={styles.spinner} />
       </View>
     </View>
@@ -131,79 +138,83 @@ function Connecting(props: Props) {
 }
 
 function Listening(props: Props) {
+  const t = getMirrorCopy(props.language)
   const heard = props.state === 'heard'
   const hasTranscript = heard && Boolean(props.userText?.trim())
   return (
     <View style={styles.conversationScene}>
-      <ConversationHeader label={props.progressText || 'TODAY’S CONVERSATION'} />
+      <ConversationHeader label={props.progressText || t.todaysConversation} />
       <View style={styles.centerContent}>
         {props.assistantText ? (
           <Text numberOfLines={4} style={styles.question}>{props.assistantText}</Text>
         ) : null}
         <AriaPortrait active mode="listening" size={heard ? 174 : 194} />
-        <MicPill label="MICROPHONE ACTIVE" />
+        <MicPill label={t.micActive} />
         <Text style={styles.sceneTitle}>
-          {props.bargeInActive ? 'I heard you — I’ve paused.' : heard ? 'I can hear you.' : 'I’m listening…'}
+          {props.bargeInActive ? t.bargeTitle : heard ? t.heardTitle : t.listeningTitle}
         </Text>
         <Text style={styles.sceneCaption}>
-          {props.bargeInActive ? 'Please keep speaking.' : 'Take your time. I’ll wait until you finish.'}
+          {props.bargeInActive ? t.bargeCaption : t.listeningCaption}
         </Text>
-        {hasTranscript ? <HeardCard text={props.userText || ''} /> : null}
+        {hasTranscript ? <HeardCard text={props.userText || ''} language={props.language} /> : null}
         <Waveform mode="listening" />
       </View>
-      <EndHint onPress={props.onEnd} />
+      <EndHint onPress={props.onEnd} language={props.language} />
     </View>
   )
 }
 
 function Thinking(props: Props) {
+  const t = getMirrorCopy(props.language)
   return (
     <View style={styles.conversationScene}>
-      <ConversationHeader label={props.progressText || 'TODAY’S CONVERSATION'} />
+      <ConversationHeader label={props.progressText || t.todaysConversation} />
       <View style={styles.centerContent}>
         <AriaPortrait active mode="thinking" size={188} />
-        <Text style={styles.sceneTitle}>Thank you.</Text>
-        <Text style={styles.sceneCaption}>I’m thinking about what you said.</Text>
-        {props.userText ? <HeardCard text={props.userText} /> : null}
+        <Text style={styles.sceneTitle}>{t.thinkingTitle}</Text>
+        <Text style={styles.sceneCaption}>{t.thinkingCaption}</Text>
+        {props.userText ? <HeardCard text={props.userText} language={props.language} /> : null}
         <ThinkingDots />
       </View>
-      <EndHint onPress={props.onEnd} />
+      <EndHint onPress={props.onEnd} language={props.language} />
     </View>
   )
 }
 
 function Speaking(props: Props) {
+  const t = getMirrorCopy(props.language)
   return (
     <View style={styles.conversationScene}>
-      <ConversationHeader label={props.progressText || 'TODAY’S CONVERSATION'} />
+      <ConversationHeader label={props.progressText || t.todaysConversation} />
       <View style={styles.centerContent}>
         <Text style={styles.ariaLabel}>Aria</Text>
         <AriaPortrait active mode="speaking" size={206} />
-        <Text numberOfLines={7} style={styles.ariaSpeech}>{props.assistantText || 'Aria is speaking…'}</Text>
+        <Text numberOfLines={7} style={styles.ariaSpeech}>{props.assistantText || t.ariaSpeakingFallback}</Text>
         <Waveform mode="speaking" />
         <View style={styles.interruptHint}>
           <Ionicons name="mic-outline" size={22} color={c.sageDeep} />
-          <Text style={styles.interruptText}>You can speak at any time to interrupt me</Text>
+          <Text style={styles.interruptText}>{t.interruptHint}</Text>
         </View>
-        {props.microphoneActive ? <MicPill label="MICROPHONE ACTIVE" quiet /> : null}
+        {props.microphoneActive ? <MicPill label={t.micActive} quiet /> : null}
       </View>
-      <EndHint onPress={props.onEnd} />
+      <EndHint onPress={props.onEnd} language={props.language} />
     </View>
   )
 }
 
 function Closing(props: Props) {
+  const t = getMirrorCopy(props.language)
   const saving = props.state === 'saving'
   return (
     <View style={styles.conversationScene}>
-      <ConversationHeader label={saving ? 'SAVING TODAY’S CHAT' : 'GOODBYE FOR NOW'} />
+      <ConversationHeader label={saving ? t.savingHeader : t.goodbyeHeader} />
       <View style={styles.centerContent}>
         <AriaPortrait active={!saving} mode={saving ? 'thinking' : 'speaking'} size={194} />
         <Text style={styles.sceneTitle}>
-          {saving ? 'Thank you for chatting with me.' : props.assistantText || 'Have a good day.'}
+          {saving ? t.savingTitle : props.assistantText || t.goodbyeFallback}
         </Text>
         <Text style={styles.sceneCaption}>
-          {saving ? 'Your check-in is being saved.' : 'I’ll finish after saying goodbye.'}
+          {saving ? t.savingCaption : t.goodbyeCaption}
         </Text>
         {saving ? <ActivityIndicator color={c.goldDeep} style={styles.spinner} /> : <Waveform mode="speaking" />}
       </View>
@@ -212,19 +223,12 @@ function Closing(props: Props) {
 }
 
 function Problem(props: Props) {
+  const t = getMirrorCopy(props.language)
   const offline = props.state === 'offline'
   const microphone = props.state === 'microphone_error'
   const icon = offline ? 'cloud-offline-outline' : microphone ? 'mic-off-outline' : 'alert-circle-outline'
-  const title = offline
-    ? 'Reflexion is offline right now.'
-    : microphone
-      ? 'I’m having trouble hearing you.'
-      : 'Aria needs a moment.'
-  const body = offline
-    ? 'Please check the connection. Anything already recorded will update your caregiver once we’re connected again.'
-    : microphone
-      ? 'Please check the microphone or restart Reflexion.'
-      : props.statusText || 'Please try again in a moment.'
+  const title = offline ? t.offlineTitle : microphone ? t.micErrorTitle : t.serviceTitle
+  const body = offline ? t.offlineBody : microphone ? t.micErrorBody : props.statusText || t.serviceBodyFallback
   return (
     <View style={styles.problemScene}>
       <Brand lockup />
@@ -236,12 +240,12 @@ function Problem(props: Props) {
       {offline ? (
         <View style={styles.offlineAssurance}>
           <Ionicons name="shield-checkmark-outline" size={23} color={c.sageDeep} />
-          <Text style={styles.offlineAssuranceText}>Nothing already recorded will be lost.</Text>
+          <Text style={styles.offlineAssuranceText}>{t.offlineAssurance}</Text>
         </View>
       ) : null}
       {props.onRetry ? (
         <Pressable accessibilityRole="button" onPress={props.onRetry} style={styles.retryButton}>
-          <Text style={styles.retryText}>{offline ? 'Check connection' : 'Try again'}</Text>
+          <Text style={styles.retryText}>{offline ? t.retryOffline : t.retry}</Text>
         </Pressable>
       ) : null}
     </View>
@@ -279,24 +283,26 @@ function MicPill({ label, quiet = false }: { label: string; quiet?: boolean }) {
   )
 }
 
-function HeardCard({ text }: { text: string }) {
+function HeardCard({ text, language }: { text: string; language?: string }) {
+  const t = getMirrorCopy(language)
   return (
     <View style={styles.heardCard}>
       <View style={styles.heardCheck}>
         <Ionicons name="checkmark" size={18} color={c.white} />
       </View>
       <View style={styles.heardCopy}>
-        <Text style={styles.heardLabel}>I HEARD YOU</Text>
+        <Text style={styles.heardLabel}>{t.heardLabel}</Text>
         <Text numberOfLines={3} style={styles.heardText}>{text}</Text>
       </View>
     </View>
   )
 }
 
-function EndHint({ onPress }: { onPress?: () => void }) {
+function EndHint({ onPress, language }: { onPress?: () => void; language?: string }) {
+  const t = getMirrorCopy(language)
   return (
     <Pressable accessibilityRole="button" onPress={onPress} style={styles.endHint}>
-      <Text style={styles.endHintText}>Say “goodbye” to finish</Text>
+      <Text style={styles.endHintText}>{t.endHint}</Text>
       <Ionicons name="close" size={18} color={c.textSecondary} />
     </Pressable>
   )
@@ -396,10 +402,6 @@ function usePulse(active: boolean, duration: number) {
     return () => loop.stop()
   }, [active, duration, pulse])
   return pulse
-}
-
-function greetingLower(greeting: string) {
-  return greeting ? `${greeting.charAt(0).toLowerCase()}${greeting.slice(1)}` : 'good morning'
 }
 
 const styles = StyleSheet.create({

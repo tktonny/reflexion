@@ -11,7 +11,10 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.tarinpairor.reflexionapp",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Reflexion uses the camera so you can take a photo for an elderly profile.",
+        "NSPhotoLibraryUsageDescription": "Reflexion needs photo access so you can choose a photo for an elderly profile.",
+        "NSPhotoLibraryAddUsageDescription": "Reflexion may save a chosen profile photo to your library."
       }
     },
     "android": {

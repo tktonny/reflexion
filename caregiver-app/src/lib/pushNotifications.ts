@@ -66,29 +66,38 @@ export async function getPushNotificationDeviceRegistration(): Promise<{
     return { ok: false, reason: 'Expo notifications are unavailable.' };
   }
 
-  configureNotificationHandler(Notifications);
-  await configureAndroidChannel(Notifications);
+  // Push is a best-effort enhancement and must NEVER block sign-in / onboarding. Without an FCM
+  // config (no google-services.json / googleServicesFile) getExpoPushTokenAsync throws
+  // "Default FirebaseApp is not initialized" — swallow that (and any permission/channel error) and
+  // degrade to "no push this session" instead of surfacing it as a sign-in failure.
+  try {
+    configureNotificationHandler(Notifications);
+    await configureAndroidChannel(Notifications);
 
-  const permission = await requestNotificationPermission(Notifications);
-  if (!permission) {
-    return { ok: false, reason: 'Notification permission was not granted.' };
+    const permission = await requestNotificationPermission(Notifications);
+    if (!permission) {
+      return { ok: false, reason: 'Notification permission was not granted.' };
+    }
+
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId || Constants.easConfig?.projectId;
+    const tokenResponse = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
+    const expoPushToken = tokenResponse.data;
+    if (!isExpoPushToken(expoPushToken)) {
+      return { ok: false, reason: 'Expo push token is invalid.' };
+    }
+
+    return {
+      ok: true,
+      device: {
+        expoPushToken,
+        platform: normalizePlatform(Platform.OS),
+        appVersion: Constants.expoConfig?.version,
+      },
+    };
+  } catch (error) {
+    console.warn('[pushNotifications] push registration unavailable (FCM not configured?)', error);
+    return { ok: false, reason: error instanceof Error ? error.message : 'Push registration unavailable.' };
   }
-
-  const projectId = Constants.expoConfig?.extra?.eas?.projectId || Constants.easConfig?.projectId;
-  const tokenResponse = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
-  const expoPushToken = tokenResponse.data;
-  if (!isExpoPushToken(expoPushToken)) {
-    return { ok: false, reason: 'Expo push token is invalid.' };
-  }
-
-  return {
-    ok: true,
-    device: {
-      expoPushToken,
-      platform: normalizePlatform(Platform.OS),
-      appVersion: Constants.expoConfig?.version,
-    },
-  };
 }
 
 async function loadNotifications() {
