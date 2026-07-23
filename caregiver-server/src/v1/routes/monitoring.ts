@@ -10,7 +10,11 @@ import { executeIdempotent } from '../platform/idempotency.js'
 import { appendOutbox } from '../platform/outbox.js'
 import { enumValue, objectBody, optionalString, pagination, requiredString } from '../platform/validation.js'
 import { researchEligibility } from '../monitoring/algorithms.js'
+import { evaluateReassuranceStatus, type MetricAggregate, type PersistenceCounts, type ReassuranceBaseline } from '../monitoring/reassuranceStatus.js'
+import { getReassuranceRules } from '../monitoring/ruleRegistry.js'
 import { zonedDateTimeToUtc } from '../care/reminderScheduler.js'
+
+const DAY_MS = 86_400_000
 
 export const monitoringRouter = Router()
 const requireHuman = requireActor('human')
@@ -207,7 +211,7 @@ monitoringRouter.post('/review-cases/:caseId/dispositions', requireHuman, requir
   sendData(response, result.data, result.status)
 }))
 
-async function computeCaregiverStatus(tenantId: string, patientId: string, timezone: string) {
+export async function computeCaregiverStatus(tenantId: string, patientId: string, timezone: string) {
   const db = await getDb()
   const now = new Date()
   const local = localYmd(now, timezone)
@@ -222,27 +226,117 @@ async function computeCaregiverStatus(tenantId: string, patientId: string, timez
     db.collection<any>(collections.manualFlags).findOne({ tenantId, patientId, state: 'active' }, { sort: { createdAt: -1 } }),
     db.collection<any>(collections.awayPeriods).findOne({ tenantId, patientId, state: 'active', startsOn: { $lte: ymdText(local) }, endsOn: { $gte: ymdText(local) } }),
   ])
+  const rules = getReassuranceRules()
   const device = assignment ? await db.collection<any>(collections.devices).findOne({ _id: assignment.deviceId }) : null
   const lastSeenAt = device?.lastSeenAt ? new Date(device.lastSeenAt) : null
-  const technicalState = !device || !lastSeenAt ? 'unknown' : now.getTime() - lastSeenAt.getTime() > 15 * 60_000 ? 'unreachable'
-    : device.technicalState === 'ok' ? 'ok' : 'possible_issue'
-  const baselineState = baseline?.state === 'complete' ? 'complete' : 'establishing'
-  let status: 'establishing' | 'doing_well' | 'worth_checking' | 'needs_attention' = baselineState === 'complete' ? 'doing_well' : 'establishing'
-  let primaryReason = baselineState === 'complete' ? 'DAILY_PATTERN_ON_TRACK' : 'LEARNING_PERSONAL_ROUTINE'
-  const secondaryReasons: string[] = []
-  const daysSinceInteraction = lastSession?.localCompletedAt ? Math.floor((now.getTime() - new Date(lastSession.localCompletedAt).getTime()) / 86_400_000) : Infinity
-  if (flag?.severity === 'needs_attention') { status = 'needs_attention'; primaryReason = 'CAREGIVER_FLAG_NEEDS_ATTENTION' }
-  else if (flag?.severity === 'worth_checking') { status = 'worth_checking'; primaryReason = 'CAREGIVER_FLAG_WORTH_CHECKING' }
-  else if (!away && baselineState === 'complete' && daysSinceInteraction >= 2) { status = 'worth_checking'; primaryReason = 'CHECKIN_MISSED_REPEATEDLY' }
-  else if (technicalState === 'unreachable') { status = baselineState === 'complete' ? 'worth_checking' : 'establishing'; primaryReason = 'DEVICE_UNREACHABLE' }
-  if (today) secondaryReasons.push('CHECKIN_COMPLETED_TODAY')
-  if (away) secondaryReasons.push('AWAY_PERIOD_ACTIVE')
+  const technicalState: 'ok' | 'possible_issue' | 'unreachable' | 'unknown' = !device || !lastSeenAt ? 'unknown'
+    : now.getTime() - lastSeenAt.getTime() > rules.technical.unreachableAfterMinutes * 60_000 ? 'unreachable'
+      : device.technicalState === 'ok' ? 'ok' : 'possible_issue'
+  const baselineState: 'establishing' | 'complete' = baseline?.state === 'complete' ? 'complete' : 'establishing'
+
+  // Away-adjusted missed-day streak: days since the last completed session, minus calendar days
+  // covered by a flagged away period (doc §5.3 — away days never count toward the streak).
+  const weekStart = new Date(dayStart.getTime() - 6 * DAY_MS)
+  const [weeklyCompletedCount, awayList, recentDaily] = await Promise.all([
+    db.collection<any>(collections.sessions).countDocuments({ tenantId, patientId, type: 'daily_checkin', localCompletedAt: { $gte: weekStart, $lt: dayEnd } }),
+    db.collection<any>(collections.awayPeriods).find({ tenantId, patientId, state: 'active' }).toArray(),
+    db.collection<any>(collections.dailyStatuses).find({ tenantId, patientId }).sort({ localDate: -1 }).limit(3).toArray(),
+  ])
+  let missedStreak = 0
+  if (!today && lastSession?.localCompletedAt) {
+    const lastMs = new Date(lastSession.localCompletedAt).getTime()
+    const rawDays = Math.max(0, Math.floor((dayEnd.getTime() - lastMs) / DAY_MS) - 1)
+    missedStreak = Math.max(0, rawDays - awayDaysWithin(awayList, lastMs, now.getTime()))
+  }
+
+  const todayAcquisition = today?.acquisition || {}
+  const inputs = {
+    baselineComplete: baselineState === 'complete',
+    baselineSessionCount: Number(baseline?.sessionCount || 0),
+    completedToday: Boolean(today),
+    today: today ? {
+      patientSpeechMs: numberOrUndefined(todayAcquisition.patientSpeechMs),
+      patientTurns: numberOrUndefined(todayAcquisition.patientTurns),
+      medianResponseLatencyMs: numberOrUndefined(todayAcquisition.medianResponseLatencyMs),
+      sessionStartMinuteOfDay: numberOrUndefined(todayAcquisition.sessionStartMinuteOfDay),
+    } : null,
+    baseline: baselineToReassurance(baseline),
+    missedStreak,
+    weeklyCompletedCount,
+    technicalState,
+    awayActive: Boolean(away),
+    manualFlag: flag?.severity === 'needs_attention' ? 'needs_attention' as const
+      : flag?.severity === 'worth_checking' ? 'worth_checking' as const : null,
+    persistence: derivePersistence(recentDaily),
+    rules,
+  }
+  const evaluation = evaluateReassuranceStatus(inputs)
   return {
-    patientId, baselineState, baselineProgress: { completedSessions: Number(baseline?.sessionCount || 0), requiredSessions: 7, windowDays: 14 },
-    status, primaryReason, secondaryReasons, completedToday: Boolean(today), technicalState,
+    patientId, baselineState,
+    baselineProgress: { completedSessions: inputs.baselineSessionCount, requiredSessions: rules.baseline.minSessions, windowDays: rules.baseline.windowDays },
+    status: evaluation.status, primaryReason: evaluation.primaryReason, secondaryReasons: evaluation.secondaryReasons,
+    ruleVersion: evaluation.ruleVersion,
+    completedToday: Boolean(today), technicalState,
     lastInteractionAt: lastSession?.localCompletedAt ? new Date(lastSession.localCompletedAt).toISOString() : null,
     updatedAt: now.toISOString(),
+    // Internal fields used by the finalize/7pm jobs (not part of the frozen §4 read model, harmless to clients).
+    metricEvaluations: evaluation.metricEvaluations,
+    missedStreak, awayActive: Boolean(away), localDate: ymdText(local),
   }
+}
+
+function numberOrUndefined(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined
+}
+
+function toAggregate(entry: any): MetricAggregate | undefined {
+  if (!entry || typeof entry.median !== 'number' || !entry.sampleCount) return undefined
+  return { median: entry.median, mad: typeof entry.mad === 'number' ? entry.mad : 0, sampleCount: Number(entry.sampleCount) }
+}
+
+function baselineToReassurance(baseline: any): ReassuranceBaseline | null {
+  if (!baseline?.metricAggregates) return null
+  const m = baseline.metricAggregates
+  return {
+    patientSpeechMs: toAggregate(m.patientSpeechMs),
+    patientTurns: toAggregate(m.patientTurns),
+    medianResponseLatencyMs: toAggregate(m.medianResponseLatencyMs),
+    sessionStartMinuteOfDay: toAggregate(m.sessionStartMinuteOfDay),
+    weeklyRate: typeof baseline.weeklyRate === 'number' ? baseline.weeklyRate : undefined,
+  }
+}
+
+// Count distinct calendar days within (fromMs, toMs] that are covered by any active away period.
+function awayDaysWithin(awayList: any[], fromMs: number, toMs: number): number {
+  if (!awayList.length) return 0
+  let count = 0
+  for (let cursor = fromMs + DAY_MS; cursor <= toMs && count < 60; cursor += DAY_MS) {
+    const ymd = new Date(cursor).toISOString().slice(0, 10)
+    if (awayList.some((away) => String(away.startsOn) <= ymd && ymd <= String(away.endsOn))) count += 1
+  }
+  return count
+}
+
+// Best-effort persistence counts from the last few finalized daily statuses, so a single bad day stays
+// amber and only a sustained pattern escalates to red (doc §12.5 baseline-deterioration resolution).
+function derivePersistence(recentDaily: any[]): PersistenceCounts {
+  const counts: PersistenceCounts = { speechBelowRed: 0, turnsBelowRed: 0, latencyAboveRed: 0, offWindowDays7d: 0, weeklyBelowRedWindows: 0 }
+  for (const day of recentDaily) {
+    const evals: any[] = Array.isArray(day.metricEvaluations) ? day.metricEvaluations : []
+    const red = (metric: string) => evals.some((item) => item.metric === metric && item.verdict === 'red')
+    if (red('M4_speech')) counts.speechBelowRed! += 1; else break
+  }
+  for (const day of recentDaily) {
+    const evals: any[] = Array.isArray(day.metricEvaluations) ? day.metricEvaluations : []
+    if (evals.some((item) => item.metric === 'M6_turns' && item.verdict === 'red')) counts.turnsBelowRed! += 1; else break
+  }
+  for (const day of recentDaily) {
+    const evals: any[] = Array.isArray(day.metricEvaluations) ? day.metricEvaluations : []
+    if (evals.some((item) => item.metric === 'M7_latency' && item.verdict === 'red')) counts.latencyAboveRed! += 1; else break
+  }
+  counts.offWindowDays7d = recentDaily.filter((day) => Array.isArray(day.metricEvaluations)
+    && day.metricEvaluations.some((item: any) => item.metric === 'M3_window' && (item.verdict === 'amber' || item.reason === 'off_window_single_day'))).length
+  return counts
 }
 
 function serializeReviewCase(item: Record<string, unknown>) {

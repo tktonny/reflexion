@@ -7,6 +7,8 @@
     "dev": "tsx watch src/index.ts",
     "dev:daily-summary-cron": "tsx watch src/jobs/dailySummaryCron.ts",
     "dev:worker": "tsx watch src/jobs/outboxWorker.ts",
+    "dev:finalize-day": "RUN_FINALIZE_JOB=1 tsx watch src/jobs/finalizeDay.ts",
+    "start:finalize-day": "RUN_FINALIZE_JOB=1 node dist/jobs/finalizeDay.js",
     "build": "tsc",
     "start": "node dist/index.js",
     "start:daily-summary-cron": "node dist/jobs/dailySummaryCron.js",
