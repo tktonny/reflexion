@@ -32,13 +32,20 @@ export default function SignInScreen() {
   const [error, setError] = useState('');
   const signInMutation = useMutation({
     mutationFn: async () => {
-      // Authoritative v1 status/flag/away routes need a v1 human JWT (baseline §5). Obtain it FIRST;
-      // if it fails we surface the error and never fall back to the legacy (wrong-answer) status path.
-      await v1Login(email, password);
-      return apiSend<SignInResponse>('/api/auth/sign-in', {
+      // Primary auth is the caregiver account (legacy sign-in) — accounts are still created via the
+      // legacy onboarding, so this must succeed for a freshly-signed-up user to get in. The v1 login
+      // is BEST-EFFORT: it unlocks the authoritative v1 status/flag/away routes when the account also
+      // exists in v1, but a v1 failure must never block sign-in (the status UI degrades to "updating").
+      const body = await apiSend<SignInResponse>('/api/auth/sign-in', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
+      try {
+        await v1Login(email, password);
+      } catch (v1Error) {
+        console.warn('[SignInScreen] v1 login unavailable; caregiver status may be delayed', v1Error);
+      }
+      return body;
     },
     onSuccess: async (body) => {
       await setStoredAuthSession({
