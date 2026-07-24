@@ -12,6 +12,7 @@ import { executeIdempotent } from '../platform/idempotency.js'
 import { appendOutbox } from '../platform/outbox.js'
 import { issueAccessToken, verifyAccessToken } from '../platform/tokens.js'
 import { enumValue, isoDate, objectBody, optionalString, requiredString } from '../platform/validation.js'
+import { getClientIp, resolveDeviceRegion } from '../platform/region.js'
 
 const PAIRING_TTL_MS = 10 * 60 * 1000
 const EXCHANGE_TTL_MS = 5 * 60 * 1000
@@ -29,6 +30,13 @@ devicesRouter.post('/device-pairings', asyncHandler(async (request, response) =>
     const softwareVersion = requiredString(body, 'softwareVersion', 80)
     const timezone = validateTimezone(requiredString(body, 'timezone', 80))
     const deviceNonce = optionalString(body, 'deviceNonce', 200)
+    // Region (cn/sg) is decided ONCE here, at pairing, when the mirror is physically present: the
+    // device's endpoint probe (probedRegion) wins, backend IP-geo validates, timezone is the fallback.
+    const probedRegion = optionalString(body, 'probedRegion', 8)
+    const regionSignals = resolveDeviceRegion({ probedRegion, ip: getClientIp(request), timezone })
+    if (regionSignals.mismatch) {
+      console.warn(`[region] device ${bootstrap.did}: probe=${regionSignals.probed} != ip=${regionSignals.ip}; using probe (${regionSignals.region}).`)
+    }
     const db = await getDb()
     const device = await db.collection<any>(collections.devices).findOne({
       _id: bootstrap.did, serialHash: bootstrap.serialHash, status: { $ne: 'revoked' },
@@ -41,10 +49,14 @@ devicesRouter.post('/device-pairings', asyncHandler(async (request, response) =>
     const expiresAt = new Date(Date.now() + PAIRING_TTL_MS)
     const pairingId = newId('pair')
     const displayCode = await insertPairingWithUniqueCode({
-      pairingId, deviceId: bootstrap.did, hardwareRevision, softwareVersion, timezone, deviceNonce, expiresAt,
+      pairingId, deviceId: bootstrap.did, hardwareRevision, softwareVersion, timezone, deviceNonce,
+      region: regionSignals.region, expiresAt,
     })
     await db.collection<any>(collections.devices).updateOne({ _id: bootstrap.did }, { $set: {
-      hardwareRevision, softwareVersion, timezone, updatedAt: new Date(),
+      hardwareRevision, softwareVersion, timezone,
+      region: regionSignals.region,
+      regionSignals: { ...regionSignals, decidedAt: new Date() },
+      updatedAt: new Date(),
     } })
     return { status: 201, data: {
       pairingId, displayCode, state: 'pending', expiresAt: expiresAt.toISOString(), pollAfterSeconds: 2,

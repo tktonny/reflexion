@@ -27,9 +27,38 @@ export type DeviceConfiguration = {
   } | null
 }
 
+const CN_PROBE_URL = process.env.EXPO_PUBLIC_QWEN_CN_PROBE_URL || 'https://dashscope.aliyuncs.com'
+const SG_PROBE_URL = process.env.EXPO_PUBLIC_QWEN_SG_PROBE_URL || 'https://ws-s37sbnnxivio0l58.ap-southeast-1.maas.aliyuncs.com'
+
+/**
+ * One-time reachability/latency probe of the CN vs SG Qwen hosts, run at pairing. Returns the faster
+ * reachable region, or undefined if neither answered (backend then falls back to IP-geo / timezone).
+ * This is the "probe wins, IP validates" signal. Best-effort and bounded — never blocks pairing.
+ */
+async function probeRegion(): Promise<'cn' | 'sg' | undefined> {
+  const measure = async (url: string): Promise<number> => {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 3000)
+    const start = Date.now()
+    try {
+      // Any HTTP response (even 401/404) proves reachability; fetch only rejects on a network error/abort.
+      await fetch(url, { method: 'GET', signal: controller.signal })
+      return Date.now() - start
+    } catch {
+      return Number.POSITIVE_INFINITY
+    } finally {
+      clearTimeout(timer)
+    }
+  }
+  const [cn, sg] = await Promise.all([measure(CN_PROBE_URL), measure(SG_PROBE_URL)])
+  if (!Number.isFinite(cn) && !Number.isFinite(sg)) return undefined
+  return sg < cn ? 'sg' : 'cn'
+}
+
 export async function createDevicePairing() {
   const bootstrap = await getBootstrapCredential()
   if (!bootstrap) throw new Error('device_not_provisioned')
+  const probedRegion = await probeRegion()
   const response = await fetch(getApiUrl('/api/v1/device-pairings'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Device-Bootstrap': bootstrap.token, 'Idempotency-Key': randomIdempotencyKey() },
@@ -37,6 +66,7 @@ export async function createDevicePairing() {
       hardwareRevision: `${Platform.OS}-${String(Platform.Version)}`,
       softwareVersion: Constants.expoConfig?.version || 'unknown',
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+      ...(probedRegion ? { probedRegion } : {}),
     }),
   })
   return dataOrThrow<V1Pairing>(response)

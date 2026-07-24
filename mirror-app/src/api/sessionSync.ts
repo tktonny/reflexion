@@ -46,6 +46,11 @@ export type ActiveMirrorSession = {
   dailyPlan?: DailyConversationPlan
   ticket?: string
   ticketExpiresAt?: string
+  // Region-adaptive endpoints, delivered by the backend ticket (never a build-time URL). The device
+  // uses these so a SEA device talks to the Singapore host and a CN device to dashscope.
+  endpoint?: string
+  httpBase?: string
+  model?: string
 }
 
 type TranscriptPayload = {
@@ -200,12 +205,27 @@ export async function getActiveQwenTicket() {
   const response = await deviceFetch(`/api/v1/sessions/${encodeURIComponent(session.sessionId)}/realtime-tickets`, {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': randomIdempotencyKey() }, body: '{}',
   })
-  const ticket = await dataOrThrow<{ ticket: string; expiresAt: string }>(response)
-  session = { ...session, ticket: ticket.ticket, ticketExpiresAt: ticket.expiresAt }
+  const ticket = await dataOrThrow<{
+    ticket: string; expiresAt: string; endpoint?: string; httpBase?: string; sessionPolicy?: { model?: string }
+  }>(response)
+  session = {
+    ...session,
+    ticket: ticket.ticket,
+    ticketExpiresAt: ticket.expiresAt,
+    endpoint: ticket.endpoint,
+    httpBase: ticket.httpBase,
+    model: ticket.sessionPolicy?.model,
+  }
   memorySession = session
   await AsyncStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, JSON.stringify(session))
   return ticket.ticket
 }
+
+/** Region-adaptive endpoints from the active ticket (populated once getActiveQwenTicket/getBearer has
+ *  resolved). Undefined before the first ticket — callers fall back to the build-time defaults. */
+export function getActiveQwenEndpoint(): string | undefined { return memorySession?.endpoint }
+export function getActiveQwenHttpBase(): string | undefined { return memorySession?.httpBase }
+export function getActiveQwenModel(): string | undefined { return memorySession?.model }
 
 function resolveTimezone(): string {
   try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC' } catch { return 'UTC' }

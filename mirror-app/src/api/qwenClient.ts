@@ -4,7 +4,13 @@
 
 import { QWEN } from '../config/conversationMode'
 import { secureQwenAssetUrl } from '../orchestration/networkSecurity'
-import { getBearer } from './qwenToken'
+import { getBearer, getQwenHttpBase } from './qwenToken'
+
+/** Region host root for HTTP calls: the active ticket's httpBase (set by the backend per the device's
+ *  region) once a ticket exists, else the build-time default. Read only AFTER getBearer() has resolved. */
+function qwenHttpBase(): string {
+  return getQwenHttpBase() || QWEN.base
+}
 
 export type QwenChatMessage = { role: 'system' | 'user' | 'assistant'; content: string }
 export type QwenContentPart =
@@ -37,9 +43,10 @@ export async function qwenVisionChat(
   parts: QwenContentPart[],
   opts: { apiKey?: string; model?: string; maxTokens?: number; temperature?: number } = {},
 ): Promise<string> {
-  const res = await fetchWithTimeout(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
+  const headers = await authHeaders(opts.apiKey)
+  const res = await fetchWithTimeout(`${qwenHttpBase()}/compatible-mode/v1/chat/completions`, {
     method: 'POST',
-    headers: await authHeaders(opts.apiKey),
+    headers,
     body: JSON.stringify({
       model: opts.model || QWEN.visionModel,
       messages: [
@@ -60,9 +67,10 @@ export async function qwenChat(
   messages: QwenChatMessage[],
   opts: { apiKey?: string; model?: string; maxTokens?: number; temperature?: number } = {},
 ): Promise<string> {
-  const res = await fetchWithTimeout(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
+  const headers = await authHeaders(opts.apiKey)
+  const res = await fetchWithTimeout(`${qwenHttpBase()}/compatible-mode/v1/chat/completions`, {
     method: 'POST',
-    headers: await authHeaders(opts.apiKey),
+    headers,
     body: JSON.stringify({
       model: opts.model || QWEN.chatModel,
       messages,
@@ -87,9 +95,10 @@ export async function qwenTTS(
   const rate = typeof opts.rate === 'number' && Number.isFinite(opts.rate) ? Math.min(Math.max(opts.rate, 0.5), 1.5) : undefined
   const input: Record<string, unknown> = { text, voice: opts.voice || QWEN.defaultVoice }
   if (rate !== undefined && rate !== 1) input.rate = rate
-  const res = await fetchWithTimeout(`${QWEN.base}/api/v1/services/aigc/multimodal-generation/generation`, {
+  const headers = await authHeaders(opts.apiKey)
+  const res = await fetchWithTimeout(`${qwenHttpBase()}/api/v1/services/aigc/multimodal-generation/generation`, {
     method: 'POST',
-    headers: await authHeaders(opts.apiKey),
+    headers,
     body: JSON.stringify({
       model: opts.model || QWEN.ttsModel,
       input,
@@ -116,9 +125,10 @@ export async function qwenASR(
 ): Promise<string> {
   const inputAudio: Record<string, string> = { data: `data:;base64,${audioBase64}` }
   if (opts.format) inputAudio.format = opts.format
-  const res = await fetchWithTimeout(`${QWEN.base}/compatible-mode/v1/chat/completions`, {
+  const headers = await authHeaders(opts.apiKey)
+  const res = await fetchWithTimeout(`${qwenHttpBase()}/compatible-mode/v1/chat/completions`, {
     method: 'POST',
-    headers: await authHeaders(opts.apiKey),
+    headers,
     body: JSON.stringify({
       model: opts.model || QWEN.asrModel,
       messages: [
