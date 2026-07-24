@@ -140,6 +140,7 @@ export default function ConversationScreen() {
     bargeInActive,
     turnState,
     ended,
+    endReason,
     recording,
     beginPushToTalk,
     endPushToTalk,
@@ -148,6 +149,7 @@ export default function ConversationScreen() {
   } = useConversation({ language, persona, patientName, dailyPlan })
 
   const endingRef = useRef(false)
+  const endHandledRef = useRef(false)
   const requestedStartHandledRef = useRef(false)
   const wakeRecognitionRef = useRef<SpeechRecognitionLike | null>(null)
   const wakeTriggeredRef = useRef(false)
@@ -415,9 +417,24 @@ export default function ConversationScreen() {
     }
   }, [language, nurseName, stopConversation])
 
+  // A realtime failure before the patient ever answered (endReason='error', zero user turns) is a
+  // startup/connection error, NOT a completed check-in. Don't run finalize (which would save a bogus
+  // turns-0 check-in and show the "check-in saved / goodbye" screen). Instead tear the session down and
+  // bounce through '/' so the mirror returns to a fresh ambient state and keeps listening for the wake
+  // word — no fake goodbye, no polluted caregiver data.
+  const abandonFailedStart = useCallback(async () => {
+    try { await stopConversation() } catch { /* transport already torn down */ }
+    router.replace('/')
+  }, [stopConversation])
+
   useEffect(() => {
-    if (ended) void finalize()
-  }, [ended, finalize])
+    if (!ended) { endHandledRef.current = false; return }
+    if (endHandledRef.current) return
+    endHandledRef.current = true
+    const userTurns = messagesRef.current.filter((message) => message.role === 'user').length
+    if (endReason === 'error' && userTurns === 0) { void abandonFailedStart(); return }
+    void finalize()
+  }, [ended, endReason, abandonFailedStart, finalize])
 
   async function retryProblem() {
     const pairing = await verifyStoredPairing()

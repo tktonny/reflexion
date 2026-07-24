@@ -44,6 +44,12 @@ export interface ConversationApi {
   turnState?: TurnTakingPhase
   /** Flips true once the assistant delivers its closing goodbye, so screens auto-finalize. */
   ended?: boolean
+  /**
+   * Why the session ended, once `ended` is true: 'goodbye' = a real completed check-in; 'error' =
+   * failClosed (connection/audio/provider failure). The screen uses this to avoid saving or announcing
+   * a bogus check-in when a startup failure ends a session before the patient ever answered.
+   */
+  endReason?: 'goodbye' | 'error'
   // Turn-based (v2) extras — present only in 'http' mode.
   recording?: boolean
   /** Press-in starts capture; press-out ends and submits exactly that held utterance. */
