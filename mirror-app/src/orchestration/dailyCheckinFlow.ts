@@ -39,7 +39,10 @@ const STAGE_SIGNALS: Record<CheckinStage, string[]> = {
   reminiscence: ['semantic_memory', 'language_richness', 'lexical_diversity', 'speech_fluency'],
 }
 
-const DEFAULTS = { maxReprompts: 1, timeoutMs: 9_000, minWordsToAnswer: 3 }
+// minWordsToAnswer is 1 (not 3): the target population gives short-but-complete answers ("Not bad",
+// "还好", "Slept okay lah") that must count as answered, not trigger a "please say more" reprompt. Only
+// true silence (0 words) is insufficient. Medication keeps its own minWordsToAnswer.
+const DEFAULTS = { maxReprompts: 1, timeoutMs: 9_000, minWordsToAnswer: 1 }
 
 // Word count that tolerates CJK (a whole Mandarin sentence is not "one word").
 function wordCount(text: string): number {

@@ -359,9 +359,12 @@ export default function ConversationScreen() {
     void handleStart()
   }, [busy, handleStart, pendingStart])
 
+  // Entry map: a short TAP on the ambient home starts free chat (companion); a long-PRESS/hold starts
+  // the deterministic 6-stage daily check-in (screening). The wake word "Hello Aria" and the scheduled
+  // morning auto-start also run the check-in for now (the wake word may move to free-talk later).
   useWakeWord(
     Platform.OS !== 'web' && !checkingPairing && !busy && !localProblem,
-    () => startWith('companion'),
+    () => startWith('screening'),
   )
 
   const finalize = useCallback(async () => {
@@ -432,7 +435,11 @@ export default function ConversationScreen() {
     if (endHandledRef.current) return
     endHandledRef.current = true
     const userTurns = messagesRef.current.filter((message) => message.role === 'user').length
-    if (endReason === 'error' && userTurns === 0) { void abandonFailedStart(); return }
+    // Any zero-user-turn end is a failed/degenerate session, never a real check-in — whether it ended as
+    // 'error' or a self-marched 'goodbye' (e.g. broken ASR let the flow run to completion with no
+    // answers). Don't save a bogus empty check-in into the caregiver pipeline or announce a fake
+    // goodbye; tear down and reset to ambient instead.
+    if (userTurns === 0) { void abandonFailedStart(); return }
     void finalize()
   }, [ended, endReason, abandonFailedStart, finalize])
 
@@ -480,7 +487,7 @@ export default function ConversationScreen() {
         wakeTriggeredRef.current = true
         shouldRunWakeListenerRef.current = false
         stopWakeListener()
-        startWith('companion')
+        startWith('screening')
       }
     }
     recognition.onerror = () => {
@@ -530,6 +537,7 @@ export default function ConversationScreen() {
         homeWidgets={homeWidgets}
         microphoneActive={sessionActive}
         onBegin={() => startWith('companion')}
+        onBeginCheckin={() => startWith('screening')}
         onEnd={() => void finalize()}
         onRetry={() => void retryProblem()}
         patientName={patientName}

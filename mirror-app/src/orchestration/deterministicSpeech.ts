@@ -164,6 +164,26 @@ export function takeYourTimeForLanguage(language: LanguageKey): string {
   }
 }
 
+// Short, sentiment-NEUTRAL connectors prepended to the next scripted question after a real answer, so
+// the check-in reads like a friend acknowledging what was said rather than a questionnaire firing the
+// next item. Neutral on purpose: the patient may have just shared good news OR sad news, so these must
+// never presume a mood (no "that's lovely" here — the close already carries the warm sign-off).
+const ACKNOWLEDGEMENTS: Partial<Record<LanguageKey, string[]>> = {
+  english: ['Thank you.', 'I see.', 'Thanks for telling me.'],
+  mandarin: ['谢谢你。', '嗯，我明白。', '谢谢你告诉我。'],
+  cantonese: ['多謝你。', '嗯，我明白。', '多謝你話我知。'],
+  minnan: ['多謝你。', '嗯，我知影矣。', '多謝你共我講。'],
+  malay: ['Terima kasih.', 'Baiklah.', 'Terima kasih kerana memberitahu saya.'],
+  tamil: ['நன்றி.', 'சரி.', 'சொன்னதற்கு நன்றி.'],
+}
+
+/** A brief neutral acknowledgement to prepend to the next scripted question, rotated by turn so it
+ *  never repeats back-to-back. */
+export function acknowledgementForLanguage(language: LanguageKey, turn: number): string {
+  const list = ACKNOWLEDGEMENTS[language] ?? ACKNOWLEDGEMENTS.english!
+  return list[Math.abs(Math.trunc(turn)) % list.length]
+}
+
 export function companionClosingTextForLanguage(language: LanguageKey): string {
   switch (language) {
     case 'mandarin': return '不客气，和你聊天很开心。下次再聊，再见。'
