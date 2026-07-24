@@ -10,6 +10,7 @@ import {
 import { buildLiveSessionUpdate, realtimeWsUrl } from '../orchestration/realtime'
 import { createEnergyVad, decodeBase64Pcm16 } from '../orchestration/energyVad'
 import {
+  acknowledgementForLanguage,
   base64ToBytes,
   closingTextForLanguage,
   companionClosingTextForLanguage,
@@ -867,14 +868,22 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         let scriptedQuestion: string | null = null
         if (persona === 'screening') {
           const flow = checkinFlowRef.current
+          let answered = false
           if (flow) {
             if (flow.recordAnswer(transcript) === 'insufficient') flow.recordRepromptOrTimeout()
+            else answered = true
             const nextQuestion = flow.current()
             scriptedQuestion = nextQuestion
               ? screeningQuestionForTurn(voiceRef.current.languageKey, nextQuestion.order, dailyPlan)
               : null
           } else {
             scriptedQuestion = screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current, dailyPlan)
+          }
+          // Warm the hand-off: prepend a brief neutral acknowledgement to the next scripted question so
+          // the check-in feels like a friend, not a questionnaire. Only after a satisfactory answer (not
+          // a reprompt), and never before the close (the dailyFlowComplete path owns the goodbye).
+          if (answered && scriptedQuestion) {
+            scriptedQuestion = `${acknowledgementForLanguage(voiceRef.current.languageKey, turnCountRef.current)} ${scriptedQuestion}`
           }
         }
         const dailyFlowComplete = persona === 'screening' && !scriptedQuestion
