@@ -127,6 +127,12 @@ devicesRouter.post('/device-pairing-claims', requireActor('human'), asyncHandler
     const exchangeTicketExpiresAt = new Date(Date.now() + EXCHANGE_TTL_MS)
     const now = new Date()
     await inTransaction(async (transactionDb, session) => {
+      // A physical device serves one patient at a time — retire ALL active assignments for this
+      // device, including any under a different tenant from an earlier pairing, so it never
+      // accumulates multiple active assignments (which later breaks device-scoped authorization).
+      await transactionDb.collection<any>(collections.assignments).updateMany(
+        { deviceId: pairing.deviceId, status: 'active' },
+        { $set: { status: 'replaced', revokedAt: now, revokedBy: principal.userId } }, { session })
       await transactionDb.collection<any>(collections.assignments).updateMany({
         tenantId: principal.tenantId,
         status: 'active',
@@ -370,10 +376,17 @@ async function authorizedDevice(request: Request, deviceId: string, scope = 'pat
   const db = await getDb()
   const device = await db.collection<any>(collections.devices).findOne({ _id: deviceId, status: { $ne: 'revoked' } })
   if (!device) throw notFound('Device')
-  const assignment = await db.collection<any>(collections.assignments).findOne({ deviceId, status: 'active' })
+  // A device can carry stale active assignments from earlier pairings (to other patients/tenants).
+  // For a device principal, match the assignment bound to THAT credential's patient — selecting an
+  // arbitrary active assignment would spuriously 403 a legitimately-authenticated device.
+  const assignment = await db.collection<any>(collections.assignments).findOne(
+    principal.kind === 'device'
+      ? { deviceId, patientId: principal.patientId, status: 'active' }
+      : { deviceId, status: 'active' },
+  )
   if (!assignment) throw forbidden()
   if (principal.kind === 'device') {
-    if (principal.deviceId !== deviceId || principal.patientId !== assignment.patientId) throw forbidden()
+    if (principal.deviceId !== deviceId) throw forbidden()
   } else {
     await authorizePatient(request, String(assignment.patientId), scope)
   }
