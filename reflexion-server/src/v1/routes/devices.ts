@@ -71,9 +71,32 @@ devicesRouter.get('/device-pairings/:pairingId', asyncHandler(async (request, re
   }
   if (state === 'paired') {
     data.patientDisplayName = pairing.patientDisplayName
-    if (!pairing.exchangeConsumedAt && pairing.exchangeTicketCipher && new Date(pairing.exchangeTicketExpiresAt).getTime() > Date.now()) {
-      data.exchangeTicket = openSecret(String(pairing.exchangeTicketCipher))
-      data.exchangeTicketExpiresAt = new Date(pairing.exchangeTicketExpiresAt).toISOString()
+    if (!pairing.exchangeConsumedAt) {
+      const ticketLive = pairing.exchangeTicketCipher && new Date(pairing.exchangeTicketExpiresAt).getTime() > Date.now()
+      if (ticketLive) {
+        data.exchangeTicket = openSecret(String(pairing.exchangeTicketCipher))
+        data.exchangeTicketExpiresAt = new Date(pairing.exchangeTicketExpiresAt).toISOString()
+      } else {
+        // Re-issue the exchange ticket to the owning device when it is missing/expired but not yet
+        // consumed. Without this, a device that was not polling within the initial 5-minute window
+        // (app closed, rebooted, or the caregiver claimed before the mirror was watching) is trapped
+        // forever on "paired but no ticket" — the mirror only re-pairs on expired/cancelled, never on
+        // paired. Safe: this request is authenticated with THIS device's bootstrap token and the
+        // pairing is bound to bootstrap.did, so the ticket only ever reaches the legitimate device.
+        const exchangeTicket = randomSecret()
+        const exchangeTicketExpiresAt = new Date(Date.now() + EXCHANGE_TTL_MS)
+        await db.collection<any>(collections.pairings).updateOne(
+          { _id: pairing._id, exchangeConsumedAt: null },
+          { $set: {
+            exchangeTicketHash: hashSecret(exchangeTicket),
+            exchangeTicketDigest: sha256(exchangeTicket),
+            exchangeTicketCipher: sealSecret(exchangeTicket),
+            exchangeTicketExpiresAt,
+          } },
+        )
+        data.exchangeTicket = exchangeTicket
+        data.exchangeTicketExpiresAt = exchangeTicketExpiresAt.toISOString()
+      }
     }
   }
   response.setHeader('Cache-Control', 'no-store')
