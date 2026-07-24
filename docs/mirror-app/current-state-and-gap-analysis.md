@@ -55,8 +55,8 @@
 
 ### 2.6 Python 平台能力
 
-- `platform_April` 有 batch video、identity profile/link、feature snapshot、longitudinal profile 和 caregiver/provider surface service。
-- `platform_April/schemas` 已有 session、feature、identity 和 home risk schema，可作为统一契约的起点。
+- `_archived` 有 batch video、identity profile/link、feature snapshot、longitudinal profile 和 caregiver/provider surface service。
+- `_archived/schemas` 已有 session、feature、identity 和 home risk schema，可作为统一契约的起点。
 
 ## 3. P0 缺口
 
@@ -194,13 +194,13 @@
 
 ### P1-06 Python 纵向能力未接入产品链路
 
-`platform_April` 已实现 identity、feature snapshot 和 longitudinal 文件，但：
+`_archived` 已实现 identity、feature snapshot 和 longitudinal 文件，但：
 
 - Mirror 保存到 Mongo `Conversation`；
 - Python 平台保存本地 JSON/media；
 - caregiver 只读 Mongo；
 - 没有 event/job/API 把一个 mirror session 转为 Python pipeline 的正式输入；
-- `platform_April` 的纵向 feature 中仍出现 `mock-*-v1` modelVersion。
+- `_archived` 的纵向 feature 中仍出现 `mock-*-v1` modelVersion。
 
 ### P1-07 Caregiver 通知和提醒未实现
 
