@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Stack, useGlobalSearchParams, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
-import { loadStoredAuthSession } from '../src/lib/authSession';
+import { getStoredAuthSession, loadStoredAuthSession } from '../src/lib/authSession';
 import { loadV1Session } from '../src/lib/v1AuthSession';
 import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { queryClient } from '../src/lib/queryClient';
@@ -41,45 +41,50 @@ function AuthGate({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { mode } = useGlobalSearchParams<{ mode?: string }>();
-  const [hasCheckedSession, setHasCheckedSession] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const { mutate: registerDevice } = useMutation({
     mutationFn: registerPushNotificationDevice,
   });
 
+  // Hydrate the stored sessions ONCE on mount (legacy session gates routing; v1 token feeds
+  // status reads). Critically, the navigator (<Stack>) is only withheld on this first boot —
+  // never on later navigations. Re-checking the session on every navigation (the previous
+  // behaviour) flipped this back to a loading <View/>, which unmounted and remounted <Stack>,
+  // re-resolving it to `index` -> <Redirect to="/(tabs)"> and bouncing the user to Home — and
+  // racing the mid-transition unmount into "Reflexion keeps stopping".
   useEffect(() => {
     let isMounted = true;
-
-    const checkSession = async () => {
-      setHasCheckedSession(false);
-      // Hydrate both the legacy session (gates routing) and the v1 token (feeds status reads) before render.
-      const [session] = await Promise.all([loadStoredAuthSession(), loadV1Session()]);
-      const isSignUpRoute = pathname === '/onboarding' && mode !== 'add-patient';
-      const isPasswordRoute = pathname === '/forgot-password' || pathname === '/reset-password';
-      const isPublicRoute = pathname === '/sign-in' || isSignUpRoute || isPasswordRoute;
-
-      if (!isMounted) {
-        return;
-      }
-
-      if (!session && !isPublicRoute) {
-        router.replace('/sign-in');
-      } else if (session && pathname === '/sign-in') {
-        router.replace('/(tabs)');
-      }
-      if (session?.nurseId && pathname !== '/sign-in' && !isSignUpRoute) {
+    void Promise.all([loadStoredAuthSession(), loadV1Session()]).then(() => {
+      if (!isMounted) return;
+      const session = getStoredAuthSession();
+      if (session?.nurseId) {
         registerDevice({ nurseId: session.nurseId });
       }
-
-      setHasCheckedSession(true);
-    };
-
-    void checkSession();
+      setIsHydrated(true);
+    });
     return () => {
       isMounted = false;
     };
-  }, [mode, pathname, registerDevice, router]);
+  }, [registerDevice]);
 
-  if (!hasCheckedSession) {
+  // Route guard: runs on every navigation, but ONLY issues a redirect — it never gates whether
+  // <Stack> renders, so navigating never remounts the navigator. Reads the in-memory session
+  // synchronously (already hydrated above).
+  useEffect(() => {
+    if (!isHydrated) return;
+    const session = getStoredAuthSession();
+    const isSignUpRoute = pathname === '/onboarding' && mode !== 'add-patient';
+    const isPasswordRoute = pathname === '/forgot-password' || pathname === '/reset-password';
+    const isPublicRoute = pathname === '/sign-in' || isSignUpRoute || isPasswordRoute;
+
+    if (!session && !isPublicRoute) {
+      router.replace('/sign-in');
+    } else if (session && pathname === '/sign-in') {
+      router.replace('/(tabs)');
+    }
+  }, [isHydrated, pathname, mode, router]);
+
+  if (!isHydrated) {
     return <View style={{ flex: 1 }} />;
   }
 
