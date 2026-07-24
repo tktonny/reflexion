@@ -1,7 +1,7 @@
 # Mirror App 产品与技术基线
 
 > 审查日期：2026-07-22
-> 范围：`mirror-app`、`caregiver-app`、`reflexion-server`、`platform_April` 及相关产品、临床、合规文档
+> 范围：`mirror-app`、`caregiver-app`、`reflexion-server`、`_archived` 及相关产品、临床、合规文档
 > 性质：代码现状审计 + 目标产品定义，不代表临床验证已经完成
 
 ## 文档导航
@@ -29,7 +29,7 @@
 2. 单次对话的 LLM 输出被直接标为 `healthy / needs_observation / dementia`，但没有同意状态、质量门控、结构校验、模型版本、纵向基线或人工复核。
 3. 评估数据虽然写入 MongoDB，caregiver 趋势却只看“当天是否完成对话”，没有消费认知变化数据。
 4. caregiver 登录没有真正的会话令牌；多数 API 直接信任请求中的 `nurseId` 或 `patientId`。设备鉴权默认也是关闭的。
-5. `mirror-app`、`reflexion-server` 和 `platform_April` 是三套未统一的数据与服务路径。Python 平台已有更完整的身份、质量和纵向能力，但没有接入镜面端的 MongoDB 会话链路。
+5. `mirror-app`、`reflexion-server` 和 `_archived` 是三套未统一的数据与服务路径。Python 平台已有更完整的身份、质量和纵向能力，但没有接入镜面端的 MongoDB 会话链路。
 6. Caregiver Express API 已部署到 Vercel，但 mirror 的生产 API host、自动同步、推送通知、目标唤醒词、全链路测试、审计和数据治理仍未闭环。
 
 因此建议将产品措辞从“每日诊断”调整为“每日认知状态采集与纵向变化筛查”。单日结果只能作为质量合格的观察记录；达到基线和持续变化规则后，才生成供专业人员复核的风险提醒。

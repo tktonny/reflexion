@@ -10,7 +10,7 @@
 
 1. `mirror-app/app/api/*`：Expo Router API 直接连接 MongoDB，负责配对、Qwen token、会话保存和 LLM 评估。
 2. `reflexion-server`：Express + MongoDB，负责 caregiver 账号、患者、配对确认、会话查询、完成状态和摘要；已部署到 `https://reflexion-caregiver-app-server.vercel.app`，`/health` 已确认返回 200。
-3. `platform_April`：FastAPI + 文件存储，拥有更完整的 batch multimodal、identity、feature snapshot 和 longitudinal service，但没有接入前两条生产数据流。
+3. `_archived`：FastAPI + 文件存储，拥有更完整的 batch multimodal、identity、feature snapshot 和 longitudinal service，但没有接入前两条生产数据流。
 
 实时对话又分为：
 
@@ -27,7 +27,7 @@ flowchart LR
     R --> Q
     C["Caregiver Expo App"] --> CS["Caregiver Express Server on Vercel"]
     CS --> DB
-    P["platform_April FastAPI"] --> FS[("Local JSON / media files")]
+    P["_archived FastAPI"] --> FS[("Local JSON / media files")]
     P --> Q
     DB -. "not integrated" .- FS
 ```
@@ -240,7 +240,7 @@ flowchart TB
 
 ### 5.2 Session envelope
 
-仓库已有 `platform_April/schemas/session-record.schema.json`，可作为起点，但需要：
+仓库已有 `_archived/schemas/session-record.schema.json`，可作为起点，但需要：
 
 - 加入 `sessionType: companion | screening`；
 - 加入 lifecycle、idempotency、processing revision；
@@ -346,7 +346,7 @@ stateDiagram-v2
 - 以已部署的 reflexion-server 为起点，或在同一网关后增加正式 mirror service；最终由一个稳定 API 域暴露认证、配对、session、plan、tools 和 caregiver API。
 - 统一 `/api` 前缀约定，再把 mirror 的 `EXPO_PUBLIC_API_BASE` 指向正式网关；在此之前不要直接指向当前 caregiver URL。
 - Realtime Gateway 作为独立 WebSocket 服务。
-- 将 `platform_April` 的 QC/identity/feature/longitudinal 逻辑改为消费统一 session event，并迁移到共享数据库/对象存储。
+- 将 `_archived` 的 QC/identity/feature/longitudinal 逻辑改为消费统一 session event，并迁移到共享数据库/对象存储。
 - 停止由 Expo Router API 直接承担生产 MongoDB 和临床评估职责。
 
 ### 8.2 环境

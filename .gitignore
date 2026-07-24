@@ -10,33 +10,33 @@ __pycache__/
 .vscode/
 
 # --- platform/ (April Python clinic platform) ---
-platform/.secret/
-platform/output/
-platform/data/uploads/
-platform/data/prepared/
-platform/data/assessments/
-platform/data/sample_videos/
-platform/data/**/*.mp4
-platform/data/**/*.MP4
-platform/data/**/*.webm
-platform/data/**/*.mov
-platform/data/**/*.MOV
-platform/data/**/*.avi
-platform/data/**/*.mkv
-platform/clinic/tests/output/
-platform/verification/data/*
-!platform/verification/data/.gitkeep
-platform/verification/results/*
-!platform/verification/results/.gitkeep
-platform/verification/**/*.mp4
-platform/verification/**/*.MP4
-platform/verification/**/*.webm
-platform/verification/**/*.mov
-platform/verification/**/*.MOV
-platform/verification/**/*.avi
-platform/verification/**/*.mkv
-platform/verification/**/*.mp3
-platform/verification/**/*.wav
+_archived/.secret/
+_archived/output/
+_archived/data/uploads/
+_archived/data/prepared/
+_archived/data/assessments/
+_archived/data/sample_videos/
+_archived/data/**/*.mp4
+_archived/data/**/*.MP4
+_archived/data/**/*.webm
+_archived/data/**/*.mov
+_archived/data/**/*.MOV
+_archived/data/**/*.avi
+_archived/data/**/*.mkv
+_archived/clinic/tests/output/
+_archived/verification/data/*
+!_archived/verification/data/.gitkeep
+_archived/verification/results/*
+!_archived/verification/results/.gitkeep
+_archived/verification/**/*.mp4
+_archived/verification/**/*.MP4
+_archived/verification/**/*.webm
+_archived/verification/**/*.mov
+_archived/verification/**/*.MOV
+_archived/verification/**/*.avi
+_archived/verification/**/*.mkv
+_archived/verification/**/*.mp3
+_archived/verification/**/*.wav
 
 # --- mirror-app/ (Expo/RN mirror device app) ---
 mirror-app/node_modules/
@@ -67,3 +67,6 @@ mirror-app/wakeword-training/pf_test2/
 mirror-app/wakeword-training/piper-sample-generator/
 mirror-app/wakeword-training/.venv/
 mirror-app/wakeword-training/output/
+
+# local scratch
+/tmp/
