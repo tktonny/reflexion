@@ -11,7 +11,7 @@ import { newId } from '../platform/ids.js'
 import { executeIdempotent, type IdempotencyCodec } from '../platform/idempotency.js'
 import { getObjectStore } from '../platform/objectStore.js'
 import { appendOutbox } from '../platform/outbox.js'
-import { createQwenRealtimeTicket } from '../platform/qwen.js'
+import { createQwenRealtimeTicket, normalizeRegion } from '../platform/qwen.js'
 import { enumValue, isoDate, objectBody, optionalString, positiveInteger, requiredString, stringArray } from '../platform/validation.js'
 
 const SESSION_TYPES = ['companion', 'daily_checkin', 'clinic_assessment', 'device_test'] as const
@@ -79,8 +79,15 @@ sessionsRouter.post('/sessions/:sessionId/realtime-tickets', requireSessionActor
     if (principal.kind !== 'device') throw forbidden('Only an assigned mirror may request a realtime ticket.')
     const session = await authorizedSession(request, request.params.sessionId, 'session:write')
     if (!['created', 'active'].includes(String(session.state))) throw conflict('SESSION_NOT_ACTIVE', 'Realtime access is not available for this session.')
-    const ticket = await createQwenRealtimeTicket(String(session.acquisition?.language || 'zh-CN'))
     const db = await getDb()
+    // Route the ticket (key + endpoint + HTTP base) to the device's region, decided at pairing and
+    // stored on the device. Missing region → QWEN_DEFAULT_REGION → 'cn' (backward-compatible).
+    const device = await db.collection<any>(collections.devices).findOne(
+      { _id: principal.deviceId },
+      { projection: { region: 1 } },
+    )
+    const region = normalizeRegion(device?.region ?? process.env.QWEN_DEFAULT_REGION)
+    const ticket = await createQwenRealtimeTicket(String(session.acquisition?.language || 'zh-CN'), region)
     if (session.state === 'created') {
       await db.collection<any>(collections.sessions).updateOne({ _id: session._id, state: 'created' }, {
         $set: { state: 'active', activatedAt: new Date(), updatedAt: new Date() }, $inc: { stateVersion: 1 },
