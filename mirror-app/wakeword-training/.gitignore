@@ -4,8 +4,21 @@ __pycache__/
 output/
 *.aiff
 *.log
-# large downloaded data / trained models (bring in ad hoc)
+# generated clips + downloaded data / models (multi-GB; regenerate via gen_local.py / data_prep.py)
+local_clips.noindex/
+piper-sample-generator/
+mit_rirs/
+background/
+mit_raw/
+esc_raw/
+*.zip
 *.npy
+neg.bin
+chunk.tmp
 my_custom_model/
 incoming/
-# keep: *.py, *.ipynb, README.md, requirements.txt, .gitignore
+# trained model lands in assets/wakeword/wakeword.onnx via validate_hello_aria.py --swap;
+# keep the raw artifacts out of git
+hello_aria.onnx
+hello_aria_metrics.json
+# keep: *.py, *.ipynb, README.md, requirements.txt, run_rest.sh, .gitignore

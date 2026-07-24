@@ -20,6 +20,7 @@ EMB_WINDOW = 76      # mel frames per embedding window
 EMB_STRIDE = 8       # mel-frame step between successive embeddings
 WW_WINDOW = 16       # embeddings per wakeword prediction
 CHUNK = 1280         # samples per melspec call (80 ms @ 16 kHz)
+MEL_LOOKBACK = 480   # mel window context: N samples -> (N-480)/160 frames; carry tail for continuity
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.path.abspath(os.path.join(HERE, "..", "assets", "wakeword"))
@@ -42,15 +43,23 @@ class FrontEnd:
         self.emb_in, self.emb_out = self.emb.get_inputs()[0].name, self.emb.get_outputs()[0].name
 
     def embeddings(self, samples: np.ndarray) -> np.ndarray:
-        """samples: 1D float32 of RAW int16 values. Returns [T, 96] embeddings (stride-8)."""
+        """samples: 1D float32 of RAW int16 values. Returns [T, 96] embeddings (stride-8).
+
+        Streaming with a 480-sample lookback: the mel model consumes 480 samples of window context
+        per call (N samples -> (N-480)/160 frames), so bare 1280-chunks drop 3 of every 8 frames at
+        chunk boundaries. Prepending the previous chunk's last 480 samples yields exactly 8 new,
+        hop-continuous frames per chunk — identical timeline to whole-clip processing."""
         samples = np.asarray(samples, dtype=np.float32).reshape(-1)
         mel_frames = []
         i = 0
         n = len(samples)
+        tail = None                               # last MEL_LOOKBACK samples of the previous chunk
         while i + CHUNK <= n:                     # drop trailing <1280 remainder, exactly like the app
             chunk = samples[i:i + CHUNK]
             i += CHUNK
-            out = self.mel.run([self.mel_out], {self.mel_in: chunk.reshape(1, CHUNK)})[0]
+            inp = chunk if tail is None else np.concatenate([tail, chunk])
+            tail = chunk[-MEL_LOOKBACK:]
+            out = self.mel.run([self.mel_out], {self.mel_in: inp.reshape(1, -1)})[0]
             data = np.asarray(out, dtype=np.float32).reshape(-1)
             frames = len(data) // MEL_BINS
             for f in range(frames):
@@ -66,6 +75,24 @@ class FrontEnd:
             embs.append(np.asarray(e, dtype=np.float32).reshape(-1))   # 96
             start += EMB_STRIDE
         return np.asarray(embs, dtype=np.float32)               # [T, 96]
+
+    def embeddings_wholeclip(self, samples: np.ndarray) -> np.ndarray:
+        """Whole-clip mel (one mel.run over the full clip), matching openWakeWord's TRAINING feature
+        space and the downloaded precomputed negatives. ~8 mel frames/1280 vs ~5 for the chunked app
+        path, so a 2 s clip yields 16 embeddings = one [16,96] window. Use this for training features."""
+        samples = np.asarray(samples, dtype=np.float32).reshape(1, -1)
+        out = self.mel.run([self.mel_out], {self.mel_in: samples})[0]
+        mel = np.asarray(out, dtype=np.float32).reshape(-1, MEL_BINS) / 10.0 + 2.0
+        if len(mel) < EMB_WINDOW:
+            return np.zeros((0, 96), dtype=np.float32)
+        embs = []
+        start = 0
+        while len(mel) >= start + EMB_WINDOW:
+            win = mel[start:start + EMB_WINDOW].reshape(1, EMB_WINDOW, MEL_BINS, 1)
+            e = self.emb.run([self.emb_out], {self.emb_in: win})[0]
+            embs.append(np.asarray(e, dtype=np.float32).reshape(-1))
+            start += EMB_STRIDE
+        return np.asarray(embs, dtype=np.float32)
 
     @staticmethod
     def windows(embs: np.ndarray) -> np.ndarray:
