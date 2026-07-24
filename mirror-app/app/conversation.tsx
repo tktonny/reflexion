@@ -435,7 +435,11 @@ export default function ConversationScreen() {
     if (endHandledRef.current) return
     endHandledRef.current = true
     const userTurns = messagesRef.current.filter((message) => message.role === 'user').length
-    if (endReason === 'error' && userTurns === 0) { void abandonFailedStart(); return }
+    // Any zero-user-turn end is a failed/degenerate session, never a real check-in — whether it ended as
+    // 'error' or a self-marched 'goodbye' (e.g. broken ASR let the flow run to completion with no
+    // answers). Don't save a bogus empty check-in into the caregiver pipeline or announce a fake
+    // goodbye; tear down and reset to ambient instead.
+    if (userTurns === 0) { void abandonFailedStart(); return }
     void finalize()
   }, [ended, endReason, abandonFailedStart, finalize])
 

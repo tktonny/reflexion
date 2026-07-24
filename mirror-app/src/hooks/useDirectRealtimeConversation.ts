@@ -16,6 +16,7 @@ import {
   companionClosingTextForLanguage,
   createDailyConversationPlan,
   dailyConversationMetadataForPatientTurn,
+  openingTextForLanguage,
   qwenWavToPcm24kChunks,
   screeningQuestionForTurn,
   takeYourTimeForLanguage,
@@ -121,12 +122,14 @@ const BARGE_IN_START_RMS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_START_R
 const BARGE_IN_MIN_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_MIN_MS, 700)
 const BARGE_IN_GRACE_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_GRACE_MS, 900)
 
-// A transient realtime WS drop during the OPENING (before the patient has answered) is common on the
-// cross-border China link and otherwise dumps the user straight to the goodbye screen. Auto-reconnect a
-// bounded number of times, but ONLY in that pre-first-turn window — a mid-conversation reconnect would
-// silently lose the provider-side turn context, so those keep the save-what-we-have path. Set the env
-// var to 0 to disable early reconnect entirely.
-const MAX_EARLY_RECONNECTS = (() => {
+// Auto-reconnect a bounded number of times per turn-gap on a transient realtime WS drop (common on the
+// cross-border China link, which otherwise dumps the user to the goodbye screen). Before the first
+// patient turn we restart fresh; mid-conversation we RESUME (screening re-asks the current scripted
+// question, companion reopens the mic — its provider-side context is gone, re-seeded from recent
+// transcripts via session memory). The budget refreshes after each successful patient turn, so a long
+// conversation survives several isolated blips without an unbounded loop inside one stall. Set the env
+// var to 0 to disable reconnect entirely.
+const MAX_RECONNECTS_PER_GAP = (() => {
   const value = Number(process.env.EXPO_PUBLIC_REALTIME_MAX_RECONNECTS)
   return Number.isInteger(value) && value >= 0 ? value : 1
 })()
@@ -165,11 +168,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   // Why the session ended: 'goodbye' (a real completed check-in) vs 'error' (failClosed). The screen
   // uses this to avoid saving/announcing a bogus check-in when a startup failure ends a turns-0 session.
   const endReasonRef = useRef<'goodbye' | 'error' | null>(null)
-  // Bounded early-reconnect bookkeeping (see MAX_EARLY_RECONNECTS). isReconnectRef tells the reset block
-  // in startConversation NOT to zero the counter on a reconnect-driven restart.
+  // Bounded reconnect bookkeeping (see MAX_RECONNECTS_PER_GAP). isReconnectRef tells the reset block in
+  // startConversation NOT to zero the counter on a reconnect-driven restart.
   const reconnectAttemptsRef = useRef(0)
   const isReconnectRef = useRef(false)
-  const startConversationRef = useRef<() => Promise<void>>(async () => {})
+  const startConversationRef = useRef<(opts?: { resume?: boolean }) => Promise<void>>(async () => {})
   const socketRef = useRef<WebSocket | null>(null)
   const phase1InjectorRef = useRef<WebSocket | null>(null)
   const phase1InjectionChainRef = useRef<Promise<void>>(Promise.resolve())
@@ -201,6 +204,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const bargeInActiveRef = useRef(false)
   const voiceRef = useRef<VoiceProfile>(voiceProfileForSession(language))
   const openingRequestedRef = useRef(false)
+  // True on the first session.updated after a MID-CONVERSATION reconnect: skip the opening and instead
+  // resume where we left off (re-ask the current screening question / reopen the mic for companion).
+  const resumingRef = useRef(false)
   const responseAfterSessionUpdateRef = useRef<'normal' | 'closing' | null>(null)
   const streamIdRef = useRef<string | null>(null)
   const assistantTextRef = useRef('')
@@ -488,11 +494,13 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       updateStatus('speaking', 'Speaking...')
 
       const tts = await qwenTTS(text, { voice: voiceRef.current.voice, rate: speechRate })
-      if (!lease.isCurrent()) return
+      // Bail if the session was torn down OR failed while the TTS request was in flight — otherwise a
+      // late-resolving opening would enqueue audio and re-open the mic after failClosed already ended it.
+      if (!lease.isCurrent() || endedRef.current) return
       let wav: Uint8Array
       if (tts.url) {
         const response = await fetch(tts.url)
-        if (!lease.isCurrent()) return
+        if (!lease.isCurrent() || endedRef.current) return
         if (!response.ok) throw new Error(`Qwen TTS audio download failed (${response.status}).`)
         wav = new Uint8Array(await response.arrayBuffer())
       } else if (tts.audioBase64) {
@@ -821,12 +829,39 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       }
       if (type === 'session.created') return
       if (type === 'session.updated') {
-        if (!openingRequestedRef.current) {
+        if (resumingRef.current) {
+          resumingRef.current = false
+          // Reconnected mid-conversation: resume instead of re-opening. Screening re-asks the current
+          // scripted question (its flow position survived in checkinFlowRef); companion just reopens the
+          // mic and continues (its provider context is gone but re-seeded via session memory above).
+          if (persona === 'screening') {
+            const pending = checkinFlowRef.current?.current()
+            const prompt = pending
+              ? screeningQuestionForTurn(voiceRef.current.languageKey, pending.order, dailyPlan)
+              : null
+            if (prompt) void playDeterministicResponse(prompt, false)
+            else requestGoodbye()
+          } else {
+            resumeListening()
+          }
+        } else if (!openingRequestedRef.current) {
           openingRequestedRef.current = true
-          responseRequestedRef.current = true
-          audioRef.current?.setCaptureMuted(true)
-          transition({ type: 'response_requested' })
-          send({ type: 'response.create' })
+          if (persona === 'screening') {
+            // Screening opens with the EXACT scripted warm-up: strict stage 1, no LLM drift, no
+            // round-trip. Mark the session live (hadResponseRef) so a later WS drop reconnects/fails
+            // rather than silently restarting under turn-based — the screening path produces no realtime
+            // provider response (only ASR), so hadResponseRef would otherwise never flip.
+            hadResponseRef.current = true
+            void playDeterministicResponse(
+              openingTextForLanguage(voiceRef.current.languageKey, dailyPlan.patientName),
+              false,
+            )
+          } else {
+            responseRequestedRef.current = true
+            audioRef.current?.setCaptureMuted(true)
+            transition({ type: 'response_requested' })
+            send({ type: 'response.create' })
+          }
         } else if (responseAfterSessionUpdateRef.current) {
           const intent = responseAfterSessionUpdateRef.current
           responseAfterSessionUpdateRef.current = null
@@ -857,6 +892,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         setMessages((prev) => [...prev, { id: randomId('user'), role: 'user', text: transcript }])
         userTranscriptsRef.current.push(transcript)
         turnCountRef.current += 1
+        // A completed turn proves the link is healthy again: refresh the reconnect budget so each
+        // isolated stall gets its own allowance instead of one budget for the whole session.
+        reconnectAttemptsRef.current = 0
         const patientTurnMeta = persona === 'screening' ? dailyConversationMetadataForPatientTurn(turnCountRef.current, dailyPlan) : null
         telemetryRef.current.onUserTurn(patientTurnMeta?.protocolStage ?? `turn_${turnCountRef.current}`, Date.now())
         const companionGoodbyeRequested =
@@ -1017,7 +1055,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
     },
-    [appendAssistantStreaming, applyVoice, clearDrain, clearTranscriptWait, configureNextResponse, dailyPlan, failClosed, finalizeAssistant, handlePlaybackComplete, patientId, persona, playDeterministicResponse, pushToTalk, rejectPendingInput, reportUnavailable, send, transition, updateStatus, waitForPlaybackDrain],
+    [appendAssistantStreaming, applyVoice, clearDrain, clearTranscriptWait, configureNextResponse, dailyPlan, failClosed, finalizeAssistant, handlePlaybackComplete, patientId, persona, playDeterministicResponse, pushToTalk, rejectPendingInput, reportUnavailable, requestGoodbye, resumeListening, send, transition, updateStatus, waitForPlaybackDrain],
   )
 
   const cleanup = useCallback(() => {
@@ -1052,6 +1090,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     phase1InjectionChainRef.current = Promise.resolve()
     phase1StopAtRef.current = null
     openingRequestedRef.current = false
+    resumingRef.current = false
     responseAfterSessionUpdateRef.current = null
     responseRequestedRef.current = false
     responseActiveRef.current = false
@@ -1072,29 +1111,38 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     resolveStop()
   }, [resolveStop])
 
-  // Bounded auto-reconnect for a transient realtime drop BEFORE the first patient turn — the flaky
-  // cross-border link's "opening → immediate end". turns>0 is deliberately excluded: a fresh socket is
-  // a fresh provider session with no memory of the turns so far, so mid-chat we keep the
-  // save-what-we-have path instead of a confused resume. Returns true when a reconnect was scheduled.
+  // Bounded auto-reconnect for a transient realtime drop on the flaky cross-border link. Pre-first-turn
+  // it restarts fresh; mid-conversation it RESUMES (see startConversation's `resume` path + the
+  // resumingRef branch in session.updated). Refused once ended/closing/manually-closed or the per-gap
+  // budget is spent. Returns true when a reconnect was scheduled (caller must then stop/return).
   const tryReconnect = useCallback((reason: string): boolean => {
     if (endedRef.current || manualCloseRequestedRef.current || closingRef.current) return false
-    if (turnCountRef.current > 0) return false
-    if (reconnectAttemptsRef.current >= MAX_EARLY_RECONNECTS) return false
+    if (reconnectAttemptsRef.current >= MAX_RECONNECTS_PER_GAP) return false
     reconnectAttemptsRef.current += 1
+    // Mid-conversation (a turn already happened) → RESUME the session; pre-first-turn → fresh restart.
+    const resume = turnCountRef.current > 0
     telemetryRef.current.onReconnect()
-    console.warn(`[realtime] early reconnect ${reconnectAttemptsRef.current}/${MAX_EARLY_RECONNECTS} after: ${reason}`)
+    console.warn(`[realtime] reconnect ${reconnectAttemptsRef.current}/${MAX_RECONNECTS_PER_GAP} (${resume ? 'resume' : 'restart'}, turns=${turnCountRef.current}) after: ${reason}`)
     updateStatus('processing', 'Reconnecting…')
+    // cleanup() wipes userTranscriptsRef; capture it first so a resumed session can re-seed companion
+    // continuity via session memory (screening resumes purely from client-side flow state).
+    const priorTranscripts = userTranscriptsRef.current.slice()
     cleanup()
+    if (resume) {
+      userTranscriptsRef.current = priorTranscripts
+      memoryRef.current = priorTranscripts.slice(-4)
+    }
     isReconnectRef.current = true
-    void startConversationRef.current()
+    void startConversationRef.current({ resume })
     return true
   }, [cleanup, updateStatus])
 
-  const startConversation = useCallback(async () => {
+  const startConversation = useCallback(async (opts?: { resume?: boolean }) => {
     if (Platform.OS === 'web') {
       updateStatus('error', 'Direct WS (v3) is native-only — web uses the relay (v1). Set mode=relay on web.')
       return
     }
+    const resume = Boolean(opts?.resume)
     if (socketRef.current || startingRef.current) return
     const runtimeLease = acquireConversationRuntime(instanceIdRef.current, cleanup)
     runtimeLeaseRef.current = runtimeLease
@@ -1106,25 +1154,36 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     turnTakingRef.current = createTurnTakingState()
     setTurnState('idle')
     transition({ type: 'connect_started' })
-    setMessages([])
     setEnded(false)
     endedRef.current = false
     endReasonRef.current = null
     // Preserve the reconnect counter across a reconnect-driven restart; zero it only for a fresh start.
     if (!isReconnectRef.current) reconnectAttemptsRef.current = 0
     isReconnectRef.current = false
-    voiceRef.current = voiceProfileForSession(language)
-    openingRequestedRef.current = false
+    // A mid-conversation RESUME keeps everything said so far — transcript, flow position, turn count,
+    // captured audio, telemetry, echo history, and the (possibly language-switched) voice. Only a fresh
+    // start wipes them. (userTranscriptsRef was wiped by cleanup() then restored in tryReconnect.)
+    if (!resume) {
+      setMessages([])
+      voiceRef.current = voiceProfileForSession(language)
+      turnCountRef.current = 0
+      telemetryRef.current.reset()
+      checkinFlowRef.current = persona === 'screening' ? createSessionCheckinFlow(voiceRef.current.languageKey, dailyPlan) : null
+      sessionAudioFramesRef.current = []
+      sessionStartedAtMsRef.current = Date.now()
+      recentAriaRef.current = []
+      userTranscriptsRef.current = []
+    }
+    // Resume skips the opening (openingRequestedRef=true), flags session.updated to pick up where we left
+    // off (resumingRef), and marks the session live (hadResponseRef) so a re-drop reconnects/fails rather
+    // than silently falling back to turn-based.
+    openingRequestedRef.current = resume
+    resumingRef.current = resume
+    hadResponseRef.current = resume
     responseAfterSessionUpdateRef.current = null
-    hadResponseRef.current = false
     openedRef.current = false
     reportedUnavailableRef.current = false
-    turnCountRef.current = 0
-    telemetryRef.current.reset()
-    checkinFlowRef.current = persona === 'screening' ? createSessionCheckinFlow(voiceRef.current.languageKey, dailyPlan) : null
     silenceNudgedRef.current = false
-    sessionAudioFramesRef.current = []
-    sessionStartedAtMsRef.current = Date.now()
     endedAtMsRef.current = 0
     closingRef.current = false
     manualCloseRequestedRef.current = false
@@ -1138,8 +1197,6 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     currentResponseClosingRef.current = false
     goodbyeDetectedRef.current = false
     drainInProgressRef.current = false
-    recentAriaRef.current = []
-    userTranscriptsRef.current = []
     vadRef.current.reset()
     bargeInVadRef.current.reset()
     vadSpeakingRef.current = false
@@ -1154,8 +1211,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     try {
       // Short-lived server-minted token (secure) or, if explicitly enabled, the kiosk client key.
       const bearer = await getBearer()
-      // Load prior-session memory for soft continuity (best-effort; empty on the first ever session).
-      try { memoryRef.current = await getStoredSessionMemory(patientId) } catch { memoryRef.current = [] }
+      // Load prior-session memory for soft continuity (best-effort; empty on the first ever session). On
+      // a resume, memoryRef was already seeded from the live transcript in tryReconnect — don't clobber it.
+      if (!resume) {
+        try { memoryRef.current = await getStoredSessionMemory(patientId) } catch { memoryRef.current = [] }
+      }
       // The hook may have been cleaned up or superseded while the token request was in flight.
       if (!runtimeLease.isCurrent() || !startingRef.current || startAttemptRef.current !== startAttempt) return
 
@@ -1170,7 +1230,14 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       if (connectTimerRef.current) clearTimeout(connectTimerRef.current)
       connectTimerRef.current = setTimeout(() => {
         connectTimerRef.current = null
-        if (!openedRef.current && !hadResponseRef.current) { reportUnavailable('ws_connect_timeout'); cleanup() }
+        if (!openedRef.current) {
+          // A resume pre-sets hadResponseRef=true, so the old `&& !hadResponseRef` gate would never fire
+          // here and a dead resume socket could hang; we also can't swap to turn-based mid-conversation.
+          // Fail closed on a dead resume socket (turns>0 → finalize saves the partial); a fresh start
+          // still falls back to turn-based.
+          if (resume) failClosed('Realtime reconnect timed out before opening.')
+          else { reportUnavailable('ws_connect_timeout'); cleanup() }
+        }
       }, 7000)
 
       socket.onopen = () => {
@@ -1198,7 +1265,10 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           .start(handleCaptureChunk)
           .then(() => audio.setCaptureMuted(true))
           .catch((e: unknown) => {
-            if (!hadResponseRef.current) { reportUnavailable('audio_start_failed'); cleanup() }
+            // Branch on a real turn, not hadResponseRef: the deterministic screening opening flips
+            // hadResponseRef at session.updated with no round-trip, so a pre-first-turn capture failure
+            // must still report-unavailable (fall back), not abandon.
+            if (turnCountRef.current === 0) { reportUnavailable('audio_start_failed'); cleanup() }
             else failClosed(e instanceof Error ? e.message : 'Audio start failed.')
           })
 
@@ -1261,12 +1331,18 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         try { handleMessage(JSON.parse(String(event.data))) } catch { /* ignore malformed */ }
       }
       socket.onerror = () => {
+        // Ignore events from a socket this hook has already superseded — e.g. a reconnect (tryReconnect
+        // → cleanup → new startConversation) released this lease and bumped startAttempt. Without this,
+        // a dead socket's error/close would run against the SUCCESSOR session's refs and kill it.
+        if (!runtimeLease.isCurrent() || startAttemptRef.current !== startAttempt) return
         // Before any response: omni is unreachable -> let the supervisor fall back (onclose cleans up).
         if (!hadResponseRef.current) { reportUnavailable('ws_error'); cleanup(); return }
         if (tryReconnect('ws_error')) return
         failClosed('Realtime connection error.')
       }
       socket.onclose = () => {
+        // Superseded socket (see onerror): a reconnect already replaced this session — do not touch it.
+        if (!runtimeLease.isCurrent() || startAttemptRef.current !== startAttempt) return
         // Closed before it ever opened (region block / handshake reject / connect fail): fall back.
         if (!openedRef.current && !hadResponseRef.current) {
           reportUnavailable('ws_closed_before_open')
