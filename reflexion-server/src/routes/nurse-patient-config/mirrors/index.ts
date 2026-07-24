@@ -93,11 +93,34 @@ mirrorsRouter.patch('/', asyncHandler(async (request, response) => {
       now,
     })
 
+    // The mirror authenticates through the v1 platform (device_assignments / device_credentials),
+    // which the legacy unlink above does NOT touch — so without this the mirror keeps working and
+    // never drops back to its pairing screen. patient.mirrorId holds the v1 deviceId (dev_...).
+    // Revoke its active assignment + credentials so the next /configuration call 403s and the mirror
+    // returns to pairing. Deliberately do NOT revoke the device row itself, so it stays re-pairable.
+    const v1DeviceId = typeof patient.mirrorId === 'string' && patient.mirrorId.startsWith('dev_') ? patient.mirrorId : ''
+    let revokedAssignments = 0
+    let revokedCredentials = 0
+    if (v1DeviceId) {
+      const assignmentResult = await db.collection('device_assignments').updateMany(
+        { deviceId: v1DeviceId, status: 'active' },
+        { $set: { status: 'revoked', revokedAt: now, revocationReason: 'unlinked_by_caregiver' } },
+      )
+      const credentialResult = await db.collection('device_credentials').updateMany(
+        { deviceId: v1DeviceId, status: 'active' },
+        { $set: { status: 'revoked', revokedAt: now } },
+      )
+      revokedAssignments = assignmentResult.modifiedCount
+      revokedCredentials = credentialResult.modifiedCount
+    }
+
     response.json({
       success: true,
       patientId: patientId.toHexString(),
       mirrorPairingStatus: '',
       ...unlinkResult,
+      revokedAssignments,
+      revokedCredentials,
     })
   })
 }))
