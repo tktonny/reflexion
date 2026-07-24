@@ -6,7 +6,7 @@ export function Users() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   useEffect(() => {
-    api.users().then((page) => setUsers(page.data)).catch((e) => setError(e.message)).finally(() => setLoading(false))
+    api.users().then((rows) => setUsers(rows ?? [])).catch((e) => setError(e.message)).finally(() => setLoading(false))
   }, [])
   return (
     <div className="stack">

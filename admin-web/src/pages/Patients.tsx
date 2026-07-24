@@ -11,7 +11,7 @@ export function Patients() {
 
   const load = () => {
     setLoading(true)
-    api.patients().then((page) => setPatients(page.data)).catch((e) => setError(e.message)).finally(() => setLoading(false))
+    api.patients().then((rows) => setPatients(rows ?? [])).catch((e) => setError(e.message)).finally(() => setLoading(false))
   }
   useEffect(load, [])
 
