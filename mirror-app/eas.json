@@ -28,7 +28,8 @@
       "env": {
         "EXPO_PUBLIC_API_BASE": "https://reflexion.production.tktonny.top",
         "EXPO_PUBLIC_ENABLE_INSTALLER_SETUP": "true",
-        "EXPO_PUBLIC_CONVERSATION_MODE": "ws"
+        "EXPO_PUBLIC_CONVERSATION_MODE": "ws",
+        "EXPO_PUBLIC_BARGEIN": "off"
       }
     },
     "production": {
@@ -37,7 +38,8 @@
       "env": {
         "EXPO_PUBLIC_API_BASE": "https://reflexion.production.tktonny.top",
         "EXPO_PUBLIC_ENABLE_INSTALLER_SETUP": "false",
-        "EXPO_PUBLIC_CONVERSATION_MODE": "ws"
+        "EXPO_PUBLIC_CONVERSATION_MODE": "ws",
+        "EXPO_PUBLIC_BARGEIN": "off"
       }
     }
   },

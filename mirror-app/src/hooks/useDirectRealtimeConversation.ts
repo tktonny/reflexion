@@ -98,6 +98,38 @@ function pcm24kBase64DurationMs(base64: string): number {
   return Math.round((base64.length * 0.75) / 2 / 24)
 }
 
+// --- barge-in (talk-over) tuning ---------------------------------------------------------------
+// The mirror plays Aria through a loud speaker. On devices whose hardware AEC is weak or absent that
+// output leaks into the mic, and the energy VAD that powers barge-in mistakes Aria's OWN voice for the
+// user starting to speak: it fires interruptAssistant() mid-sentence ("I heard you — I've paused"),
+// cutting her off, and when it lands on the opening line it cancels that turn and can cascade the whole
+// session to an early close. These knobs make barge-in reject echo. They are env-tunable so the floor
+// can be calibrated on the real hardware without rebuilding the APK:
+//   EXPO_PUBLIC_BARGEIN=off            → disable talk-over entirely (half-duplex: the mic stays muted
+//                                        while Aria speaks). The most robust setting for a bad-AEC room.
+//   EXPO_PUBLIC_BARGEIN_START_RMS=0.06 → loudness (0..1) the mic must reach to count as an interruption.
+//   EXPO_PUBLIC_BARGEIN_MIN_MS=700     → how long that loudness must persist before we believe it.
+//   EXPO_PUBLIC_BARGEIN_GRACE_MS=900   → ignore barge-in for this long after Aria STARTS an utterance,
+//                                        where echo onset is loudest and a real interruption never is.
+function numberFromEnv(raw: string | undefined, fallback: number): number {
+  const value = Number(raw)
+  return Number.isFinite(value) && value > 0 ? value : fallback
+}
+const BARGE_IN_ENABLED = (process.env.EXPO_PUBLIC_BARGEIN ?? 'on') !== 'off'
+const BARGE_IN_START_RMS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_START_RMS, 0.06)
+const BARGE_IN_MIN_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_MIN_MS, 700)
+const BARGE_IN_GRACE_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_GRACE_MS, 900)
+
+// A transient realtime WS drop during the OPENING (before the patient has answered) is common on the
+// cross-border China link and otherwise dumps the user straight to the goodbye screen. Auto-reconnect a
+// bounded number of times, but ONLY in that pre-first-turn window — a mid-conversation reconnect would
+// silently lose the provider-side turn context, so those keep the save-what-we-have path. Set the env
+// var to 0 to disable early reconnect entirely.
+const MAX_EARLY_RECONNECTS = (() => {
+  const value = Number(process.env.EXPO_PUBLIC_REALTIME_MAX_RECONNECTS)
+  return Number.isInteger(value) && value >= 0 ? value : 1
+})()
+
 /**
  * Version 3 (Flavor A): NATIVE device opens a direct realtime WebSocket to Qwen (header auth
  * with a short-lived ticket minted for an authenticated `/api/v1/sessions/:id` session), running the on-device orchestration
@@ -129,6 +161,14 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const instanceIdRef = useRef(randomId('direct'))
   const runtimeLeaseRef = useRef<ConversationRuntimeLease | null>(null)
   const endedRef = useRef(false)
+  // Why the session ended: 'goodbye' (a real completed check-in) vs 'error' (failClosed). The screen
+  // uses this to avoid saving/announcing a bogus check-in when a startup failure ends a turns-0 session.
+  const endReasonRef = useRef<'goodbye' | 'error' | null>(null)
+  // Bounded early-reconnect bookkeeping (see MAX_EARLY_RECONNECTS). isReconnectRef tells the reset block
+  // in startConversation NOT to zero the counter on a reconnect-driven restart.
+  const reconnectAttemptsRef = useRef(0)
+  const isReconnectRef = useRef(false)
+  const startConversationRef = useRef<() => Promise<void>>(async () => {})
   const socketRef = useRef<WebSocket | null>(null)
   const phase1InjectorRef = useRef<WebSocket | null>(null)
   const phase1InjectionChainRef = useRef<Promise<void>>(Promise.resolve())
@@ -141,15 +181,19 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const startAttemptRef = useRef(0)
   const audioRef = useRef<PcmAudioBridge | null>(null)
   const vadRef = useRef(createEnergyVad())
-  // Barge-in is intentionally more conservative than ordinary turn VAD. Android/iOS voice-chat
-  // processing removes most speaker echo; the higher floor and three-frame confirmation reject the
-  // remaining room tail without making an older adult repeat a genuine interruption.
+  // Barge-in is intentionally far more conservative than ordinary turn VAD. It runs while Aria's
+  // speaker is playing, so its floor must sit ABOVE the residual echo a weak-AEC device leaks into the
+  // mic — otherwise Aria interrupts herself. Floor + confirmation window are env-tunable (see the
+  // BARGE_IN_* constants) so a noisy/bad-AEC room can be calibrated on the device.
   const bargeInVadRef = useRef(createEnergyVad({
-    speechStartRms: 0.025,
+    speechStartRms: BARGE_IN_START_RMS,
     speechContinueRms: 0.01,
-    minSpeechMs: 300,
+    minSpeechMs: BARGE_IN_MIN_MS,
     silenceMs: 1200,
   }))
+  // Wall-clock (ms) when Aria's current utterance began playing; used for the start-of-utterance
+  // barge-in grace window where echo onset is strongest.
+  const playbackStartedAtRef = useRef(0)
   const vadSpeakingRef = useRef(false)
   const audioPreRollRef = useRef<string[]>([])
   const bargeInPreRollRef = useRef<string[]>([])
@@ -250,6 +294,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     if (hadResponseRef.current || reportedUnavailableRef.current) return
     reportedUnavailableRef.current = true
     if (connectTimerRef.current) { clearTimeout(connectTimerRef.current); connectTimerRef.current = null }
+    // Non-__DEV__ breadcrumb (like [session-telemetry]) so the reason for a v3→fallback is visible in a
+    // production logcat — critical for telling a real device startup failure from an echo/barge-in one.
+    console.info(`[realtime] unavailable → turn-based fallback: ${reason}`)
     onUnavailableRef.current?.(reason)
   }, [])
 
@@ -258,6 +305,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const completeConversation = useCallback(() => {
     if (endedRef.current) return
     endedRef.current = true
+    endReasonRef.current = 'goodbye'
     endedAtMsRef.current = Date.now()
     wrappingUpRef.current = true
     audioRef.current?.setCaptureMuted(true)
@@ -270,9 +318,14 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const failClosed = useCallback((reason: string) => {
     if (endedRef.current) return
     endedRef.current = true
+    endReasonRef.current = 'error'
     endedAtMsRef.current = Date.now()
     wrappingUpRef.current = true
     audioRef.current?.setCaptureMuted(true)
+    // Non-__DEV__ breadcrumb: failClosed ends the session and the screen then navigates to the closing
+    // scene, masking the reason. Log it (with whether a turn had happened) so a production logcat shows
+    // exactly why the mirror ended — the definitive signal for a non-echo "opening → immediate end".
+    console.warn(`[realtime] failClosed (hadResponse=${hadResponseRef.current}, turns=${turnCountRef.current}): ${reason}`)
     transition({ type: 'failed', reason })
     updateStatus('error', reason)
     setEnded(true)
@@ -351,6 +404,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     const partialText = assistantTextRef.current.trim()
     streamIdRef.current = null
     assistantTextRef.current = ''
+    // A provider turn (e.g. the opening line) is only added to the echo-suppression list on
+    // response.done. If it is interrupted before that — which on a bad-AEC device is usually Aria's own
+    // echo tripping barge-in — its text never lands there, so the echo transcript is NOT recognised as
+    // Aria and gets accepted as a real user turn. Register the partial line now so the echo is dropped.
+    if (partialText) recentAriaRef.current = [partialText, ...recentAriaRef.current].slice(0, 4)
     setMessages((previous) => {
       if (streamingId) {
         return previous.map((message) => message.id === streamingId
@@ -448,6 +506,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       responseAudioReceivedRef.current = true
       transition({ type: 'audio_delta' })
       telemetryRef.current.onAriaFirstAudio(Date.now())
+      playbackStartedAtRef.current = Date.now()
       enqueuedPlaybackMsRef.current = 0
       for (const chunk of chunks) {
         enqueuedPlaybackMsRef.current += pcm24kBase64DurationMs(chunk)
@@ -457,10 +516,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       responseCompletedRef.current = true
       responseActiveRef.current = false
       // Keep capture frames local while the speaker is active. JS sends nothing upstream unless
-      // conservative barge-in VAD confirms that the person has actually started speaking.
+      // conservative barge-in VAD confirms that the person has actually started speaking. With barge-in
+      // disabled the mic stays muted for the whole utterance (true half-duplex — no echo can reach it).
       bargeInVadRef.current.reset()
       bargeInPreRollRef.current = []
-      audioRef.current?.setCaptureMuted(pushToTalk || manualCloseRequestedRef.current)
+      audioRef.current?.setCaptureMuted(pushToTalk || manualCloseRequestedRef.current || !BARGE_IN_ENABLED)
       transition({ type: 'response_done' })
       telemetryRef.current.onAriaResponseDone(Date.now())
       updateStatus('speaking', 'Finishing playback...')
@@ -624,6 +684,10 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     const state = turnTakingRef.current
     const assistantOwnsAudio = state.responseInFlight || state.awaitingPlayback
     if (assistantOwnsAudio && !manualCloseRequestedRef.current) {
+      // Reject echo-driven false interruptions: ignore the mic entirely while talk-over is disabled,
+      // and during the start-of-utterance grace window (loudest echo onset, where no real user would
+      // interrupt). Outside the window a genuine interruption still has to clear the raised RMS floor.
+      if (!BARGE_IN_ENABLED || Date.now() - playbackStartedAtRef.current < BARGE_IN_GRACE_MS) return
       try {
         const result = bargeInVadRef.current.feed(decodeBase64Pcm16(base64Pcm16))
         bargeInPreRollRef.current.push(base64Pcm16)
@@ -884,8 +948,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           responseAudioReceivedRef.current = true
           transition({ type: 'audio_delta' })
           telemetryRef.current.onAriaFirstAudio(Date.now())
+          playbackStartedAtRef.current = Date.now()
           enqueuedPlaybackMsRef.current = 0
-          if (!pushToTalk && !manualCloseRequestedRef.current) {
+          if (!pushToTalk && !manualCloseRequestedRef.current && BARGE_IN_ENABLED) {
             bargeInVadRef.current.reset()
             bargeInPreRollRef.current = []
             audioRef.current?.setCaptureMuted(false)
@@ -998,6 +1063,24 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     resolveStop()
   }, [resolveStop])
 
+  // Bounded auto-reconnect for a transient realtime drop BEFORE the first patient turn — the flaky
+  // cross-border link's "opening → immediate end". turns>0 is deliberately excluded: a fresh socket is
+  // a fresh provider session with no memory of the turns so far, so mid-chat we keep the
+  // save-what-we-have path instead of a confused resume. Returns true when a reconnect was scheduled.
+  const tryReconnect = useCallback((reason: string): boolean => {
+    if (endedRef.current || manualCloseRequestedRef.current || closingRef.current) return false
+    if (turnCountRef.current > 0) return false
+    if (reconnectAttemptsRef.current >= MAX_EARLY_RECONNECTS) return false
+    reconnectAttemptsRef.current += 1
+    telemetryRef.current.onReconnect()
+    console.warn(`[realtime] early reconnect ${reconnectAttemptsRef.current}/${MAX_EARLY_RECONNECTS} after: ${reason}`)
+    updateStatus('processing', 'Reconnecting…')
+    cleanup()
+    isReconnectRef.current = true
+    void startConversationRef.current()
+    return true
+  }, [cleanup, updateStatus])
+
   const startConversation = useCallback(async () => {
     if (Platform.OS === 'web') {
       updateStatus('error', 'Direct WS (v3) is native-only — web uses the relay (v1). Set mode=relay on web.')
@@ -1017,6 +1100,10 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     setMessages([])
     setEnded(false)
     endedRef.current = false
+    endReasonRef.current = null
+    // Preserve the reconnect counter across a reconnect-driven restart; zero it only for a fresh start.
+    if (!isReconnectRef.current) reconnectAttemptsRef.current = 0
+    isReconnectRef.current = false
     voiceRef.current = voiceProfileForSession(language)
     openingRequestedRef.current = false
     responseAfterSessionUpdateRef.current = null
@@ -1167,6 +1254,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       socket.onerror = () => {
         // Before any response: omni is unreachable -> let the supervisor fall back (onclose cleans up).
         if (!hadResponseRef.current) { reportUnavailable('ws_error'); cleanup(); return }
+        if (tryReconnect('ws_error')) return
         failClosed('Realtime connection error.')
       }
       socket.onclose = () => {
@@ -1174,6 +1262,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         if (!openedRef.current && !hadResponseRef.current) {
           reportUnavailable('ws_closed_before_open')
         } else if (hadResponseRef.current && !endedRef.current) {
+          // Dropped mid-opening on the flaky cross-border link: try a bounded reconnect before giving
+          // up. tryReconnect runs its own cleanup + restart, so return without the teardown below.
+          if (tryReconnect('ws_closed_before_turn')) return
           // A live provider close is not proof that queued audio played. Fail closed and preserve the
           // captured session instead of reopening capture or pretending the goodbye completed.
           failClosed('Realtime connection closed before the turn completed.')
@@ -1187,7 +1278,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       if (!hadResponseRef.current) { reportUnavailable('ws_start_failed'); return }
       failClosed(`Error: ${e instanceof Error ? e.message : 'unknown'}`)
     }
-  }, [cleanup, dailyPlan.patientName, failClosed, handleCaptureChunk, handleMessage, language, patientId, persona, reportUnavailable, send, transition, updateStatus])
+  }, [cleanup, dailyPlan.patientName, failClosed, handleCaptureChunk, handleMessage, language, patientId, persona, reportUnavailable, send, transition, tryReconnect, updateStatus])
+  // Let tryReconnect re-invoke the latest startConversation without a hook-ordering cycle.
+  startConversationRef.current = startConversation
 
   const stopConversation = useCallback(async () => {
     // Auto-close already observed the complete goodbye playback; teardown is now safe.
@@ -1284,6 +1377,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     bargeInActive,
     turnState,
     ended,
+    endReason: endReasonRef.current ?? undefined,
     recording: pushToTalk ? recording : undefined,
     beginPushToTalk: pushToTalk ? beginPushToTalk : undefined,
     endPushToTalk: pushToTalk ? endPushToTalk : undefined,
