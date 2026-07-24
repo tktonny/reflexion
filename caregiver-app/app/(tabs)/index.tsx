@@ -119,7 +119,7 @@ export default function HomeScreen() {
           configuredPatients.map((patient, index) => {
             const statusResult = statusResults[index];
             const v1 = statusResult?.data;
-            const dotColor = v1 ? STATUS_META[v1.status].dot : NEUTRAL_STATUS_COLOR;
+            const dotColor = v1 ? (STATUS_META[v1.status]?.dot ?? NEUTRAL_STATUS_COLOR) : NEUTRAL_STATUS_COLOR;
             const label = v1
               ? getStatusLabel(v1.status, patient.name)
               : statusResult?.isLoading
