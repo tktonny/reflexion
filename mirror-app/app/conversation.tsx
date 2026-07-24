@@ -359,9 +359,12 @@ export default function ConversationScreen() {
     void handleStart()
   }, [busy, handleStart, pendingStart])
 
+  // Entry map: a short TAP on the ambient home starts free chat (companion); a long-PRESS/hold starts
+  // the deterministic 6-stage daily check-in (screening). The wake word "Hello Aria" and the scheduled
+  // morning auto-start also run the check-in for now (the wake word may move to free-talk later).
   useWakeWord(
     Platform.OS !== 'web' && !checkingPairing && !busy && !localProblem,
-    () => startWith('companion'),
+    () => startWith('screening'),
   )
 
   const finalize = useCallback(async () => {
@@ -480,7 +483,7 @@ export default function ConversationScreen() {
         wakeTriggeredRef.current = true
         shouldRunWakeListenerRef.current = false
         stopWakeListener()
-        startWith('companion')
+        startWith('screening')
       }
     }
     recognition.onerror = () => {
@@ -530,6 +533,7 @@ export default function ConversationScreen() {
         homeWidgets={homeWidgets}
         microphoneActive={sessionActive}
         onBegin={() => startWith('companion')}
+        onBeginCheckin={() => startWith('screening')}
         onEnd={() => void finalize()}
         onRetry={() => void retryProblem()}
         patientName={patientName}

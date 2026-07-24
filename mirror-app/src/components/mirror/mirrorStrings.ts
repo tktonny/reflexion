@@ -52,7 +52,7 @@ export type MirrorCopy = {
 const EN: MirrorCopy = {
   wakePhraseReady: 'WAKE PHRASE READY',
   sayHello: (phrase) => `Say “${phrase}”`,
-  tapToBegin: 'or tap here to begin',
+  tapToBegin: 'Hold for today’s check-in · tap to chat',
   toBegin: 'to begin',
   micActive: 'MICROPHONE ACTIVE',
   startingChat: 'STARTING YOUR CHAT',
@@ -98,7 +98,7 @@ const EN: MirrorCopy = {
 const ZH: MirrorCopy = {
   wakePhraseReady: '唤醒词已就绪',
   sayHello: (phrase) => `说 “${phrase}”`,
-  tapToBegin: '或点这里开始',
+  tapToBegin: '长按开始今天的问候 · 轻触聊天',
   toBegin: '开始对话',
   micActive: '麦克风已开启',
   startingChat: '正在开始对话',

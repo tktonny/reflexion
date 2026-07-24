@@ -54,7 +54,10 @@ type Props = {
   microphoneActive?: boolean
   onEnd?: () => void
   onRetry?: () => void
+  /** Short tap on the ambient prompt — starts free chat (companion). */
   onBegin?: () => void
+  /** Long-press/hold on the ambient prompt — starts the 6-stage daily check-in (screening). */
+  onBeginCheckin?: () => void
 }
 
 const ARIA_AVATAR = require('../../../assets/images/aria-avatar.png')
@@ -111,7 +114,14 @@ function Ambient(props: Props) {
         </View>
       ) : null}
 
-      <Pressable accessibilityRole="button" onPress={props.onBegin} style={styles.ambientPrompt}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityHint={t.tapToBegin}
+        onPress={props.onBegin}
+        onLongPress={props.onBeginCheckin}
+        delayLongPress={500}
+        style={styles.ambientPrompt}
+      >
         <ReadyOrb active={Boolean(props.wakeListening)} />
         <Text style={styles.prompt}>{t.sayHello(WAKE_PHRASE)}</Text>
         <Text style={styles.promptSub}>{props.onBegin ? t.tapToBegin : t.toBegin}</Text>
