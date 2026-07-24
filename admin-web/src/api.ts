@@ -94,13 +94,12 @@ export type AdminUser = { userId: string; name: string; email: string; roles: st
 export type Patient = { patientId: string; displayName: string; preferredLanguage: string; timezone: string; ageBand: string | null; status: string; version: number; createdAt: string | null; updatedAt: string | null }
 export type Thread = { threadId: string; subject: string; status: 'open' | 'closed'; caregiverUserId: string; caregiverName: string; lastMessageAt: string; lastMessagePreview: string; adminUnread: boolean; caregiverUnread: boolean; createdAt: string }
 export type Message = { messageId: string; threadId: string; authorType: 'caregiver' | 'admin'; authorId: string; authorName: string; body: string; createdAt: string }
-type Page<T> = { data: T[]; meta?: { nextCursor?: string | null } }
 
 // --- Endpoints ---
 export const api = {
   overview: () => request<Overview>('GET', '/admin/overview'),
-  users: () => request<Page<AdminUser>>('GET', '/admin/users'),
-  patients: (q?: string) => request<Page<Patient>>('GET', `/admin/patients${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+  users: () => request<AdminUser[]>('GET', '/admin/users'),
+  patients: (q?: string) => request<Patient[]>('GET', `/admin/patients${q ? `?q=${encodeURIComponent(q)}` : ''}`),
   createPatient: (input: { displayName: string; preferredLanguage: string; timezone: string; ageBand?: string; caregiverUserId?: string }) =>
     request<Patient>('POST', '/admin/patients', input),
   updatePatient: (patientId: string, input: Partial<{ displayName: string; preferredLanguage: string; timezone: string; ageBand: string; status: string }>) =>
