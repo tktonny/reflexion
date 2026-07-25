@@ -56,6 +56,33 @@ toolsRouter.post('/sessions/:sessionId/tool-invocations', requireDevice, asyncHa
   sendData(response, result.data, result.status)
 }))
 
+// Per-patient soft-continuity memory (non-clinical): a few durable facts the mirror injects at the next
+// session start so Aria remembers earlier conversations. Device-scoped to the mirror's own patient.
+toolsRouter.get('/assistant/memory', requireDevice, asyncHandler(async (request, response) => {
+  const principal = getPrincipal(request)
+  if (principal.kind !== 'device') throw forbidden()
+  const db = await getDb()
+  const doc = await db.collection<any>(collections.patientMemory).findOne({ _id: principal.patientId })
+  response.setHeader('Cache-Control', 'no-store')
+  sendData(response, { facts: Array.isArray(doc?.facts) ? doc.facts : [], updatedAt: doc?.updatedAt ?? null })
+}))
+
+toolsRouter.put('/assistant/memory', requireDevice, asyncHandler(async (request, response) => {
+  const principal = getPrincipal(request)
+  if (principal.kind !== 'device') throw forbidden()
+  const body = objectBody(request.body)
+  const raw = Array.isArray(body.facts) ? body.facts : []
+  const facts = raw.map((f) => String(f ?? '').trim()).filter(Boolean).slice(0, 8).map((f) => f.slice(0, 200))
+  const db = await getDb()
+  await db.collection<any>(collections.patientMemory).updateOne(
+    { _id: principal.patientId },
+    { $set: { tenantId: principal.tenantId, patientId: principal.patientId, facts, updatedAt: new Date() } },
+    { upsert: true },
+  )
+  response.setHeader('Cache-Control', 'no-store')
+  sendData(response, { facts })
+}))
+
 async function invokeTool(db: Awaited<ReturnType<typeof getDb>>, tenantId: string, patientId: string, tool: typeof TOOL_NAMES[number], args: Record<string, unknown>, session: Record<string, any>) {
   if (tool === 'weather.get') {
     const carePlan = await db.collection<any>(collections.carePlans).findOne({ tenantId, patientId, status: 'active' }, { sort: { version: -1 } })

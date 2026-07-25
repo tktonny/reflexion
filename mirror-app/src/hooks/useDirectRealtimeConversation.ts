@@ -7,7 +7,8 @@ import {
   looksLikeGoodbye,
   looksLikeUserGoodbye,
 } from '../orchestration/orchestrator'
-import { buildLiveSessionUpdate, realtimeWsUrl } from '../orchestration/realtime'
+import { buildLiveSessionUpdate, realtimeWsUrl, REALTIME_TOOL_BACKEND } from '../orchestration/realtime'
+import { invokeSessionTool, getPatientMemory } from '../api/sessionSync'
 import { createEnergyVad, decodeBase64Pcm16 } from '../orchestration/energyVad'
 import {
   acknowledgementForLanguage,
@@ -23,7 +24,6 @@ import {
 } from '../orchestration/deterministicSpeech'
 import { createSessionTelemetry } from '../orchestration/sessionTelemetry'
 import { createSessionCheckinFlow, type DailyCheckinFlow } from '../orchestration/dailyCheckinFlow'
-import { getStoredSessionMemory } from '../storage/mirrorStorage'
 import {
   acquireConversationRuntime,
   type ConversationRuntimeLease,
@@ -203,6 +203,12 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const bargeInPreRollRef = useRef<string[]>([])
   const bargeInActiveRef = useRef(false)
   const voiceRef = useRef<VoiceProfile>(voiceProfileForSession(language))
+  // Latest ambient weather line (refreshes ~30 min), injected into each session.update so Aria knows it.
+  const weatherRef = useRef(options.weather)
+  weatherRef.current = options.weather
+  // True while a provider function/tool call is being executed (no-audio response) — suppresses the
+  // tool-call response.done from reopening the mic; the tool result + a fresh response drive the answer.
+  const toolCallActiveRef = useRef(false)
   const openingRequestedRef = useRef(false)
   // True on the first session.updated after a MID-CONVERSATION reconnect: skip the opening and instead
   // resume where we left off (re-ask the current screening question / reopen the mic for companion).
@@ -803,6 +809,25 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   }, [dailyPlan, persona, playDeterministicResponse, requestGoodbye])
   onSilenceRef.current = handleSilence
 
+  // Execute a provider-requested function call against the backend tool endpoint, then feed the result
+  // back over the WS and ask for the spoken answer. Never throws to the socket: a failed tool returns an
+  // error payload so Aria can gracefully say she couldn't fetch it.
+  const handleToolCall = useCallback(async (callId: string, name: string, argsJson: string) => {
+    let output: unknown
+    try {
+      const backendTool = REALTIME_TOOL_BACKEND[name]
+      if (!backendTool) throw new Error(`unknown tool: ${name}`)
+      let args: Record<string, unknown> = {}
+      try { const parsed = JSON.parse(argsJson || '{}'); if (parsed && typeof parsed === 'object') args = parsed } catch { /* keep {} */ }
+      output = await invokeSessionTool(backendTool, args)
+    } catch (error) {
+      output = { error: error instanceof Error ? error.message : 'tool_failed' }
+    }
+    if (!runtimeLeaseRef.current?.isCurrent() || endedRef.current) return
+    send({ type: 'conversation.item.create', item: { type: 'function_call_output', call_id: callId, output: JSON.stringify(output) } })
+    send({ type: 'response.create' })
+  }, [send])
+
   const handleMessage = useCallback(
     (payload: any) => {
       if (!runtimeLeaseRef.current?.isCurrent()) return
@@ -954,6 +979,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
             patientName: dailyPlan.patientName,
             autoCreateResponse: false,
             memory: memoryRef.current,
+            weather: weatherRef.current,
           }), 'normal')
         }
         return
@@ -1030,11 +1056,26 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         goodbyeDetectedRef.current = looksLikeGoodbye(finalText)
         return
       }
+      if (type === 'response.function_call_arguments.done') {
+        if (isCancelledProviderEvent(payload, cancelledProviderResponseIdRef.current)) return
+        // Aria asked to call a tool. Run it against the backend, then feed the result back for the answer.
+        toolCallActiveRef.current = true
+        void handleToolCall(String(payload?.call_id || ''), String(payload?.name || ''), String(payload?.arguments || '{}'))
+        return
+      }
       if (type === 'response.done') {
         if (isCancelledProviderEvent(payload, cancelledProviderResponseIdRef.current)) {
           cancelledProviderResponseIdRef.current = null
           activeProviderResponseIdRef.current = null
           currentResponseSourceRef.current = null
+          return
+        }
+        if (toolCallActiveRef.current) {
+          // This response.done closes the (audio-less) tool-call turn. handleToolCall feeds the result
+          // back and issues a fresh response.create for the spoken answer, so do NOT drain/reopen here.
+          toolCallActiveRef.current = false
+          responseRequestedRef.current = false
+          responseActiveRef.current = false
           return
         }
         if (responseCompletedRef.current) {
@@ -1055,7 +1096,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
     },
-    [appendAssistantStreaming, applyVoice, clearDrain, clearTranscriptWait, configureNextResponse, dailyPlan, failClosed, finalizeAssistant, handlePlaybackComplete, patientId, persona, playDeterministicResponse, pushToTalk, rejectPendingInput, reportUnavailable, requestGoodbye, resumeListening, send, transition, updateStatus, waitForPlaybackDrain],
+    [appendAssistantStreaming, applyVoice, clearDrain, clearTranscriptWait, configureNextResponse, dailyPlan, failClosed, finalizeAssistant, handlePlaybackComplete, handleToolCall, patientId, persona, playDeterministicResponse, pushToTalk, rejectPendingInput, reportUnavailable, requestGoodbye, resumeListening, send, transition, updateStatus, waitForPlaybackDrain],
   )
 
   const cleanup = useCallback(() => {
@@ -1214,7 +1255,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       // Load prior-session memory for soft continuity (best-effort; empty on the first ever session). On
       // a resume, memoryRef was already seeded from the live transcript in tryReconnect — don't clobber it.
       if (!resume) {
-        try { memoryRef.current = await getStoredSessionMemory(patientId) } catch { memoryRef.current = [] }
+        try { memoryRef.current = await getPatientMemory() } catch { memoryRef.current = [] }
       }
       // The hook may have been cleaned up or superseded while the token request was in flight.
       if (!runtimeLease.isCurrent() || !startingRef.current || startAttemptRef.current !== startAttempt) return
@@ -1255,6 +1296,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           patientName: dailyPlan.patientName,
           autoCreateResponse: false,
           memory: memoryRef.current,
+          weather: weatherRef.current,
         }))
         // Start native PCM capture -> stream frames upstream.
         const audio = createPcmAudioBridge()

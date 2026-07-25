@@ -8,7 +8,7 @@ import { dataOrThrow, type DeviceConfiguration } from '../src/api/devicePairing'
 import { loadDailyConversationPlan } from '../src/api/dailyConversationContext'
 import { sendDeviceHeartbeat, subscribeDeviceHeartbeat } from '../src/api/deviceHeartbeat'
 import { resolveOwnerIds, saveCheckin } from '../src/api/saveCheckin'
-import { setStoredSessionMemory } from '../src/storage/mirrorStorage'
+import { updatePatientMemoryFromChat } from '../src/api/patientMemory'
 import { beginMirrorSession } from '../src/api/sessionSync'
 import { MirrorExperience, type MirrorHomeWidget, type MirrorVisualState } from '../src/components/mirror/MirrorExperience'
 import { getMirrorCopy } from '../src/components/mirror/mirrorStrings'
@@ -146,7 +146,10 @@ export default function ConversationScreen() {
     endPushToTalk,
     getSessionTelemetry,
     getSessionAudio,
-  } = useConversation({ language, persona, patientName, dailyPlan })
+  } = useConversation({
+    language, persona, patientName, dailyPlan,
+    weather: weather ? `${weather.tempC}°C, ${weather.label}`.trim() : undefined,
+  })
 
   const endingRef = useRef(false)
   const endHandledRef = useRef(false)
@@ -400,13 +403,11 @@ export default function ConversationScreen() {
         telemetry,
         sessionAudio,
       })
-      // Persist a few salient user lines as soft continuity memory for the next session.
+      // Summarize this conversation into durable, non-clinical facts and merge them into backend memory
+      // so Aria remembers the patient next time. Fire-and-forget — never delay the closing screen for an
+      // LLM round-trip; a failure just leaves the prior memory untouched.
       if (ids.patientId) {
-        const memoryLines = messagesRef.current
-          .filter((message) => message.role === 'user' && message.text.trim().length >= 8)
-          .slice(-3)
-          .map((message) => message.text.trim().slice(0, 140))
-        await setStoredSessionMemory(ids.patientId, memoryLines).catch(() => undefined)
+        void updatePatientMemoryFromChat(messagesRef.current).catch(() => undefined)
       }
       router.replace({
         pathname: '/conversation-closing',

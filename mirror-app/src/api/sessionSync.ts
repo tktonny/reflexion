@@ -207,6 +207,43 @@ export async function getActiveQwenTicket() {
   return ticket.ticket
 }
 
+/** Execute a backend tool for the active session (POST /sessions/:id/tool-invocations) and return its
+ *  output — used by the realtime hook when Qwen requests a function call. The backend holds the provider
+ *  keys and audits every invocation; the device only forwards the tool name + arguments. */
+export async function invokeSessionTool(tool: string, args: Record<string, unknown>): Promise<unknown> {
+  const session = await getActiveMirrorSession()
+  if (!session) throw new Error('no_active_session')
+  const response = await deviceFetch(`/api/v1/sessions/${encodeURIComponent(session.sessionId)}/tool-invocations`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Idempotency-Key': randomIdempotencyKey() },
+    body: JSON.stringify({ tool, arguments: args }),
+  })
+  const data = await dataOrThrow<{ output: unknown }>(response)
+  return data.output
+}
+
+/** Per-patient soft-continuity memory (backend). Fetched at session start to inject into Aria's
+ *  instructions; written at session end from a device-side summary. Best-effort (never blocks a chat). */
+export async function getPatientMemory(): Promise<string[]> {
+  try {
+    const response = await deviceFetch('/api/v1/assistant/memory', { method: 'GET' })
+    const data = await dataOrThrow<{ facts: string[] }>(response)
+    return Array.isArray(data.facts) ? data.facts : []
+  } catch {
+    return []
+  }
+}
+
+export async function savePatientMemory(facts: string[]): Promise<void> {
+  try {
+    await deviceFetch('/api/v1/assistant/memory', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ facts }),
+    })
+  } catch {
+    // best-effort; memory is soft continuity, never critical
+  }
+}
+
 function resolveTimezone(): string {
   try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC' } catch { return 'UTC' }
 }

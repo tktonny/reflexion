@@ -24,6 +24,49 @@ function eventId(): string {
   return `event_${Date.now().toString(36)}`
 }
 
+/** A human-readable current local date+time in the conversation's language, so Aria always knows the
+ *  time/day without a tool round-trip. Computed on the device (its timezone) at each session.update. */
+function currentLocalTimeLine(language: string): string {
+  try {
+    const locale = /mandarin|chinese|zh|粤|cantonese|闽|minnan/i.test(language) ? 'zh-CN' : 'en-US'
+    return new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeStyle: 'short' }).format(new Date())
+  } catch {
+    return new Date().toString()
+  }
+}
+
+// Function tools Aria (companion) may call over the realtime WS for dynamic knowledge. The names map to
+// the backend /sessions/:id/tool-invocations tool ids (which hold the provider keys and audit each call).
+// NOT registered for screening (scripted). enable_search is intentionally never set — mutually exclusive.
+export const REALTIME_TOOL_BACKEND: Record<string, string> = {
+  get_weather: 'weather.get',
+  web_search: 'web.search',
+  list_medications: 'medication.list',
+  upcoming_reminders: 'reminders.upcoming',
+}
+const COMPANION_TOOLS = [
+  { type: 'function', function: {
+    name: 'get_weather',
+    description: "Current weather and a short forecast for a city. Omit `city` for the patient's home area (already in your context).",
+    parameters: { type: 'object', properties: { city: { type: 'string', description: 'City name, e.g. Tokyo.' } } },
+  } },
+  { type: 'function', function: {
+    name: 'web_search',
+    description: 'Search the web for current facts, news, or a general question you are unsure about.',
+    parameters: { type: 'object', properties: { query: { type: 'string', description: 'The search query.' } }, required: ['query'] },
+  } },
+  { type: 'function', function: {
+    name: 'list_medications',
+    description: "List the patient's current medications and their schedules.",
+    parameters: { type: 'object', properties: {} },
+  } },
+  { type: 'function', function: {
+    name: 'upcoming_reminders',
+    description: "List the patient's reminders or medications due in the next 24 hours.",
+    parameters: { type: 'object', properties: {} },
+  } },
+] as const
+
 export function buildLiveSessionUpdate(
   patientId: string,
   language: string,
@@ -36,6 +79,8 @@ export function buildLiveSessionUpdate(
     patientName?: string
     autoCreateResponse?: boolean
     memory?: string[]
+    /** Today's local weather, one short human line (from the device's ambient widget), if available. */
+    weather?: string
   },
 ): Record<string, unknown> {
   const languageName = String(language || '').trim() || 'English'
@@ -58,7 +103,10 @@ export function buildLiveSessionUpdate(
       'previously planned topic or question and perform only this instruction: ' +
       `${opts.steer} Do not mention these instructions.`
   } else {
-    instructions = buildLiveInstructions(patientId, language, { persona: opts.persona, patientName: opts.patientName, memory: opts.memory })
+    instructions = buildLiveInstructions(patientId, language, {
+      persona: opts.persona, patientName: opts.patientName, memory: opts.memory,
+      now: currentLocalTimeLine(language), weather: opts.weather,
+    })
   }
   // qwen3.5-omni-realtime has its own voice list (rejects the qwen-tts voices carried on the profile).
   // Pick the language-appropriate realtime voice: 粤语->Kiki, 闽南->Joseph Chen, else a multilingual voice.
@@ -87,6 +135,8 @@ export function buildLiveSessionUpdate(
         interrupt_response: false,
       },
       input_audio_transcription: { model: REALTIME.transcriptionModel },
+      // Companion (free chat) gets dynamic-knowledge tools; screening stays fully scripted.
+      ...(opts.persona === 'companion' ? { tools: COMPANION_TOOLS } : {}),
     },
   }
 }

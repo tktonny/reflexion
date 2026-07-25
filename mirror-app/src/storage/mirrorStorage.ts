@@ -21,26 +21,9 @@ export async function loadJson<T>(key: string): Promise<T | null> {
   }
 }
 
-// Cross-session continuity memory (doc "Memory use": reference prior sessions naturally). A few short
-// salient lines from the last check-in, stored per patient on-device and injected as SOFT context into
-// the next session's instructions. Deliberately local + tiny — not clinical data, and the patient can
-// correct anything that changed.
-const SESSION_MEMORY_KEY_PREFIX = 'reflexion:sessionMemory:'
-const MAX_MEMORY_LINES = 4
-
-export async function getStoredSessionMemory(patientId: string): Promise<string[]> {
-  if (!patientId) return []
-  const lines = await loadJson<string[]>(`${SESSION_MEMORY_KEY_PREFIX}${patientId}`)
-  return Array.isArray(lines) ? lines.filter((line) => typeof line === 'string' && line.trim()).slice(0, MAX_MEMORY_LINES) : []
-}
-
-export async function setStoredSessionMemory(patientId: string, lines: string[]) {
-  if (!patientId) return
-  const clean = lines.map((line) => String(line).replace(/\s+/g, ' ').trim()).filter(Boolean).slice(0, MAX_MEMORY_LINES)
-  const key = `${SESSION_MEMORY_KEY_PREFIX}${patientId}`
-  if (clean.length) await AsyncStorage.setItem(key, JSON.stringify(clean))
-  else await AsyncStorage.removeItem(key)
-}
+// Cross-session continuity memory now lives in the backend (per-patient, LLM-summarized): the mirror
+// fetches it at session start via getPatientMemory() and writes it at session end via a device-side
+// summary (see src/api/patientMemory.ts). The old on-device AsyncStorage memory was removed.
 
 export async function persistNursePatientIds(config: unknown, mirrorId: string) {
   const { nurseId, patientId } = extractNursePatientIds(config, mirrorId)

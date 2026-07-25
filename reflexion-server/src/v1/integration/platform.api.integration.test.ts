@@ -228,6 +228,35 @@ test('all unified v1 business routes work through HTTP with real Mongo authoriza
         .expect(401)
     })
 
+    await t.test('device-scoped assistant memory persists, is capped, and denies humans', async () => {
+      const empty = await app.get('/api/v1/assistant/memory').set(bearer(device)).expect(200)
+      assert.deepEqual(empty.body.data.facts, [])
+      assert.equal(empty.body.data.updatedAt, null)
+
+      const longFirst = 'y'.repeat(500)
+      const many = Array.from({ length: 12 }, (_, i) => `fact number ${i}`)
+      const saved = await app.put('/api/v1/assistant/memory')
+        .set(bearer(device))
+        .send({ facts: [longFirst, ...many, '   ', ''] })
+        .expect(200)
+      assert.equal(saved.body.data.facts.length, 8) // capped to at most 8 facts
+      assert.equal(saved.body.data.facts[0].length, 200) // each fact truncated to 200 chars
+      assert.ok(saved.body.data.facts.every((f: string) => f.trim().length > 0)) // empties dropped
+
+      const reread = await app.get('/api/v1/assistant/memory').set(bearer(device)).expect(200)
+      assert.equal(reread.body.data.facts.length, 8)
+      assert.ok(reread.body.data.updatedAt)
+
+      // Stored under the device's own patient, scoped to its tenant.
+      const doc = await db.collection(collections.patientMemory).findOne({ _id: PATIENT_ID })
+      assert.equal(doc?.patientId, PATIENT_ID)
+      assert.equal(doc?.tenantId, TENANT_ID)
+
+      // Memory is device-only: a human token can neither read nor write it.
+      await app.get('/api/v1/assistant/memory').set(bearer(human)).expect(401)
+      await app.put('/api/v1/assistant/memory').set(bearer(human)).send({ facts: ['nope'] }).expect(401)
+    })
+
     await t.test('deterministic status, monitoring, review and notification routes', async () => {
       const now = new Date()
       await db.collection(collections.operationalBaselines).insertOne({

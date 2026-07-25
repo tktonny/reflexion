@@ -75,14 +75,18 @@ export function closingGoodbyeSentence(language: string | null | undefined): str
 export function buildLiveInstructions(
   patientId: string,
   language: string,
-  opts: { patientName?: string | null; memory?: string[]; steer?: string; persona?: 'screening' | 'companion' } = {},
+  opts: { patientName?: string | null; memory?: string[]; steer?: string; persona?: 'screening' | 'companion'; now?: string; weather?: string } = {},
 ): string {
-  const { patientName = null, memory = [], steer, persona = 'screening' } = opts
+  const { patientName = null, memory = [], steer, persona = 'screening', now, weather } = opts
   const languageName = String(language || '').trim() || 'en'
   const openingMessage = openingMessageForLanguage(language, patientName)
 
   const knownMemory = (memory || []).map((m) => String(m).trim()).filter(Boolean)
   let memoryBlock = ''
+  // Live context Aria always knows (like a real assistant): the current local time and, when available,
+  // today's weather. Kept factual — never invent values the device did not supply.
+  if (now) memoryBlock += `The current local date and time is ${now}. Use it to greet appropriately (morning/afternoon/evening) and to answer questions about the time or day.\n`
+  if (weather) memoryBlock += `Today's local weather: ${weather}. Share it naturally if asked, but do not invent forecasts beyond this.\n`
   if (patientName) {
     memoryBlock += `The patient's known preferred name is ${patientName}. Do not ask what to call them unless they correct you or offer a new preference.\n`
   }

@@ -25,6 +25,8 @@ export type ConversationOptions = {
   pushToTalk?: boolean
   /** Aria TTS speech rate (doc default 0.85× for elderly listeners; configurable per patient). */
   speechRate?: number
+  /** Today's local weather as one short human line (from the ambient widget), injected so Aria knows it. */
+  weather?: string
 }
 
 /** Common shape every conversation version returns, so screens are version-agnostic. */
