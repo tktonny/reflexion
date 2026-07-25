@@ -13,10 +13,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { apiSend } from '../src/lib/apiClient';
+import { signInMessage } from '../src/lib/authMessages';
 import { clearStoredAuthSession, setStoredAuthSession } from '../src/lib/authSession';
 import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { v1Login } from '../src/lib/v1Client';
 import { clearV1Session } from '../src/lib/v1AuthSession';
+import { clearCaregiverCache } from '../src/lib/queryKeys';
+import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../src/theme';
 
 type SignInResponse = {
   nurseId: string;
@@ -53,7 +56,9 @@ export default function SignInScreen() {
         name: body.name || '',
         email: body.email || email.trim().toLowerCase(),
       });
-      await queryClient.invalidateQueries({ queryKey: ['latestConfig'] });
+      // Defensive: the previous session may have ended without a clean sign-out (app killed, or the
+      // sign-up path), which would otherwise leave that caregiver's data cached under gcTime: Infinity.
+      clearCaregiverCache(queryClient);
       const registration = await registerPushNotificationDevice({ nurseId: body.nurseId });
       if (!registration.ok) {
         console.warn('[SignInScreen] push registration failed', registration.reason);
@@ -61,7 +66,8 @@ export default function SignInScreen() {
       router.replace('/(tabs)');
     },
     onError: (err) => {
-      setError(err instanceof Error ? err.message : 'Unable to sign in.');
+      // Never the server's own text: see src/lib/authMessages.ts.
+      setError(signInMessage(err));
     },
   });
 
@@ -96,46 +102,72 @@ export default function SignInScreen() {
           <Text style={styles.subtitle}>Use your caregiver account to continue.</Text>
 
           {error ? (
-            <View style={styles.errorBox}>
+            // Announced on Android: the button returns to its idle state on failure, so without a live
+            // region a screen-reader user is left with no signal that the sign-in was rejected at all.
+            <View accessibilityLiveRegion="polite" style={styles.errorBox}>
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
 
           <Text style={styles.label}>Email</Text>
           <TextInput
+            accessibilityLabel="Email"
             autoCapitalize="none"
             autoComplete="email"
             keyboardType="email-address"
             onChangeText={setEmail}
             placeholder="you@email.com"
             style={styles.input}
+            // textContentType lets iOS Keychain / Android autofill fill these two fields, which is the
+            // difference between one tap and typing an address on a phone keyboard.
+            textContentType="emailAddress"
             value={email}
           />
 
           <Text style={styles.label}>Password</Text>
           <TextInput
+            accessibilityLabel="Password"
             autoCapitalize="none"
+            autoComplete="password"
             onChangeText={setPassword}
             onSubmitEditing={signIn}
             placeholder="Password"
             secureTextEntry
             style={styles.input}
+            textContentType="password"
             value={password}
           />
 
-          <TouchableOpacity disabled={signInMutation.isPending} onPress={signIn} style={styles.signInBtn}>
+          <TouchableOpacity
+            // The label is spelled out because the spinner replaces the visible text while signing in —
+            // otherwise the button loses its name at exactly the moment someone is waiting on it.
+            accessibilityLabel="Sign in"
+            accessibilityRole="button"
+            accessibilityState={{ busy: signInMutation.isPending, disabled: signInMutation.isPending }}
+            disabled={signInMutation.isPending}
+            onPress={signIn}
+            style={styles.signInBtn}
+          >
             {signInMutation.isPending ? (
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={colors.text.onAccent} />
             ) : (
               <Text style={styles.signInText}>Sign in</Text>
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => router.push('/forgot-password')} style={styles.signUpBtn}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => router.push('/forgot-password')}
+            style={styles.signUpBtn}
+          >
             <Text style={styles.signUpText}>Forgot password?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => void goToSignUp()} style={styles.signUpBtn}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => void goToSignUp()}
+            style={styles.signUpBtn}
+          >
             <Text style={styles.signUpText}>If you don't have an account, sign up!</Text>
           </TouchableOpacity>
         </View>
@@ -147,7 +179,7 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#F8F3EC',
+    backgroundColor: colors.surface.page,
   },
   keyboard: {
     flex: 1,
@@ -155,73 +187,80 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
     borderRadius: 18,
     borderWidth: 1,
     padding: 24,
   },
   title: {
-    color: '#2B2522',
-    fontFamily: 'Georgia',
+    color: colors.text.primary,
+    fontFamily: fontFamily.display,
     fontSize: 34,
     fontWeight: '500',
   },
   subtitle: {
-    color: '#8F867D',
+    color: colors.text.secondary,
     fontSize: 16,
     marginBottom: 24,
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   errorBox: {
-    backgroundColor: '#FDECEC',
-    borderColor: '#F2C7C7',
+    // Form-rejection red. Not a status colour (those live in src/lib/v1Status.ts) and not in the theme,
+    // so it stays literal here.
+    backgroundColor: colors.error.surface,
+    borderColor: colors.error.border,
     borderRadius: 12,
     borderWidth: 1,
     marginBottom: 18,
-    padding: 12,
+    padding: spacing.md,
   },
   errorText: {
-    color: '#8A2E2E',
-    fontSize: 14,
+    color: colors.error.text,
+    fontSize: fontSize.bodyLarge,
+    lineHeight: 20,
   },
   label: {
-    color: '#756C64',
-    fontSize: 14,
+    color: colors.text.secondary,
+    fontSize: fontSize.bodyLarge,
     fontWeight: '700',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
     marginTop: 14,
   },
   input: {
-    backgroundColor: '#FBF8F4',
-    borderColor: '#E7DED2',
+    backgroundColor: colors.surface.input,
+    borderColor: colors.border.default,
     borderRadius: 12,
     borderWidth: 1,
-    color: '#2B2522',
+    color: colors.text.primary,
     fontSize: 16,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: spacing.md,
   },
   signInBtn: {
     alignItems: 'center',
-    backgroundColor: '#87566A',
-    borderRadius: 14,
+    backgroundColor: colors.accent,
+    borderRadius: radius.lg,
     justifyContent: 'center',
     marginTop: 24,
     minHeight: 50,
   },
   signInText: {
-    color: '#FFFFFF',
+    color: colors.text.onAccent,
     fontSize: 16,
     fontWeight: '700',
   },
   signUpBtn: {
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 18,
+    // These two are plain text links about 20pt tall; 44pt keeps them tappable one-handed without
+    // changing how they look.
+    minHeight: MIN_TOUCH_TARGET,
   },
   signUpText: {
-    color: '#87566A',
-    fontSize: 15,
+    color: colors.accent,
+    fontSize: fontSize.subheading,
     fontWeight: '700',
   },
 });

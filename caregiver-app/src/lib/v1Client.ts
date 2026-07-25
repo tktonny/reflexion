@@ -1,4 +1,4 @@
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import {
   clearV1Session,
   getV1Session,
@@ -8,23 +8,14 @@ import {
   type V1Actor,
   type V1Session,
 } from './v1AuthSession';
+import { getV1Url } from './apiUrl';
 import type { V1PatientStatus } from './v1Status';
 
-// Client for the authoritative v1 API (reflexion-implementation-baseline.md §4/§5).
-// Base URL env has no /api segment; v1 is mounted at /api/v1. getApiUrl (legacy) strips a leading
-// /api, so it cannot build v1 URLs — hence this dedicated builder. All v1 responses are enveloped
-// as { data, meta }; errors as { error: { code, message }, meta }.
-
-export function getV1Url(path: string): string {
-  const baseUrl = process.env.EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL?.trim();
-  if (!baseUrl) {
-    throw new Error('EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL is not set');
-  }
-  const normalizedBase = baseUrl.replace(/\/+$/, '');
-  const apiBase = /\/api$/.test(normalizedBase) ? normalizedBase : `${normalizedBase}/api`;
-  const normalizedPath = path.replace(/^\/?/, '/');
-  return `${apiBase}/v1${normalizedPath}`;
-}
+// Client for the authoritative v1 API (reflexion-implementation-baseline.md §4/§5). All v1 responses are
+// enveloped as { data, meta }; errors as { error: { code, message }, meta }.
+//
+// The URL builder lives in ./apiUrl next to the legacy one, so the two mounting rules can be read together
+// (and unit-tested without pulling React Native into the test process).
 
 export class V1ApiError extends Error {
   status: number;
@@ -270,25 +261,179 @@ export async function createAwayPeriodV1(
   );
 }
 
+// ── Notifications (the caregiver alert feed) ────────────────────────────────
+
+export type V1NotificationType =
+  | 'completion' | 'missed_7pm' | 'red_missed_streak' | 'technical_issue' | 'late_completion'
+  | 'worth_checking' | 'needs_attention';
+
+export type V1Notification = {
+  notificationId: string;
+  patientId: string;
+  type: V1NotificationType | string;
+  state: 'unread' | 'read';
+  title: string;
+  body: string;
+  source?: { type: string; id: string } | null;
+  localDate: string | null;
+  createdAt: string;
+  readAt: string | null;
+};
+
+export async function listNotificationsV1(options: { limit?: number; cursor?: string | null } = {}): Promise<{
+  data: V1Notification[];
+  nextCursor: string | null;
+}> {
+  const params = new URLSearchParams({ limit: String(options.limit || 20) });
+  if (options.cursor) params.set('cursor', options.cursor);
+  const envelope = await v1Fetch<V1Notification[]>(`/notifications?${params.toString()}`, { method: 'GET' });
+  return {
+    data: Array.isArray(envelope.data) ? envelope.data : [],
+    nextCursor: envelope.meta?.nextCursor ?? null,
+  };
+}
+
+export async function markNotificationReadV1(notificationId: string): Promise<V1Notification> {
+  return v1Post<V1Notification>(`/notifications/${encodeURIComponent(notificationId)}/read`);
+}
+
+/**
+ * Registers this phone to receive push notifications. Identity comes from the bearer token, so the
+ * server needs no caregiver id. The Expo token is the device key, making repeat calls a safe upsert —
+ * hence no Idempotency-Key.
+ */
+export async function registerNotificationDeviceV1(input: {
+  expoPushToken: string;
+  platform: 'ios' | 'android' | 'web' | 'unknown';
+  appVersion?: string;
+}): Promise<{ deviceId: string; state: string }> {
+  return v1Post('/notification-devices', input);
+}
+
+// ── Support threads (the in-app "Support" conversation) ─────────────────────
+
+export type V1SupportThread = {
+  threadId: string;
+  subject: string;
+  status: 'open' | 'closed' | string;
+  lastMessageAt: string;
+  lastMessagePreview: string;
+  caregiverUnread: boolean;
+  createdAt: string;
+};
+
+export async function listSupportThreadsV1(): Promise<V1SupportThread[]> {
+  const threads = await v1Get<V1SupportThread[]>('/support/threads');
+  return Array.isArray(threads) ? threads : [];
+}
+
+export async function openSupportThreadV1(subject: string, body: string): Promise<V1SupportThread> {
+  return v1Post<V1SupportThread>('/support/threads', { subject, body }, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export async function postSupportMessageV1(threadId: string, body: string): Promise<{ messageId: string }> {
+  return v1Post(`/support/threads/${encodeURIComponent(threadId)}/messages`, { body });
+}
+
 // ── react-query hooks ───────────────────────────────────────────────────────
 
-export const patientStatusQueryKey = (patientId: string | null | undefined) => ['patientStatusV1', patientId];
+export const PATIENT_STATUS_QUERY_ROOT = 'patientStatusV1';
+export const patientStatusQueryKey = (patientId: string | null | undefined) => [PATIENT_STATUS_QUERY_ROOT, patientId];
+
+// The app-wide default is staleTime: Infinity (queryClient.ts) with explicit per-screen refetching. That
+// default is wrong for status: it is the one value the mirror changes behind the app's back, so a cached
+// answer goes stale on its own within minutes. A bounded staleTime lets a remount pick up a new check-in
+// instead of serving the same dot for the whole process lifetime.
+const STATUS_STALE_TIME_MS = 60_000;
+
+/** Marks every patient's status stale so the visible screens refetch. Call from useFocusEffect. */
+export function invalidatePatientStatuses(queryClient: QueryClient) {
+  return queryClient.invalidateQueries({ queryKey: [PATIENT_STATUS_QUERY_ROOT] });
+}
 
 export function usePatientStatusV1(patientId: string | null | undefined) {
   return useQuery({
     queryKey: patientStatusQueryKey(patientId),
     queryFn: () => getPatientStatusV1(patientId as string),
     enabled: Boolean(patientId) && hasV1Session(),
+    staleTime: STATUS_STALE_TIME_MS,
+    refetchOnMount: true,
   });
 }
 
-export function usePatientStatusesV1(patientIds: string[]) {
-  const enabled = hasV1Session();
-  return useQueries({
-    queries: patientIds.map((patientId) => ({
-      queryKey: patientStatusQueryKey(patientId),
-      queryFn: () => getPatientStatusV1(patientId),
-      enabled: Boolean(patientId) && enabled,
-    })),
+/** Per-id outcome from `GET /patient-statuses`. See the route comment for why each id keeps its own. */
+export type V1PatientStatusOutcome = {
+  patientId: string;
+  outcome: 'ok' | 'unavailable' | 'failed';
+  status: V1PatientStatus | null;
+};
+
+export async function getPatientStatusesV1(patientIds: string[]): Promise<V1PatientStatusOutcome[]> {
+  if (!patientIds.length) return [];
+  return v1Get<V1PatientStatusOutcome[]>(`/patient-statuses?ids=${encodeURIComponent(patientIds.join(','))}`);
+}
+
+/** What the dashboard needs to know about one loved one's status, and why it is missing when it is. */
+export type PatientStatusSlot = {
+  data: V1PatientStatus | undefined;
+  isLoading: boolean;
+  /** The request itself failed, or the server could not compute this one. Retrying may help. */
+  isError: boolean;
+  /** No v1 session — a normal state, since v1 login is best-effort. Retrying will NOT help. */
+  isSignedOut: boolean;
+  /** No monitoring record yet, typically a loved one whose mirror has not been paired. */
+  isUnavailable: boolean;
+};
+
+/**
+ * Every loved one's status in ONE request.
+ *
+ * The dashboard used to issue a status request per patient on top of the list request. Each round trip is a
+ * cross-region hop from Singapore, so the batch matters more here than the request count suggests.
+ *
+ * Successful rows are also written into the per-patient cache entry that usePatientStatusV1 reads, so
+ * opening a profile shows the status the dashboard already has instead of starting from "Checking in…", and
+ * one invalidatePatientStatuses() call still refreshes both.
+ *
+ * Each slot reports WHY a status is missing. Collapsing that into a bare `undefined` is what let the
+ * dashboard show "0 needs attention" for a patient whose status simply had not been fetched.
+ */
+export function usePatientStatusesV1(patientIds: string[]): PatientStatusSlot[] {
+  const queryClient = useQueryClient();
+  const signedOut = !hasV1Session();
+  const enabled = !signedOut && patientIds.length > 0;
+  // Sorted so re-ordering the loved-one list reuses the same cache entry instead of refetching.
+  const key = [...patientIds].sort().join(',');
+
+  const query = useQuery({
+    enabled,
+    queryKey: [PATIENT_STATUS_QUERY_ROOT, 'batch', key],
+    queryFn: async () => {
+      const outcomes = await getPatientStatusesV1(patientIds);
+      for (const outcome of outcomes) {
+        // Only a real status seeds the per-patient cache. Writing null would make the profile screen
+        // believe it had fetched and suppress its own "sign in again" / retry affordances.
+        if (outcome.outcome === 'ok' && outcome.status) {
+          queryClient.setQueryData(patientStatusQueryKey(outcome.patientId), outcome.status);
+        }
+      }
+      return outcomes;
+    },
+    staleTime: STATUS_STALE_TIME_MS,
+    refetchOnMount: true,
+  });
+
+  const byId = new Map((query.data || []).map((outcome) => [outcome.patientId, outcome]));
+
+  return patientIds.map((patientId) => {
+    const outcome = byId.get(patientId);
+    return {
+      data: outcome?.outcome === 'ok' ? outcome.status ?? undefined : undefined,
+      isLoading: enabled && query.isLoading,
+      // A patient the server could not compute is an error for that patient even though the request was 200.
+      isError: Boolean(query.isError) || outcome?.outcome === 'failed',
+      isSignedOut: signedOut,
+      isUnavailable: outcome?.outcome === 'unavailable',
+    };
   });
 }

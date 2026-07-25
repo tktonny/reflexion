@@ -14,8 +14,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { EmptyState, ErrorState, LoadingState } from '../src/components/ScreenState';
 import { apiGet, apiSend } from '../src/lib/apiClient';
 import { getStoredAuthSession } from '../src/lib/authSession';
+import { invalidateCaregiverConfig } from '../src/lib/queryKeys';
+import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../src/theme';
 
 type MirrorPatient = {
   patientId: string;
@@ -57,7 +60,7 @@ export default function MirrorManagementScreen() {
     }),
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.nurseId || ''] });
-      await queryClient.invalidateQueries({ queryKey: ['latestConfig'] });
+      await invalidateCaregiverConfig(queryClient);
       showMessage(
         'Mirror unlinked',
         `Removed ${result?.deletedMirrorMapCount ?? 0} mirror map and ${result?.deletedPairingSessionCount ?? 0} pairing session(s). You can add a new connection for this patient.`,
@@ -68,7 +71,10 @@ export default function MirrorManagementScreen() {
     },
   });
   const patients = mirrorsQuery.data || [];
-  const savingPatientId = patchMirrorMutation.variables?.patientId || '';
+  // AND-ed with isPending on purpose. react-query keeps `variables` after a mutation settles, so relying on
+  // it alone left a card spinning "Deleting connection…" forever after a FAILED unlink — with the only
+  // control on that card disabled and announced as busy, so there was no way to retry short of a remount.
+  const savingPatientId = patchMirrorMutation.isPending ? patchMirrorMutation.variables?.patientId || '' : '';
   const { refetch: refetchMirrors } = mirrorsQuery;
 
   useFocusEffect(
@@ -127,8 +133,13 @@ export default function MirrorManagementScreen() {
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={goBack}>
-            <Feather name="chevron-left" size={24} color="#87566A" />
+          <TouchableOpacity
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
+            style={styles.backButton}
+            onPress={goBack}
+          >
+            <Feather name="chevron-left" size={24} color={colors.accent} />
           </TouchableOpacity>
           <View style={styles.headerTextBlock}>
             <Text style={styles.eyebrow}>Voice Companion</Text>
@@ -136,11 +147,13 @@ export default function MirrorManagementScreen() {
           </View>
         </View>
 
-        {mirrorsQuery.isLoading ? (
-          <View style={styles.loadingCard}>
-            <ActivityIndicator color="#87566A" />
-            <Text style={styles.loadingText}>Loading mirror connections.</Text>
-          </View>
+        {patients.length === 0 ? (
+          <MirrorsPlaceholder
+            isSignedIn={Boolean(session?.nurseId)}
+            isLoading={mirrorsQuery.isLoading}
+            hasError={Boolean(mirrorsQuery.error)}
+            onRetry={() => void mirrorsQuery.refetch()}
+          />
         ) : (
           patients.map((patient) => {
             const isSavingThisPatient = savingPatientId === patient.patientId;
@@ -148,11 +161,19 @@ export default function MirrorManagementScreen() {
             return (
               <View key={patient.patientId} style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <View>
+                  {/* flex:1 so a long name wraps instead of being squeezed off-card once the pill grows
+                      with the system font size. */}
+                  <View style={styles.cardHeaderTextBlock}>
                     <Text style={styles.patientName}>{patient.patientName}</Text>
                     <Text style={styles.mirrorName}>{patient.mirrorName || 'No mirror linked'}</Text>
                   </View>
-                  <View style={[styles.statusPill, isPaired ? styles.statusPaired : styles.statusUnpaired]}>
+                  {/* One spoken phrase for the pill, so a reader does not announce a bare word "Unpaired"
+                      with no idea what it belongs to. */}
+                  <View
+                    accessible
+                    accessibilityLabel={isPaired ? 'Mirror is paired' : 'Mirror is not paired yet'}
+                    style={[styles.statusPill, isPaired ? styles.statusPaired : styles.statusUnpaired]}
+                  >
                     <Text style={[styles.statusText, isPaired ? styles.statusTextPaired : styles.statusTextUnpaired]}>
                       {isPaired ? 'Paired' : 'Unpaired'}
                     </Text>
@@ -166,14 +187,25 @@ export default function MirrorManagementScreen() {
 
                 {isPaired ? (
                   <TouchableOpacity
+                    // Destructive and irreversible from here, so the label names exactly what disappears —
+                    // "Delete connection" alone tells a screen-reader user nothing about whose mirror it is.
+                    // The in-progress state lives in the label itself. A live region on the child <Text>
+                    // does not work here: Android redirects the announcement to this focusable ancestor,
+                    // whose own label would still read "Delete the mirror connection…", and iOS ignores
+                    // live regions entirely — so a screen-reader caregiver got no confirmation at all.
+                    accessibilityLabel={isSavingThisPatient
+                      ? `Deleting the mirror connection for ${patient.patientName}`
+                      : `Delete the mirror connection between ${patient.mirrorName || 'the mirror'} and ${patient.patientName}`}
+                    accessibilityRole="button"
+                    accessibilityState={{ busy: isSavingThisPatient, disabled: isSavingThisPatient }}
                     disabled={isSavingThisPatient}
                     onPress={() => confirmUnlink(patient)}
                     style={[styles.deleteButton, isSavingThisPatient && styles.disabledOutlineButton]}
                   >
                     {isSavingThisPatient ? (
-                      <ActivityIndicator color="#B45F56" />
+                      <ActivityIndicator accessibilityElementsHidden importantForAccessibility="no" color="#AA554B" />
                     ) : (
-                      <Feather name="trash-2" size={17} color="#B45F56" />
+                      <Feather accessibilityElementsHidden importantForAccessibility="no" name="trash-2" size={17} color="#AA554B" />
                     )}
                     <Text style={styles.deleteButtonText}>
                       {isSavingThisPatient ? 'Deleting connection...' : 'Delete connection'}
@@ -181,10 +213,12 @@ export default function MirrorManagementScreen() {
                   </TouchableOpacity>
                 ) : (
                   <TouchableOpacity
+                    accessibilityLabel={`Add a mirror connection for ${patient.patientName}`}
+                    accessibilityRole="button"
                     onPress={() => router.push(`/mirror-management/add?patientId=${patient.patientId}`)}
                     style={styles.primaryButton}
                   >
-                    <Feather name="plus" size={18} color="#FFFFFF" />
+                    <Feather name="plus" size={18} color={colors.text.onAccent} />
                     <Text style={styles.primaryButtonText}>Add connection</Text>
                   </TouchableOpacity>
                 )}
@@ -194,6 +228,56 @@ export default function MirrorManagementScreen() {
         )}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+/**
+ * Loading / signed-out / failed / genuinely-empty are four different situations and the caregiver deserves
+ * to be told which. This screen is where someone lands when a mirror has gone quiet, so "nothing linked"
+ * and "we could not reach the server" must never look alike. The failure branch never renders the server's
+ * error text — those strings are for logs, not for a headline above someone's mother's name.
+ */
+function MirrorsPlaceholder({
+  isSignedIn,
+  isLoading,
+  hasError,
+  onRetry,
+}: {
+  isSignedIn: boolean;
+  isLoading: boolean;
+  hasError: boolean;
+  onRetry: () => void;
+}) {
+  if (isLoading) {
+    return <LoadingState title="Loading mirror connections" />;
+  }
+
+  if (!isSignedIn) {
+    return (
+      <EmptyState
+        icon="lock"
+        title="Sign in again to manage mirrors"
+        message="Your mirror connections are kept private to your account. Signing out and back in will reconnect them."
+      />
+    );
+  }
+
+  if (hasError) {
+    return (
+      <ErrorState
+        title="We could not load your mirror connections"
+        message="This is usually a connection problem, not something about your loved one."
+        onRetry={onRetry}
+      />
+    );
+  }
+
+  return (
+    <EmptyState
+      icon="monitor"
+      title="No mirrors to manage yet"
+      message="Once a loved one has been added, their mirror connection will show up here."
+    />
   );
 }
 
@@ -207,8 +291,10 @@ function showMessage(title: string, message: string) {
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
+  // Grouped into a single spoken phrase ("Pairing code, None") — read as two elements the label and its
+  // value drift apart while swiping through four rows in a row.
   return (
-    <View style={styles.infoRow}>
+    <View accessible accessibilityLabel={`${label}: ${value}`} style={styles.infoRow}>
       <Text style={styles.infoLabel}>{label}</Text>
       <Text style={styles.infoValue}>{value}</Text>
     </View>
@@ -228,90 +314,105 @@ function formatDate(value: string | null) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#F8F3EC' },
+  safe: { flex: 1, backgroundColor: colors.surface.page },
   scroll: { flex: 1 },
-  content: { gap: 16, padding: 20, paddingBottom: 52 },
-  header: { alignItems: 'center', flexDirection: 'row', gap: 12, marginBottom: 4 },
+  content: { gap: spacing.lg, padding: spacing.xl, paddingBottom: 52 },
+  header: { alignItems: 'center', flexDirection: 'row', gap: spacing.md, marginBottom: spacing.xs },
   backButton: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
     borderRadius: 22,
     borderWidth: 1,
-    height: 44,
+    height: MIN_TOUCH_TARGET,
     justifyContent: 'center',
-    width: 44,
+    width: MIN_TOUCH_TARGET,
   },
   headerTextBlock: { flex: 1 },
   eyebrow: {
-    color: '#A69C92',
-    fontSize: 12,
+    color: colors.text.tertiary,
+    fontSize: fontSize.caption,
     fontWeight: '700',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
-  title: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 28, fontWeight: '500', marginTop: 4 },
-  loadingCard: {
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
-    borderRadius: 16,
-    borderWidth: 1,
-    gap: 10,
-    padding: 28,
+  title: {
+    color: colors.text.primary,
+    fontFamily: fontFamily.display,
+    fontSize: 28,
+    fontWeight: '500',
+    marginTop: spacing.xs,
   },
-  loadingText: { color: '#756C64', fontSize: 15 },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
     borderRadius: 18,
     borderWidth: 1,
-    gap: 12,
+    gap: spacing.md,
     padding: 18,
+    // Deliberately deeper and warmer than the shared cardShadow — these cards carry a whole connection,
+    // so the literal stays until the theme has a token for it.
     shadowColor: '#6E5B4B',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
     shadowRadius: 18,
   },
-  cardHeader: { alignItems: 'flex-start', flexDirection: 'row', gap: 12, justifyContent: 'space-between' },
-  patientName: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 24, fontWeight: '500' },
-  mirrorName: { color: '#756C64', fontSize: 15, marginTop: 4 },
-  statusPill: { borderRadius: 999, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 6 },
+  cardHeader: { alignItems: 'flex-start', flexDirection: 'row', gap: spacing.md, justifyContent: 'space-between' },
+  cardHeaderTextBlock: { flex: 1 },
+  patientName: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 24, fontWeight: '500' },
+  mirrorName: { color: colors.text.secondary, fontSize: fontSize.subheading, marginTop: spacing.xs },
+  statusPill: {
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    flexShrink: 0,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 6,
+  },
   statusPaired: { backgroundColor: '#F1F7ED', borderColor: '#ABC5A1' },
-  statusUnpaired: { backgroundColor: '#F8F3EC', borderColor: '#D8CFC3' },
-  statusText: { fontSize: 12, fontWeight: '700' },
+  statusUnpaired: { backgroundColor: colors.surface.page, borderColor: colors.border.strong },
+  // Whether the mirror is actually paired is the whole point of this screen, so this reads at 13 rather
+  // than the old 12 and is left free to grow with the system font (the pill is padding-sized, not fixed).
+  statusText: { fontSize: fontSize.caption, fontWeight: '700' },
   statusTextPaired: { color: '#617A58' },
-  statusTextUnpaired: { color: '#8E7F6D' },
+  statusTextUnpaired: { color: '#786C5C' },
   infoRow: {
     alignItems: 'center',
-    borderTopColor: '#F3EDE6',
+    borderTopColor: colors.border.subtle,
     borderTopWidth: 1,
     flexDirection: 'row',
+    // gap keeps the label and the right-aligned value from colliding once both grow at large font sizes.
+    gap: spacing.md,
     justifyContent: 'space-between',
     paddingTop: 10,
   },
-  infoLabel: { color: '#8E7F6D', fontSize: 13, fontWeight: '600' },
-  infoValue: { color: '#2B2522', flex: 1, fontSize: 14, textAlign: 'right' },
+  infoLabel: { color: '#786C5C', fontSize: fontSize.body, fontWeight: '600' },
+  infoValue: { color: colors.text.primary, flex: 1, fontSize: fontSize.bodyLarge, textAlign: 'right' },
   primaryButton: {
     alignItems: 'center',
-    backgroundColor: '#87566A',
+    backgroundColor: colors.accent,
     borderRadius: 12,
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     justifyContent: 'center',
     minHeight: 48,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
-  primaryButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
+  // flexShrink lets the label wrap inside the button at large system font sizes; without it the row
+  // overflows the rounded edge and the last word is clipped.
+  primaryButtonText: { color: colors.text.onAccent, flexShrink: 1, fontSize: fontSize.subheading, fontWeight: '800' },
   deleteButton: {
     alignItems: 'center',
     borderColor: '#E6C8C4',
     borderRadius: 12,
     borderWidth: 1,
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     justifyContent: 'center',
     minHeight: 46,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
-  disabledOutlineButton: { borderColor: '#E7DED2', opacity: 0.75 },
-  deleteButtonText: { color: '#B45F56', fontSize: 15, fontWeight: '700' },
+  disabledOutlineButton: { borderColor: colors.border.default, opacity: 0.75 },
+  deleteButtonText: { color: '#AA554B', flexShrink: 1, fontSize: fontSize.subheading, fontWeight: '700' },
 });

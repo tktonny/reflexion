@@ -11,8 +11,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import StatusBadge from '../../../src/components/StatusBadge';
+import { EmptyState, ErrorState, LoadingState } from '../../../src/components/ScreenState';
 import { apiGet, apiSend } from '../../../src/lib/apiClient';
+import {
+  MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, spacing,
+} from '../../../src/theme';
 
 type ConversationLog = {
   sentence: string;
@@ -94,7 +97,9 @@ export default function SessionHistoryDayScreen() {
     },
   });
 
-  const selectedSession = daySessions?.sessions[selectedSessionIndex] || null;
+  const sessions = daySessions?.sessions || [];
+  const hasSessions = sessions.length > 0;
+  const selectedSession = sessions[selectedSessionIndex] || null;
   const transcript = useMemo(
     () => buildTranscript(selectedSession?.logs || []),
     [selectedSession?.logs],
@@ -107,13 +112,17 @@ export default function SessionHistoryDayScreen() {
     setShowTranscript(true);
   }, [daySessionsQuery.data]);
 
+  // The route params are missing or malformed, so the query never runs. Nothing to retry here — this is the
+  // disabled case, deliberately kept distinct from a request that actually failed below.
   if (!shouldLoadRealSession) {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.placeholder}>
-          <Feather name="activity" size={28} color="#87566A" />
-          <Text style={styles.placeholderTitle}>Bear with us</Text>
-          <Text style={styles.placeholderText}>This session day is not ready to show yet.</Text>
+          <EmptyState
+            icon="activity"
+            title="Bear with us"
+            message="This session day is not ready to show yet."
+          />
         </View>
       </SafeAreaView>
     );
@@ -124,12 +133,13 @@ export default function SessionHistoryDayScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{formatSelectedDate(date)}</Text>
-          {daySessionsQuery.isLoading ? (
-            <Text style={styles.emptyText}>Loading sessions...</Text>
-          ) : daySessions && daySessions.sessions.length > 0 ? (
+          {hasSessions ? (
             <View style={styles.sessionTabs}>
-              {daySessions.sessions.map((item, index) => (
+              {sessions.map((item, index) => (
                 <TouchableOpacity
+                  accessibilityLabel={`Session ${index + 1} of ${sessions.length}, ${formatSessionTabLabel(item, index)}`}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: selectedSessionIndex === index }}
                   key={item.id || index}
                   onPress={() => setSelectedSessionIndex(index)}
                   style={[styles.sessionTab, selectedSessionIndex === index && styles.sessionTabActive]}
@@ -140,10 +150,30 @@ export default function SessionHistoryDayScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          ) : (
-            <Text style={styles.emptyText}>No sessions recorded on this day.</Text>
-          )}
+          ) : null}
         </View>
+
+        {/* Loading, failed and genuinely-empty are three different answers to "did she talk to Aria that day?"
+            and the caregiver deserves to be told which. The failure branch never renders the server's own
+            message: a 404 on this endpoint used to reach the screen as the headline "Not found". */}
+        {/* Order matters: the error card only appears when there is nothing to show. A failed refetch keeps
+            its cached data (retry:1 + staleTime Infinity + the focus refetch above), so checking isError
+            first would stack "we could not load this day" directly on top of the day's own, still-accurate
+            session cards. */}
+        {daySessionsQuery.isLoading ? (
+          <LoadingState title="Loading this day" />
+        ) : daySessionsQuery.isError && !hasSessions ? (
+          <ErrorState
+            title="We could not load this day"
+            onRetry={() => void daySessionsQuery.refetch()}
+          />
+        ) : !hasSessions ? (
+          <EmptyState
+            icon="calendar"
+            title="No check-in on this day"
+            message="Nothing was recorded for this date. The other days in the history list are still there."
+          />
+        ) : null}
 
         {selectedSession && daySessions ? (
           <>
@@ -152,26 +182,38 @@ export default function SessionHistoryDayScreen() {
                 <Text style={styles.cardTitle}>AI summary</Text>
                 {!generatedSummary ? (
                   <TouchableOpacity
+                    accessibilityRole="button"
                     disabled={summaryMutation.isPending}
                     onPress={() => summaryMutation.mutate()}
                     style={[styles.summaryBtn, summaryMutation.isPending && styles.summaryBtnDisabled]}
                   >
-                    <Feather name="cpu" size={14} color="#87566A" />
+                    <Feather
+                      accessibilityElementsHidden
+                      importantForAccessibility="no"
+                      name="cpu"
+                      size={14}
+                      color={colors.accent}
+                    />
                     <Text style={styles.summaryBtnText}>
                       {summaryMutation.isPending ? 'Generating...' : 'Generate'}
                     </Text>
                   </TouchableOpacity>
                 ) : null}
               </View>
-              <Text style={generatedSummary ? styles.summaryText : styles.emptyText}>
+              {/* Announced when it arrives, so pressing Generate is not a silent action for a screen reader. */}
+              <Text
+                accessibilityLiveRegion="polite"
+                style={generatedSummary ? styles.summaryText : styles.emptyText}
+              >
                 {generatedSummary || 'No summary yet.'}
               </Text>
             </View>
 
             <View style={styles.card}>
+              {/* No status indicator here on purpose: this card is one day's raw conversation detail, and the
+                  only status the app may show is the one the server computes on the dashboard/profile. */}
               <View style={styles.metaRow}>
                 <Text style={styles.metaName}>{daySessions.patientName}</Text>
-                <StatusBadge status="green" label="Normal" />
               </View>
               <Text style={styles.metaDate}>{formatDateTime(selectedSession.createdAt)}</Text>
               <View style={styles.statsRow}>
@@ -183,22 +225,44 @@ export default function SessionHistoryDayScreen() {
             </View>
 
             <View style={styles.card}>
-              <TouchableOpacity style={styles.transcriptHeader} onPress={() => setShowTranscript(value => !value)}>
-                <Text style={styles.cardTitle}>View the full conversation with {daySessions.patientName} below</Text>
-                <Feather name={showTranscript ? 'chevron-up' : 'chevron-down'} size={16} color="#87566A" />
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityState={{ expanded: showTranscript }}
+                onPress={() => setShowTranscript(value => !value)}
+                style={styles.transcriptHeader}
+              >
+                {/* flexShrink keeps this sentence inside the row instead of pushing the chevron off-screen
+                    once the system font is scaled up. */}
+                <Text style={[styles.cardTitle, styles.transcriptTitle]}>
+                  View the full conversation with {daySessions.patientName} below
+                </Text>
+                <Feather
+                  accessibilityElementsHidden
+                  importantForAccessibility="no"
+                  name={showTranscript ? 'chevron-up' : 'chevron-down'}
+                  size={16}
+                  color={colors.accent}
+                />
               </TouchableOpacity>
 
               {showTranscript && transcript.length > 0 ? (
                 <View style={styles.transcript}>
-                  {transcript.map((line, index) => (
-                    <View key={index} style={[styles.line, line.speaker === 'Aria' ? styles.lineAria : styles.lineUser]}>
-                      <Text style={styles.lineLabel}>
-                        {line.speaker === 'Aria' ? 'Aria' : daySessions.patientName}
-                      </Text>
-                      <Text style={styles.lineText}>{line.text}</Text>
-                      <Text style={styles.lineTime}>{formatSeconds(line.timestamp)}</Text>
-                    </View>
-                  ))}
+                  {transcript.map((line, index) => {
+                    const speaker = line.speaker === 'Aria' ? 'Aria' : daySessions.patientName;
+                    return (
+                      // Grouped into one label so a long transcript is not read as three fragments per line.
+                      <View
+                        accessible
+                        accessibilityLabel={`${speaker}, at ${formatSeconds(line.timestamp)}: ${line.text}`}
+                        key={index}
+                        style={[styles.line, line.speaker === 'Aria' ? styles.lineAria : styles.lineUser]}
+                      >
+                        <Text style={styles.lineLabel}>{speaker}</Text>
+                        <Text style={styles.lineText}>{line.text}</Text>
+                        <Text style={styles.lineTime}>{formatSeconds(line.timestamp)}</Text>
+                      </View>
+                    );
+                  })}
                 </View>
               ) : null}
               {showTranscript && transcript.length === 0 ? (
@@ -224,8 +288,19 @@ function StatChip({
   value: string;
 }) {
   return (
-    <View style={[styles.statChip, highlight && styles.statChipHighlight]}>
-      <Feather name={icon} size={14} color={highlight ? '#6E2F48' : '#A69C92'} />
+    // One label per chip ("Words, 214"), otherwise the four chips read as eight disconnected fragments.
+    <View
+      accessible
+      accessibilityLabel={`${label}, ${value}`}
+      style={[styles.statChip, highlight && styles.statChipHighlight]}
+    >
+      <Feather
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+        name={icon}
+        size={14}
+        color={highlight ? colors.accentPressed : colors.text.tertiary}
+      />
       <Text style={[styles.statValue, highlight && styles.statValueHighlight]}>{value}</Text>
       <Text style={[styles.statLabel, highlight && styles.statLabelHighlight]}>{label}</Text>
     </View>
@@ -292,57 +367,50 @@ function buildTranscript(logs: ConversationLog[]) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#F8F3EC' },
+  safe: { flex: 1, backgroundColor: colors.surface.page },
   placeholder: {
-    alignItems: 'center',
     flex: 1,
-    gap: 8,
     justifyContent: 'center',
-    paddingHorizontal: 28,
+    paddingHorizontal: 14,
   },
-  placeholderTitle: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 24, fontWeight: '500' },
-  placeholderText: { color: '#756C64', fontSize: 15, lineHeight: 22, textAlign: 'center' },
-  content: { paddingBottom: 48, paddingHorizontal: 14, paddingTop: 16 },
+  content: { paddingBottom: 48, paddingHorizontal: 14, paddingTop: spacing.lg },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
-    borderRadius: 16,
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
+    borderRadius: radius.xl,
     borderWidth: 1,
-    elevation: 2,
     marginBottom: 14,
     padding: 14,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.035,
-    shadowRadius: 10,
+    ...cardShadow,
   },
   cardTitle: {
-    color: '#A69C92',
-    fontSize: 12,
+    color: colors.text.tertiary,
+    fontSize: fontSize.caption,
     fontWeight: '600',
     letterSpacing: 0.6,
     marginBottom: 10,
     textTransform: 'uppercase',
   },
-  emptyText: { color: '#A69C92', fontSize: 14, lineHeight: 21 },
+  emptyText: { color: colors.text.tertiary, fontSize: fontSize.bodyLarge, lineHeight: 21 },
   summaryHeader: {
     alignItems: 'flex-start',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 8,
+    gap: spacing.sm,
     marginBottom: 10,
   },
   summaryBtn: {
     alignItems: 'center',
-    backgroundColor: '#F4F0EA',
-    borderColor: '#E7DED2',
-    borderRadius: 999,
+    backgroundColor: colors.surface.muted,
+    borderColor: colors.border.default,
+    borderRadius: radius.pill,
     borderWidth: 1,
     flexDirection: 'row',
     gap: 6,
     maxWidth: '100%',
-    minHeight: 36,
+    // 44pt: this is the only action on the card and it sits in a tight header row.
+    minHeight: MIN_TOUCH_TARGET,
     paddingHorizontal: 10,
     paddingVertical: 7,
   },
@@ -350,59 +418,85 @@ const styles = StyleSheet.create({
     opacity: 0.65,
   },
   summaryBtnText: {
-    color: '#87566A',
-    fontSize: 11,
+    color: colors.accent,
+    fontSize: fontSize.body,
     fontWeight: '700',
     flexShrink: 1,
   },
-  summaryText: { color: '#756C64', fontSize: 14, lineHeight: 21 },
+  summaryText: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 21 },
   sessionTabs: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: spacing.sm,
   },
   sessionTab: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
-    borderRadius: 999,
+    alignItems: 'center',
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
+    borderRadius: radius.pill,
     borderWidth: 1,
+    justifyContent: 'center',
+    // These pills were ~34pt tall; switching session is the main control on this screen.
+    minHeight: MIN_TOUCH_TARGET,
+    minWidth: MIN_TOUCH_TARGET,
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
   },
   sessionTabActive: {
-    backgroundColor: '#87566A',
-    borderColor: '#87566A',
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
-  sessionTabText: { color: '#756C64', fontSize: 13, fontWeight: '700' },
-  sessionTabTextActive: { color: '#FFFFFF' },
-  metaRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  metaName: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 18, fontWeight: '500' },
-  metaDate: { color: '#A69C92', fontSize: 13, marginBottom: 16 },
-  statsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between' },
+  sessionTabText: { color: colors.text.secondary, fontSize: fontSize.body, fontWeight: '700' },
+  sessionTabTextActive: { color: colors.text.onAccent },
+  metaRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xs },
+  metaName: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 18, fontWeight: '500' },
+  metaDate: { color: colors.text.tertiary, fontSize: fontSize.body, marginBottom: spacing.lg },
+  statsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, justifyContent: 'space-between' },
   statChip: {
     alignItems: 'center',
-    backgroundColor: '#F8F3EC',
-    borderColor: '#E7DED2',
+    backgroundColor: colors.surface.page,
+    borderColor: colors.border.default,
     borderRadius: 12,
     borderWidth: 1,
-    gap: 4,
+    gap: spacing.xs,
     minHeight: 74,
     paddingHorizontal: 6,
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
     width: '47%',
   },
-  statValue: { color: '#2B2522', fontSize: 15, fontWeight: '600', lineHeight: 19, textAlign: 'center' },
-  statLabel: { color: '#A69C92', fontSize: 10, lineHeight: 12, textAlign: 'center' },
+  statValue: {
+    color: colors.text.primary,
+    fontSize: fontSize.subheading,
+    fontWeight: '600',
+    lineHeight: 19,
+    textAlign: 'center',
+  },
+  // 10px was unreadable for the caregivers this app is for; these four words are the point of the chip.
+  statLabel: { color: colors.text.tertiary, fontSize: fontSize.caption, lineHeight: 15, textAlign: 'center' },
   statChipHighlight: { backgroundColor: '#F7EEF2', borderColor: '#CFA7B7' },
-  statValueHighlight: { color: '#6E2F48' },
-  statLabelHighlight: { color: '#6E2F48', fontWeight: '700' },
-  transcriptHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  statValueHighlight: { color: colors.accentPressed },
+  statLabelHighlight: { color: colors.accentPressed, fontWeight: '700' },
+  transcriptHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
+    // The whole row is the expand/collapse target, so it has to be reachable in a hurry.
+    minHeight: MIN_TOUCH_TARGET,
+  },
+  transcriptTitle: { flexShrink: 1 },
   transcript: { gap: 10, marginTop: 10 },
-  line: { borderRadius: 12, padding: 12 },
-  lineAria: { backgroundColor: '#F3E8ED', borderLeftColor: '#87566A', borderLeftWidth: 3 },
-  lineUser: { backgroundColor: '#F4F0EA', borderLeftColor: '#B9AA99', borderLeftWidth: 3 },
-  lineLabel: { color: '#A69C92', fontSize: 11, fontWeight: '700', marginBottom: 4 },
-  lineText: { color: '#2B2522', fontSize: 14, lineHeight: 20 },
-  lineTime: { color: '#C4B9AF', fontSize: 11, marginTop: 4, textAlign: 'right' },
-  emptyTranscript: { color: '#A69C92', fontSize: 14, paddingVertical: 16, textAlign: 'center' },
+  line: { borderRadius: 12, padding: spacing.md },
+  lineAria: { backgroundColor: '#F3E8ED', borderLeftColor: colors.accent, borderLeftWidth: 3 },
+  lineUser: { backgroundColor: colors.surface.muted, borderLeftColor: '#B9AA99', borderLeftWidth: 3 },
+  lineLabel: { color: colors.text.tertiary, fontSize: fontSize.caption, fontWeight: '700', marginBottom: spacing.xs },
+  lineText: { color: colors.text.primary, fontSize: fontSize.bodyLarge, lineHeight: 20 },
+  lineTime: { color: colors.text.tertiary, fontSize: fontSize.caption, marginTop: spacing.xs, textAlign: 'right' },
+  emptyTranscript: {
+    color: colors.text.tertiary,
+    fontSize: fontSize.bodyLarge,
+    paddingVertical: spacing.lg,
+    textAlign: 'center',
+  },
 });

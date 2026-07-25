@@ -1,15 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
 import {
-  ActivityIndicator,
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
 import { apiGet } from '../../src/lib/apiClient';
 import { getStoredAuthSession } from '../../src/lib/authSession';
-import { usePatientStatusesV1 } from '../../src/lib/v1Client';
+import { hasV1Session } from '../../src/lib/v1AuthSession';
+import { caregiverConfigKey } from '../../src/lib/queryKeys';
+import { invalidatePatientStatuses, usePatientStatusesV1 } from '../../src/lib/v1Client';
 import {
   STATUS_META,
   NEUTRAL_STATUS_COLOR,
@@ -18,6 +20,9 @@ import {
   getBaselineProgressText,
   formatLastInteraction,
 } from '../../src/lib/v1Status';
+import {
+  colors, spacing, radius, fontSize, fontFamily, cardShadow, MIN_TOUCH_TARGET,
+} from '../../src/theme';
 
 // Summary-strip dots use the authoritative Option-1 status palette (baseline §2.9).
 const STATUS_DOT: Record<string, string> = {
@@ -26,13 +31,9 @@ const STATUS_DOT: Record<string, string> = {
   red: STATUS_META.needs_attention.dot,
 };
 
+// The legacy list still reports a coarse status; it is typed here for accuracy but never rendered —
+// every status the caregiver sees comes from src/lib/v1Status.ts via the v1 read model.
 type PatientStatus = 'doing_well' | 'worth_checking' | 'needs_attention';
-
-const STATUS_COPY: Record<PatientStatus, { color: string; label: string }> = {
-  doing_well: { color: STATUS_DOT.green, label: 'Doing well' },
-  worth_checking: { color: STATUS_DOT.yellow, label: 'Worth checking' },
-  needs_attention: { color: STATUS_DOT.red, label: 'Needs attention' },
-};
 
 type DashboardPatient = {
   id: string;
@@ -57,23 +58,30 @@ type LatestConfigResponse = {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const session = getStoredAuthSession();
   const latestConfigQuery = useQuery({
-    queryKey: ['latestConfig', session?.nurseId || 'latest'],
+    // The endpoint requires an explicit nurseId — without one it used to return an arbitrary caregiver's
+    // record, so the query stays disabled rather than asking for "whoever is newest".
+    enabled: Boolean(session?.nurseId),
+    queryKey: caregiverConfigKey(session?.nurseId),
     queryFn: () => apiGet<LatestConfigResponse>(
-      `/api/nurse-patient-config/latest${session?.nurseId ? `?nurseId=${encodeURIComponent(session.nurseId)}` : ''}`,
+      `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(session?.nurseId || '')}`,
     ),
   });
   const { refetch: refetchLatestConfig } = latestConfigQuery;
 
+  // Refresh BOTH the loved-one list and the authoritative v1 status on every focus. Status is the whole
+  // point of this screen and the mirror moves it behind the app's back; refetching only the legacy list
+  // (the previous behaviour) left the dots frozen for as long as the process stayed alive.
   useFocusEffect(
     useCallback(() => {
-      void refetchLatestConfig();
-    }, [refetchLatestConfig]),
+      if (session?.nurseId) void refetchLatestConfig();
+      void invalidatePatientStatuses(queryClient);
+    }, [queryClient, refetchLatestConfig, session?.nurseId]),
   );
   const configuredPatients = Array.isArray(latestConfigQuery.data?.patients) ? latestConfigQuery.data.patients : [];
   const caregiverName = typeof latestConfigQuery.data?.caregiverName === 'string' ? latestConfigQuery.data.caregiverName : '';
-  const isLoadingConfig = latestConfigQuery.isLoading;
   const today = new Date().toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const displayName = getFirstName(caregiverName) || 'there';
 
@@ -88,50 +96,108 @@ export default function HomeScreen() {
   const checkIn = statusValues.filter((status) => status === 'worth_checking').length;
   const attention = statusValues.filter((status) => status === 'needs_attention').length;
 
+  // A zero in this strip must mean "nobody is in this bucket", never "we could not find out" — so when no
+  // status arrived at all the counts are replaced rather than shown as zeroes.
+  //
+  // WHY it is missing decides what to say, and the three reasons need three different messages. Calling all
+  // of them a connection problem was wrong twice over: v1 login is best-effort by design (CLAUDE.md), so a
+  // caregiver with no v1 session was told to check a connection that was fine, and offered a Try again that
+  // could never succeed; and a loved one whose mirror is not paired yet has no monitoring record at all,
+  // which is a setup step, not a fault.
+  const canReadStatuses = hasV1Session();
+  const statusesLoading = statusResults.some((result) => result.isLoading);
+  const noStatusArrived = configuredPatients.length > 0
+    && !statusesLoading
+    && statusResults.every((result) => !result.data);
+  const everyPatientUnpaired = noStatusArrived && statusResults.every((result) => result.isUnavailable);
+  const statusNotice: 'none' | 'signed-out' | 'not-set-up' | 'failed' = !noStatusArrived
+    ? 'none'
+    : !canReadStatuses
+      ? 'signed-out'
+      : everyPatientUnpaired
+        ? 'not-set-up'
+        : 'failed';
+  const retryStatuses = () => {
+    void invalidatePatientStatuses(queryClient);
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         {/* Header */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>Good morning, {displayName}</Text>
+          <View style={styles.headerText}>
+            <Text style={styles.greeting}>{getGreeting()}, {displayName}</Text>
             <Text style={styles.date}>{today}</Text>
           </View>
-          <TouchableOpacity onPress={() => router.push('/onboarding?mode=add-patient&returnTo=home')} style={styles.addBtn}>
-            <Feather name="plus" size={16} color="#FFFFFF" />
+          <TouchableOpacity
+            accessibilityLabel="Add a loved one"
+            accessibilityRole="button"
+            // The circle stays 36pt so the header keeps its proportions; hitSlop takes the tappable area
+            // past 44pt, which is what a thumb actually needs.
+            hitSlop={{ bottom: 8, left: 8, right: 8, top: 8 }}
+            onPress={() => router.push('/onboarding?mode=add-patient&returnTo=home')}
+            style={styles.addBtn}
+          >
+            <Feather
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+              name="plus"
+              size={16}
+              color={colors.text.onAccent}
+            />
           </TouchableOpacity>
         </View>
 
         {/* Status Summary Strip */}
-        <View style={styles.summaryStrip}>
-          <SummaryChip dot={STATUS_DOT.green} count={doingWell} label="Doing well" />
-          <View style={styles.divider} />
-          <SummaryChip dot={STATUS_DOT.yellow} count={checkIn} label="Worth checking" />
-          <View style={styles.divider} />
-          <SummaryChip dot={STATUS_DOT.red} count={attention} label="Needs attention" />
-        </View>
+        {statusNotice !== 'none' ? (
+          <StatusNotice notice={statusNotice} onRetry={retryStatuses} />
+        ) : (
+          <View style={styles.summaryStrip}>
+            <SummaryChip dot={STATUS_DOT.green} count={doingWell} label="Doing well" pending={statusesLoading} />
+            <View style={styles.divider} />
+            <SummaryChip dot={STATUS_DOT.yellow} count={checkIn} label="Worth checking" pending={statusesLoading} />
+            <View style={styles.divider} />
+            <SummaryChip dot={STATUS_DOT.red} count={attention} label="Needs attention" pending={statusesLoading} />
+          </View>
+        )}
 
         {/* Loved One Cards */}
         <Text style={styles.sectionTitle}>Your loved ones</Text>
-        {isLoadingConfig ? (
-          <LoadingCard />
-        ) : configuredPatients.length ? (
+        {configuredPatients.length ? (
           configuredPatients.map((patient, index) => {
             const statusResult = statusResults[index];
             const v1 = statusResult?.data;
             const dotColor = v1 ? (STATUS_META[v1.status]?.dot ?? NEUTRAL_STATUS_COLOR) : NEUTRAL_STATUS_COLOR;
+            // Four reasons for "no status", each said plainly. They used to collapse into one vague
+            // "Status updating" that a caregiver could stare at forever without learning that their mirror
+            // was never connected, or that signing in again would fix it. None of these is phrased as news
+            // about the person.
             const label = v1
               ? getStatusLabel(v1.status, patient.name)
               : statusResult?.isLoading
                 ? 'Checking in…'
-                : 'Status updating';
+                : statusResult?.isSignedOut
+                  ? 'Sign in again to see today'
+                  : statusResult?.isUnavailable
+                    ? 'Connect a mirror to start check-ins'
+                    : statusResult?.isError
+                      ? "Today's update did not reach us"
+                      : 'Status updating';
             const metaLine = v1
               ? v1.status === 'establishing'
                 ? getBaselineProgressText(v1.baselineProgress)
                 : getReasonText(v1.primaryReason, patient.name)
               : patient.lastSpokenLabel;
+            const lastInteractionLine = v1 ? formatLastInteraction(v1.lastInteractionAt) : '';
             return (
               <TouchableOpacity
+                // One label for the whole row. Read as separate elements this card is six fragments —
+                // initials, name, a dot, a status, a reason, a chevron — which is unusable by voice.
+                accessibilityLabel={[patient.name, label, metaLine, lastInteractionLine]
+                  .filter(Boolean)
+                  .join('. ')}
+                accessibilityRole="button"
                 activeOpacity={0.8}
                 key={patient.id}
                 onPress={() =>
@@ -145,30 +211,57 @@ export default function HomeScreen() {
                 }
                 style={styles.patientCard}
               >
-                <View style={styles.patientAvatar}>
+                <View
+                  accessibilityElementsHidden
+                  importantForAccessibility="no"
+                  style={styles.patientAvatar}
+                >
                   {patient.photoUrl ? (
                     <Image source={{ uri: patient.photoUrl }} style={styles.patientAvatarImage} />
                   ) : (
-                    <Text style={styles.patientAvatarText}>{getInitials(patient.name)}</Text>
+                    // Initials sit in a fixed circle that cannot grow with the system font without
+                    // becoming an oval, so this one label is capped.
+                    <Text maxFontSizeMultiplier={1.6} style={styles.patientAvatarText}>
+                      {getInitials(patient.name)}
+                    </Text>
                   )}
                 </View>
                 <View style={styles.patientInfo}>
                   <Text style={styles.patientName}>{patient.name}</Text>
                   <View style={styles.patientStatusRow}>
-                    <View style={[styles.patientStatusDot, { backgroundColor: dotColor }]} />
+                    <View
+                      accessibilityElementsHidden
+                      importantForAccessibility="no"
+                      style={[styles.patientStatusDot, { backgroundColor: dotColor }]}
+                    />
                     <Text style={styles.patientStatusText}>{label}</Text>
                   </View>
                   <Text style={styles.patientMeta}>{metaLine}</Text>
                   {v1 ? (
-                    <Text style={styles.patientSubMeta}>{formatLastInteraction(v1.lastInteractionAt)}</Text>
+                    <Text style={styles.patientSubMeta}>{lastInteractionLine}</Text>
                   ) : null}
                 </View>
-                <Text style={styles.chevron}>›</Text>
+                <Text
+                  accessibilityElementsHidden
+                  importantForAccessibility="no"
+                  style={styles.chevron}
+                >
+                  ›
+                </Text>
               </TouchableOpacity>
             );
           })
         ) : (
-          <EmptyCard />
+          // Polite live region so a caregiver using a screen reader hears the outcome of "Try again"
+          // instead of being left on the old placeholder.
+          <View accessibilityLiveRegion="polite">
+            <LovedOnesPlaceholder
+              hasError={Boolean(latestConfigQuery.error)}
+              isLoading={latestConfigQuery.isLoading}
+              isSignedIn={Boolean(session?.nurseId)}
+              onRetry={() => void latestConfigQuery.refetch()}
+            />
+          </View>
         )}
 
         {/* Quick Links */}
@@ -182,28 +275,68 @@ export default function HomeScreen() {
   );
 }
 
-function LoadingCard() {
-  return (
-    <View style={styles.stateCard}>
-      <ActivityIndicator color="#87566A" />
-      <Text style={styles.stateTitle}>Bear with us</Text>
-      <Text style={styles.stateText}>We are loading your loved ones.</Text>
-    </View>
-  );
-}
+/**
+ * Loading / signed-out / failed / genuinely-empty are four different situations and the caregiver deserves
+ * to be told which. Previously there were two branches, so both a disabled query (no nurseId after a
+ * dropped session) and a failed request rendered as "no loved one profiles yet" — telling someone their
+ * mother is not in the app when the only problem was sign-in or signal. A failure also never renders the
+ * server's error text: raw strings are for logs, not for someone wondering whether Mum is alright.
+ */
+function LovedOnesPlaceholder({
+  hasError,
+  isLoading,
+  isSignedIn,
+  onRetry,
+}: {
+  hasError: boolean;
+  isLoading: boolean;
+  isSignedIn: boolean;
+  onRetry: () => void;
+}) {
+  if (isLoading) {
+    return <LoadingState message="We are loading your loved ones." />;
+  }
 
-function EmptyCard() {
+  if (!isSignedIn) {
+    return (
+      <EmptyState
+        icon="lock"
+        title="Sign in again to see your loved ones"
+        message="Your loved ones are kept private to your account. Signing out and back in will reconnect them."
+      />
+    );
+  }
+
+  if (hasError) {
+    return (
+      <ErrorState
+        title="We could not load your loved ones"
+        message="This is usually a connection problem, not something about your loved one."
+        onRetry={onRetry}
+      />
+    );
+  }
+
   return (
-    <View style={styles.stateCard}>
-      <Feather name="user-plus" size={24} color="#87566A" />
-      <Text style={styles.stateTitle}>Bear with us</Text>
-      <Text style={styles.stateText}>No loved one profiles are ready to show yet.</Text>
-    </View>
+    <EmptyState
+      icon="user-plus"
+      title="No loved ones yet"
+      message="Add someone you care for and their daily check-ins will show up here."
+    />
   );
 }
 
 function getFirstName(name: string) {
   return name.trim().split(/\s+/)[0] || '';
+}
+
+// The greeting used to be hardcoded "Good morning" — read at 11pm by someone checking on their mother it
+// makes the app feel like it is not paying attention. Local device hour, no server involvement.
+function getGreeting(now: Date = new Date()) {
+  const hour = now.getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
 }
 
 function getInitials(name: string) {
@@ -212,41 +345,107 @@ function getInitials(name: string) {
   return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join('');
 }
 
+// Identity and last-interaction only. The legacy list's own `status` is deliberately NOT forwarded: the
+// profile screen reads the authoritative v1 status, and the legacy bucket reports a patient who is still
+// establishing a baseline as red.
 function toProfileRoutePatient(patient: DashboardPatient) {
-  const status = getPatientStatus(patient.status);
   return {
     name: patient.name,
     phoneNumber: patient.phoneNumber,
     photoUrl: patient.photoUrl,
-    status,
-    statusLabel: patient.statusLabel || STATUS_COPY[status].label,
     lastSpokenAt: patient.lastSpokenAt,
     lastSpokenLabel: patient.lastSpokenLabel,
     duration: patient.duration,
   };
 }
 
-function getPatientStatus(status: unknown): PatientStatus {
-  if (status === 'doing_well' || status === 'green') return 'doing_well';
-  if (status === 'worth_checking' || status === 'yellow' || status === 'amber') return 'worth_checking';
-  if (status === 'needs_attention' || status === 'red') return 'needs_attention';
-  return 'needs_attention';
+/**
+ * Stands in for the summary strip when no status could be read. One message per reason: a retry is only
+ * offered where retrying can actually change the outcome, and nothing here is framed as news about a person.
+ */
+function StatusNotice({
+  notice,
+  onRetry,
+}: {
+  notice: 'signed-out' | 'not-set-up' | 'failed';
+  onRetry: () => void;
+}) {
+  const copy = {
+    'signed-out': {
+      icon: 'lock' as const,
+      text: "Sign out and back in to see today's summary. Your loved ones are listed below either way.",
+      retry: false,
+    },
+    'not-set-up': {
+      icon: 'link' as const,
+      text: 'Daily check-ins start once a mirror is connected. You can set that up from Settings.',
+      retry: false,
+    },
+    failed: {
+      icon: 'cloud-off' as const,
+      text: "Today's summary is not available yet. This is a connection issue, not a change in how anyone is doing.",
+      retry: true,
+    },
+  }[notice];
+
+  return (
+    <View accessibilityLiveRegion="polite" style={styles.statusUnavailable}>
+      <Feather
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+        name={copy.icon}
+        size={16}
+        color={colors.text.secondary}
+      />
+      <Text style={styles.statusUnavailableText}>{copy.text}</Text>
+      {copy.retry ? (
+        <TouchableOpacity
+          accessibilityLabel="Try loading today's summary again"
+          accessibilityRole="button"
+          hitSlop={{ bottom: 8, left: 8, right: 8, top: 8 }}
+          onPress={onRetry}
+          style={styles.statusRetry}
+        >
+          <Text style={styles.statusRetryText}>Try again</Text>
+        </TouchableOpacity>
+      ) : null}
+    </View>
+  );
 }
 
-function SummaryChip({ dot, count, label }: { dot: string; count: number; label: string }) {
+function SummaryChip({ dot, count, label, pending }: { dot: string; count: number; label: string; pending?: boolean }) {
   return (
-    <View style={styles.chip}>
-      <Text style={styles.chipCount}>{count}</Text>
-      <View style={[styles.chipDot, { backgroundColor: dot }]} />
-      <Text style={styles.chipLabel} numberOfLines={2}>{label}</Text>
+    // One reading per chip ("2 worth checking"); otherwise the strip announces a bare number, a coloured
+    // dot and a label as three unrelated stops. While statuses are still arriving the count is not
+    // asserted at all — a half-loaded strip must not be read as a finished tally.
+    <View
+      accessible
+      accessibilityLabel={pending ? `${label}, still loading` : `${count} ${label.toLowerCase()}`}
+      style={styles.chip}
+    >
+      {/* The count sits between two fixed dividers and is at most two digits, so it is the one place a cap
+          loses nothing. The label below it stays uncapped and wraps. */}
+      <Text maxFontSizeMultiplier={1.6} style={styles.chipCount}>{pending ? '–' : count}</Text>
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+        style={[styles.chipDot, { backgroundColor: dot }]}
+      />
+      <Text style={styles.chipLabel}>{label}</Text>
     </View>
   );
 }
 
 function QuickLink({ icon, label, sub, onPress }: { icon: any; label: string; sub: string; onPress: () => void }) {
   return (
-    <TouchableOpacity style={styles.quickLink} onPress={onPress} activeOpacity={0.7}>
-      <Feather name={icon} size={22} color="#87566A" />
+    <TouchableOpacity accessibilityRole="button" style={styles.quickLink} onPress={onPress} activeOpacity={0.7}>
+      <Feather
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+        name={icon}
+        size={22}
+        color={colors.accent}
+      />
       <Text style={styles.quickLabel}>{label}</Text>
       <Text style={styles.quickSub}>{sub}</Text>
     </TouchableOpacity>
@@ -254,9 +453,9 @@ function QuickLink({ icon, label, sub, onPress }: { icon: any; label: string; su
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#F8F3EC' },
+  safe: { flex: 1, backgroundColor: colors.surface.page },
   scroll: { flex: 1 },
-  content: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 48 },
+  content: { paddingHorizontal: spacing.xl, paddingTop: spacing.xl, paddingBottom: 48 },
 
   header: {
     flexDirection: 'row',
@@ -264,73 +463,95 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 22,
   },
-  greeting: { fontSize: 26, fontWeight: '500', color: '#2B2522', fontFamily: 'Georgia' },
-  date: { fontSize: 13, color: '#A69C92', marginTop: 3 },
+  // flex (RN does not shrink flex items by default) so a scaled-up greeting wraps instead of pushing the
+  // add button off the right edge.
+  headerText: { flex: 1, paddingRight: spacing.md },
+  greeting: {
+    fontSize: fontSize.display, fontWeight: '500', color: colors.text.primary, fontFamily: fontFamily.display,
+  },
+  date: { fontSize: fontSize.body, color: colors.text.tertiary, marginTop: 3 },
   addBtn: {
     width: 36,
     height: 36,
-    borderRadius: 999,
-    backgroundColor: '#87566A',
+    borderRadius: radius.pill,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   summaryStrip: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    backgroundColor: colors.surface.card,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: '#E7DED2',
+    borderColor: colors.border.default,
     paddingHorizontal: 10,
-    paddingVertical: 16,
-    marginBottom: 28,
+    paddingVertical: spacing.lg,
+    marginBottom: spacing.xxl,
     alignItems: 'center',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.035,
-    shadowRadius: 10,
-    elevation: 2,
+    ...cardShadow,
   },
+  // Shown in place of the strip when no status could be read at all, so a zero is never mistaken for a
+  // finding. Deliberately neutral (no status colour) — it is a connection notice, not a status.
+  statusUnavailable: {
+    alignItems: 'center',
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    gap: spacing.sm,
+    marginBottom: spacing.xxl,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+  },
+  statusUnavailableText: {
+    color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 21, textAlign: 'center',
+  },
+  statusRetry: {
+    alignItems: 'center', justifyContent: 'center', minHeight: MIN_TOUCH_TARGET, paddingHorizontal: spacing.lg,
+  },
+  statusRetryText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
   chip: { alignItems: 'center', flex: 1, gap: 5, minWidth: 0 },
-  chipCount: { fontSize: 24, fontWeight: '500', color: '#2B2522', fontFamily: 'Georgia', lineHeight: 29 },
-  chipDot: { width: 7, height: 7, borderRadius: 999 },
+  chipCount: {
+    fontSize: 24, fontWeight: '500', color: colors.text.primary, fontFamily: fontFamily.display, lineHeight: 29,
+  },
+  chipDot: { width: 7, height: 7, borderRadius: radius.pill },
   chipLabel: {
-    color: '#756C64',
-    fontSize: 11,
-    lineHeight: 14,
-    maxWidth: 82,
+    color: colors.text.secondary,
+    // Was 11px capped at 82pt wide and clipped to two lines: "Needs attention" was the first thing on the
+    // dashboard to lose a word at large system text. minHeight only aligns the three chips, it never caps.
+    fontSize: fontSize.body,
+    lineHeight: 17,
     minHeight: 28,
     textAlign: 'center',
   },
-  divider: { width: 1, height: 46, backgroundColor: '#E7DED2', marginHorizontal: 4 },
+  divider: {
+    width: 1, height: 46, backgroundColor: colors.border.default, marginHorizontal: spacing.xs,
+  },
 
   sectionTitle: {
-    fontSize: 17,
+    fontSize: fontSize.heading,
     fontWeight: '600',
-    color: '#2B2522',
+    color: colors.text.primary,
     marginBottom: 14,
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
   patientCard: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
-    borderRadius: 16,
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
+    borderRadius: radius.xl,
     borderWidth: 1,
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 12,
-    padding: 16,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.035,
-    shadowRadius: 10,
-    elevation: 2,
+    gap: spacing.md,
+    marginBottom: spacing.md,
+    padding: spacing.lg,
+    ...cardShadow,
   },
   patientAvatar: {
     alignItems: 'center',
-    backgroundColor: '#F4F0EA',
-    borderRadius: 999,
+    backgroundColor: colors.surface.muted,
+    borderRadius: radius.pill,
     height: 56,
     justifyContent: 'center',
     overflow: 'hidden',
@@ -341,47 +562,34 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   patientAvatarText: {
-    color: '#756C64',
-    fontFamily: 'Georgia',
+    color: colors.text.secondary,
+    fontFamily: fontFamily.display,
     fontSize: 18,
     fontWeight: '500',
   },
   patientInfo: { flex: 1 },
-  patientName: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 20, fontWeight: '400' },
-  patientStatusRow: { alignItems: 'center', flexDirection: 'row', gap: 7, marginTop: 7 },
-  patientStatusDot: { borderRadius: 999, height: 8, width: 8 },
-  patientStatusText: { color: '#756C64', fontSize: 13, fontWeight: '400' },
-  patientMeta: { color: '#756C64', fontSize: 13, fontWeight: '500', marginTop: 7 },
-  patientSubMeta: { color: '#A69C92', fontSize: 12, fontWeight: '400', marginTop: 3 },
-  chevron: { fontSize: 20, color: '#C4B9AF', fontWeight: '300' },
-  stateCard: {
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
-    borderRadius: 16,
-    borderWidth: 1,
-    gap: 8,
-    marginBottom: 16,
-    padding: 24,
+  patientName: {
+    color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, fontWeight: '400',
   },
-  stateTitle: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 20, fontWeight: '500' },
-  stateText: { color: '#756C64', fontSize: 14, lineHeight: 20, textAlign: 'center' },
+  patientStatusRow: { alignItems: 'center', flexDirection: 'row', gap: 7, marginTop: 7 },
+  patientStatusDot: { borderRadius: radius.pill, height: 8, width: 8 },
+  // flex so a long status label wraps beside the dot instead of running past the card edge.
+  patientStatusText: { color: colors.text.secondary, flex: 1, fontSize: fontSize.body, fontWeight: '400' },
+  patientMeta: { color: colors.text.secondary, fontSize: fontSize.body, fontWeight: '500', marginTop: 7 },
+  patientSubMeta: { color: colors.text.tertiary, fontSize: fontSize.caption, fontWeight: '400', marginTop: 3 },
+  chevron: { fontSize: fontSize.title, color: colors.textDecorative, fontWeight: '300' },
 
-  quickGrid: { flexDirection: 'row', gap: 12 },
+  quickGrid: { flexDirection: 'row', gap: spacing.md },
   quickLink: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    backgroundColor: colors.surface.card,
+    borderRadius: radius.xl,
     borderWidth: 1,
-    borderColor: '#E7DED2',
+    borderColor: colors.border.default,
     padding: 18,
     gap: 6,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.035,
-    shadowRadius: 10,
-    elevation: 2,
+    ...cardShadow,
   },
-  quickLabel: { fontSize: 14, fontWeight: '600', color: '#2B2522' },
-  quickSub: { fontSize: 12, color: '#A69C92' },
+  quickLabel: { fontSize: fontSize.bodyLarge, fontWeight: '600', color: colors.text.primary },
+  quickSub: { fontSize: fontSize.caption, color: colors.text.tertiary },
 });

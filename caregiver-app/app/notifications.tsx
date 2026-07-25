@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -14,144 +14,148 @@ import {
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { apiGet, apiSend } from '../src/lib/apiClient';
+import { apiGet } from '../src/lib/apiClient';
 import { getStoredAuthSession } from '../src/lib/authSession';
 import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
+import { caregiverConfigKey, notificationsQueryKey } from '../src/lib/queryKeys';
+import { hasV1Session } from '../src/lib/v1AuthSession';
+import { STATUS_META } from '../src/lib/v1Status';
+import {
+  listNotificationsV1,
+  markNotificationReadV1,
+  type V1Notification,
+} from '../src/lib/v1Client';
+import { colors, spacing, radius, fontSize, fontFamily, MIN_TOUCH_TARGET } from '../src/theme';
 
-type NotificationStatus = 'queued' | 'sent' | 'failed';
-type NotificationType =
-  | 'completed_session'
-  | 'missed_7pm'
-  | 'red_missed_streak'
-  | 'late_completion'
-  | 'daily_summary';
+// The alert feed is the authoritative v1 read model (GET /api/v1/notifications), produced by the
+// server's end-of-day evaluation. It replaced a legacy `/notifications?nurseId=` endpoint that never
+// existed on the server — every request 404'd and the screen rendered the words "Not found" as its
+// headline. v1 rows carry only a patientId, so names and phone numbers are joined from the loved-one
+// list the dashboard already caches.
 
-type CaregiverNotification = {
-  id: string;
-  patientId: string;
-  patientName: string;
-  patientPhoneNumber: string;
-  date: string;
-  type: NotificationType;
-  title: string;
-  body: string;
-  status: NotificationStatus;
-  error?: string;
-  createdAt: string | null;
+const PAGE_SIZE = 12;
+type NotificationsTab = 'alerts' | 'device';
+
+type TypeMeta = { color: string; icon: keyof typeof Feather.glyphMap; label: string };
+
+// Keyed on the types the server actually emits (jobs/finalizeDay.ts + v1/notifications/service.ts).
+// `technical_issue` is deliberately styled and labelled as a device/connection matter, never as a change
+// in the person — same product rule the status screens follow.
+// The two review-case types share their name with a caregiver status, so their colour is READ from the
+// authoritative palette rather than copied. Copies were already byte-identical here, which is precisely how
+// a second status vocabulary starts drifting away from the one the doc fixes (§2.9).
+const TYPE_META: Record<string, TypeMeta> = {
+  completion: { color: STATUS_META.doing_well.dot, icon: 'check-circle', label: 'Checked in' },
+  late_completion: { color: '#8B6A92', icon: 'clock', label: 'Later than usual' },
+  missed_7pm: { color: STATUS_META.worth_checking.dot, icon: 'alert-circle', label: 'No check-in yet' },
+  red_missed_streak: { color: STATUS_META.needs_attention.dot, icon: 'alert-triangle', label: 'Worth a call' },
+  technical_issue: { color: '#6F7F92', icon: 'wifi-off', label: 'Connection issue' },
+  worth_checking: { color: STATUS_META.worth_checking.dot, icon: 'eye', label: 'Worth checking' },
+  needs_attention: { color: STATUS_META.needs_attention.dot, icon: 'alert-triangle', label: 'Needs attention' },
 };
 
-type NotificationsResponse = {
-  notifications?: CaregiverNotification[];
-  hasMore?: boolean;
-  deviceCount?: number;
-};
+// Neutral, matching the `establishing` tone: an unrecognised type must not borrow an alarm colour.
+const FALLBACK_TYPE_META: TypeMeta = { color: STATUS_META.establishing.dot, icon: 'bell', label: 'Update' };
 
-const PAGE_SIZE = 8;
-type NotificationsTab = 'alerts' | 'test';
+function typeMetaFor(type: string): TypeMeta {
+  return TYPE_META[type] || FALLBACK_TYPE_META;
+}
 
-const TYPE_META: Record<NotificationType, { color: string; icon: keyof typeof Feather.glyphMap; label: string }> = {
-  completed_session: { color: '#6F806A', icon: 'check-circle', label: 'Completed' },
-  late_completion: { color: '#8B6A92', icon: 'clock', label: 'Late completion' },
-  daily_summary: { color: '#6F7F92', icon: 'book-open', label: 'Daily summary' },
-  missed_7pm: { color: '#D29A52', icon: 'alert-circle', label: 'Missed' },
-  red_missed_streak: { color: '#9B5361', icon: 'alert-triangle', label: 'Needs attention' },
-};
-
-const STATUS_META: Record<NotificationStatus, { color: string; label: string }> = {
-  queued: { color: '#8B7C70', label: 'Queued' },
-  sent: { color: '#6F806A', label: 'Sent' },
-  failed: { color: '#9B5361', label: 'Failed' },
+type PatientDirectoryEntry = { name: string; phoneNumber: string };
+type LatestConfigResponse = {
+  patients?: { id?: string; patientId?: string; name?: string; phoneNumber?: string }[];
 };
 
 export default function NotificationsScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const session = getStoredAuthSession();
-  const [notifications, setNotifications] = useState<CaregiverNotification[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
+  const canReadAlerts = hasV1Session();
   const [selectedTab, setSelectedTab] = useState<NotificationsTab>('alerts');
-  const [testMessage, setTestMessage] = useState('');
-  const notificationsQuery = useQuery({
+  const [deviceMessage, setDeviceMessage] = useState('');
+
+  const notificationsQuery = useInfiniteQuery({
+    enabled: canReadAlerts,
+    queryKey: notificationsQueryKey(session?.nurseId),
+    initialPageParam: null as string | null,
+    queryFn: ({ pageParam }) => listNotificationsV1({ limit: PAGE_SIZE, cursor: pageParam }),
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    // Alerts are written by a server job, so unlike most screens here a cached page really does go out of
+    // date on its own. Bounded rather than the app-wide staleTime: Infinity.
+    staleTime: 60_000,
+  });
+
+  const notifications = useMemo(
+    () => (notificationsQuery.data?.pages || []).flatMap((page) => page.data),
+    [notificationsQuery.data],
+  );
+
+  // Names/phones for the alert cards. Reuses the dashboard's cache entry, so in practice this costs no
+  // extra request; v1 notifications carry only a patientId.
+  const directoryQuery = useQuery({
     enabled: Boolean(session?.nurseId),
-    queryKey: ['notifications', session?.nurseId || '', page],
-    queryFn: () => apiGet<NotificationsResponse>(
-      `/api/notifications?nurseId=${encodeURIComponent(session?.nurseId || '')}&page=${page}&limit=${PAGE_SIZE}`,
+    queryKey: caregiverConfigKey(session?.nurseId),
+    queryFn: () => apiGet<LatestConfigResponse>(
+      `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(session?.nurseId || '')}`,
     ),
   });
+
+  const directory = useMemo(() => {
+    const map = new Map<string, PatientDirectoryEntry>();
+    for (const patient of directoryQuery.data?.patients || []) {
+      const entry = { name: patient.name || '', phoneNumber: patient.phoneNumber || '' };
+      if (patient.patientId) map.set(patient.patientId, entry);
+      if (patient.id) map.set(patient.id, entry);
+    }
+    return map;
+  }, [directoryQuery.data]);
+
   const { refetch: refetchNotifications } = notificationsQuery;
   useFocusEffect(
     useCallback(() => {
-      if (session?.nurseId) {
-        void refetchNotifications();
-      }
-    }, [refetchNotifications, session?.nurseId]),
+      if (canReadAlerts) void refetchNotifications();
+    }, [canReadAlerts, refetchNotifications]),
   );
-  const registerDeviceMutation = useMutation({
-    mutationFn: registerPushNotificationDevice,
-  });
-  const testNotificationMutation = useMutation({
-    mutationFn: async () => {
-      if (!session?.nurseId) throw new Error('Sign in before sending a test notification.');
-      setTestMessage('Registering this device...');
-      const registration = await registerPushNotificationDevice({ nurseId: session.nurseId });
-      if (!registration.ok) {
-        throw new Error(registration.reason || 'Unable to register this device for push notifications.');
-      }
-      setTestMessage('Sending test notification...');
-      return apiSend<NotificationsResponse>('/api/notifications/test', {
-        method: 'POST',
-        body: JSON.stringify({ nurseId: session.nurseId }),
+
+  const markReadMutation = useMutation({
+    mutationFn: markNotificationReadV1,
+    onSuccess: (updated) => {
+      // Patch in place so the list does not jump while the caregiver is reading it.
+      queryClient.setQueryData<typeof notificationsQuery.data>(notificationsQueryKey(session?.nurseId), (current) => {
+        if (!current) return current;
+        return {
+          ...current,
+          pages: current.pages.map((page) => ({
+            ...page,
+            data: page.data.map((item) => (item.notificationId === updated.notificationId ? updated : item)),
+          })),
+        };
       });
     },
-    onSuccess: async (body) => {
-      setTestMessage(`Test notification sent to ${body?.deviceCount || 1} device${body?.deviceCount === 1 ? '' : 's'}.`);
-      setPage(1);
-      await queryClient.invalidateQueries({ queryKey: ['notifications', session?.nurseId || ''] });
+  });
+
+  const registerDeviceMutation = useMutation({
+    mutationFn: registerPushNotificationDevice,
+    onMutate: () => setDeviceMessage('Registering this phone...'),
+    onSuccess: (result) => {
+      setDeviceMessage(result.ok
+        ? 'This phone is registered. Alerts will also appear in the list above.'
+        : result.reason || 'Could not register this phone for alerts.');
     },
-    onError: (err) => {
-      setTestMessage(err instanceof Error ? err.message : 'Unable to send test notification.');
+    onError: (error) => {
+      setDeviceMessage(error instanceof Error ? error.message : 'Could not register this phone for alerts.');
     },
   });
 
-  useEffect(() => {
-    if (!session?.nurseId) {
-      setNotifications([]);
-      setHasMore(false);
-      return;
-    }
-    if (!notificationsQuery.data) return;
-    setNotifications((current) =>
-      page === 1
-        ? notificationsQuery.data?.notifications || []
-        : mergeNotifications(current, notificationsQuery.data?.notifications || []),
-    );
-    setHasMore(Boolean(notificationsQuery.data.hasMore));
-  }, [notificationsQuery.data, page, session?.nurseId]);
-
-  useEffect(() => {
-    if (!session?.nurseId) {
-      return;
-    }
-
-    registerDeviceMutation.mutate({ nurseId: session.nurseId });
-  }, [session?.nurseId]);
-
   async function refresh() {
-    setPage(1);
-    await queryClient.invalidateQueries({ queryKey: ['notifications', session?.nurseId || ''] });
+    if (!canReadAlerts) return;
+    await queryClient.invalidateQueries({ queryKey: ['notificationsV1'] });
   }
 
-  async function loadMore() {
-    if (!hasMore || notificationsQuery.isFetching) {
-      return;
+  function loadMore() {
+    if (notificationsQuery.hasNextPage && !notificationsQuery.isFetchingNextPage) {
+      void notificationsQuery.fetchNextPage();
     }
-
-    setPage((current) => current + 1);
-  }
-
-  async function sendTestNotification() {
-    testNotificationMutation.mutate();
   }
 
   const header = (
@@ -160,15 +164,18 @@ export default function NotificationsScreen() {
         <Text style={styles.title}>Alerts</Text>
         <TouchableOpacity
           accessibilityLabel="Refresh alerts"
+          accessibilityRole="button"
           disabled={notificationsQuery.isFetching}
           onPress={() => void refresh()}
           style={styles.refreshButton}
         >
-          <Feather name="refresh-cw" size={18} color="#87566A" />
+          <Feather name="refresh-cw" size={18} color={colors.accent} />
         </TouchableOpacity>
       </View>
       <View style={styles.segmentedControl}>
         <TouchableOpacity
+          accessibilityLabel="Notifications list"
+          accessibilityRole="tab"
           activeOpacity={0.82}
           onPress={() => setSelectedTab('alerts')}
           style={[styles.segmentButton, selectedTab === 'alerts' && styles.segmentButtonActive]}
@@ -178,48 +185,53 @@ export default function NotificationsScreen() {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          accessibilityLabel="Alerts on this phone"
+          accessibilityRole="tab"
           activeOpacity={0.82}
-          onPress={() => setSelectedTab('test')}
-          style={[styles.segmentButton, selectedTab === 'test' && styles.segmentButtonActive]}
+          onPress={() => setSelectedTab('device')}
+          style={[styles.segmentButton, selectedTab === 'device' && styles.segmentButtonActive]}
         >
-          <Text style={[styles.segmentText, selectedTab === 'test' && styles.segmentTextActive]}>
-            Test notification
+          <Text style={[styles.segmentText, selectedTab === 'device' && styles.segmentTextActive]}>
+            This phone
           </Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
-  if (selectedTab === 'test') {
+  if (selectedTab === 'device') {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.content}>
           {header}
           <View style={styles.testCard}>
             <View style={styles.testIcon}>
-              <Feather name="bell" size={24} color="#87566A" />
+              <Feather name="bell" size={24} color={colors.accent} />
             </View>
-            <Text style={styles.testTitle}>Send a test notification</Text>
+            <Text style={styles.testTitle}>Alerts on this phone</Text>
             <Text style={styles.testText}>
-              This registers the current phone as an enabled Expo push device, then sends one test push.
+              Register this phone so Reflexion can reach you here. Your alerts always appear in the list on
+              the Notifications tab, whether or not this phone is registered.
             </Text>
             <TouchableOpacity
+              accessibilityLabel="Register this phone for alerts"
+              accessibilityRole="button"
               activeOpacity={0.84}
-              disabled={testNotificationMutation.isPending}
-              onPress={() => void sendTestNotification()}
-              style={[styles.testButton, testNotificationMutation.isPending && styles.testButtonDisabled]}
+              disabled={registerDeviceMutation.isPending || !session?.nurseId}
+              onPress={() => registerDeviceMutation.mutate({ nurseId: session?.nurseId || '' })}
+              style={[styles.testButton, (registerDeviceMutation.isPending || !session?.nurseId) && styles.testButtonDisabled]}
             >
-              {testNotificationMutation.isPending ? (
-                <ActivityIndicator color="#FFFFFF" />
+              {registerDeviceMutation.isPending ? (
+                <ActivityIndicator color={colors.text.onAccent} />
               ) : (
                 <>
-                  <Feather name="send" size={16} color="#FFFFFF" />
-                  <Text style={styles.testButtonText}>Send test notification</Text>
+                  <Feather name="smartphone" size={16} color={colors.text.onAccent} />
+                  <Text style={styles.testButtonText}>Register this phone</Text>
                 </>
               )}
             </TouchableOpacity>
-            {testMessage ? (
-              <Text style={styles.testMessage}>{testMessage}</Text>
+            {deviceMessage ? (
+              <Text style={styles.testMessage}>{deviceMessage}</Text>
             ) : null}
           </View>
         </View>
@@ -232,33 +244,27 @@ export default function NotificationsScreen() {
       <FlatList
         contentContainerStyle={styles.content}
         data={notifications}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.notificationId}
         ListHeaderComponent={header}
         ListEmptyComponent={
-          notificationsQuery.isLoading ? (
-            <View style={styles.emptyState}>
-              <ActivityIndicator color="#87566A" />
-              <Text style={styles.emptyTitle}>Loading alerts</Text>
-            </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <View style={styles.emptyIcon}>
-                <Feather name="bell" size={28} color="#87566A" />
-              </View>
-              <Text style={styles.emptyTitle}>{notificationsQuery.error instanceof Error ? notificationsQuery.error.message : 'No alerts yet'}</Text>
-              <Text style={styles.emptyText}>
-                New caregiver alerts will appear here after backend checks run.
-              </Text>
-            </View>
-          )
+          <AlertsPlaceholder
+            canReadAlerts={canReadAlerts}
+            isLoading={notificationsQuery.isLoading}
+            hasError={Boolean(notificationsQuery.error)}
+            onRetry={() => void refresh()}
+          />
         }
         ListFooterComponent={
           notifications.length > 0 ? (
             <View style={styles.footer}>
-              {notificationsQuery.isFetching && page > 1 ? (
-                <ActivityIndicator color="#87566A" />
-              ) : hasMore ? (
-                <TouchableOpacity onPress={() => void loadMore()} style={styles.loadMoreButton}>
+              {notificationsQuery.isFetchingNextPage ? (
+                <ActivityIndicator color={colors.accent} />
+              ) : notificationsQuery.hasNextPage ? (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={loadMore}
+                  style={styles.loadMoreButton}
+                >
                   <Text style={styles.loadMoreText}>Load more</Text>
                 </TouchableOpacity>
               ) : (
@@ -267,48 +273,139 @@ export default function NotificationsScreen() {
             </View>
           ) : null
         }
-        onEndReached={() => void loadMore()}
+        onEndReached={loadMore}
         onEndReachedThreshold={0.35}
         refreshControl={
-          <RefreshControl refreshing={notificationsQuery.isFetching && page === 1} tintColor="#87566A" onRefresh={() => void refresh()} />
+          <RefreshControl
+            refreshing={notificationsQuery.isRefetching}
+            tintColor={colors.accent}
+            onRefresh={() => void refresh()}
+          />
         }
-        renderItem={({ item }) => <AlertCard notification={item} router={router} />}
+        renderItem={({ item }) => (
+          <AlertCard
+            notification={item}
+            patient={directory.get(item.patientId)}
+            router={router}
+            onMarkRead={() => markReadMutation.mutate(item.notificationId)}
+          />
+        )}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );
 }
 
-function AlertCard({
-  notification,
-  router,
+/**
+ * Loading / signed-out / failed / genuinely-empty are four different situations and the caregiver deserves
+ * to be told which. Notably a failure NEVER renders the server's error text as copy — that is how this
+ * screen came to greet people with the headline "Not found".
+ */
+function AlertsPlaceholder({
+  canReadAlerts,
+  isLoading,
+  hasError,
+  onRetry,
 }: {
-  notification: CaregiverNotification;
-  router: ReturnType<typeof useRouter>;
+  canReadAlerts: boolean;
+  isLoading: boolean;
+  hasError: boolean;
+  onRetry: () => void;
 }) {
-  const typeMeta = TYPE_META[notification.type];
-  const statusMeta = STATUS_META[notification.status];
-  const showPatientActions = notification.type === 'missed_7pm' || notification.type === 'red_missed_streak';
-  const showDailySummaryAction = notification.type === 'daily_summary';
+  if (isLoading) {
+    return (
+      <View style={styles.emptyState}>
+        <ActivityIndicator color={colors.accent} />
+        <Text style={styles.emptyTitle}>Loading alerts</Text>
+      </View>
+    );
+  }
+
+  if (!canReadAlerts) {
+    return (
+      <View style={styles.emptyState}>
+        <View style={styles.emptyIcon}>
+          <Feather name="lock" size={28} color={colors.accent} />
+        </View>
+        <Text style={styles.emptyTitle}>Sign in again to see alerts</Text>
+        <Text style={styles.emptyText}>
+          Your alerts are kept private to your account. Signing out and back in will reconnect them.
+        </Text>
+      </View>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <View style={styles.emptyState}>
+        <View style={styles.emptyIcon}>
+          <Feather name="cloud-off" size={28} color={colors.accent} />
+        </View>
+        <Text style={styles.emptyTitle}>We could not load your alerts</Text>
+        <Text style={styles.emptyText}>
+          This is usually a connection problem, not something about your loved one.
+        </Text>
+        <TouchableOpacity accessibilityRole="button" onPress={onRetry} style={styles.retryButton}>
+          <Text style={styles.retryButtonText}>Try again</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
-    <View style={[styles.card, { borderLeftColor: typeMeta.color }]}>
+    <View style={styles.emptyState}>
+      <View style={styles.emptyIcon}>
+        <Feather name="bell" size={28} color={colors.accent} />
+      </View>
+      <Text style={styles.emptyTitle}>No alerts yet</Text>
+      <Text style={styles.emptyText}>
+        Nothing needs your attention right now. We will let you know here if that changes.
+      </Text>
+    </View>
+  );
+}
+
+const CALL_TO_ACTION_TYPES = new Set(['missed_7pm', 'red_missed_streak', 'worth_checking', 'needs_attention']);
+const DAY_DETAIL_TYPES = new Set(['completion', 'late_completion']);
+
+function AlertCard({
+  notification,
+  patient,
+  router,
+  onMarkRead,
+}: {
+  notification: V1Notification;
+  patient?: PatientDirectoryEntry;
+  router: ReturnType<typeof useRouter>;
+  onMarkRead: () => void;
+}) {
+  const typeMeta = typeMetaFor(notification.type);
+  const isUnread = notification.state !== 'read';
+  const patientName = patient?.name || 'Your loved one';
+  // A connection problem is never a reason to call the person — the mirror is what needs attention.
+  const showPatientActions = CALL_TO_ACTION_TYPES.has(notification.type);
+  const showDayDetailAction = DAY_DETAIL_TYPES.has(notification.type) && Boolean(notification.localDate);
+
+  return (
+    <TouchableOpacity
+      accessibilityLabel={`${notification.title}. ${patientName}. ${notification.body}${isUnread ? '. Unread' : ''}`}
+      accessibilityRole="button"
+      activeOpacity={0.9}
+      disabled={!isUnread}
+      onPress={onMarkRead}
+      style={[styles.card, { borderLeftColor: typeMeta.color }, !isUnread && styles.cardRead]}
+    >
       <View style={styles.cardTopRow}>
         <View style={[styles.iconWrap, { backgroundColor: `${typeMeta.color}18` }]}>
           <Feather name={typeMeta.icon} size={18} color={typeMeta.color} />
         </View>
         <View style={styles.cardTextBlock}>
           <View style={styles.titleLine}>
-            <Text style={styles.cardTitle} numberOfLines={2}>{notification.title}</Text>
-            <View style={[styles.statusPill, { borderColor: statusMeta.color }]}>
-              <Text style={[styles.statusText, { color: statusMeta.color }]}>{statusMeta.label}</Text>
-            </View>
+            <Text style={styles.cardTitle}>{notification.title}</Text>
+            {isUnread ? <View style={styles.unreadDot} /> : null}
           </View>
-          <Text style={styles.patientName}>{notification.patientName}</Text>
+          <Text style={styles.patientName}>{patientName}</Text>
           <Text style={styles.bodyText}>{notification.body}</Text>
-          {notification.status === 'failed' && notification.error ? (
-            <Text style={styles.errorText}>{notification.error}</Text>
-          ) : null}
           <View style={styles.metaRow}>
             <Text style={styles.metaText}>{typeMeta.label}</Text>
             <View style={styles.metaDot} />
@@ -317,87 +414,83 @@ function AlertCard({
           {showPatientActions ? (
             <View style={styles.actionRow}>
               <TouchableOpacity
+                accessibilityLabel={`Call ${patientName}`}
+                accessibilityRole="button"
                 activeOpacity={0.82}
-                onPress={() => void callPatient(notification)}
+                onPress={() => void callPatient(patientName, patient?.phoneNumber)}
                 style={styles.callButton}
               >
-                <Feather name="phone" size={15} color="#FFFFFF" />
+                <Feather name="phone" size={15} color={colors.text.onAccent} />
                 <Text style={styles.callButtonText}>Call now</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                accessibilityLabel={`View ${patientName}'s profile`}
+                accessibilityRole="button"
                 activeOpacity={0.82}
-                onPress={() => viewPatientProfile(notification, router)}
+                onPress={() => viewPatientProfile(notification, patientName, patient?.phoneNumber, router)}
                 style={styles.profileButton}
               >
                 <Text style={styles.profileButtonText}>View profile</Text>
               </TouchableOpacity>
             </View>
           ) : null}
-          {showDailySummaryAction ? (
+          {showDayDetailAction ? (
             <TouchableOpacity
+              accessibilityRole="button"
               activeOpacity={0.82}
-              onPress={() => viewDailySummary(notification, router)}
+              onPress={() => router.push(`/session-history/${notification.patientId}/${notification.localDate}`)}
               style={styles.summaryButton}
             >
-              <Feather name="book-open" size={15} color="#FFFFFF" />
-              <Text style={styles.summaryButtonText}>View daily summary</Text>
+              <Feather name="book-open" size={15} color={colors.text.onAccent} />
+              <Text style={styles.summaryButtonText}>View that day</Text>
             </TouchableOpacity>
           ) : null}
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
-function viewDailySummary(notification: CaregiverNotification, router: ReturnType<typeof useRouter>) {
-  if (!notification.patientId || !notification.date) {
-    Alert.alert('Summary unavailable', 'This alert is not linked to a daily summary.');
+async function callPatient(patientName: string, phoneNumber?: string) {
+  if (!phoneNumber?.trim()) {
+    Alert.alert('No phone number', `${patientName} does not have a phone number saved.`);
     return;
   }
 
-  router.push(`/session-history/${notification.patientId}/${notification.date}`);
-}
-
-async function callPatient(notification: CaregiverNotification) {
-  if (!notification.patientPhoneNumber.trim()) {
-    Alert.alert('No phone number', `${notification.patientName} does not have a phone number saved.`);
-    return;
-  }
-
-  const phoneNumber = notification.patientPhoneNumber.replace(/[^\d+]/g, '');
   try {
-    await Linking.openURL(`tel:${phoneNumber}`);
+    await Linking.openURL(`tel:${phoneNumber.replace(/[^\d+]/g, '')}`);
   } catch {
-    Alert.alert('Unable to call', `Could not open the phone app for ${notification.patientPhoneNumber}.`);
+    Alert.alert('Unable to call', `Could not open the phone app for ${phoneNumber}.`);
   }
 }
 
-function viewPatientProfile(notification: CaregiverNotification, router: ReturnType<typeof useRouter>) {
+function viewPatientProfile(
+  notification: V1Notification,
+  patientName: string,
+  phoneNumber: string | undefined,
+  router: ReturnType<typeof useRouter>,
+) {
   if (!notification.patientId) {
-    Alert.alert('Profile unavailable', 'This alert is not linked to a patient profile.');
+    Alert.alert('Profile unavailable', 'This alert is not linked to a profile.');
     return;
   }
 
+  // Only identity is passed through the route param. Status is deliberately NOT included: the profile
+  // screen reads the authoritative v1 status itself, and guessing a colour from an alert type is exactly
+  // how a patient still learning their routine could get shown as red.
   router.push({
     pathname: '/profile/[id]',
     params: {
       id: notification.patientId,
       patient: JSON.stringify({
-        name: notification.patientName,
-        phoneNumber: notification.patientPhoneNumber,
-        status: notification.type === 'red_missed_streak' ? 'needs_attention' : 'worth_checking',
-        statusLabel: notification.type === 'red_missed_streak' ? 'Needs attention' : 'Worth checking',
+        name: patientName,
+        phoneNumber: phoneNumber || '',
         lastSpokenAt: null,
-        lastSpokenLabel: 'No completed check-in',
+        lastSpokenLabel: '',
         duration: 0,
       }),
     },
   });
-}
-
-function mergeNotifications(current: CaregiverNotification[], next: CaregiverNotification[]) {
-  const existing = new Set(current.map((item) => item.id));
-  return [...current, ...next.filter((item) => !existing.has(item.id))];
 }
 
 function formatAlertTime(value: string | null) {
@@ -420,8 +513,8 @@ function formatAlertTime(value: string | null) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#F8F3EC' },
-  content: { padding: 20, paddingBottom: 104 },
+  safe: { flex: 1, backgroundColor: colors.surface.page },
+  content: { padding: spacing.xl, paddingBottom: 104 },
   headerBlock: { marginBottom: 18 },
   header: {
     alignItems: 'center',
@@ -429,41 +522,41 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 14,
   },
-  title: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 26, fontWeight: '600' },
+  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.display, fontWeight: '600' },
   refreshButton: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
     borderRadius: 22,
     borderWidth: 1,
-    height: 44,
+    height: MIN_TOUCH_TARGET,
     justifyContent: 'center',
-    width: 44,
+    width: MIN_TOUCH_TARGET,
   },
   segmentedControl: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
-    borderRadius: 10,
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
+    borderRadius: radius.md,
     borderWidth: 1,
     flexDirection: 'row',
-    padding: 4,
+    padding: spacing.xs,
   },
   segmentButton: {
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: radius.sm,
     flex: 1,
     justifyContent: 'center',
     minHeight: 38,
     paddingHorizontal: 10,
   },
-  segmentButtonActive: { backgroundColor: '#87566A' },
-  segmentText: { color: '#756C64', fontSize: 13, fontWeight: '700', textAlign: 'center' },
-  segmentTextActive: { color: '#FFFFFF' },
+  segmentButtonActive: { backgroundColor: colors.accent },
+  segmentText: { color: colors.text.secondary, fontSize: fontSize.body, fontWeight: '700', textAlign: 'center' },
+  segmentTextActive: { color: colors.text.onAccent },
   testCard: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface.card,
     borderColor: '#ECE4D9',
-    borderRadius: 8,
+    borderRadius: radius.sm,
     borderWidth: 1,
     padding: 22,
     shadowColor: '#3B3028',
@@ -480,14 +573,14 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     width: 56,
   },
-  testTitle: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 21, fontWeight: '600' },
-  testText: { color: '#756C64', fontSize: 14, lineHeight: 20, marginTop: 8, textAlign: 'center' },
+  testTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 21, fontWeight: '600' },
+  testText: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 20, marginTop: spacing.sm, textAlign: 'center' },
   testButton: {
     alignItems: 'center',
-    backgroundColor: '#87566A',
-    borderRadius: 8,
+    backgroundColor: colors.accent,
+    borderRadius: radius.sm,
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     justifyContent: 'center',
     marginTop: 18,
     minHeight: 46,
@@ -495,22 +588,23 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   testButtonDisabled: { opacity: 0.72 },
-  testButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  testMessage: { color: '#5E554E', fontSize: 13, lineHeight: 19, marginTop: 12, textAlign: 'center' },
+  testButtonText: { color: colors.text.onAccent, fontSize: fontSize.bodyLarge, fontWeight: '700' },
+  testMessage: { color: '#5E554E', fontSize: fontSize.body, lineHeight: 19, marginTop: spacing.md, textAlign: 'center' },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface.card,
     borderColor: '#ECE4D9',
     borderLeftWidth: 3,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     borderWidth: 1,
     marginBottom: 14,
-    padding: 16,
+    padding: spacing.lg,
     shadowColor: '#3B3028',
     shadowOffset: { height: 3, width: 0 },
     shadowOpacity: 0.07,
     shadowRadius: 12,
   },
-  cardTopRow: { alignItems: 'flex-start', flexDirection: 'row', gap: 12 },
+  cardRead: { opacity: 0.72 },
+  cardTopRow: { alignItems: 'flex-start', flexDirection: 'row', gap: spacing.md },
   iconWrap: {
     alignItems: 'center',
     borderRadius: 18,
@@ -522,67 +616,66 @@ const styles = StyleSheet.create({
   titleLine: {
     alignItems: 'flex-start',
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     justifyContent: 'space-between',
   },
   cardTitle: {
-    color: '#2B2522',
+    color: colors.text.primary,
     flex: 1,
-    fontFamily: 'Georgia',
+    fontFamily: fontFamily.display,
     fontSize: 18,
     fontWeight: '600',
     lineHeight: 23,
   },
-  statusPill: {
-    borderRadius: 999,
-    borderWidth: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  unreadDot: {
+    backgroundColor: colors.accent,
+    borderRadius: radius.pill,
+    height: 9,
+    marginTop: 7,
+    width: 9,
   },
-  statusText: { fontSize: 11, fontWeight: '700' },
-  patientName: { color: '#5E554E', fontSize: 13, fontWeight: '700', marginTop: 3 },
-  bodyText: { color: '#3C342E', fontSize: 14, lineHeight: 20, marginTop: 10 },
-  errorText: { color: '#9B5361', fontSize: 12, lineHeight: 17, marginTop: 8 },
-  metaRow: { alignItems: 'center', flexDirection: 'row', gap: 8, marginTop: 14 },
-  metaText: { color: '#8B8177', fontSize: 12, fontWeight: '600' },
-  metaDot: { backgroundColor: '#D8CFC3', borderRadius: 2, height: 4, width: 4 },
-  actionRow: { flexDirection: 'row', gap: 12, marginTop: 18 },
+  patientName: { color: '#5E554E', fontSize: fontSize.body, fontWeight: '700', marginTop: 3 },
+  bodyText: { color: '#3C342E', fontSize: fontSize.bodyLarge, lineHeight: 20, marginTop: 10 },
+  metaRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm, marginTop: 14 },
+  metaText: { color: '#746B63', fontSize: fontSize.caption, fontWeight: '600' },
+  metaDot: { backgroundColor: colors.border.strong, borderRadius: 2, height: 4, width: 4 },
+  actionRow: { flexDirection: 'row', gap: spacing.md, marginTop: 18 },
   callButton: {
     alignItems: 'center',
-    backgroundColor: '#87566A',
-    borderRadius: 8,
+    backgroundColor: colors.accent,
+    borderRadius: radius.sm,
     flex: 1,
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     justifyContent: 'center',
-    minHeight: 44,
-    paddingHorizontal: 12,
+    minHeight: MIN_TOUCH_TARGET,
+    paddingHorizontal: spacing.md,
   },
-  callButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  callButtonText: { color: colors.text.onAccent, fontSize: fontSize.bodyLarge, fontWeight: '700' },
   profileButton: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
-    borderRadius: 8,
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
+    borderRadius: radius.sm,
     borderWidth: 1,
     flex: 1,
     justifyContent: 'center',
-    minHeight: 44,
-    paddingHorizontal: 12,
+    minHeight: MIN_TOUCH_TARGET,
+    paddingHorizontal: spacing.md,
   },
-  profileButtonText: { color: '#3C342E', fontSize: 14, fontWeight: '700' },
+  profileButtonText: { color: '#3C342E', fontSize: fontSize.bodyLarge, fontWeight: '700' },
   summaryButton: {
     alignItems: 'center',
     backgroundColor: '#6F7F92',
-    borderRadius: 8,
+    borderRadius: radius.sm,
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     justifyContent: 'center',
     marginTop: 18,
-    minHeight: 44,
-    paddingHorizontal: 12,
+    minHeight: MIN_TOUCH_TARGET,
+    paddingHorizontal: spacing.md,
   },
-  summaryButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  summaryButtonText: { color: colors.text.onAccent, fontSize: fontSize.bodyLarge, fontWeight: '700' },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -591,8 +684,8 @@ const styles = StyleSheet.create({
   },
   emptyIcon: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
     borderRadius: 34,
     borderWidth: 1,
     height: 68,
@@ -600,15 +693,25 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     width: 68,
   },
-  emptyTitle: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 22, fontWeight: '600', marginTop: 10 },
-  emptyText: { color: '#756C64', fontSize: 14, lineHeight: 20, marginTop: 8, textAlign: 'center' },
+  emptyTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 22, fontWeight: '600', marginTop: 10 },
+  emptyText: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 20, marginTop: spacing.sm, textAlign: 'center' },
   footer: { alignItems: 'center', minHeight: 58, paddingTop: 10 },
   loadMoreButton: {
-    backgroundColor: '#87566A',
-    borderRadius: 8,
+    backgroundColor: colors.accent,
+    borderRadius: radius.sm,
     paddingHorizontal: 18,
     paddingVertical: 11,
   },
-  loadMoreText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  endText: { color: '#8B8177', fontSize: 12, fontWeight: '700', paddingVertical: 12 },
+  loadMoreText: { color: colors.text.onAccent, fontSize: fontSize.bodyLarge, fontWeight: '700' },
+  endText: { color: '#746B63', fontSize: fontSize.caption, fontWeight: '700', paddingVertical: spacing.md },
+  retryButton: {
+    alignItems: 'center',
+    backgroundColor: colors.accent,
+    borderRadius: radius.sm,
+    justifyContent: 'center',
+    marginTop: 18,
+    minHeight: 46,
+    paddingHorizontal: 24,
+  },
+  retryButtonText: { color: colors.text.onAccent, fontSize: fontSize.bodyLarge, fontWeight: '700' },
 });

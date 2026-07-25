@@ -1,0 +1,18 @@
+{
+  // Unit tests run in plain Node via tsx (`npm test`), matching reflexion-server's convention. They only
+  // ever import modules with no React Native dependency — anything that pulls in `react-native` cannot be
+  // transformed outside Metro, which is why the URL builders live in src/lib/apiUrl.ts rather than beside
+  // the client that uses them.
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "types": ["node"],
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.test.ts", "src/lib/apiUrl.ts", "src/lib/v1Status.ts", "src/lib/authMessages.ts", "src/lib/apiClient.ts", "src/screens/**/helpers.ts"]
+}

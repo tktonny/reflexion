@@ -1,9 +1,13 @@
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
-import { apiSend } from './apiClient';
+import { registerNotificationDeviceV1 } from './v1Client';
+import { hasV1Session } from './v1AuthSession';
 
 type NotificationsModule = typeof import('expo-notifications');
 
+// `nurseId` is retained so callers keep their existing shape, but the device is registered against the
+// v1 human token (identity comes from the bearer, not the body). The legacy `/caregiver-devices` route
+// this used to POST to never existed on the server — every registration 404'd and was swallowed.
 type RegisterPushNotificationDeviceInput = {
   nurseId: string;
 };
@@ -29,20 +33,19 @@ export async function registerPushNotificationDevice({
     return { ok: false, reason: 'Missing nurse id.' };
   }
 
+  // The v1 route is authenticated. v1 login is best-effort by design, so a caregiver signed in only via
+  // legacy simply has no push device this session — that must not surface as a sign-in failure.
+  if (!hasV1Session()) {
+    return { ok: false, reason: 'Sign in again to enable alerts on this phone.' };
+  }
+
   const registration = await getPushNotificationDeviceRegistration();
-  if (!registration.ok) {
+  if (!registration.ok || !registration.device) {
     return { ok: false, reason: registration.reason };
   }
 
   try {
-    const body = await apiSend<{ deviceId?: string }>('/api/caregiver-devices', {
-      method: 'POST',
-      body: JSON.stringify({
-        nurseId,
-        ...registration.device,
-      }),
-    });
-
+    const body = await registerNotificationDeviceV1(registration.device);
     return { ok: true, deviceId: body?.deviceId };
   } catch (error) {
     return {

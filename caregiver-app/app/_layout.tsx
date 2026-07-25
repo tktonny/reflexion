@@ -3,11 +3,12 @@ import { QueryClientProvider, useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Stack, useGlobalSearchParams, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { getStoredAuthSession, loadStoredAuthSession } from '../src/lib/authSession';
 import { loadV1Session } from '../src/lib/v1AuthSession';
 import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { queryClient } from '../src/lib/queryClient';
+import { colors } from '../src/theme';
 
 export default function RootLayout() {
   return (
@@ -85,8 +86,22 @@ function AuthGate({ children }: { children: ReactNode }) {
   }, [isHydrated, pathname, mode, router]);
 
   if (!isHydrated) {
-    return <View style={{ flex: 1 }} />;
+    // First boot only (see above). A bare <View/> leaves a screen reader with nothing to announce while
+    // the stored session is read, so the wait is voiced rather than silent.
+    return (
+      <View
+        accessibilityLabel="Opening Reflexion"
+        accessibilityRole="progressbar"
+        style={styles.hydrating}
+      >
+        <ActivityIndicator color={colors.accent} />
+      </View>
+    );
   }
 
   return <View style={{ flex: 1 }}>{children}</View>;
 }
+
+const styles = StyleSheet.create({
+  hydrating: { alignItems: 'center', backgroundColor: colors.surface.page, flex: 1, justifyContent: 'center' },
+});
