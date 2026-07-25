@@ -48,14 +48,17 @@ devicesRouter.post('/device-pairings', asyncHandler(async (request, response) =>
 
     const expiresAt = new Date(Date.now() + PAIRING_TTL_MS)
     const pairingId = newId('pair')
+    // Persist the region decision + its cross-validation signals on BOTH the pairing and the device
+    // doc (same blob) so the pairing record is self-contained for audit at claim time.
+    const regionSignalsDoc = { ...regionSignals, decidedAt: new Date() }
     const displayCode = await insertPairingWithUniqueCode({
       pairingId, deviceId: bootstrap.did, hardwareRevision, softwareVersion, timezone, deviceNonce,
-      region: regionSignals.region, expiresAt,
+      region: regionSignals.region, regionSignals: regionSignalsDoc, expiresAt,
     })
     await db.collection<any>(collections.devices).updateOne({ _id: bootstrap.did }, { $set: {
       hardwareRevision, softwareVersion, timezone,
       region: regionSignals.region,
-      regionSignals: { ...regionSignals, decidedAt: new Date() },
+      regionSignals: regionSignalsDoc,
       updatedAt: new Date(),
     } })
     return { status: 201, data: {
@@ -313,7 +316,7 @@ async function insertPairingWithUniqueCode(input: Record<string, unknown>) {
         _id: input.pairingId, deviceId: input.deviceId, codeHash: hmac(displayCode), codeHint: displayCode.slice(-2),
         state: 'pending', expiresAt: input.expiresAt, failedAttempts: 0, hardwareRevision: input.hardwareRevision,
         softwareVersion: input.softwareVersion, timezone: input.timezone, deviceNonce: input.deviceNonce,
-        region: input.region, createdAt: new Date(),
+        region: input.region, regionSignals: input.regionSignals, createdAt: new Date(),
       })
       return displayCode
     } catch (error) {
