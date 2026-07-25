@@ -72,3 +72,8 @@ mirror-app/wakeword-training/output/
 
 # local scratch
 /tmp/
+
+# local .env backups (e.g. from re-formatting) — never commit
+.env.backup
+.env.*.backup
+.env.bak
