@@ -76,7 +76,14 @@ const indexes: IndexSet[] = [
   [c.notifications, [
     { key: { tenantId: 1, recipientUserId: 1, dedupeKey: 1 }, unique: true },
     { key: { tenantId: 1, recipientUserId: 1, state: 1, createdAt: -1 } },
+    // Drives the push dispatcher's pickup query (notifications awaiting a phone push, oldest first).
+    { key: { pushState: 1, createdAt: 1 } },
   ]],
+  [c.dailySummaries, [
+    // One cached AI daily summary per patient per local calendar day.
+    { key: { patientId: 1, dateKey: 1 }, unique: true },
+  ]],
+  [c.feedback, [{ key: { nurseId: 1, createdAt: -1 } }]],
   [c.notificationDevices, [
     // One row per physical device: the Expo token is the device identity, and re-registering after an
     // account switch moves the row to the new user rather than creating a second one.
