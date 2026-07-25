@@ -6,7 +6,7 @@ export type IdPrefix =
   | 'ses' | 'evt' | 'art' | 'op' | 'run'
   | 'plan' | 'rem' | 'task' | 'away' | 'flag'
   | 'base' | 'score' | 'win' | 'case' | 'disp'
-  | 'auth' | 'idem' | 'audit' | 'notif' | 'day' | 'thr' | 'msg'
+  | 'auth' | 'idem' | 'audit' | 'notif' | 'ndev' | 'day' | 'thr' | 'msg'
 
 export function newId(prefix: IdPrefix) {
   return `${prefix}_${randomUUID().replaceAll('-', '')}`

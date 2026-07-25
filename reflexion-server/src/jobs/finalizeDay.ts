@@ -3,6 +3,12 @@ import type { Db } from 'mongodb'
 import { withMongo } from '../lib/mongo.js'
 import { collections } from '../v1/platform/collections.js'
 import { newId } from '../v1/platform/ids.js'
+import {
+  dailyCheckNotificationCopy,
+  materializeNotifications,
+  notificationRecipients,
+  type DailyCheckNotificationType,
+} from '../v1/notifications/service.js'
 import { computeCaregiverStatus } from '../v1/routes/monitoring.js'
 
 // v1 timezone-aware scheduled jobs (doc "Signal-to-Status Algorithm" §12 + §16). Two responsibilities:
@@ -13,7 +19,7 @@ import { computeCaregiverStatus } from '../v1/routes/monitoring.js'
 // once-a-minute supervisor loop is safe.
 
 const DEFAULT_TZ = process.env.DEFAULT_TIMEZONE || 'Asia/Singapore'
-type NotificationType = 'completion' | 'missed_7pm' | 'red_missed_streak' | 'technical_issue' | 'late_completion'
+type NotificationType = DailyCheckNotificationType
 
 function colorFor(status: string): 'green' | 'amber' | 'red' | null {
   return status === 'doing_well' ? 'green' : status === 'worth_checking' ? 'amber' : status === 'needs_attention' ? 'red' : null
@@ -29,20 +35,35 @@ function localParts(now: Date, timezone: string) {
 
 async function activePatients(db: Db) {
   return db.collection<any>(collections.patients).find({ status: { $ne: 'archived' } })
-    .project({ _id: 1, tenantId: 1, timezone: 1 }).toArray()
+    .project({ _id: 1, tenantId: 1, timezone: 1, displayName: 1 }).toArray()
 }
 
 // Deduplicates on (patient, localDate, type) per doc §13.2 — at most one notification of each type per
-// user per day, while still allowing different types (e.g. technical_issue and late_completion) to fire.
-async function queueNotification(db: Db, patient: any, localDate: string, type: NotificationType, status: string, reason: string) {
-  const dedupeKey = `${patient._id}:${localDate}:${type}`
-  const existing = await db.collection<any>(collections.notifications).findOne({ dedupeKey })
-  if (existing) return false
-  await db.collection<any>(collections.notifications).insertOne({
-    _id: newId('notif'), tenantId: patient.tenantId, patientId: String(patient._id), dedupeKey,
-    type, statusAtSend: colorFor(status), reason, localDate, channel: 'push', state: 'queued', createdAt: new Date(),
+// recipient per day, while still allowing different types (e.g. technical_issue and late_completion) to
+// fire. Fans out to every caregiver holding `monitoring:read` on the patient: the read model filters on
+// {tenantId, recipientUserId}, so a row without a recipient is invisible to every client.
+async function queueNotification(
+  db: Db, patient: any, recipientUserIds: string[], localDate: string,
+  type: NotificationType, status: string, reason: string,
+) {
+  const tenantId = String(patient.tenantId)
+  const patientId = String(patient._id)
+  if (!recipientUserIds.length) return false
+  const copy = dailyCheckNotificationCopy(type, patient.displayName)
+  const dedupeKey = `${patientId}:${localDate}:${type}`
+  const created = await materializeNotifications(db, {
+    tenantId,
+    patientId,
+    recipientUserIds,
+    type,
+    title: copy.title,
+    body: copy.body,
+    dedupeKey,
+    source: { type: 'daily_check', id: dedupeKey },
+    // Analytics/debug fields the status engine writes alongside the caregiver-facing copy.
+    extra: { statusAtSend: colorFor(status), reason, localDate, channel: 'push' },
   })
-  return true
+  return created > 0
 }
 
 export async function evaluate7pm(db: Db, options: { patientId?: string; now?: Date } = {}) {
@@ -51,6 +72,9 @@ export async function evaluate7pm(db: Db, options: { patientId?: string; now?: D
     ? await db.collection<any>(collections.patients).find({ _id: options.patientId }).toArray()
     : await activePatients(db)
   const queued: string[] = []
+  // Patients whose alert had nowhere to go — no active care relationship carries `monitoring:read`, so no
+  // caregiver can ever see it. Surfaced so "my caregiver got no alert" is diagnosable without a Mongo dig.
+  const withoutRecipient: string[] = []
   for (const patient of patients) {
     const timezone = String(patient.timezone || DEFAULT_TZ)
     const local = localParts(now, timezone)
@@ -63,9 +87,19 @@ export async function evaluate7pm(db: Db, options: { patientId?: string; now?: D
     if (status.technicalState === 'unreachable') { type = 'technical_issue'; reason = 'MIRROR_OFFLINE_OR_UNREACHABLE' }
     else if (status.missedStreak >= 3) { type = 'red_missed_streak'; reason = 'CHECKIN_MISSED_3_DAYS' }
     else { type = 'missed_7pm'; reason = 'CHECKIN_MISSED_TODAY' }
-    if (await queueNotification(db, patient, status.localDate, type, status.status, reason)) queued.push(`${patient._id}:${type}`)
+    const recipientUserIds = await notificationRecipients(db, String(patient.tenantId), String(patient._id))
+    if (!recipientUserIds.length) {
+      withoutRecipient.push(`${patient._id}:${type}`)
+      continue
+    }
+    if (await queueNotification(db, patient, recipientUserIds, status.localDate, type, status.status, reason)) {
+      queued.push(`${patient._id}:${type}`)
+    }
   }
-  return { queued }
+  if (withoutRecipient.length) {
+    console.warn('[evaluate7pm] no caregiver holds monitoring:read for', withoutRecipient.join(', '))
+  }
+  return { queued, withoutRecipient }
 }
 
 export async function finalizeDay(db: Db, options: { patientId?: string; now?: Date; force?: boolean } = {}) {

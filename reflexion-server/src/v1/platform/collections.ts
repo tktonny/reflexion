@@ -12,6 +12,7 @@ export const collections = {
   manualFlags: 'manual_flags', baselineModels: 'baseline_models', anomalyScores: 'anomaly_scores',
   monitoringWindows: 'monitoring_windows', reviewCases: 'review_cases', reviewDispositions: 'review_dispositions',
   notifications: 'notifications', notificationSuppressions: 'notification_suppressions',
+  notificationDevices: 'notification_devices',
   protocolRegistry: 'protocol_registry', featureRegistry: 'feature_registry', modelRegistry: 'model_registry',
   ruleRegistry: 'rule_registry', outboxEvents: 'outbox_events', eventConsumptions: 'event_consumptions',
   auditEvents: 'audit_events', idempotencyRecords: 'idempotency_records',

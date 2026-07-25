@@ -11,18 +11,20 @@ type PatientStatus = 'doing_well' | 'worth_checking' | 'needs_attention'
 
 export const latestConfigRouter = Router()
 
+// `nurseId` is REQUIRED. It used to be optional, falling back to the most recently created config —
+// which handed an unauthenticated caller an arbitrary caregiver's name, email, phone and patient list.
+// This surface is still tokenless (legacy trust model, sunset 2026-12-31), so requiring the id is the
+// floor, not the fix: it stops enumeration but a leaked id still reads the record.
 latestConfigRouter.get('/', asyncHandler(async (request, response) => {
   const nurseId = typeof request.query.nurseId === 'string' ? request.query.nurseId : ''
-  if (nurseId && !ObjectId.isValid(nurseId)) {
-    response.status(400).json({ error: 'Nurse id is invalid.' })
+  if (!nurseId || !ObjectId.isValid(nurseId)) {
+    response.status(400).json({ error: 'A valid nurse id is required.' })
     return
   }
 
   await withMongo(async (client) => {
     const db = client.db(DB_NAME)
-    const filter = nurseId ? { _id: new ObjectId(nurseId) } : {}
-    const document = await db.collection(NURSE_CONFIG_COLLECTION).findOne(filter, {
-      sort: nurseId ? undefined : { createdAt: -1 },
+    const document = await db.collection(NURSE_CONFIG_COLLECTION).findOne({ _id: new ObjectId(nurseId) }, {
       projection: {
         alertSensitivity: 1,
         email: 1,
@@ -31,6 +33,7 @@ latestConfigRouter.get('/', asyncHandler(async (request, response) => {
         phoneNumber: 1,
         preferredDailySummaryTime: 1,
         pushNotificationsEnabled: 1,
+        storeSessionSummaries: 1,
       },
     })
 
@@ -44,6 +47,7 @@ latestConfigRouter.get('/', asyncHandler(async (request, response) => {
       pushNotificationsEnabled: Boolean(document?.pushNotificationsEnabled),
       alertSensitivity: document?.alertSensitivity || 'only_important_changes',
       preferredDailySummaryTime: document?.preferredDailySummaryTime || '09:00',
+      storeSessionSummaries: document?.storeSessionSummaries !== false,
       patients,
     })
   })
@@ -70,6 +74,13 @@ async function returnPatientsWithStatuses(db: Db, storedPatients: StoredPatient[
       speechSpeed: patient.speechSpeed || 'Slow',
       mirrorName: patient.mirrorName || `Mirror ${index + 1}`,
       photoUrl: patient.photoUrl || '',
+      // The Settings screen seeds its edit form from this payload. Omitting these fields made the form
+      // open blank and a save would then overwrite the stored values with empty ones.
+      gender: patient.gender || '',
+      usualWakeTime: patient.usualWakeTime || '',
+      speechOrHearingConditions: patient.speechOrHearingConditions || '',
+      keyTopics: Array.isArray(patient.keyTopics) ? patient.keyTopics : [],
+      keyTopicsOtherText: patient.keyTopicsOtherText || '',
       status,
       statusLabel: getStatusLabel(status),
       lastSpokenAt: latestConversation?.createdAt?.toISOString?.() || null,

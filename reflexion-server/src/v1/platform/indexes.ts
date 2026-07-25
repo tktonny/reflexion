@@ -77,6 +77,12 @@ const indexes: IndexSet[] = [
     { key: { tenantId: 1, recipientUserId: 1, dedupeKey: 1 }, unique: true },
     { key: { tenantId: 1, recipientUserId: 1, state: 1, createdAt: -1 } },
   ]],
+  [c.notificationDevices, [
+    // One row per physical device: the Expo token is the device identity, and re-registering after an
+    // account switch moves the row to the new user rather than creating a second one.
+    { key: { tenantId: 1, expoPushToken: 1 }, unique: true },
+    { key: { tenantId: 1, userId: 1, state: 1 } },
+  ]],
   [c.outboxEvents, [{ key: { state: 1, nextAttemptAt: 1 } }, { key: { aggregateType: 1, aggregateId: 1, occurredAt: 1 } }]],
   [c.eventConsumptions, [{ key: { eventId: 1, consumerName: 1 }, unique: true }]],
   [c.auditEvents, [{ key: { tenantId: 1, occurredAt: -1 } }]],
