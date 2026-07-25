@@ -203,6 +203,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const bargeInPreRollRef = useRef<string[]>([])
   const bargeInActiveRef = useRef(false)
   const voiceRef = useRef<VoiceProfile>(voiceProfileForSession(language))
+  // Latest ambient weather line (refreshes ~30 min), injected into each session.update so Aria knows it.
+  const weatherRef = useRef(options.weather)
+  weatherRef.current = options.weather
   const openingRequestedRef = useRef(false)
   // True on the first session.updated after a MID-CONVERSATION reconnect: skip the opening and instead
   // resume where we left off (re-ask the current screening question / reopen the mic for companion).
@@ -954,6 +957,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
             patientName: dailyPlan.patientName,
             autoCreateResponse: false,
             memory: memoryRef.current,
+            weather: weatherRef.current,
           }), 'normal')
         }
         return
@@ -1255,6 +1259,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           patientName: dailyPlan.patientName,
           autoCreateResponse: false,
           memory: memoryRef.current,
+          weather: weatherRef.current,
         }))
         // Start native PCM capture -> stream frames upstream.
         const audio = createPcmAudioBridge()

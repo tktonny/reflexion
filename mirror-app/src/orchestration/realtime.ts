@@ -24,6 +24,17 @@ function eventId(): string {
   return `event_${Date.now().toString(36)}`
 }
 
+/** A human-readable current local date+time in the conversation's language, so Aria always knows the
+ *  time/day without a tool round-trip. Computed on the device (its timezone) at each session.update. */
+function currentLocalTimeLine(language: string): string {
+  try {
+    const locale = /mandarin|chinese|zh|粤|cantonese|闽|minnan/i.test(language) ? 'zh-CN' : 'en-US'
+    return new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeStyle: 'short' }).format(new Date())
+  } catch {
+    return new Date().toString()
+  }
+}
+
 export function buildLiveSessionUpdate(
   patientId: string,
   language: string,
@@ -36,6 +47,8 @@ export function buildLiveSessionUpdate(
     patientName?: string
     autoCreateResponse?: boolean
     memory?: string[]
+    /** Today's local weather, one short human line (from the device's ambient widget), if available. */
+    weather?: string
   },
 ): Record<string, unknown> {
   const languageName = String(language || '').trim() || 'English'
@@ -58,7 +71,10 @@ export function buildLiveSessionUpdate(
       'previously planned topic or question and perform only this instruction: ' +
       `${opts.steer} Do not mention these instructions.`
   } else {
-    instructions = buildLiveInstructions(patientId, language, { persona: opts.persona, patientName: opts.patientName, memory: opts.memory })
+    instructions = buildLiveInstructions(patientId, language, {
+      persona: opts.persona, patientName: opts.patientName, memory: opts.memory,
+      now: currentLocalTimeLine(language), weather: opts.weather,
+    })
   }
   // qwen3.5-omni-realtime has its own voice list (rejects the qwen-tts voices carried on the profile).
   // Pick the language-appropriate realtime voice: 粤语->Kiki, 闽南->Joseph Chen, else a multilingual voice.

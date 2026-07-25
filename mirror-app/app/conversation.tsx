@@ -146,7 +146,10 @@ export default function ConversationScreen() {
     endPushToTalk,
     getSessionTelemetry,
     getSessionAudio,
-  } = useConversation({ language, persona, patientName, dailyPlan })
+  } = useConversation({
+    language, persona, patientName, dailyPlan,
+    weather: weather ? `${weather.tempC}°C, ${weather.label}`.trim() : undefined,
+  })
 
   const endingRef = useRef(false)
   const endHandledRef = useRef(false)
