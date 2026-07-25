@@ -17,6 +17,7 @@ import { signInMessage } from '../src/lib/authMessages';
 import { clearStoredAuthSession, setStoredAuthSession } from '../src/lib/authSession';
 import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { v1Login } from '../src/lib/v1Client';
+import { V1ApiError } from '../src/lib/v1Errors';
 import { clearV1Session } from '../src/lib/v1AuthSession';
 import { clearCaregiverCache } from '../src/lib/queryKeys';
 import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../src/theme';
@@ -35,31 +36,38 @@ export default function SignInScreen() {
   const [error, setError] = useState('');
   const signInMutation = useMutation({
     mutationFn: async () => {
-      // Primary auth is the caregiver account (legacy sign-in) — accounts are still created via the
-      // legacy onboarding, so this must succeed for a freshly-signed-up user to get in. The v1 login
-      // is BEST-EFFORT: it unlocks the authoritative v1 status/flag/away routes when the account also
-      // exists in v1, but a v1 failure must never block sign-in (the status UI degrades to "updating").
-      const body = await apiSend<SignInResponse>('/api/auth/sign-in', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-      });
+      // v1 is now the primary session — it is what every screen reads. Legacy sign-in is kept only as a
+      // SELF-HEALING fallback for an account that predates the migration: the server bridges a caregiver
+      // into v1 during legacy sign-in, so falling back once and retrying v1 turns a would-be lockout into a
+      // slightly slower first login. Without that fallback, anyone the migration missed could never get in.
       try {
-        await v1Login(email, password);
+        const session = await v1Login(email, password);
+        return { userId: session.actor.userId, name: session.actor.name || '', email: session.actor.email || email };
       } catch (v1Error) {
-        console.warn('[SignInScreen] v1 login unavailable; caregiver status may be delayed', v1Error);
+        if (!isCredentialRejection(v1Error)) throw v1Error;
+        // Wrong password, or an account with no v1 user yet. Legacy tells the two apart, and signing in
+        // there creates the v1 user as a side effect.
+        console.warn('[SignInScreen] v1 sign-in refused; trying the legacy bridge once', v1Error);
+        await apiSend<SignInResponse>('/api/auth/sign-in', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+        });
+        const session = await v1Login(email, password);
+        return { userId: session.actor.userId, name: session.actor.name || '', email: session.actor.email || email };
       }
-      return body;
     },
     onSuccess: async (body) => {
+      // nurseId is retained under its old name while the legacy surface is still mounted; for a v1-native
+      // account it is the v1 userId, which is what every remaining nurseId consumer needs it to be.
       await setStoredAuthSession({
-        nurseId: body.nurseId,
-        name: body.name || '',
+        nurseId: body.userId,
+        name: body.name,
         email: body.email || email.trim().toLowerCase(),
       });
       // Defensive: the previous session may have ended without a clean sign-out (app killed, or the
       // sign-up path), which would otherwise leave that caregiver's data cached under gcTime: Infinity.
       clearCaregiverCache(queryClient);
-      const registration = await registerPushNotificationDevice({ nurseId: body.nurseId });
+      const registration = await registerPushNotificationDevice({ nurseId: body.userId });
       if (!registration.ok) {
         console.warn('[SignInScreen] push registration failed', registration.reason);
       }
@@ -264,3 +272,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
+
+/**
+ * True only for a definite "these credentials were not accepted" — 401, or 404 for an account v1 has never
+ * heard of. Anything else (offline, 5xx, a parse failure) must not trigger the legacy retry: re-sending the
+ * password to a second endpoint because the network blipped is the wrong trade.
+ */
+function isCredentialRejection(error: unknown): boolean {
+  return error instanceof V1ApiError && (error.status === 401 || error.status === 404);
+}

@@ -1,3 +1,4 @@
+import { MIN_PASSWORD_LENGTH } from '../../lib/authMessages';
 // Pure helpers for the onboarding funnel: form seeding, input formatting, step copy, and the per-step
 // validator. Nothing here touches state or the network, so each one is directly testable.
 
@@ -50,8 +51,8 @@ export function validateStep(step: number, account: AccountForm, patients: Patie
     if (!account.email.includes('@')) {
       return 'Enter a valid email address.';
     }
-    if (account.password.length < 8) {
-      return 'Use a password with at least 8 characters.';
+    if (account.password.length < MIN_PASSWORD_LENGTH) {
+      return `Use a password with at least ${MIN_PASSWORD_LENGTH} characters.`;
     }
   }
 

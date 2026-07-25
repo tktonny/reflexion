@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { LegacyApiError } from './apiClient';
-import { passwordResetMessage, passwordResetRequestMessage, signInMessage } from './authMessages';
+import { MIN_PASSWORD_LENGTH, passwordResetMessage, passwordResetRequestMessage, signInMessage } from './authMessages';
+import { V1ApiError } from './v1Errors';
 
 // Regression guard for a real leak. Sign-in built its visible error straight from err.message, and
 // apiClient composes those from the wire, so the app's front door could display — and, once the box became
@@ -77,4 +78,34 @@ test('the raw error is still logged for whoever has to debug it', () => {
 
   assert.equal(logged.length, 1);
   assert.match(JSON.stringify(logged[0]), /502/, 'the detail must survive somewhere');
+});
+
+test('a rejected v1 password reads as bad credentials, not as a connection problem', () => {
+  // v1 is the primary login now. Classifying only LegacyApiError meant every v1 401 fell through to
+  // "we could not reach Reflexion" — sending the caregiver to check a connection that was fine.
+  const rejected = signInMessage(new V1ApiError('Email or password is incorrect.', 401, 'INVALID_CREDENTIALS'));
+  assert.match(rejected, /email and password/i);
+  assert.doesNotMatch(rejected, /connection/i);
+
+  const rateLimited = signInMessage(new V1ApiError('slow down', 429, 'RATE_LIMITED'));
+  assert.match(rateLimited, /wait a moment/i);
+
+  // A v1 5xx or a network failure still reads as a connection problem, which is what it is.
+  assert.match(signInMessage(new V1ApiError('boom', 502, 'BAD_GATEWAY')), /connection/i);
+  assert.match(signInMessage(new TypeError('Network request failed')), /connection/i);
+});
+
+test('a v1 error never leaks its own message either', () => {
+  const leaky = new V1ApiError('Expected JSON from /api/v1/auth/sessions (received 502).', 502);
+  for (const build of [signInMessage, passwordResetRequestMessage, passwordResetMessage]) {
+    const message = build(leaky);
+    assert.doesNotMatch(message, /\/api\//);
+    assert.doesNotMatch(message, /Expected JSON|502/);
+  }
+});
+
+test('the password floor matches what the server enforces', () => {
+  // v1 identity.ts rejects anything shorter than 12. The form used to accept 8, so a 9-character password
+  // passed validation and was then refused by the server.
+  assert.equal(MIN_PASSWORD_LENGTH, 12);
 });

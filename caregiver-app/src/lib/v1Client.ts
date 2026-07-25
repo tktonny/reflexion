@@ -9,6 +9,7 @@ import {
   type V1Session,
 } from './v1AuthSession';
 import { getV1Url } from './apiUrl';
+import { V1ApiError } from './v1Errors';
 import type { V1PatientStatus } from './v1Status';
 
 // Client for the authoritative v1 API (reflexion-implementation-baseline.md §4/§5). All v1 responses are
@@ -17,17 +18,9 @@ import type { V1PatientStatus } from './v1Status';
 // The URL builder lives in ./apiUrl next to the legacy one, so the two mounting rules can be read together
 // (and unit-tested without pulling React Native into the test process).
 
-export class V1ApiError extends Error {
-  status: number;
-  code?: string;
-
-  constructor(message: string, status: number, code?: string) {
-    super(message);
-    this.name = 'V1ApiError';
-    this.status = status;
-    this.code = code;
-  }
-}
+// Re-exported so existing importers keep working; defined in ./v1Errors because this module reaches
+// SecureStore and therefore cannot be loaded by a plain-Node test.
+export { V1ApiError } from './v1Errors';
 
 type Envelope<T> = { data: T; meta?: { requestId?: string; nextCursor?: string | null } };
 
@@ -122,6 +115,18 @@ function buildHeaders(accessToken: string | undefined, extra?: Record<string, st
 
 // Authenticated request: attaches Bearer, and on 401 refreshes once then retries with the same body
 // and headers (so an Idempotency-Key survives the retry).
+/**
+ * Same as the internal fetch, exported for the caregiver data layer: v1 enforces If-Match on versioned
+ * resources (patient PATCH, care-plan PUT) and an Idempotency-Key on most writes, and those are the only
+ * routes that need arbitrary headers.
+ */
+export async function v1FetchWithHeaders<T>(
+  path: string,
+  init: { method?: string; body?: unknown; headers?: Record<string, string> },
+): Promise<Envelope<T>> {
+  return v1Fetch<T>(path, init)
+}
+
 async function v1Fetch<T>(
   path: string,
   init: { method?: string; body?: unknown; headers?: Record<string, string> } = {},

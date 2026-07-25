@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { apiSend } from '../src/lib/apiClient';
+import { MIN_PASSWORD_LENGTH } from '../src/lib/authMessages';
 import { passwordResetMessage } from '../src/lib/authMessages';
 import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../src/theme';
 
@@ -29,7 +30,12 @@ export default function ResetPasswordScreen() {
   async function submit() {
     if (submitting) return;
     if (!token) { setError('This reset link is missing its token. Open the link from your email again.'); return; }
-    if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+    // v1 enforces 12 (identity.ts). Validating 8 here meant a 9-character password passed the form and was
+    // then rejected by the server, which reads as the app being broken.
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+      return;
+    }
     setSubmitting(true);
     setError('');
     try {

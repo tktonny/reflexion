@@ -1,4 +1,5 @@
 import { LegacyApiError } from './apiClient';
+import { V1ApiError } from './v1Errors';
 
 // Caregiver-facing wording for auth failures.
 //
@@ -9,8 +10,16 @@ import { LegacyApiError } from './apiClient';
 // worth distinguishing: their details were wrong, or we could not be reached. Everything else is framed
 // as a connection problem, because that is what it almost always is.
 
+/** The server's rule (v1 identity.ts). Kept here so the form and the server cannot disagree. */
+export const MIN_PASSWORD_LENGTH = 12;
+
 function statusOf(error: unknown): number | null {
-  return error instanceof LegacyApiError ? error.status : null;
+  // BOTH error types. v1 is the primary login now, so inspecting only LegacyApiError meant every rejected
+  // v1 password fell through to "we could not reach Reflexion" — telling the caregiver to check a connection
+  // that was fine, and hiding the one thing they could act on.
+  if (error instanceof V1ApiError) return error.status;
+  if (error instanceof LegacyApiError) return error.status;
+  return null;
 }
 
 function describe(error: unknown): string {
