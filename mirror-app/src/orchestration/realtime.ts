@@ -143,9 +143,11 @@ export function buildLiveSessionUpdate(
 
 const REALTIME_VOICE_DEFAULT = realtimeVoiceForLanguageKey('english')
 
-/** Realtime WS URL. Our key is China-region (relay showed intl 401 → china OK). */
-export function realtimeWsUrl(): string {
-  return `${QWEN.realtimeUrl}?model=${QWEN.realtimeModel}`
+/** Realtime WS URL. Prefer the region-adaptive endpoint + model the backend put in the session ticket
+ *  (so a SEA device reaches Singapore, a CN device reaches dashscope); fall back to the build-time
+ *  defaults when a ticket has not populated them yet. */
+export function realtimeWsUrl(endpoint?: string, model?: string): string {
+  return `${endpoint || QWEN.realtimeUrl}?model=${model || QWEN.realtimeModel}`
 }
 
 /**

@@ -46,6 +46,13 @@ export type ActiveMirrorSession = {
   dailyPlan?: DailyConversationPlan
   ticket?: string
   ticketExpiresAt?: string
+  // Region-adaptive endpoints, delivered by the backend ticket (never a build-time URL). The device
+  // uses these so a SEA device talks to the Singapore host and a CN device to dashscope.
+  endpoint?: string
+  httpBase?: string
+  model?: string
+  // Region-correct HTTP model names (SG serves TTS as qwen3-tts-flash, not qwen-tts).
+  httpModels?: { tts?: string; asr?: string; chat?: string; vision?: string }
 }
 
 type TranscriptPayload = {
@@ -196,12 +203,26 @@ export async function getActiveMirrorSession() {
 export async function getActiveQwenTicket() {
   let session = await getActiveMirrorSession()
   if (!session) session = await beginMirrorSession('companion', 'mandarin')
-  if (session.ticket && session.ticketExpiresAt && Date.parse(session.ticketExpiresAt) > Date.now() + 60_000) return session.ticket
+  // Also require the region endpoints: a ticket rehydrated from before this change (or an app upgrade
+  // over an old cache) has no endpoint/httpBase, so force a refetch rather than fall back to the China URL.
+  if (session.ticket && session.ticketExpiresAt && Date.parse(session.ticketExpiresAt) > Date.now() + 60_000
+    && session.endpoint && session.httpBase) return session.ticket
   const response = await deviceFetch(`/api/v1/sessions/${encodeURIComponent(session.sessionId)}/realtime-tickets`, {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': randomIdempotencyKey() }, body: '{}',
   })
-  const ticket = await dataOrThrow<{ ticket: string; expiresAt: string }>(response)
-  session = { ...session, ticket: ticket.ticket, ticketExpiresAt: ticket.expiresAt }
+  const ticket = await dataOrThrow<{
+    ticket: string; expiresAt: string; endpoint?: string; httpBase?: string
+    models?: { tts?: string; asr?: string; chat?: string; vision?: string }; sessionPolicy?: { model?: string }
+  }>(response)
+  session = {
+    ...session,
+    ticket: ticket.ticket,
+    ticketExpiresAt: ticket.expiresAt,
+    endpoint: ticket.endpoint,
+    httpBase: ticket.httpBase,
+    model: ticket.sessionPolicy?.model,
+    httpModels: ticket.models,
+  }
   memorySession = session
   await AsyncStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, JSON.stringify(session))
   return ticket.ticket
@@ -242,6 +263,16 @@ export async function savePatientMemory(facts: string[]): Promise<void> {
   } catch {
     // best-effort; memory is soft continuity, never critical
   }
+}
+
+/** Region-adaptive endpoints from the active ticket (populated once getActiveQwenTicket/getBearer has
+ *  resolved). Undefined before the first ticket — callers fall back to the build-time defaults. */
+export function getActiveQwenEndpoint(): string | undefined { return memorySession?.endpoint }
+export function getActiveQwenHttpBase(): string | undefined { return memorySession?.httpBase }
+export function getActiveQwenModel(): string | undefined { return memorySession?.model }
+/** Region-correct HTTP model name for a turn-based call, or undefined → caller uses the build-time default. */
+export function getActiveQwenHttpModel(kind: 'tts' | 'asr' | 'chat' | 'vision'): string | undefined {
+  return memorySession?.httpModels?.[kind]
 }
 
 function resolveTimezone(): string {

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
-import { getBearer } from '../api/qwenToken'
+import { getBearer, getQwenRealtimeEndpoint, getQwenRealtimeModel } from '../api/qwenToken'
 import { qwenTTS } from '../api/qwenClient'
 import {
   looksLikeGoodbye,
@@ -1260,8 +1260,10 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       // The hook may have been cleaned up or superseded while the token request was in flight.
       if (!runtimeLease.isCurrent() || !startingRef.current || startAttemptRef.current !== startAttempt) return
 
-      // RN WebSocket supports a 3rd `options.headers` arg (not in DOM types → cast).
-      const socket = new (WebSocket as any)(realtimeWsUrl(), undefined, {
+      // RN WebSocket supports a 3rd `options.headers` arg (not in DOM types → cast). The endpoint +
+      // model come from the region-adaptive ticket (getBearer above populated them); build-time defaults
+      // apply until then.
+      const socket = new (WebSocket as any)(realtimeWsUrl(getQwenRealtimeEndpoint(), getQwenRealtimeModel()), undefined, {
         headers: { Authorization: `Bearer ${bearer}` },
       }) as WebSocket
       socketRef.current = socket
