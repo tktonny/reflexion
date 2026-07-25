@@ -57,7 +57,11 @@ export async function ensureV1TenantUser(db: Db, nurse: LegacyNurse): Promise<{ 
     {
       $setOnInsert: { _id: userId, createdAt: now },
       $set: {
+        // emailNormalized is the field v1 login (identity.ts POST /auth/sessions) matches on — WITHOUT it
+        // a bridged caregiver can never obtain a v1 session (401 despite a correct password), which locks
+        // every v1-gated screen behind "Sign in again". Keep it identical to `email` (lowercased).
         tenantId, name: nurse.name || '', email: (nurse.email || '').trim().toLowerCase(),
+        emailNormalized: (nurse.email || '').trim().toLowerCase(),
         passwordHash: nurse.passwordHash || '', phoneNumber: nurse.phoneNumber || '',
         roles: ['caregiver', 'tenant_admin'], scopes: [], status: 'active',
         notificationPreferences: {
