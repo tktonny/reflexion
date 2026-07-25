@@ -8,7 +8,7 @@ import {
   looksLikeUserGoodbye,
 } from '../orchestration/orchestrator'
 import { buildLiveSessionUpdate, realtimeWsUrl, REALTIME_TOOL_BACKEND } from '../orchestration/realtime'
-import { invokeSessionTool } from '../api/sessionSync'
+import { invokeSessionTool, getPatientMemory } from '../api/sessionSync'
 import { createEnergyVad, decodeBase64Pcm16 } from '../orchestration/energyVad'
 import {
   acknowledgementForLanguage,
@@ -24,7 +24,6 @@ import {
 } from '../orchestration/deterministicSpeech'
 import { createSessionTelemetry } from '../orchestration/sessionTelemetry'
 import { createSessionCheckinFlow, type DailyCheckinFlow } from '../orchestration/dailyCheckinFlow'
-import { getStoredSessionMemory } from '../storage/mirrorStorage'
 import {
   acquireConversationRuntime,
   type ConversationRuntimeLease,
@@ -1256,7 +1255,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       // Load prior-session memory for soft continuity (best-effort; empty on the first ever session). On
       // a resume, memoryRef was already seeded from the live transcript in tryReconnect — don't clobber it.
       if (!resume) {
-        try { memoryRef.current = await getStoredSessionMemory(patientId) } catch { memoryRef.current = [] }
+        try { memoryRef.current = await getPatientMemory() } catch { memoryRef.current = [] }
       }
       // The hook may have been cleaned up or superseded while the token request was in flight.
       if (!runtimeLease.isCurrent() || !startingRef.current || startAttemptRef.current !== startAttempt) return

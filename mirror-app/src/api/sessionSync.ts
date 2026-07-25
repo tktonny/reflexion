@@ -222,6 +222,28 @@ export async function invokeSessionTool(tool: string, args: Record<string, unkno
   return data.output
 }
 
+/** Per-patient soft-continuity memory (backend). Fetched at session start to inject into Aria's
+ *  instructions; written at session end from a device-side summary. Best-effort (never blocks a chat). */
+export async function getPatientMemory(): Promise<string[]> {
+  try {
+    const response = await deviceFetch('/api/v1/assistant/memory', { method: 'GET' })
+    const data = await dataOrThrow<{ facts: string[] }>(response)
+    return Array.isArray(data.facts) ? data.facts : []
+  } catch {
+    return []
+  }
+}
+
+export async function savePatientMemory(facts: string[]): Promise<void> {
+  try {
+    await deviceFetch('/api/v1/assistant/memory', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ facts }),
+    })
+  } catch {
+    // best-effort; memory is soft continuity, never critical
+  }
+}
+
 function resolveTimezone(): string {
   try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC' } catch { return 'UTC' }
 }
