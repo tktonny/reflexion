@@ -24,6 +24,56 @@ monitoringRouter.get('/patients/:patientId/status', requireHuman, asyncHandler(a
   sendData(response, await computeCaregiverStatus(getPrincipal(request).tenantId, String(patient._id), String(patient.timezone || 'UTC')))
 }))
 
+const MAX_STATUS_BATCH = 25
+
+/**
+ * Batch form of the route above, for the caregiver dashboard.
+ *
+ * The dashboard shows every loved one at once and previously fired one request per patient on top of the
+ * list request — fine for one patient, wasteful for several, and every round trip is a cross-region hop for
+ * a Singapore caregiver.
+ *
+ * Every id keeps its OWN outcome, which matters more than it looks. An earlier version wrapped the whole
+ * per-id body in `catch { return null }` and returned only the successes, making three different things
+ * indistinguishable to the client: a patient the caller may not see, a patient with no monitoring record
+ * yet, and a genuine computation failure. The dashboard then counted a failed patient into no status bucket
+ * at all and rendered a confident "0 needs attention" — the exact thing its own comment forbids.
+ *
+ * So: `unavailable` when there is no monitoring record this caller may read (authorization and
+ * not-set-up-yet are deliberately NOT distinguished, so this cannot be used to probe another tenant), and
+ * `failed` for anything unexpected — which is logged, because 4xx/5xx bodies are not.
+ *
+ * Deliberately NOT mounted at `/patients/statuses`: patientsRouter is registered before this one and its
+ * `GET /patients/:patientId` would capture that path with patientId = "statuses".
+ */
+monitoringRouter.get('/patient-statuses', requireHuman, asyncHandler(async (request, response) => {
+  const raw = typeof request.query.ids === 'string' ? request.query.ids : ''
+  const ids = [...new Set(raw.split(',').map((id) => id.trim()).filter(Boolean))]
+  if (!ids.length) throw badRequest('VALIDATION_FAILED', 'At least one patient id is required.')
+  if (ids.length > MAX_STATUS_BATCH) {
+    throw badRequest('VALIDATION_FAILED', `At most ${MAX_STATUS_BATCH} patient ids may be requested at once.`)
+  }
+
+  const tenantId = getPrincipal(request).tenantId
+  const statuses = await Promise.all(ids.map(async (patientId) => {
+    let patient
+    try {
+      patient = await authorizePatient(request, patientId, 'monitoring:read')
+    } catch {
+      return { patientId, outcome: 'unavailable' as const, status: null }
+    }
+    try {
+      const status = await computeCaregiverStatus(tenantId, String(patient._id), String(patient.timezone || 'UTC'))
+      return { patientId, outcome: 'ok' as const, status }
+    } catch (error) {
+      console.error(`[patient-statuses] could not compute status for ${patientId}`, error)
+      return { patientId, outcome: 'failed' as const, status: null }
+    }
+  }))
+
+  sendData(response, statuses)
+}))
+
 monitoringRouter.post('/patients/:patientId/away-periods', requireHuman, asyncHandler(async (request, response) => {
   const result = await executeIdempotent(request, 'POST:/api/v1/patients/:patientId/away-periods', async () => {
     const patientId = request.params.patientId

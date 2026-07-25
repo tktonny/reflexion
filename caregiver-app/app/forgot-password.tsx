@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { apiSend } from '../src/lib/apiClient';
+import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../src/theme';
 
 // Reserved forgot-password request screen. The backend always accepts (no account enumeration); the
 // reset email itself is dormant until Postmark is configured on the server (launch-time).
@@ -45,11 +46,16 @@ export default function ForgotPasswordScreen() {
           <Text style={styles.title}>Reset password</Text>
           {sent ? (
             <>
-              <Text style={styles.subtitle}>
+              {/* The confirmation replaces the form in place, so it is announced rather than left silent. */}
+              <Text accessibilityLiveRegion="polite" style={styles.subtitle}>
                 If an account exists for that email, we’ve sent reset instructions. Open the link in the
                 email to set a new password.
               </Text>
-              <TouchableOpacity onPress={() => router.replace('/sign-in')} style={styles.primaryBtn}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={() => router.replace('/sign-in')}
+                style={styles.primaryBtn}
+              >
                 <Text style={styles.primaryText}>Back to sign in</Text>
               </TouchableOpacity>
             </>
@@ -58,19 +64,35 @@ export default function ForgotPasswordScreen() {
               <Text style={styles.subtitle}>Enter your caregiver email and we’ll send a link to reset your password.</Text>
               <Text style={styles.label}>Email</Text>
               <TextInput
+                accessibilityLabel="Email"
                 autoCapitalize="none"
                 autoComplete="email"
                 keyboardType="email-address"
                 onChangeText={setEmail}
                 placeholder="you@email.com"
-                placeholderTextColor="#B7ACA1"
+                placeholderTextColor={colors.placeholder}
                 style={styles.input}
+                // Autofill matters here: this screen is reached by someone who has already forgotten
+                // something, on a phone keyboard.
+                textContentType="emailAddress"
                 value={email}
               />
-              <TouchableOpacity disabled={submitting} onPress={submit} style={styles.primaryBtn}>
-                {submitting ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.primaryText}>Send reset link</Text>}
+              <TouchableOpacity
+                // Named explicitly because the spinner takes the visible text away while submitting.
+                accessibilityLabel="Send reset link"
+                accessibilityRole="button"
+                accessibilityState={{ busy: submitting, disabled: submitting }}
+                disabled={submitting}
+                onPress={submit}
+                style={styles.primaryBtn}
+              >
+                {submitting ? <ActivityIndicator color={colors.text.onAccent} /> : <Text style={styles.primaryText}>Send reset link</Text>}
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => router.replace('/sign-in')} style={styles.linkBtn}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={() => router.replace('/sign-in')}
+                style={styles.linkBtn}
+              >
                 <Text style={styles.linkText}>Back to sign in</Text>
               </TouchableOpacity>
             </>
@@ -82,21 +104,28 @@ export default function ForgotPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#F8F3EC' },
+  safe: { flex: 1, backgroundColor: colors.surface.page },
   keyboard: { flex: 1, justifyContent: 'center', padding: 24 },
-  card: { backgroundColor: '#FFFFFF', borderColor: '#E7DED2', borderRadius: 18, borderWidth: 1, padding: 24 },
-  title: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 34, fontWeight: '500' },
-  subtitle: { color: '#8F867D', fontSize: 16, lineHeight: 23, marginBottom: 24, marginTop: 8 },
-  label: { color: '#756C64', fontSize: 14, fontWeight: '700', marginBottom: 8, marginTop: 14 },
+  card: {
+    backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: 18,
+    borderWidth: 1, padding: 24,
+  },
+  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 34, fontWeight: '500' },
+  subtitle: { color: colors.text.secondary, fontSize: 16, lineHeight: 23, marginBottom: 24, marginTop: spacing.sm },
+  label: {
+    color: colors.text.secondary, fontSize: fontSize.bodyLarge, fontWeight: '700',
+    marginBottom: spacing.sm, marginTop: 14,
+  },
   input: {
-    backgroundColor: '#FBF8F4', borderColor: '#E7DED2', borderRadius: 12, borderWidth: 1,
-    color: '#2B2522', fontSize: 16, paddingHorizontal: 14, paddingVertical: 12,
+    backgroundColor: colors.surface.input, borderColor: colors.border.default, borderRadius: 12, borderWidth: 1,
+    color: colors.text.primary, fontSize: 16, paddingHorizontal: 14, paddingVertical: spacing.md,
   },
   primaryBtn: {
-    alignItems: 'center', backgroundColor: '#87566A', borderRadius: 14, justifyContent: 'center',
+    alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.lg, justifyContent: 'center',
     marginTop: 24, minHeight: 50,
   },
-  primaryText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  linkBtn: { alignItems: 'center', marginTop: 18 },
-  linkText: { color: '#87566A', fontSize: 15, fontWeight: '700' },
+  primaryText: { color: colors.text.onAccent, fontSize: 16, fontWeight: '700' },
+  // 44pt: the text link is only ~20pt tall on its own, which is an easy miss one-handed.
+  linkBtn: { alignItems: 'center', justifyContent: 'center', marginTop: 18, minHeight: MIN_TOUCH_TARGET },
+  linkText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
 });

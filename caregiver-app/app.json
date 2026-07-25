@@ -3,21 +3,23 @@
     "name": "Reflexion",
     "slug": "reflexion-app",
     "scheme": "reflexion",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tarinpairor.reflexionapp",
+      "bundleIdentifier": "com.reflexion.caregiver",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Reflexion uses the camera so you can take a photo for an elderly profile.",
         "NSPhotoLibraryUsageDescription": "Reflexion needs photo access so you can choose a photo for an elderly profile.",
         "NSPhotoLibraryAddUsageDescription": "Reflexion may save a chosen profile photo to your library."
-      }
+      },
+      "buildNumber": "4"
     },
     "android": {
+      "allowBackup": false,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -25,10 +27,11 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.tarinpairor.reflexionapp"
+      "package": "com.reflexion.caregiver",
+      "versionCode": 4
     },
     "web": {
-      "output": "server",
+      "output": "static",
       "favicon": "./assets/favicon.png"
     },
     "plugins": [

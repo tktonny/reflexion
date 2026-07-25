@@ -1,9 +1,11 @@
 import * as FileSystem from 'expo-file-system/legacy';
-import { Platform } from 'react-native';
+import { getWebStorage, migrateLegacyPlaintextFile, secureDelete, secureGet, secureSet } from './secureStorage';
 
 // v1 human JWT session (see reflexion-implementation-baseline.md §5). Stored ALONGSIDE the legacy
-// AuthSession — this holds the tokens the /api/v1 status/flag/away routes require. Storage mirrors
-// authSession.ts exactly: localStorage on web, an app-document file on native, with a memory cache.
+// AuthSession — this holds the tokens the /api/v1 status/flag/away/notification routes require. Storage
+// mirrors authSession.ts exactly: the OS keystore on native, localStorage on web, with a memory cache.
+// This session carries the 30-day rotating refresh token, which is why it must never sit in a plaintext
+// file (see secureStorage.ts).
 
 export type V1Actor = {
   userId: string;
@@ -22,18 +24,12 @@ export type V1Session = {
 };
 
 const V1_SESSION_KEY = 'reflexion.v1Session';
-const V1_SESSION_FILE = FileSystem.documentDirectory
+// Where builds before the SecureStore migration kept this session in plaintext.
+const LEGACY_V1_SESSION_FILE = FileSystem.documentDirectory
   ? `${FileSystem.documentDirectory}reflexion-v1-session.json`
   : '';
 
 let memorySession: V1Session | null = null;
-
-function getStorage(): Storage | null {
-  if (typeof globalThis === 'undefined') {
-    return null;
-  }
-  return (globalThis as typeof globalThis & { localStorage?: Storage }).localStorage ?? null;
-}
 
 function parseSession(raw: string | null | undefined): V1Session | null {
   if (!raw) {
@@ -66,7 +62,7 @@ export function getV1Session(): V1Session | null {
   if (memorySession) {
     return memorySession;
   }
-  const storage = getStorage();
+  const storage = getWebStorage();
   if (!storage) {
     return memorySession;
   }
@@ -81,29 +77,20 @@ export function hasV1Session(): boolean {
 // Native cold-start hydration (mirrors loadStoredAuthSession). Call once on app boot before any v1 read.
 export async function loadV1Session(): Promise<V1Session | null> {
   const existing = getV1Session();
-  if (existing || Platform.OS === 'web' || !V1_SESSION_FILE) {
+  if (existing) {
     return existing;
   }
-  try {
-    const raw = await FileSystem.readAsStringAsync(V1_SESSION_FILE);
-    memorySession = parseSession(raw);
+  memorySession = parseSession(await secureGet(V1_SESSION_KEY));
+  if (memorySession) {
     return memorySession;
-  } catch {
-    return null;
   }
+  memorySession = parseSession(await migrateLegacyPlaintextFile(V1_SESSION_KEY, LEGACY_V1_SESSION_FILE));
+  return memorySession;
 }
 
 export async function setV1Session(session: V1Session): Promise<void> {
   memorySession = session;
-  const serialized = JSON.stringify(session);
-  const storage = getStorage();
-  if (storage) {
-    storage.setItem(V1_SESSION_KEY, serialized);
-    return;
-  }
-  if (Platform.OS !== 'web' && V1_SESSION_FILE) {
-    await FileSystem.writeAsStringAsync(V1_SESSION_FILE, serialized);
-  }
+  await secureSet(V1_SESSION_KEY, JSON.stringify(session));
 }
 
 // Persist rotated tokens after a refresh, keeping the existing actor.
@@ -122,12 +109,5 @@ export async function updateV1Tokens(tokens: {
 
 export async function clearV1Session(): Promise<void> {
   memorySession = null;
-  const storage = getStorage();
-  if (storage) {
-    storage.removeItem(V1_SESSION_KEY);
-    return;
-  }
-  if (Platform.OS !== 'web' && V1_SESSION_FILE) {
-    await FileSystem.deleteAsync(V1_SESSION_FILE, { idempotent: true });
-  }
+  await secureDelete(V1_SESSION_KEY);
 }

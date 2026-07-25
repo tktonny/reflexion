@@ -16,8 +16,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
+import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
 import { apiGet, apiSend } from '../../src/lib/apiClient';
 import { getStoredAuthSession } from '../../src/lib/authSession';
+import { invalidateCaregiverConfig } from '../../src/lib/queryKeys';
+import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../../src/theme';
 
 type MirrorPatient = {
   patientId: string;
@@ -25,6 +28,11 @@ type MirrorPatient = {
   mirrorName: string;
   timezone: string;
 };
+
+// Four different situations, four different things to say. This screen used to show one loading card and
+// then the headline "Patient not found", so a failed request read as news about the person instead of a
+// connection problem — and a signed-out session looked the same as an empty list.
+type PairingState = 'loading' | 'signed-out' | 'failed' | 'no-match' | 'ready';
 
 export default function AddMirrorConnectionScreen() {
   const router = useRouter();
@@ -35,6 +43,7 @@ export default function AddMirrorConnectionScreen() {
   const [pairingCode, setPairingCode] = useState('');
   const [timezone, setTimezone] = useState('Asia/Singapore');
   const [scanning, setScanning] = useState(false);
+  const [cameraNotice, setCameraNotice] = useState('');
   const [permission, requestPermission] = useCameraPermissions();
   const mirrorsQuery = useQuery({
     enabled: Boolean(session?.nurseId),
@@ -61,7 +70,7 @@ export default function AddMirrorConnectionScreen() {
     }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.nurseId || ''] });
-      await queryClient.invalidateQueries({ queryKey: ['latestConfig'] });
+      await invalidateCaregiverConfig(queryClient);
       router.replace('/mirror-management');
     },
     onError: (err) => {
@@ -74,6 +83,21 @@ export default function AddMirrorConnectionScreen() {
     () => patients.find((candidate) => candidate.patientId === params.patientId) || null,
     [params.patientId, patients],
   );
+
+  // Usable cached data outranks a stale error. This list shares its cache key with the mirror list this
+  // screen is opened from, and it refetches on every focus, so a single failed background refetch would
+  // otherwise replace the whole pairing form — mirror name, the code the caregiver has already typed, the
+  // Scan QR button — with an error card, even though everything needed to pair is right there and the
+  // POST would still succeed.
+  const pairingState: PairingState = !session?.nurseId
+    ? 'signed-out'
+    : patient
+      ? 'ready'
+      : mirrorsQuery.isLoading
+        ? 'loading'
+        : mirrorsQuery.error
+          ? 'failed'
+          : 'no-match';
 
   useEffect(() => {
     if (!patient) return;
@@ -122,10 +146,17 @@ export default function AddMirrorConnectionScreen() {
   }
 
   async function openScanner() {
+    setCameraNotice('');
     if (!permission?.granted) {
       const res = await requestPermission();
       if (!res.granted) {
-        Alert.alert('Camera needed', 'Allow camera access to scan the mirror QR.');
+        // A declined camera prompt left the screen unchanged behind a one-line alert, so the caregiver was
+        // stuck with no visible way forward. Say it calmly on the screen and point at the code they can type.
+        setCameraNotice(
+          res.canAskAgain
+            ? 'Scanning needs the camera, and it is not open yet. You can type the 6-digit code shown on the mirror instead.'
+            : 'Camera access for Reflexion is turned off in your phone settings. You can type the 6-digit code shown on the mirror instead.',
+        );
         return;
       }
     }
@@ -137,9 +168,12 @@ export default function AddMirrorConnectionScreen() {
     setScanning(false);
     const code = extractPairingCode(result.data);
     if (code.length !== 6) {
-      Alert.alert('QR not recognized', 'That QR did not contain a valid 6-digit pairing code.');
+      // Told on the screen rather than in an alert: this fires in the same tick as the scanner modal
+      // dismissing, and an alert raised mid-dismiss can be swallowed, leaving an unreadable QR silent.
+      setCameraNotice('That QR did not have a 6-digit pairing code in it. Try again, or type the code shown on the mirror.');
       return;
     }
+    setCameraNotice('');
     setPairingCode(formatPairingInput(code));
   }
 
@@ -147,8 +181,19 @@ export default function AddMirrorConnectionScreen() {
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={goBack}>
-            <Feather name="chevron-left" size={24} color="#87566A" />
+          <TouchableOpacity
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
+            onPress={goBack}
+            style={styles.backButton}
+          >
+            <Feather
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+              name="chevron-left"
+              size={24}
+              color={colors.accent}
+            />
           </TouchableOpacity>
           <View style={styles.headerTextBlock}>
             <Text style={styles.eyebrow}>Mirror pairing</Text>
@@ -156,17 +201,16 @@ export default function AddMirrorConnectionScreen() {
           </View>
         </View>
 
-        {mirrorsQuery.isLoading ? (
-          <View style={styles.card}>
-            <ActivityIndicator color="#87566A" />
-            <Text style={styles.loadingText}>Loading pairing details.</Text>
+        {pairingState !== 'ready' ? (
+          // Live region so retrying announces the new outcome instead of silently swapping the card.
+          <View accessibilityLiveRegion="polite">
+            <PairingPlaceholder
+              hasPatients={patients.length > 0}
+              onRetry={() => void mirrorsQuery.refetch()}
+              state={pairingState}
+            />
           </View>
-        ) : !patient ? (
-          <View style={styles.card}>
-            <Text style={styles.emptyTitle}>Patient not found</Text>
-            <Text style={styles.emptyText}>Go back and choose a patient from Manage linked mirrors.</Text>
-          </View>
-        ) : (
+        ) : patient ? (
           <>
             <View style={styles.infoBox}>
               <Text style={styles.infoTitle}>{patient.patientName}</Text>
@@ -178,40 +222,59 @@ export default function AddMirrorConnectionScreen() {
             <View style={styles.card}>
               <Label>Mirror name</Label>
               <TextInput
+                accessibilityLabel="Mirror name"
                 onChangeText={setMirrorName}
                 placeholder={`Mirror for ${patient.patientName}`}
-                placeholderTextColor="#B7ACA1"
+                placeholderTextColor={colors.placeholder}
                 style={styles.input}
                 value={mirrorName}
               />
 
               <Label>Mirror pairing code</Label>
               <TextInput
+                accessibilityLabel="Mirror pairing code, 6 digits"
                 keyboardType="number-pad"
                 maxLength={7}
                 onChangeText={(value) => setPairingCode(formatPairingInput(value))}
                 placeholder="482 913"
-                placeholderTextColor="#B7ACA1"
+                placeholderTextColor={colors.placeholder}
                 style={styles.input}
                 value={pairingCode}
               />
 
-              <TouchableOpacity onPress={() => void openScanner()} style={styles.scanButton}>
-                <Feather name="camera" size={17} color="#87566A" />
+              <TouchableOpacity
+                accessibilityLabel="Scan mirror QR"
+                accessibilityRole="button"
+                onPress={() => void openScanner()}
+                style={styles.scanButton}
+              >
+                <Feather
+                  accessibilityElementsHidden
+                  importantForAccessibility="no"
+                  name="camera"
+                  size={17}
+                  color={colors.accent}
+                />
                 <Text style={styles.scanButtonText}>Scan mirror QR</Text>
               </TouchableOpacity>
 
+              {cameraNotice ? (
+                <Text accessibilityLiveRegion="polite" style={styles.notice}>{cameraNotice}</Text>
+              ) : null}
+
               <Label>Mirror timezone</Label>
               <TextInput
+                accessibilityLabel="Mirror timezone"
                 autoCapitalize="none"
                 onChangeText={setTimezone}
                 placeholder="Asia/Singapore"
-                placeholderTextColor="#B7ACA1"
+                placeholderTextColor={colors.placeholder}
                 style={styles.input}
                 value={timezone}
               />
 
               <TouchableOpacity
+                accessibilityRole="button"
                 onPress={() =>
                   Alert.alert(
                     'Pairing instructions',
@@ -220,27 +283,42 @@ export default function AddMirrorConnectionScreen() {
                 }
                 style={styles.secondaryButton}
               >
-                <Feather name="help-circle" size={17} color="#87566A" />
+                <Feather
+                  accessibilityElementsHidden
+                  importantForAccessibility="no"
+                  name="help-circle"
+                  size={17}
+                  color={colors.accent}
+                />
                 <Text style={styles.secondaryButtonText}>How pairing works</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
+                accessibilityLabel="Add connection"
+                accessibilityRole="button"
+                accessibilityState={{ busy: connectMirrorMutation.isPending, disabled: connectMirrorMutation.isPending }}
                 disabled={connectMirrorMutation.isPending}
                 onPress={() => void saveConnection()}
                 style={[styles.primaryButton, connectMirrorMutation.isPending && styles.disabledButton]}
               >
                 {connectMirrorMutation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
+                  <ActivityIndicator color={colors.text.onAccent} />
                 ) : (
                   <>
-                    <Feather name="link" size={18} color="#FFFFFF" />
+                    <Feather
+                      accessibilityElementsHidden
+                      importantForAccessibility="no"
+                      name="link"
+                      size={18}
+                      color={colors.text.onAccent}
+                    />
                     <Text style={styles.primaryButtonText}>Add connection</Text>
                   </>
                 )}
               </TouchableOpacity>
             </View>
           </>
-        )}
+        ) : null}
       </ScrollView>
       <Modal visible={scanning} animationType="slide" onRequestClose={() => setScanning(false)}>
         <View style={styles.scannerWrap}>
@@ -251,8 +329,16 @@ export default function AddMirrorConnectionScreen() {
             onBarcodeScanned={onScan}
           />
           <View style={styles.scannerOverlay}>
-            <Text style={styles.scannerHint}>Point at the mirror’s pairing QR</Text>
-            <TouchableOpacity onPress={() => setScanning(false)} style={styles.scannerCancel}>
+            {/* Announced when the scanner opens: a camera view is silent to a screen reader otherwise. */}
+            <Text accessibilityLiveRegion="polite" style={styles.scannerHint}>
+              Point at the mirror’s pairing QR
+            </Text>
+            <TouchableOpacity
+              accessibilityLabel="Cancel scanning"
+              accessibilityRole="button"
+              onPress={() => setScanning(false)}
+              style={styles.scannerCancel}
+            >
               <Text style={styles.scannerCancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -266,62 +352,117 @@ function Label({ children }: { children: React.ReactNode }) {
   return <Text style={styles.label}>{children}</Text>;
 }
 
+/**
+ * Nothing here ever renders the server's error text. A caregiver opening this screen is trying to reach
+ * their mother's mirror, and a raw string like "Not found" reads as news about her rather than about the
+ * request — so a failure is always framed as a connection problem with a way to try again.
+ */
+function PairingPlaceholder({
+  hasPatients,
+  onRetry,
+  state,
+}: {
+  hasPatients: boolean;
+  onRetry: () => void;
+  state: Exclude<PairingState, 'ready'>;
+}) {
+  if (state === 'loading') {
+    return <LoadingState title="Loading pairing details" message="Getting the mirror settings for this profile." />;
+  }
+
+  if (state === 'signed-out') {
+    return (
+      <EmptyState
+        icon="lock"
+        title="Sign in again to pair a mirror"
+        message="Your mirrors are kept private to your account. Signing out and back in will reconnect them."
+      />
+    );
+  }
+
+  if (state === 'failed') {
+    return (
+      <ErrorState
+        onRetry={onRetry}
+        title="We could not load the pairing details"
+        message="This is usually a connection problem, not something about your loved one. The mirror keeps its code on screen while you try again."
+      />
+    );
+  }
+
+  return (
+    <EmptyState
+      icon="users"
+      title={hasPatients ? 'We could not match this profile' : 'No profiles to pair yet'}
+      message={
+        hasPatients
+          ? 'Go back to Manage linked mirrors and choose who this mirror belongs to.'
+          : 'Add a loved one first, then come back here to pair their mirror.'
+      }
+    />
+  );
+}
+
 function formatPairingInput(value: string) {
   return value.replace(/\D/g, '').slice(0, 6).replace(/(\d{3})(\d{1,3})/, '$1 $2');
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#F8F3EC' },
+  safe: { flex: 1, backgroundColor: colors.surface.page },
   scroll: { flex: 1 },
-  content: { gap: 16, padding: 20, paddingBottom: 52 },
-  header: { alignItems: 'center', flexDirection: 'row', gap: 12, marginBottom: 4 },
+  content: { gap: spacing.lg, padding: spacing.xl, paddingBottom: 52 },
+  header: { alignItems: 'center', flexDirection: 'row', gap: spacing.md, marginBottom: spacing.xs },
   backButton: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
     borderRadius: 22,
     borderWidth: 1,
-    height: 44,
+    height: MIN_TOUCH_TARGET,
     justifyContent: 'center',
-    width: 44,
+    width: MIN_TOUCH_TARGET,
   },
   headerTextBlock: { flex: 1 },
   eyebrow: {
-    color: '#A69C92',
-    fontSize: 12,
+    color: colors.text.tertiary,
+    fontSize: fontSize.caption,
     fontWeight: '700',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
-  title: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 28, fontWeight: '500', marginTop: 4 },
+  title: {
+    color: colors.text.primary,
+    fontFamily: fontFamily.display,
+    fontSize: 28,
+    fontWeight: '500',
+    marginTop: spacing.xs,
+  },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
     borderRadius: 18,
     borderWidth: 1,
-    gap: 12,
+    gap: spacing.md,
     padding: 18,
   },
   infoBox: {
     backgroundColor: '#FFF6EA',
-    borderColor: '#E7DED2',
+    borderColor: colors.border.default,
     borderRadius: 18,
     borderWidth: 1,
-    gap: 8,
+    gap: spacing.sm,
     padding: 18,
   },
-  infoTitle: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 24, fontWeight: '500' },
-  infoText: { color: '#756C64', fontSize: 15, lineHeight: 22 },
-  loadingText: { color: '#756C64', fontSize: 15, textAlign: 'center' },
-  emptyTitle: { color: '#2B2522', fontFamily: 'Georgia', fontSize: 22, fontWeight: '500' },
-  emptyText: { color: '#756C64', fontSize: 15, lineHeight: 22 },
-  label: { color: '#756C64', fontSize: 13, fontWeight: '700', marginTop: 4 },
+  infoTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 24, fontWeight: '500' },
+  infoText: { color: colors.text.secondary, fontSize: fontSize.subheading, lineHeight: 22 },
+  label: { color: colors.text.secondary, fontSize: fontSize.body, fontWeight: '700', marginTop: spacing.xs },
+  notice: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: 19 },
   input: {
     backgroundColor: '#FFFDF8',
-    borderColor: '#D8CFC3',
+    borderColor: colors.border.strong,
     borderRadius: 12,
     borderWidth: 1,
-    color: '#2B2522',
+    color: colors.text.primary,
     fontSize: 18,
     fontWeight: '600',
     paddingHorizontal: 14,
@@ -329,38 +470,58 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     alignItems: 'center',
-    backgroundColor: '#87566A',
+    backgroundColor: colors.accent,
     borderRadius: 12,
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     justifyContent: 'center',
     minHeight: 48,
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
-  primaryButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
+  primaryButtonText: { color: colors.text.onAccent, fontSize: fontSize.subheading, fontWeight: '800' },
   secondaryButton: {
     alignItems: 'center',
-    borderColor: '#D8CFC3',
+    borderColor: colors.border.strong,
     borderRadius: 12,
     borderWidth: 1,
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     justifyContent: 'center',
     minHeight: 46,
   },
-  secondaryButtonText: { color: '#87566A', fontSize: 15, fontWeight: '700' },
+  secondaryButtonText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
   disabledButton: { opacity: 0.7 },
   scanButton: {
-    alignItems: 'center', borderColor: '#D8CFC3', borderRadius: 12, borderWidth: 1,
-    flexDirection: 'row', gap: 8, justifyContent: 'center', minHeight: 46,
+    alignItems: 'center', borderColor: colors.border.strong, borderRadius: 12, borderWidth: 1,
+    flexDirection: 'row', gap: spacing.sm, justifyContent: 'center', minHeight: 46,
   },
-  scanButtonText: { color: '#87566A', fontSize: 15, fontWeight: '700' },
+  scanButtonText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
+  // Opaque black behind the camera preview, not the shadow colour that happens to share its value.
   scannerWrap: { backgroundColor: '#000000', flex: 1 },
-  scannerOverlay: { alignItems: 'center', bottom: 48, gap: 16, left: 0, position: 'absolute', right: 0 },
-  scannerHint: {
-    backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 10, color: '#FFFFFF', fontSize: 15,
-    fontWeight: '700', overflow: 'hidden', paddingHorizontal: 14, paddingVertical: 8,
+  // Padded so the hint still has margins when it wraps to two or three lines at large system text sizes.
+  scannerOverlay: {
+    alignItems: 'center',
+    bottom: 48,
+    gap: spacing.lg,
+    left: 0,
+    paddingHorizontal: 24,
+    position: 'absolute',
+    right: 0,
   },
-  scannerCancel: { backgroundColor: '#FFFFFF', borderRadius: 10, paddingHorizontal: 28, paddingVertical: 12 },
-  scannerCancelText: { color: '#2B2522', fontSize: 15, fontWeight: '800' },
+  scannerHint: {
+    backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: radius.md, color: colors.text.onAccent,
+    fontSize: fontSize.subheading, fontWeight: '700', overflow: 'hidden', paddingHorizontal: 14,
+    paddingVertical: spacing.sm,
+  },
+  scannerCancel: {
+    alignItems: 'center',
+    backgroundColor: colors.surface.card,
+    borderRadius: radius.md,
+    justifyContent: 'center',
+    // Was ~43pt tall; the only escape from a full-screen camera must not be a near-miss tap.
+    minHeight: MIN_TOUCH_TARGET,
+    paddingHorizontal: spacing.xxl,
+    paddingVertical: spacing.md,
+  },
+  scannerCancelText: { color: colors.text.primary, fontSize: fontSize.subheading, fontWeight: '800' },
 });

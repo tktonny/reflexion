@@ -2,66 +2,32 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiSend } from '../src/lib/apiClient';
 import { getStoredAuthSession, setStoredAuthSession } from '../src/lib/authSession';
+import { caregiverConfigKey, refreshCaregiverConfig } from '../src/lib/queryKeys';
 import {
   getPushNotificationDeviceRegistration,
   registerPushNotificationDevice,
 } from '../src/lib/pushNotifications';
-
-type Relationship = 'parent' | 'sibling' | 'spouse' | 'inlaw' | 'grandpa' | 'grandma' | 'other';
-type Gender = 'male' | 'female' | 'other';
-type PreferredLanguage = 'english' | 'mandarin' | 'other';
-type Topic = 'family' | 'food' | 'travel' | 'work' | 'others';
-type AlertSensitivity =
-  | 'notify_me_about_everything'
-  | 'only_important_changes'
-  | 'only_urgent_alerts';
-type SummaryTime = '09:00' | '19:00';
-
-type AccountForm = {
-  name: string;
-  email: string;
-  password: string;
-  phoneNumber: string;
-  relationshipToElderly: Relationship;
-};
-
-type PatientForm = {
-  name: string;
-  phoneNumber: string;
-  age: string;
-  gender: Gender;
-  preferredLanguage: PreferredLanguage;
-  usualWakeTime: string;
-  speechOrHearingConditions: string;
-  photoUrl: string;
-  keyTopics: Topic[];
-  keyTopicsOtherText: string;
-  mirrorName: string;
-  mirrorPairingCode: string;
-  timezone: string;
-};
-
-type NotificationForm = {
-  pushNotificationsEnabled: boolean;
-  alertSensitivity: AlertSensitivity;
-  preferredDailySummaryTime: SummaryTime;
-};
+import { AccountStep } from '../src/screens/onboarding/AccountStep';
+import { ElderlyStep } from '../src/screens/onboarding/ElderlyStep';
+import { ExistingProfilesState } from '../src/screens/onboarding/ExistingProfilesState';
+import { MirrorStep } from '../src/screens/onboarding/MirrorStep';
+import { NotificationStep } from '../src/screens/onboarding/NotificationStep';
+import { blankPatient, getStepSubtitle, validateStep } from '../src/screens/onboarding/helpers';
+import type { AccountForm, NotificationForm, PatientForm } from '../src/screens/onboarding/types';
+import { colors, fontSize, radius, spacing } from '../src/theme';
 
 type LatestConfigResponse = {
   patients?: unknown[];
@@ -81,75 +47,6 @@ type AddPatientsResponse = {
 type CreateConfigVariables = {
   pushDeviceRegistration: Awaited<ReturnType<typeof getPushNotificationDeviceRegistration>> | null;
 };
-
-const RELATIONSHIP_OPTIONS: { value: Relationship; label: string }[] = [
-  { value: 'parent', label: 'Parent' },
-  { value: 'sibling', label: 'Sibling' },
-  { value: 'spouse', label: 'Spouse' },
-  { value: 'inlaw', label: 'In-law' },
-  { value: 'grandpa', label: 'Grandpa' },
-  { value: 'grandma', label: 'Grandma' },
-  { value: 'other', label: 'Other' },
-];
-
-const GENDER_OPTIONS: { value: Gender; label: string }[] = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
-  { value: 'other', label: 'Other' },
-];
-
-const LANGUAGE_OPTIONS: { value: PreferredLanguage; label: string }[] = [
-  { value: 'english', label: 'English' },
-  { value: 'mandarin', label: 'Mandarin' },
-  { value: 'other', label: 'Other' },
-];
-
-const TOPIC_OPTIONS: { value: Topic; label: string }[] = [
-  { value: 'family', label: 'Family' },
-  { value: 'food', label: 'Food' },
-  { value: 'travel', label: 'Travel' },
-  { value: 'work', label: 'Work' },
-  { value: 'others', label: 'Others' },
-];
-
-const ALERT_OPTIONS: { value: AlertSensitivity; label: string }[] = [
-  { value: 'notify_me_about_everything', label: 'Notify me about everything' },
-  { value: 'only_important_changes', label: 'Only important changes' },
-  { value: 'only_urgent_alerts', label: 'Only urgent alerts' },
-];
-
-const SUMMARY_OPTIONS: { value: SummaryTime; label: string }[] = [
-  { value: '09:00', label: 'Morning push at 9am' },
-  { value: '19:00', label: 'Evening push at 7pm' },
-];
-
-const PLACEHOLDER_TEXT_COLOR = '#B7ACA1';
-
-// Hermes builds without full Intl timezone data throw on resolvedOptions().timeZone. blankPatient runs
-// at mount (useState initializer), so an unguarded throw crashes the whole onboarding/sign-up screen.
-function deviceTimeZone(): string {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Singapore';
-  } catch {
-    return 'Asia/Singapore';
-  }
-}
-
-const blankPatient = (index: number): PatientForm => ({
-  name: '',
-  phoneNumber: '',
-  age: '',
-  gender: 'male',
-  preferredLanguage: 'english',
-  usualWakeTime: '07:30',
-  speechOrHearingConditions: '',
-  photoUrl: '',
-  keyTopics: ['family'],
-  keyTopicsOtherText: '',
-  mirrorName: `Mirror ${index + 1}`,
-  mirrorPairingCode: '',
-  timezone: deviceTimeZone(),
-});
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -183,6 +80,8 @@ export default function OnboardingScreen() {
   const canGoBack = isAddPatientMode || step > 1;
   const totalSteps = isAddPatientMode ? 2 : 4;
   const displayStep = isAddPatientMode ? step - 1 : step;
+  const isFinalStep = step === 4 || (isAddPatientMode && step === 3);
+  const nextLabel = isFinalStep ? 'Finish setup' : 'Continue';
   const stepTitle = useMemo(() => {
     if (isAddPatientMode && step === 2) return `Add elderly profile ${displayedPatientNumber}`;
     if (step === 1) return 'Account creation';
@@ -193,7 +92,7 @@ export default function OnboardingScreen() {
 
   const existingConfigQuery = useQuery({
     enabled: isAddPatientMode && Boolean(storedSession?.nurseId),
-    queryKey: ['latestConfig', storedSession?.nurseId || 'latest'],
+    queryKey: caregiverConfigKey(storedSession?.nurseId),
     queryFn: () =>
       apiGet<LatestConfigResponse>(
         `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(storedSession?.nurseId || '')}`,
@@ -216,6 +115,8 @@ export default function OnboardingScreen() {
     );
   }, [existingConfigQuery.data]);
 
+  // The raw error stays in the log only. What the caregiver sees is <ExistingProfilesState> below: the
+  // server string itself must never become on-screen copy.
   useEffect(() => {
     if (existingConfigQuery.error) {
       console.warn('[Onboarding] load existing patient count failed', existingConfigQuery.error);
@@ -285,52 +186,9 @@ export default function OnboardingScreen() {
     });
   }
 
-  function validateCurrentStep() {
-    if (step === 1) {
-      if (!account.name.trim() || !account.email.trim() || !account.password || !account.phoneNumber.trim()) {
-        return 'Enter your name, email, password, and phone number.';
-      }
-      if (!account.email.includes('@')) {
-        return 'Enter a valid email address.';
-      }
-      if (account.password.length < 8) {
-        return 'Use a password with at least 8 characters.';
-      }
-    }
-
-    if (step === 2) {
-      for (const patient of patients) {
-        if (!patient.name.trim() || !patient.age.trim() || !patient.usualWakeTime.trim()) {
-          return 'Each elderly profile needs a name, age, and usual wake time.';
-        }
-        const age = Number(patient.age);
-        if (!Number.isInteger(age) || age < 1 || age > 130) {
-          return 'Enter a valid age for each elderly profile.';
-        }
-        if (patient.keyTopics.length === 0) {
-          return 'Choose at least one topic for each elderly profile.';
-        }
-        if (patient.keyTopics.includes('others') && !patient.keyTopicsOtherText.trim()) {
-          return 'Add free text for any profile using the Others topic.';
-        }
-      }
-    }
-
-    if (step === 3) {
-      if (patients.some((patient) => !patient.mirrorName.trim())) {
-        return 'Give each mirror a name.';
-      }
-      if (patients.some((patient) => patient.mirrorPairingCode.trim() && patient.mirrorPairingCode.replace(/\D/g, '').length !== 6)) {
-        return 'Pairing codes must be 6 digits.';
-      }
-    }
-
-    return '';
-  }
-
   async function goNext() {
     setNotice(null);
-    const validationMessage = validateCurrentStep();
+    const validationMessage = validateStep(step, account, patients);
     if (validationMessage) {
       setNotice({ type: 'error', message: validationMessage });
       return;
@@ -379,17 +237,20 @@ export default function OnboardingScreen() {
         }
       }
 
-      await queryClient.invalidateQueries({ queryKey: ['latestConfig'] });
-      await queryClient.refetchQueries({ queryKey: ['latestConfig'], type: 'all' });
+      await refreshCaregiverConfig(queryClient);
       setNotice({
         type: 'success',
         message: `Created caregiver profile with ${body.patientCount || patients.length} elderly profile${body.patientCount === 1 ? '' : 's'}.`,
       });
       setTimeout(() => router.replace('/(tabs)'), 900);
     } catch (err) {
+      // The server's own words used to land here verbatim. Whatever it says, the caregiver gets calm copy
+      // plus the one thing they can act on; the detail goes to the log for us.
+      console.warn('[Onboarding] create caregiver profile failed', err);
       setNotice({
         type: 'error',
-        message: err instanceof Error ? err.message : 'Unable to create onboarding profile.',
+        message:
+          'We could not save your details just now. This is usually a connection problem. Please try again — or sign in instead if you already have an account.',
       });
     } finally {
       setIsSubmitting(false);
@@ -404,17 +265,18 @@ export default function OnboardingScreen() {
     try {
       const body = await addPatientsMutation.mutateAsync();
 
-      await queryClient.invalidateQueries({ queryKey: ['latestConfig'] });
-      await queryClient.refetchQueries({ queryKey: ['latestConfig'], type: 'all' });
+      await refreshCaregiverConfig(queryClient);
       setNotice({
         type: 'success',
         message: `Added ${body.patientCount || patients.length} loved one${body.patientCount === 1 ? '' : 's'}.`,
       });
       setTimeout(() => router.replace(addPatientReturnPath), 900);
     } catch (err) {
+      console.warn('[Onboarding] add loved one failed', err);
       setNotice({
         type: 'error',
-        message: err instanceof Error ? err.message : 'Unable to add loved one.',
+        message:
+          'We could not save this profile just now. This is usually a connection problem, not something about your loved one. Nothing you typed has been lost — please try again.',
       });
     } finally {
       setIsSubmitting(false);
@@ -430,11 +292,16 @@ export default function OnboardingScreen() {
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
             <Text style={styles.eyebrow}>Step {displayStep} of {totalSteps}</Text>
-            <Text style={styles.title}>{stepTitle}</Text>
+            <Text accessibilityRole="header" style={styles.title}>{stepTitle}</Text>
             <Text style={styles.subtitle}>{getStepSubtitle(step, displayedTotalPatientCount)}</Text>
           </View>
 
-          <View style={styles.progressTrack}>
+          {/* The eyebrow above already says "Step 2 of 4"; unlabelled bars would just add four announcements. */}
+          <View
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            style={styles.progressTrack}
+          >
             {Array.from({ length: totalSteps }, (_, index) => index + 1).map((item) => (
               <View
                 key={item}
@@ -444,11 +311,26 @@ export default function OnboardingScreen() {
           </View>
 
           {notice ? (
-            <View style={[styles.notice, notice.type === 'success' ? styles.noticeSuccess : styles.noticeError]}>
+            // Announced on Android without stealing focus — the notice appears after Continue is pressed,
+            // often far above the button the caregiver is still looking at.
+            <View
+              accessibilityLiveRegion="polite"
+              accessibilityRole={notice.type === 'error' ? 'alert' : 'text'}
+              style={[styles.notice, notice.type === 'success' ? styles.noticeSuccess : styles.noticeError]}
+            >
               <Text style={[styles.noticeText, notice.type === 'success' ? styles.noticeSuccessText : styles.noticeErrorText]}>
                 {notice.message}
               </Text>
             </View>
+          ) : null}
+
+          {isAddPatientMode ? (
+            <ExistingProfilesState
+              hasSession={Boolean(storedSession?.nurseId)}
+              isLoading={existingConfigQuery.isLoading}
+              hasError={Boolean(existingConfigQuery.error)}
+              onRetry={() => void refetchExistingConfig()}
+            />
           ) : null}
 
           {step === 1 ? (
@@ -484,6 +366,8 @@ export default function OnboardingScreen() {
 
         <View style={styles.navBar}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !canGoBack || isSubmitting }}
             disabled={!canGoBack || isSubmitting}
             onPress={() => {
               if (isAddPatientMode && step === 2) {
@@ -497,13 +381,20 @@ export default function OnboardingScreen() {
           >
             <Text style={styles.backBtnText}>{canGoBack ? 'Back' : 'Cancel'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity disabled={isSubmitting} style={styles.nextBtn} onPress={goNext}>
+          <TouchableOpacity
+            // While saving, the spinner replaces the only text in here, so without a label the primary
+            // button of the whole funnel announces nothing at all.
+            accessibilityLabel={isSubmitting ? 'Saving, please wait' : nextLabel}
+            accessibilityRole="button"
+            accessibilityState={{ busy: isSubmitting, disabled: isSubmitting }}
+            disabled={isSubmitting}
+            style={styles.nextBtn}
+            onPress={goNext}
+          >
             {isSubmitting ? (
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={colors.text.onAccent} />
             ) : (
-              <Text style={styles.nextBtnText}>
-                {step === 4 || (isAddPatientMode && step === 3) ? 'Finish setup' : 'Continue'}
-              </Text>
+              <Text style={styles.nextBtnText}>{nextLabel}</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -512,516 +403,41 @@ export default function OnboardingScreen() {
   );
 }
 
-function AccountStep({
-  account,
-  onSignIn,
-  setAccount,
-}: {
-  account: AccountForm;
-  onSignIn: () => void;
-  setAccount: React.Dispatch<React.SetStateAction<AccountForm>>;
-}) {
-  return (
-    <View>
-      <Label>Name</Label>
-      <TextInput
-        onChangeText={(name) => setAccount((current) => ({ ...current, name }))}
-        placeholder="e.g. Sarah Lim"
-        placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-        style={styles.input}
-        value={account.name}
-      />
-
-      <Label>Email</Label>
-      <TextInput
-        autoCapitalize="none"
-        autoComplete="email"
-        keyboardType="email-address"
-        onChangeText={(email) => setAccount((current) => ({ ...current, email }))}
-        placeholder="you@email.com"
-        placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-        style={styles.input}
-        value={account.email}
-      />
-
-      <Label>Password</Label>
-      <TextInput
-        autoCapitalize="none"
-        onChangeText={(password) => setAccount((current) => ({ ...current, password }))}
-        placeholder="Create a password"
-        placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-        secureTextEntry
-        style={styles.input}
-        value={account.password}
-      />
-
-      <Label>Phone number</Label>
-      <TextInput
-        keyboardType="phone-pad"
-        onChangeText={(phoneNumber) => setAccount((current) => ({ ...current, phoneNumber }))}
-        placeholder="+65 9123 4567"
-        placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-        style={styles.input}
-        value={account.phoneNumber}
-      />
-
-      <Label>I am caring for...</Label>
-      <OptionGrid
-        options={RELATIONSHIP_OPTIONS}
-        selected={account.relationshipToElderly}
-        onSelect={(relationshipToElderly) =>
-          setAccount((current) => ({ ...current, relationshipToElderly }))
-        }
-      />
-
-      <TouchableOpacity onPress={onSignIn} style={styles.signInLink}>
-        <Text style={styles.signInLinkText}>Have an account? Sign in!</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-function ElderlyStep({
-  addPatient,
-  patient,
-  patientIndex,
-  patientNumberOffset,
-  patients,
-  removePatient,
-  selectedPatientIndex,
-  setSelectedPatientIndex,
-  updatePatient,
-}: {
-  addPatient: () => void;
-  patient: PatientForm;
-  patientIndex: number;
-  patientNumberOffset: number;
-  patients: PatientForm[];
-  removePatient: (index: number) => void;
-  selectedPatientIndex: number;
-  setSelectedPatientIndex: (index: number) => void;
-  updatePatient: (index: number, updates: Partial<PatientForm>) => void;
-}) {
-  return (
-    <View>
-      <View style={styles.patientTabs}>
-        {patients.map((item, index) => (
-          <View
-            key={index}
-            style={[styles.patientTab, selectedPatientIndex === index && styles.patientTabActive]}
-          >
-            <TouchableOpacity
-              onPress={() => setSelectedPatientIndex(index)}
-              style={styles.patientTabLabel}
-            >
-              <Text style={[styles.patientTabText, selectedPatientIndex === index && styles.patientTabTextActive]}>
-                {item.name.trim() || `Person ${patientNumberOffset + index + 1}`}
-              </Text>
-            </TouchableOpacity>
-            {patients.length > 1 ? (
-              <TouchableOpacity
-                accessibilityLabel={`Remove ${item.name.trim() || `Person ${patientNumberOffset + index + 1}`}`}
-                onPress={() => removePatient(index)}
-                style={[styles.patientTabRemove, selectedPatientIndex === index && styles.patientTabRemoveActive]}
-              >
-                <Text style={[styles.patientTabRemoveText, selectedPatientIndex === index && styles.patientTabRemoveTextActive]}>
-                  ×
-                </Text>
-              </TouchableOpacity>
-            ) : null}
-          </View>
-        ))}
-        <TouchableOpacity onPress={addPatient} style={styles.addTab}>
-          <Text style={styles.addTabText}>+ Add</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Label>Name they like to be called</Label>
-      <TextInput
-        onChangeText={(name) => updatePatient(patientIndex, { name })}
-        placeholder="e.g. Grandpa Tan"
-        placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-        style={styles.input}
-        value={patient.name}
-      />
-
-      <Label>Phone number</Label>
-      <TextInput
-        keyboardType="phone-pad"
-        onChangeText={(phoneNumber) => updatePatient(patientIndex, { phoneNumber })}
-        placeholder="+65 9123 4567"
-        placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-        style={styles.input}
-        value={patient.phoneNumber}
-      />
-
-      <View style={styles.twoCol}>
-        <View style={styles.col}>
-          <Label>Age</Label>
-          <TextInput
-            keyboardType="number-pad"
-            onChangeText={(age) => updatePatient(patientIndex, { age })}
-            placeholder="82"
-            placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-            style={styles.input}
-            value={patient.age}
-          />
-        </View>
-        <View style={styles.col}>
-          <Label>Usual wake time</Label>
-          <TextInput
-            onChangeText={(usualWakeTime) => updatePatient(patientIndex, { usualWakeTime })}
-            placeholder="07:30"
-            placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-            style={styles.input}
-            value={patient.usualWakeTime}
-          />
-        </View>
-      </View>
-
-      <Label>Gender</Label>
-      <OptionGrid
-        options={GENDER_OPTIONS}
-        selected={patient.gender}
-        onSelect={(gender) => updatePatient(patientIndex, { gender })}
-      />
-
-      <Label>Preferred language</Label>
-      <OptionGrid
-        options={LANGUAGE_OPTIONS}
-        selected={patient.preferredLanguage}
-        onSelect={(preferredLanguage) => updatePatient(patientIndex, { preferredLanguage })}
-      />
-
-      <Label>Speech or hearing conditions</Label>
-      <TextInput
-        multiline
-        onChangeText={(speechOrHearingConditions) =>
-          updatePatient(patientIndex, { speechOrHearingConditions })
-        }
-        placeholder="Optional"
-        placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-        style={[styles.input, styles.textArea]}
-        value={patient.speechOrHearingConditions}
-      />
-
-      <Label>Photo upload</Label>
-      <PhotoInput
-        photoUrl={patient.photoUrl}
-        onChange={(photoUrl) => updatePatient(patientIndex, { photoUrl })}
-      />
-
-      <Label>Key topics they enjoy</Label>
-      <MultiOptionGrid
-        options={TOPIC_OPTIONS}
-        selected={patient.keyTopics}
-        onToggle={(topic) => {
-          const isSelected = patient.keyTopics.includes(topic);
-          const keyTopics = isSelected
-            ? patient.keyTopics.filter((item) => item !== topic)
-            : [...patient.keyTopics, topic];
-          updatePatient(patientIndex, { keyTopics });
-        }}
-      />
-
-      {patient.keyTopics.includes('others') ? (
-        <>
-          <Label>Other topics</Label>
-          <TextInput
-            onChangeText={(keyTopicsOtherText) => updatePatient(patientIndex, { keyTopicsOtherText })}
-            placeholder="Gardening, mahjong, music..."
-            placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-            style={styles.input}
-            value={patient.keyTopicsOtherText}
-          />
-        </>
-      ) : null}
-
-      {patients.length > 1 ? (
-        <TouchableOpacity onPress={() => removePatient(patientIndex)} style={styles.removeBtn}>
-          <Text style={styles.removeBtnText}>Remove this profile</Text>
-        </TouchableOpacity>
-      ) : null}
-    </View>
-  );
-}
-
-function MirrorStep({
-  patients,
-  updatePatient,
-}: {
-  patients: PatientForm[];
-  updatePatient: (index: number, updates: Partial<PatientForm>) => void;
-}) {
-  return (
-    <View>
-      <View style={styles.infoBox}>
-        <Text style={styles.infoTitle}>Mirror pairing</Text>
-        <Text style={styles.infoText}>
-          On the mirror, open setup and enter the 6-digit pairing code shown there. You can leave this blank and pair the mirror later from settings.
-        </Text>
-      </View>
-
-      {patients.map((patient, index) => (
-        <View key={index} style={styles.mirrorBlock}>
-          <Text style={styles.mirrorHeading}>{patient.name.trim() || `Person ${index + 1}`}</Text>
-          <Label>Mirror name</Label>
-          <TextInput
-            onChangeText={(mirrorName) => updatePatient(index, { mirrorName })}
-            placeholder={`Mirror ${index + 1} - Toa Payoh home`}
-            placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-            style={styles.input}
-            value={patient.mirrorName}
-          />
-          <Label>Mirror pairing code</Label>
-          <TextInput
-            keyboardType="number-pad"
-            maxLength={7}
-            onChangeText={(mirrorPairingCode) => updatePatient(index, { mirrorPairingCode })}
-            placeholder="482 913"
-            placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-            style={styles.input}
-            value={formatPairingInput(patient.mirrorPairingCode)}
-          />
-          <Label>Mirror timezone</Label>
-          <TextInput
-            autoCapitalize="none"
-            onChangeText={(timezone) => updatePatient(index, { timezone })}
-            placeholder="Asia/Singapore"
-            placeholderTextColor={PLACEHOLDER_TEXT_COLOR}
-            style={styles.input}
-            value={patient.timezone}
-          />
-          <TouchableOpacity
-            onPress={() => Alert.alert('Pairing instructions', 'Enter the code displayed on the mirror, or scan the mirror QR in the caregiver app once scanner support is enabled.')}
-            style={styles.testBtn}
-          >
-            <Text style={styles.testBtnText}>How pairing works</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
-    </View>
-  );
-}
-
-function NotificationStep({
-  notifications,
-  setNotifications,
-}: {
-  notifications: NotificationForm;
-  setNotifications: React.Dispatch<React.SetStateAction<NotificationForm>>;
-}) {
-  return (
-    <View>
-      <Label>Push notifications</Label>
-      <OptionGrid
-        options={[
-          { value: true, label: 'Enable (recommended)' },
-          { value: false, label: 'Disable' },
-        ]}
-        selected={notifications.pushNotificationsEnabled}
-        onSelect={(pushNotificationsEnabled) =>
-          setNotifications((current) => ({ ...current, pushNotificationsEnabled }))
-        }
-      />
-
-      <Label>Alert sensitivity</Label>
-      <OptionGrid
-        options={ALERT_OPTIONS}
-        selected={notifications.alertSensitivity}
-        onSelect={(alertSensitivity) =>
-          setNotifications((current) => ({ ...current, alertSensitivity }))
-        }
-      />
-
-      <Label>Preferred daily summary time</Label>
-      <OptionGrid
-        options={SUMMARY_OPTIONS}
-        selected={notifications.preferredDailySummaryTime}
-        onSelect={(preferredDailySummaryTime) =>
-          setNotifications((current) => ({ ...current, preferredDailySummaryTime }))
-        }
-      />
-    </View>
-  );
-}
-
-function PhotoInput({ photoUrl, onChange }: { photoUrl: string; onChange: (value: string) => void }) {
-  async function pickImage() {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert('Photo access needed', 'Allow photo library access to choose a profile photo.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.7,
-    });
-
-    if (!result.canceled && result.assets[0]?.uri) {
-      onChange(result.assets[0].uri);
-    }
-  }
-
-  if (Platform.OS === 'web') {
-    return (
-      <View style={styles.uploadBox}>
-        {photoUrl ? (
-          <Image source={{ uri: photoUrl }} style={styles.photoPreview} />
-        ) : null}
-        {React.createElement('input', {
-          accept: 'image/*',
-          type: 'file',
-          onChange: (event: { target?: { files?: FileList | null } }) => {
-            const file = event.target?.files?.[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = () => {
-              if (typeof reader.result === 'string') {
-                onChange(reader.result);
-              }
-            };
-            reader.readAsDataURL(file);
-          },
-        })}
-        <Text style={styles.uploadText}>
-          {photoUrl ? 'Photo selected' : 'Choose a photo for the dashboard card'}
-        </Text>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.uploadBox}>
-      {photoUrl ? (
-        <Image source={{ uri: photoUrl }} style={styles.photoPreview} />
-      ) : (
-        <View style={styles.photoPlaceholder}>
-          <Text style={styles.photoPlaceholderText}>No photo selected</Text>
-        </View>
-      )}
-      <TouchableOpacity activeOpacity={0.8} onPress={() => void pickImage()} style={styles.photoButton}>
-        <Text style={styles.photoButtonText}>{photoUrl ? 'Change photo' : 'Choose photo'}</Text>
-      </TouchableOpacity>
-      {photoUrl ? (
-        <TouchableOpacity activeOpacity={0.8} onPress={() => onChange('')} style={styles.clearPhotoButton}>
-          <Text style={styles.clearPhotoText}>Remove photo</Text>
-        </TouchableOpacity>
-      ) : null}
-    </View>
-  );
-}
-
-function formatPairingInput(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 6);
-  return digits.length > 3 ? `${digits.slice(0, 3)} ${digits.slice(3)}` : digits;
-}
-
-function OptionGrid<T extends string | boolean>({
-  options,
-  selected,
-  onSelect,
-}: {
-  options: { value: T; label: string }[];
-  selected: T;
-  onSelect: (value: T) => void;
-}) {
-  return (
-    <View style={styles.pillRow}>
-      {options.map((option) => {
-        const isSelected = option.value === selected;
-        return (
-          <TouchableOpacity
-            key={String(option.value)}
-            onPress={() => onSelect(option.value)}
-            style={[styles.pill, isSelected && styles.pillActive]}
-          >
-            <Text style={[styles.pillText, isSelected && styles.pillTextActive]}>
-              {option.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-}
-
-function MultiOptionGrid<T extends string>({
-  options,
-  selected,
-  onToggle,
-}: {
-  options: { value: T; label: string }[];
-  selected: T[];
-  onToggle: (value: T) => void;
-}) {
-  return (
-    <View style={styles.pillRow}>
-      {options.map((option) => {
-        const isSelected = selected.includes(option.value);
-        return (
-          <TouchableOpacity
-            key={option.value}
-            onPress={() => onToggle(option.value)}
-            style={[styles.pill, isSelected && styles.pillActive]}
-          >
-            <Text style={[styles.pillText, isSelected && styles.pillTextActive]}>
-              {option.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-}
-
-function Label({ children }: { children: React.ReactNode }) {
-  return <Text style={styles.label}>{children}</Text>;
-}
-
-function getStepSubtitle(step: number, patientCount: number) {
-  if (step === 1) return 'Set up the caregiver account details.';
-  if (step === 2) return `Add one or more elderly profiles. Current total: ${patientCount}.`;
-  if (step === 3) return 'Link each profile to the pairing code displayed on their mirror.';
-  return 'Choose alert and daily summary preferences.';
-}
-
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  safe: { flex: 1, backgroundColor: '#F8F3EC' },
-  content: { padding: 20, paddingBottom: 24 },
-  header: { marginBottom: 16 },
+  safe: { flex: 1, backgroundColor: colors.surface.page },
+  content: { padding: spacing.xl, paddingBottom: 24 },
+  header: { marginBottom: spacing.lg },
   eyebrow: {
-    color: '#87566A',
-    fontSize: 12,
+    color: colors.accent,
+    // "Step 2 of 4" is orientation, not decoration — 12pt uppercase was the smallest text on the screen.
+    fontSize: fontSize.caption,
     fontWeight: '800',
     textTransform: 'uppercase',
   },
-  title: { color: '#2B2522', fontSize: 27, fontWeight: '800', marginTop: 4 },
-  subtitle: { color: '#756C64', fontSize: 14, lineHeight: 20, marginTop: 6 },
+  title: { color: colors.text.primary, fontSize: 27, fontWeight: '800', marginTop: spacing.xs },
+  subtitle: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 20, marginTop: 6 },
   progressTrack: {
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     marginBottom: 18,
   },
   progressStep: {
-    backgroundColor: '#E7DED2',
-    borderRadius: 999,
+    backgroundColor: colors.border.default,
+    borderRadius: radius.pill,
     flex: 1,
     height: 6,
   },
-  progressStepActive: { backgroundColor: '#87566A' },
+  progressStepActive: { backgroundColor: colors.accent },
   notice: {
-    borderRadius: 8,
+    borderRadius: radius.sm,
     borderWidth: 1,
     marginBottom: 14,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
+  // The success/error notice tints are this screen's own pair and have no theme token; the error text
+  // reuses the brand accent.
   noticeSuccess: {
     backgroundColor: '#E6F9F0',
     borderColor: '#BFE8D2',
@@ -1031,7 +447,7 @@ const styles = StyleSheet.create({
     borderColor: '#E7C2CE',
   },
   noticeText: {
-    fontSize: 13,
+    fontSize: fontSize.body,
     fontWeight: '700',
     lineHeight: 18,
   },
@@ -1039,248 +455,21 @@ const styles = StyleSheet.create({
     color: '#1A7A4A',
   },
   noticeErrorText: {
-    color: '#87566A',
-  },
-  label: {
-    color: '#2B2522',
-    fontSize: 13,
-    fontWeight: '800',
-    marginBottom: 7,
-    marginTop: 16,
-  },
-  input: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#D8CFC3',
-    borderRadius: 8,
-    borderWidth: 1,
-    color: '#2B2522',
-    fontSize: 15,
-    minHeight: 48,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  textArea: {
-    minHeight: 84,
-    textAlignVertical: 'top',
-  },
-  twoCol: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  col: { flex: 1 },
-  pillRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  pill: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#D8CFC3',
-    borderRadius: 8,
-    borderWidth: 1,
-    paddingHorizontal: 13,
-    paddingVertical: 10,
-  },
-  pillActive: {
-    backgroundColor: '#87566A',
-    borderColor: '#87566A',
-  },
-  pillText: {
-    color: '#756C64',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  pillTextActive: { color: '#FFFFFF' },
-  signInLink: {
-    alignItems: 'center',
-    marginTop: 22,
-  },
-  signInLinkText: {
-    color: '#87566A',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  patientTabs: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 6,
-  },
-  patientTab: {
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderColor: '#D8CFC3',
-    borderRadius: 8,
-    borderWidth: 1,
-    flexDirection: 'row',
-    overflow: 'hidden',
-  },
-  patientTabActive: {
-    backgroundColor: '#2B2522',
-    borderColor: '#2B2522',
-  },
-  patientTabText: {
-    color: '#756C64',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  patientTabTextActive: { color: '#FFFFFF' },
-  patientTabLabel: {
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-  },
-  patientTabRemove: {
-    alignItems: 'center',
-    borderLeftColor: '#E7DED2',
-    borderLeftWidth: 1,
-    justifyContent: 'center',
-    minHeight: 36,
-    width: 34,
-  },
-  patientTabRemoveActive: {
-    borderLeftColor: 'rgba(255,255,255,0.22)',
-  },
-  patientTabRemoveText: {
-    color: '#87566A',
-    fontSize: 20,
-    fontWeight: '800',
-    lineHeight: 20,
-  },
-  patientTabRemoveTextActive: {
-    color: '#FFFFFF',
-  },
-  addTab: {
-    backgroundColor: '#EFE7DD',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-  },
-  addTabText: {
-    color: '#87566A',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  uploadBox: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#D8CFC3',
-    borderRadius: 8,
-    borderWidth: 1,
-    gap: 10,
-    padding: 14,
-  },
-  photoPreview: {
-    alignSelf: 'center',
-    backgroundColor: '#F4F0EA',
-    borderRadius: 12,
-    height: 132,
-    width: 132,
-  },
-  photoPlaceholder: {
-    alignItems: 'center',
-    alignSelf: 'center',
-    backgroundColor: '#F4F0EA',
-    borderColor: '#E7DED2',
-    borderRadius: 12,
-    borderWidth: 1,
-    height: 132,
-    justifyContent: 'center',
-    width: 132,
-  },
-  photoPlaceholderText: {
-    color: '#A69C92',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  photoButton: {
-    alignItems: 'center',
-    backgroundColor: '#87566A',
-    borderRadius: 8,
-    paddingVertical: 11,
-  },
-  photoButtonText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  clearPhotoButton: {
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  clearPhotoText: {
-    color: '#87566A',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  uploadText: {
-    color: '#756C64',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  removeBtn: {
-    alignSelf: 'flex-start',
-    marginTop: 18,
-    paddingVertical: 8,
-  },
-  removeBtnText: {
-    color: '#87566A',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  infoBox: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7DED2',
-    borderRadius: 8,
-    borderWidth: 1,
-    padding: 14,
-  },
-  infoTitle: {
-    color: '#2B2522',
-    fontSize: 14,
-    fontWeight: '800',
-    marginBottom: 4,
-  },
-  infoText: {
-    color: '#756C64',
-    fontSize: 13,
-    lineHeight: 19,
-  },
-  mirrorBlock: {
-    borderBottomColor: '#E7DED2',
-    borderBottomWidth: 1,
-    paddingBottom: 18,
-    paddingTop: 18,
-  },
-  mirrorHeading: {
-    color: '#2B2522',
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  testBtn: {
-    alignItems: 'center',
-    backgroundColor: '#2B2522',
-    borderRadius: 8,
-    marginTop: 12,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-  testBtnText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
+    color: colors.accent,
   },
   navBar: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderTopColor: '#E7DED2',
+    backgroundColor: colors.surface.card,
+    borderTopColor: colors.border.default,
     borderTopWidth: 1,
     flexDirection: 'row',
-    gap: 12,
-    padding: 16,
+    gap: spacing.md,
+    padding: spacing.lg,
   },
   backBtn: {
     alignItems: 'center',
-    borderColor: '#D8CFC3',
-    borderRadius: 8,
+    borderColor: colors.border.strong,
+    borderRadius: radius.sm,
     borderWidth: 1,
     flex: 1,
     minHeight: 48,
@@ -1290,21 +479,21 @@ const styles = StyleSheet.create({
     opacity: 0.45,
   },
   backBtnText: {
-    color: '#756C64',
-    fontSize: 15,
+    color: colors.text.secondary,
+    fontSize: fontSize.subheading,
     fontWeight: '800',
   },
   nextBtn: {
     alignItems: 'center',
-    backgroundColor: '#87566A',
-    borderRadius: 8,
+    backgroundColor: colors.accent,
+    borderRadius: radius.sm,
     flex: 2,
     minHeight: 48,
     justifyContent: 'center',
   },
   nextBtnText: {
-    color: '#FFFFFF',
-    fontSize: 15,
+    color: colors.text.onAccent,
+    fontSize: fontSize.subheading,
     fontWeight: '800',
   },
 });

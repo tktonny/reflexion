@@ -1,22 +1,25 @@
 import { Tabs } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import { colors, spacing, fontSize } from '../../src/theme';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#87566A',
-        tabBarInactiveTintColor: '#8D8278',
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.tabInactive,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E7DED2',
+          backgroundColor: colors.surface.card,
+          borderTopColor: colors.border.default,
           borderTopWidth: 1,
-          height: 72,
-          paddingBottom: 12,
-          paddingTop: 8,
+          // minHeight, not height: a fixed bar clips its own labels once the system font size is raised,
+          // which is the first setting an older caregiver changes.
+          minHeight: 72,
+          paddingBottom: spacing.md,
+          paddingTop: spacing.sm,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: fontSize.caption,
           fontWeight: '500',
         },
         headerShown: false,

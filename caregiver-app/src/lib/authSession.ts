@@ -1,5 +1,5 @@
 import * as FileSystem from 'expo-file-system/legacy';
-import { Platform } from 'react-native';
+import { getWebStorage, migrateLegacyPlaintextFile, secureDelete, secureGet, secureSet } from './secureStorage';
 
 export type AuthSession = {
   nurseId: string;
@@ -8,99 +8,77 @@ export type AuthSession = {
 };
 
 const AUTH_SESSION_KEY = 'reflexion.authSession';
-const AUTH_SESSION_FILE = FileSystem.documentDirectory
+// Where builds before the SecureStore migration kept this session in plaintext.
+const LEGACY_AUTH_SESSION_FILE = FileSystem.documentDirectory
   ? `${FileSystem.documentDirectory}reflexion-auth-session.json`
   : '';
 
 let memorySession: AuthSession | null = null;
 
-function getStorage() {
-  if (typeof globalThis === 'undefined') {
+function parseSession(raw: string | null | undefined): AuthSession | null {
+  if (!raw) {
     return null;
   }
-
-  return (globalThis as typeof globalThis & { localStorage?: Storage }).localStorage ?? null;
-}
-
-export function getStoredAuthSession(): AuthSession | null {
-  if (memorySession) {
-    return memorySession;
-  }
-
-  const storage = getStorage();
-  if (!storage) {
-    return memorySession;
-  }
-
-  const rawSession = storage.getItem(AUTH_SESSION_KEY);
-  if (!rawSession) {
-    return null;
-  }
-
   try {
-    const parsed = JSON.parse(rawSession) as Partial<AuthSession>;
+    const parsed = JSON.parse(raw) as Partial<AuthSession>;
     if (!parsed.nurseId || !parsed.email) {
       return null;
     }
-
     return {
       nurseId: parsed.nurseId,
       name: parsed.name || '',
       email: parsed.email,
     };
   } catch {
-    storage.removeItem(AUTH_SESSION_KEY);
     return null;
   }
+}
+
+/**
+ * Synchronous read for render bodies and route guards. Native storage is async, so this serves the
+ * in-memory copy that loadStoredAuthSession() hydrates once on boot; on web it reads localStorage
+ * directly. Callers must not treat a null here as "signed out" before hydration has run.
+ */
+export function getStoredAuthSession(): AuthSession | null {
+  if (memorySession) {
+    return memorySession;
+  }
+
+  const storage = getWebStorage();
+  if (!storage) {
+    return memorySession;
+  }
+
+  const raw = storage.getItem(AUTH_SESSION_KEY);
+  const parsed = parseSession(raw);
+  if (!parsed && raw) {
+    storage.removeItem(AUTH_SESSION_KEY);
+  }
+  return parsed;
 }
 
 export async function loadStoredAuthSession(): Promise<AuthSession | null> {
   const existingSession = getStoredAuthSession();
-  if (existingSession || Platform.OS === 'web' || !AUTH_SESSION_FILE) {
+  if (existingSession) {
     return existingSession;
   }
 
-  try {
-    const rawSession = await FileSystem.readAsStringAsync(AUTH_SESSION_FILE);
-    const parsed = JSON.parse(rawSession) as Partial<AuthSession>;
-    if (!parsed.nurseId || !parsed.email) {
-      return null;
-    }
-
-    memorySession = {
-      nurseId: parsed.nurseId,
-      name: parsed.name || '',
-      email: parsed.email,
-    };
+  memorySession = parseSession(await secureGet(AUTH_SESSION_KEY));
+  if (memorySession) {
     return memorySession;
-  } catch {
-    return null;
   }
+
+  // One-time move off the plaintext file an earlier build wrote.
+  memorySession = parseSession(await migrateLegacyPlaintextFile(AUTH_SESSION_KEY, LEGACY_AUTH_SESSION_FILE));
+  return memorySession;
 }
 
 export async function setStoredAuthSession(session: AuthSession) {
   memorySession = session;
-  const serializedSession = JSON.stringify(session);
-  const storage = getStorage();
-  if (storage) {
-    storage.setItem(AUTH_SESSION_KEY, serializedSession);
-    return;
-  }
-
-  if (Platform.OS !== 'web' && AUTH_SESSION_FILE) {
-    await FileSystem.writeAsStringAsync(AUTH_SESSION_FILE, serializedSession);
-  }
+  await secureSet(AUTH_SESSION_KEY, JSON.stringify(session));
 }
 
 export async function clearStoredAuthSession() {
   memorySession = null;
-  const storage = getStorage();
-  if (storage) {
-    storage.removeItem(AUTH_SESSION_KEY);
-    return;
-  }
-
-  if (Platform.OS !== 'web' && AUTH_SESSION_FILE) {
-    await FileSystem.deleteAsync(AUTH_SESSION_FILE, { idempotent: true });
-  }
+  await secureDelete(AUTH_SESSION_KEY);
 }

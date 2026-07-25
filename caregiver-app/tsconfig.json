@@ -2,5 +2,9 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true
-  }
+  },
+  // Test files are checked by tsconfig.test.json instead. The Expo base pins
+  // customConditions: ["react-native"], under which @types/node does not resolve, so keeping the two
+  // programs separate lets the app stay strictly React Native while the tests get Node's globals.
+  "exclude": ["**/*.test.ts", "**/*.test.tsx"]
 }
