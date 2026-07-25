@@ -55,14 +55,17 @@ export async function ensureV1TenantUser(db: Db, nurse: LegacyNurse): Promise<{ 
   await db.collection<any>(collections.users).updateOne(
     { _id: userId },
     {
-      $setOnInsert: { _id: userId, createdAt: now },
+      // passwordHash is seeded ONLY on insert. It used to be re-$set on every legacy sign-in, which copied the
+      // legacy hash over the v1 one — reverting a completed password reset. Both stores are now written
+      // together by the reset route (routes/auth/password-reset.ts), so they stay in step without this.
+      $setOnInsert: { _id: userId, createdAt: now, passwordHash: nurse.passwordHash || '' },
       $set: {
         // emailNormalized is the field v1 login (identity.ts POST /auth/sessions) matches on — WITHOUT it
         // a bridged caregiver can never obtain a v1 session (401 despite a correct password), which locks
         // every v1-gated screen behind "Sign in again". Keep it identical to `email` (lowercased).
         tenantId, name: nurse.name || '', email: (nurse.email || '').trim().toLowerCase(),
         emailNormalized: (nurse.email || '').trim().toLowerCase(),
-        passwordHash: nurse.passwordHash || '', phoneNumber: nurse.phoneNumber || '',
+        phoneNumber: nurse.phoneNumber || '',
         roles: ['caregiver', 'tenant_admin'], scopes: [], status: 'active',
         notificationPreferences: {
           pushNotificationsEnabled: nurse.pushNotificationsEnabled ?? true,
@@ -74,6 +77,27 @@ export async function ensureV1TenantUser(db: Db, nurse: LegacyNurse): Promise<{ 
     },
     { upsert: true },
   )
+  // Collapse duplicates so one email means one account.
+  //
+  // The hex-keyed row is canonical: its _id IS the legacy nurse's ObjectId, and every existing patient and
+  // care_relationship for this caregiver is keyed to its tenant. An older `usr_`-keyed row for the same email
+  // (created by an earlier code path, in its own tenant) is an interloper — but because the users unique index
+  // is per tenant, nothing stopped it existing, and every tenant-less email lookup in the codebase could
+  // return either one: v1 sign-in 401'd with the correct password, and a password-reset token could be minted
+  // against the wrong row entirely.
+  //
+  // Archived rather than deleted: this is a data repair inferred from shape, so it stays reversible.
+  const emailNormalized = (nurse.email || '').trim().toLowerCase()
+  if (emailNormalized) {
+    const collapsed = await db.collection<any>(collections.users).updateMany(
+      { emailNormalized, status: 'active', _id: { $ne: userId } },
+      { $set: { status: 'archived', archivedAt: now, archivedReason: 'duplicate_email_superseded_by_legacy_identity' } },
+    )
+    if (collapsed.modifiedCount) {
+      console.warn(`[bridge] archived ${collapsed.modifiedCount} duplicate v1 user(s) for ${emailNormalized}; canonical is ${userId}`)
+    }
+  }
+
   return { tenantId, userId }
 }
 

@@ -13,19 +13,47 @@ import { objectBody, requiredString } from '../platform/validation.js'
 import { appendOutbox } from '../platform/outbox.js'
 
 const ACCESS_TTL_SECONDS = 15 * 60
+/** Bounded so a pathological duplicate set cannot turn one sign-in into an unbounded scan. */
+const MAX_LOGIN_CANDIDATES = 10
+
 const REFRESH_TTL_MS = 30 * 24 * 60 * 60 * 1000
 
 export const identityRouter = Router()
 
+/**
+ * Sign in.
+ *
+ * Resolves the account by trying EVERY user with this email, not the first one Mongo happens to return.
+ * That matters because email is only unique per tenant (`{tenantId, emailNormalized}` in platform/indexes.ts)
+ * while this lookup is deliberately tenant-less — the caller does not know their tenant yet — and the legacy
+ * bridge gives every caregiver a private tenant. So one email CAN legitimately have several user documents,
+ * and a plain findOne picked one arbitrarily: for an account with a stale duplicate that meant a 401 with the
+ * correct password, and in the worst case signing someone into the wrong account and therefore another
+ * family's tenant.
+ *
+ * Candidates are ordered newest-first so a repeat login is stable, and the first whose password verifies wins.
+ */
 identityRouter.post('/auth/sessions', asyncHandler(async (request, response) => {
   const body = objectBody(request.body)
   const email = requiredString(body, 'email', 320).toLowerCase()
   const password = requiredString(body, 'password', 500)
   const db = await getDb()
-  const user = await db.collection<any>(collections.users).findOne({ emailNormalized: email, status: 'active' })
-  if (!user?.passwordHash || !verifyPassword(password, String(user.passwordHash))) {
+  const candidates = await db.collection<any>(collections.users)
+    .find({ emailNormalized: email, status: 'active' })
+    .sort({ updatedAt: -1, _id: 1 })
+    .limit(MAX_LOGIN_CANDIDATES)
+    .toArray()
+
+  const user = candidates.find((candidate) => candidate?.passwordHash && verifyPassword(password, String(candidate.passwordHash)))
+  if (!user) {
     throw new ApiError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect.')
   }
+  if (candidates.length > 1) {
+    // Not fatal — the right account was found — but duplicate users for one email are a data defect that
+    // will keep producing confusing behaviour until they are merged.
+    console.warn(`[auth] ${candidates.length} active users share ${email}; signed in as ${user._id} (tenant ${user.tenantId})`)
+  }
+
   const issued = await createHumanSession(user as HumanUser)
   sendData(response, { ...issued, actor: serializeActor(user as HumanUser) }, 201)
 }))
