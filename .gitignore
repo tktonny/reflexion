@@ -46,10 +46,12 @@ mirror-app/android/
 mirror-app/ios/
 
 # --- caregiver-app/ (Expo/RN) + reflexion-server/ (Express) ---
-caregiver-app/node_modules/
+# No trailing slash: ignore node_modules whether it is a real directory OR a symlink
+# (a symlink form slipped past the dir-only pattern and got committed once — see git history).
+caregiver-app/node_modules
 caregiver-app/.expo/
 caregiver-app/dist/
-reflexion-server/node_modules/
+reflexion-server/node_modules
 reflexion-server/dist/
 mirror-app/server/generated/
 
