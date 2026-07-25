@@ -166,4 +166,45 @@ test('the caregiver history read models work over v1 and enforce the care relati
     assert.deepEqual(strangerView.body.data.assignments, [])
     await app.get('/api/v1/device-assignments').expect(401)
   })
+
+  await t.test('the day summary handles a quiet day, a real transcript and a refused caller', async () => {
+    // The upstream model is stubbed: what is under test is the route's auth, validation and quiet-day
+    // handling, not OpenAI. A quiet day must be reported as such rather than as an empty string or an error.
+    const originalFetch = globalThis.fetch
+    process.env.OPENAI_API_KEY = 'test-key'
+    globalThis.fetch = (async (input: unknown, init?: unknown) => {
+      if (String(input).startsWith('https://api.openai.com/')) {
+        return Response.json({ choices: [{ message: { content: 'Mei Ling sounded bright and talked about sleeping well.' } }] })
+      }
+      return (originalFetch as typeof fetch)(input as never, init as never)
+    }) as typeof fetch
+
+    try {
+      const quiet = await app.post(`/api/v1/patients/${PATIENT_ID}/session-summaries`)
+        .set({ ...caregiver, 'Idempotency-Key': 'summary_quiet_day_000001' })
+        .send({ date: '2026-07-19' }).expect(200)
+      assert.equal(quiet.body.data.summary, null)
+      assert.equal(quiet.body.data.reason, 'no_transcript')
+
+      const written = await app.post(`/api/v1/patients/${PATIENT_ID}/session-summaries`)
+        .set({ ...caregiver, 'Idempotency-Key': 'summary_written_day_000001' })
+        .send({ date: day }).expect(200)
+      assert.match(written.body.data.summary, /Mei Ling/)
+      assert.equal(written.body.data.reason, null)
+
+      await app.post(`/api/v1/patients/${PATIENT_ID}/session-summaries`)
+        .set({ ...caregiver, 'Idempotency-Key': 'summary_bad_date_000001' })
+        .send({ date: '19-07-2026' }).expect(400)
+
+      // Reading what someone said needs the relationship, exactly like the day-detail route.
+      await app.post(`/api/v1/patients/${PATIENT_ID}/session-summaries`)
+        .set({ ...stranger, 'Idempotency-Key': 'summary_stranger_call_000001' })
+        .send({ date: day }).expect(403)
+      await app.post(`/api/v1/patients/${PATIENT_ID}/session-summaries`)
+        .set({ 'Idempotency-Key': 'summary_anonymous_call_000001' }).send({ date: day }).expect(401)
+    } finally {
+      globalThis.fetch = originalFetch
+      delete process.env.OPENAI_API_KEY
+    }
+  })
 })

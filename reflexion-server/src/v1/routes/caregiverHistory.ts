@@ -13,9 +13,12 @@ import {
   isV1SessionCompleted,
   serializeV1Session,
 } from '../../lib/v1Conversations.js'
+import { getOpenAIApiKey } from '../../lib/env.js'
 import { authorizePatient, requireActor } from '../platform/auth.js'
-import { badRequest } from '../platform/errors.js'
+import { ApiError, badRequest } from '../platform/errors.js'
 import { sendData } from '../platform/http.js'
+import { objectBody } from '../platform/validation.js'
+import { executeIdempotent } from '../platform/idempotency.js'
 
 /**
  * The session history a caregiver browses: a month calendar, one day in detail, and a duration trend.
@@ -146,4 +149,98 @@ function getSingaporeDayKey(date: Date): string {
   }).formatToParts(date)
   const value = Object.fromEntries(parts.map((part) => [part.type, part.value])) as Record<string, string>
   return `${value.year}-${value.month}-${value.day}`
+}
+
+const SUMMARY_MODEL = 'gpt-4o-mini'
+
+/**
+ * A short caregiver-facing summary of one day's conversation, generated on demand.
+ *
+ * The legacy /patient-summary route had no v1 equivalent — v1's /monitoring/summary is a different thing
+ * entirely (research baseline coverage), so this was the last screen action with nowhere to move to.
+ *
+ * Deliberately NOT persisted. The legacy route did not store it either, and generating on demand means the
+ * transcript is summarised only when a caregiver actually asks — which is also what makes the long-dead
+ * `storeSessionSummaries` toggle unnecessary rather than merely unimplemented.
+ *
+ * Gated on `session:read`, since it reads what the person said, and idempotent per key so a double tap does
+ * not bill two model calls.
+ */
+caregiverHistoryRouter.post('/patients/:patientId/session-summaries', requireHuman, asyncHandler(async (request, response) => {
+  type SummaryResult = { patientId: string; date: string; summary: string | null; reason: string | null }
+  const result = await executeIdempotent<SummaryResult>(request, 'POST:/api/v1/patients/:patientId/session-summaries', async () => {
+    const patientId = request.params.patientId
+    const patient = await authorizePatient(request, patientId, 'session:read')
+    const body = objectBody(request.body)
+    const date = 'date' in body ? String(body.date) : getSingaporeDayKey(new Date())
+    if (!DATE_PATTERN.test(date)) throw badRequest('VALIDATION_FAILED', 'date must be formatted YYYY-MM-DD.')
+
+    const { start, end } = getSingaporeDayBoundsFromKey(date)
+    const db = await getDb()
+    const sessions = await getV1SessionsForPatientRange(db, patientId, start, end)
+    const turnsBySession = await getV1TurnsBySession(db, sessions.map((session) => session._id))
+    const transcript = sessions
+      .flatMap((session) => turnsBySession.get(session._id) || [])
+      .map((turn) => `${turn.role === 'patient' ? 'Patient' : 'Aria'}: ${(turn.text || '').trim()}`)
+      .filter((line) => line.length > 9)
+      .join('\n')
+
+    if (!transcript) {
+      // Not an error: a quiet day is a normal outcome, and saying so beats an empty string.
+      return { status: 200, data: { patientId, date, summary: null, reason: 'no_transcript' } }
+    }
+
+    const summary = await summarizeTranscript(transcript, date, {
+      displayName: String(patient.displayName || ''),
+      preferredLanguage: String(patient.preferredLanguage || ''),
+      profile: (patient.profile || {}) as Record<string, unknown>,
+    })
+    return { status: 200, data: { patientId, date, summary, reason: null } }
+  })
+  sendData(response, result.data, result.status)
+}))
+
+async function summarizeTranscript(
+  transcript: string,
+  dateKey: string,
+  patient: { displayName: string; preferredLanguage: string; profile: Record<string, unknown> },
+): Promise<string> {
+  const details = [
+    `Name: ${patient.displayName || 'unknown'}`,
+    `Preferred language: ${patient.preferredLanguage || 'unknown'}`,
+    patient.profile.age ? `Age: ${patient.profile.age}` : null,
+    patient.profile.gender ? `Gender: ${patient.profile.gender}` : null,
+    patient.profile.speechSpeed ? `Speech speed: ${patient.profile.speechSpeed}` : null,
+  ].filter(Boolean).join('\n')
+
+  const upstream = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${getOpenAIApiKey()}`, 'content-type': 'application/json' },
+    body: JSON.stringify({
+      model: SUMMARY_MODEL,
+      temperature: 0.2,
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You summarize elderly-care voice companion conversations for a caregiver. Be factual, concise, '
+            + 'and never diagnostic — no conditions, scores, stages or clinical language. Use the patient '
+            + 'details only to interpret context and personalise wording; never invent facts. Mention mood, '
+            + 'notable topics, and whether anything may be worth following up on.',
+        },
+        {
+          role: 'user',
+          content: `Date: ${dateKey}\n\nPatient details:\n${details}\n\nTranscript:\n${transcript}\n\n`
+            + 'Write a 2-4 sentence caregiver summary.',
+        },
+      ],
+    }),
+  })
+  const payload = await upstream.json().catch(() => null) as { choices?: { message?: { content?: string } }[]; error?: { message?: string } } | null
+  if (!upstream.ok) {
+    // The upstream message can carry account/billing detail, so it is logged rather than returned.
+    console.error('[session-summaries] upstream summary failed', payload?.error?.message || upstream.status)
+    throw new ApiError(502, 'SUMMARY_UNAVAILABLE', 'The summary could not be generated just now.', true)
+  }
+  return payload?.choices?.[0]?.message?.content?.trim() || 'No summary generated.'
 }
