@@ -119,7 +119,29 @@ async function main() {
   const backfilled = consents.filter((consent) => consent.documentVersion === 'legacy-onboarding-backfill-v1').length
   if (backfilled) console.log(`  (${backfilled} consent(s) are already marked as backfills)`)
 
-  heading('4. Collections the migration will touch')
+  heading('4. The authorization boundary (all three must read 0 after the migration)')
+  // A caregiver's authority must come from care_relationships alone. `tenant_admin` makes authorizePatient
+  // return before it reads the relationship, unfilters GET /patients, and opens the clinical review queue
+  // and providerDetail, so any non-operator holding it is a caregiver with operator reach.
+  const strayAdmins = users.filter((user) => user.status === 'active'
+    && (user.roles || []).includes('tenant_admin')
+    && !(user.roles || []).some((role) => role === 'operator' || role === 'provider'))
+  console.log(`caregivers still holding tenant_admin:   ${strayAdmins.length}`)
+  for (const user of strayAdmins.slice(0, 10)) console.log(`     ${String(user._id)}  ${user.email || '(no email)'}  roles=[${(user.roles || []).join(',')}]`)
+
+  // These two were missing from hand-written scope lists. Without session:read the check-in history screens
+  // 403; without device:assign the caregiver cannot pair the mirror.
+  const REQUIRED_SCOPES = ['patient:read', 'patient:write', 'device:assign', 'care_plan:read', 'care_plan:write', 'monitoring:read', 'session:read']
+  const shortScoped = relationships.filter((relationship) =>
+    REQUIRED_SCOPES.some((scope) => !(relationship.scopes || []).includes(scope)))
+  console.log(`relationships missing a needed scope:    ${shortScoped.length}`)
+  for (const relationship of shortScoped.slice(0, 10)) {
+    const missing = REQUIRED_SCOPES.filter((scope) => !(relationship.scopes || []).includes(scope))
+    console.log(`     ${String(relationship._id)}  patient=${relationship.patientId}  missing=[${missing.join(',')}]`)
+  }
+  console.log(`patients without a check-in consent:     ${blocked.length}   (repeated from section 3)`)
+
+  heading('5. Collections the migration will touch')
   for (const name of ['users', 'tenants', 'patients', 'care_relationships', 'consents', 'care_plans', 'notification_devices']) {
     const count = await db.collection(name).countDocuments().catch(() => 'n/a')
     console.log(`  ${name.padEnd(22)} ${count}`)
@@ -129,7 +151,7 @@ async function main() {
   console.log('  1. mongodump the users, consents, patients and care_plans collections (the dedupe changes status).')
   console.log('  2. npm run db:indexes')
   console.log('  3. npm run migrate:legacy-v1   (idempotent; prints how many consents it backfilled)')
-  console.log('  4. Re-run this script — section 3 should show 0 patients without consent.')
+  console.log('  4. Re-run this script — sections 3 and 4 should read 0 across the board.')
 
   await client.close()
 }
