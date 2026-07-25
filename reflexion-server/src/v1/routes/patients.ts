@@ -14,6 +14,12 @@ const DEFAULT_RELATIONSHIP_SCOPES = [
   'patient:read', 'patient:write', 'device:assign', 'care_plan:read', 'care_plan:write', 'monitoring:read',
 ]
 
+/**
+ * The consent purpose a daily check-in is gated on. Kept here next to the consent routes and imported by
+ * the session route, so the gate and the thing that reports on the gate cannot drift apart.
+ */
+export const DAILY_CHECKIN_CONSENT_PURPOSE = 'home_cognitive_monitoring'
+
 export const patientsRouter = Router()
 const requireHuman = requireActor('human')
 
@@ -111,6 +117,39 @@ patientsRouter.get('/patients/:patientId/care-relationships', requireHuman, asyn
     tenantId: principal.tenantId, patientId, status: 'active',
   }).project({ tenantId: 0 }).toArray()
   sendData(response, rows.map(({ _id, ...row }) => ({ relationshipId: _id, ...row })))
+}))
+
+/**
+ * Whether this loved one has an active consent, and for what.
+ *
+ * There was no way to ask. That mattered because consent is a HARD gate, not bookkeeping:
+ * POST /sessions throws 403 CONSENT_REQUIRED for a `daily_checkin` without a granted
+ * `home_cognitive_monitoring` consent (routes/sessions.ts consentForSession), and the monitoring pipeline
+ * excludes any session lacking a consentRef (monitoring/pipeline.ts evaluateConsent). Since no
+ * patient-creation path has ever written a consent, the daily check-in — the product's core function —
+ * cannot start, and the caregiver app could not even detect why.
+ *
+ * `requiredPurposes` is returned so a client does not have to hard-code which consent gates check-ins.
+ */
+patientsRouter.get('/patients/:patientId/consents', requireHuman, asyncHandler(async (request, response) => {
+  const patientId = request.params.patientId
+  await authorizePatient(request, patientId, 'patient:read')
+  const principal = getPrincipal(request)
+  const rows = await (await getDb()).collection<any>(collections.consents)
+    .find({ tenantId: principal.tenantId, patientId })
+    .sort({ signedAt: -1, _id: -1 })
+    .limit(50)
+    .toArray()
+  const granted = rows.filter((row) => row.status === 'granted' && !row.withdrawnAt)
+  sendData(response, {
+    patientId,
+    consents: rows.map(serializeConsent),
+    /** Purposes a daily check-in requires. Missing any of these means check-ins cannot run. */
+    requiredPurposes: [DAILY_CHECKIN_CONSENT_PURPOSE],
+    missingPurposes: [DAILY_CHECKIN_CONSENT_PURPOSE].filter(
+      (purpose) => !granted.some((row) => row.purpose === purpose),
+    ),
+  })
 }))
 
 patientsRouter.post('/patients/:patientId/consents', requireHuman, asyncHandler(async (request, response) => {

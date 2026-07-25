@@ -43,6 +43,52 @@ export type LegacyPatient = {
 }
 
 /** Idempotently upsert the v1 tenant + user for a legacy nurse. Returns { tenantId, userId }. */
+/**
+ * Document version stamped on a consent this code inferred rather than asked for.
+ *
+ * A real consent record answers "who agreed, when, to what document". A backfilled one cannot — nobody was
+ * asked, because no onboarding flow has ever had a consent step. Marking it keeps the two distinguishable
+ * forever: `db.consents.find({ documentVersion: 'legacy-onboarding-backfill-v1' })` is exactly the set that
+ * was assumed, so it can be audited, re-confirmed or revoked later without guessing.
+ */
+export const BACKFILL_CONSENT_DOCUMENT_VERSION = 'legacy-onboarding-backfill-v1'
+
+/** The purpose a daily check-in is gated on. Must match v1/routes/patients.ts DAILY_CHECKIN_CONSENT_PURPOSE. */
+const CHECKIN_CONSENT_PURPOSE = 'home_cognitive_monitoring'
+
+/**
+ * Ensures the patient has the consent a daily check-in requires, creating a marked backfill if not.
+ *
+ * Why this is needed at all: consent is a HARD gate, not bookkeeping. POST /sessions returns 403
+ * CONSENT_REQUIRED for a `daily_checkin` without a granted consent, and the monitoring pipeline excludes
+ * any session lacking a consentRef. No patient-creation path has ever written one, so the daily check-in —
+ * the product's core function — could never start, and the mirror surfaced only a generic error.
+ *
+ * Idempotent: an existing granted consent (backfilled or real) is left exactly as it is.
+ */
+export async function ensureCheckInConsent(
+  db: Db,
+  input: { tenantId: string; patientId: string; actorId: string },
+): Promise<'created' | 'present'> {
+  const existing = await db.collection<any>(collections.consents).findOne({
+    tenantId: input.tenantId, patientId: input.patientId,
+    purpose: CHECKIN_CONSENT_PURPOSE, status: 'granted', withdrawnAt: null,
+  })
+  if (existing) return 'present'
+
+  const now = new Date()
+  await db.collection<any>(collections.consents).insertOne({
+    _id: newId('con'), tenantId: input.tenantId, patientId: input.patientId,
+    purpose: CHECKIN_CONSENT_PURPOSE, documentVersion: BACKFILL_CONSENT_DOCUMENT_VERSION,
+    status: 'granted', signedAt: now, withdrawnAt: null,
+    actorId: input.actorId,
+    // Queryable provenance, so a backfilled record is never mistaken for one a caregiver actually gave.
+    source: 'legacy_onboarding_backfill',
+    createdAt: now,
+  })
+  return 'created'
+}
+
 export async function ensureV1TenantUser(db: Db, nurse: LegacyNurse): Promise<{ tenantId: string; userId: string }> {
   const userId = nurse._id.toHexString()
   const tenantId = tenantIdForNurse(userId)
@@ -128,6 +174,9 @@ export async function ensureV1Patient(db: Db, tenantId: string, userId: string, 
     },
     { upsert: true },
   )
+  // Without this the patient exists but every daily check-in is refused with 403 CONSENT_REQUIRED.
+  await ensureCheckInConsent(db, { tenantId, patientId, actorId: userId })
+
   return patientId
 }
 
