@@ -194,6 +194,76 @@ devicesRouter.post('/device-credentials/exchange', asyncHandler(async (request, 
   sendData(response, credential)
 }))
 
+/**
+ * Every mirror assigned to a patient this caregiver can see, one row per loved one.
+ *
+ * v1 could only look a device up BY ID, so the mirror-management screen — which needs the whole list, and
+ * needs to show loved ones with no mirror yet so they can be paired — had no v1 to move to. Built from
+ * `device_assignments` (which carries the mirror's display name) joined to the caregiver's patients, so a
+ * loved one always appears whether or not a mirror is attached.
+ *
+ * Deliberately NOT mounted at /devices: the assignment, not the device, is what the caregiver manages, and a
+ * bare /devices would read as "all devices in the tenant".
+ */
+devicesRouter.get('/device-assignments', requireActor('human'), asyncHandler(async (request, response) => {
+  const principal = getPrincipal(request)
+  if (principal.kind !== 'human') throw forbidden()
+  const db = await getDb()
+
+  // Same visibility rule the rest of the caregiver API uses: an active care relationship, or tenant_admin.
+  const isTenantAdmin = principal.roles.includes('tenant_admin')
+  const relationships = isTenantAdmin ? [] : await db.collection<any>(collections.careRelationships).find({
+    tenantId: principal.tenantId, userId: principal.userId, status: 'active', scopes: 'patient:read',
+    $or: [{ validTo: null }, { validTo: { $gt: new Date() } }, { validTo: { $exists: false } }],
+  }).project({ patientId: 1 }).toArray()
+
+  const patientFilter: Record<string, unknown> = { tenantId: principal.tenantId, status: { $ne: 'archived' } }
+  if (!isTenantAdmin) {
+    patientFilter._id = { $in: [...new Set(relationships.map((relationship) => String(relationship.patientId)))] }
+  }
+  const patients = await db.collection<any>(collections.patients).find(patientFilter)
+    .project({ displayName: 1 }).sort({ _id: 1 }).toArray()
+  if (!patients.length) {
+    sendData(response, { assignments: [] })
+    return
+  }
+
+  const patientIds = patients.map((patient) => String(patient._id))
+  const assignments = await db.collection<any>(collections.assignments).find({
+    tenantId: principal.tenantId, patientId: { $in: patientIds }, status: 'active',
+  }).toArray()
+  const byPatient = new Map(assignments.map((assignment) => [String(assignment.patientId), assignment]))
+
+  const deviceIds = [...new Set(assignments.map((assignment) => String(assignment.deviceId)))]
+  const devices = deviceIds.length
+    ? await db.collection<any>(collections.devices).find({ _id: { $in: deviceIds } })
+      .project({ serial: 1, softwareVersion: 1, lastHeartbeatAt: 1, status: 1 }).toArray()
+    : []
+  const byDevice = new Map(devices.map((device) => [String(device._id), device]))
+
+  sendData(response, {
+    assignments: patients.map((patient) => {
+      const assignment = byPatient.get(String(patient._id))
+      const device = assignment ? byDevice.get(String(assignment.deviceId)) : undefined
+      return {
+        patientId: String(patient._id),
+        patientName: String(patient.displayName || ''),
+        // Null when this loved one has no mirror yet — the screen needs that row to offer pairing.
+        assignmentId: assignment ? String(assignment._id) : null,
+        deviceId: assignment ? String(assignment.deviceId) : null,
+        mirrorName: assignment?.mirrorName || null,
+        assignedAt: assignment?.assignedAt ? new Date(assignment.assignedAt).toISOString() : null,
+        device: device ? {
+          serial: device.serial || null,
+          softwareVersion: device.softwareVersion || null,
+          status: device.status || null,
+          lastHeartbeatAt: device.lastHeartbeatAt ? new Date(device.lastHeartbeatAt).toISOString() : null,
+        } : null,
+      }
+    }),
+  })
+}))
+
 devicesRouter.get('/devices/:deviceId', requireActor('human', 'device'), asyncHandler(async (request, response) => {
   const { device, assignment } = await authorizedDevice(request, request.params.deviceId)
   sendData(response, serializeDevice(device, assignment))
