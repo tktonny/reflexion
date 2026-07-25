@@ -35,6 +35,38 @@ function currentLocalTimeLine(language: string): string {
   }
 }
 
+// Function tools Aria (companion) may call over the realtime WS for dynamic knowledge. The names map to
+// the backend /sessions/:id/tool-invocations tool ids (which hold the provider keys and audit each call).
+// NOT registered for screening (scripted). enable_search is intentionally never set — mutually exclusive.
+export const REALTIME_TOOL_BACKEND: Record<string, string> = {
+  get_weather: 'weather.get',
+  web_search: 'web.search',
+  list_medications: 'medication.list',
+  upcoming_reminders: 'reminders.upcoming',
+}
+const COMPANION_TOOLS = [
+  { type: 'function', function: {
+    name: 'get_weather',
+    description: "Current weather and a short forecast for a city. Omit `city` for the patient's home area (already in your context).",
+    parameters: { type: 'object', properties: { city: { type: 'string', description: 'City name, e.g. Tokyo.' } } },
+  } },
+  { type: 'function', function: {
+    name: 'web_search',
+    description: 'Search the web for current facts, news, or a general question you are unsure about.',
+    parameters: { type: 'object', properties: { query: { type: 'string', description: 'The search query.' } }, required: ['query'] },
+  } },
+  { type: 'function', function: {
+    name: 'list_medications',
+    description: "List the patient's current medications and their schedules.",
+    parameters: { type: 'object', properties: {} },
+  } },
+  { type: 'function', function: {
+    name: 'upcoming_reminders',
+    description: "List the patient's reminders or medications due in the next 24 hours.",
+    parameters: { type: 'object', properties: {} },
+  } },
+] as const
+
 export function buildLiveSessionUpdate(
   patientId: string,
   language: string,
@@ -103,6 +135,8 @@ export function buildLiveSessionUpdate(
         interrupt_response: false,
       },
       input_audio_transcription: { model: REALTIME.transcriptionModel },
+      // Companion (free chat) gets dynamic-knowledge tools; screening stays fully scripted.
+      ...(opts.persona === 'companion' ? { tools: COMPANION_TOOLS } : {}),
     },
   }
 }
