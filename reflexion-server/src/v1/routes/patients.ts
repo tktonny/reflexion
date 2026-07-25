@@ -7,12 +7,11 @@ import { badRequest, conflict, notFound } from '../platform/errors.js'
 import { sendData, sendPage } from '../platform/http.js'
 import { newId } from '../platform/ids.js'
 import { executeIdempotent } from '../platform/idempotency.js'
+import { CAREGIVER_RELATIONSHIP_SCOPES } from '../platform/scopes.js'
 import { enumValue, objectBody, optionalString, pagination, requiredString } from '../platform/validation.js'
 
 const PATIENT_STATUSES = ['active', 'inactive'] as const
-const DEFAULT_RELATIONSHIP_SCOPES = [
-  'patient:read', 'patient:write', 'device:assign', 'care_plan:read', 'care_plan:write', 'monitoring:read',
-]
+const DEFAULT_RELATIONSHIP_SCOPES = [...CAREGIVER_RELATIONSHIP_SCOPES]
 
 /**
  * The consent purpose a daily check-in is gated on. Kept here next to the consent routes and imported by

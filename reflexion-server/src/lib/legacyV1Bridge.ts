@@ -9,12 +9,11 @@ import { getDb, inTransaction } from './mongo.js'
 import { collections } from '../v1/platform/collections.js'
 import { hashSecret, hmac, sealSecret, sha256 } from '../v1/platform/crypto.js'
 import { newId, randomSecret } from '../v1/platform/ids.js'
+import { CAREGIVER_RELATIONSHIP_SCOPES } from '../v1/platform/scopes.js'
 import { appendOutbox } from '../v1/platform/outbox.js'
 
 const EXCHANGE_TTL_MS = 5 * 60 * 1000
-const RELATIONSHIP_SCOPES = [
-  'patient:read', 'patient:write', 'device:assign', 'care_plan:read', 'care_plan:write', 'monitoring:read',
-]
+const RELATIONSHIP_SCOPES = [...CAREGIVER_RELATIONSHIP_SCOPES]
 
 /** Error carrying an HTTP status so legacy routes can map it to their {error} shape. */
 export class BridgeError extends Error {
@@ -112,20 +111,42 @@ export async function ensureV1TenantUser(db: Db, nurse: LegacyNurse): Promise<{ 
       // passwordHash is seeded ONLY on insert. It used to be re-$set on every legacy sign-in, which copied the
       // legacy hash over the v1 one — reverting a completed password reset. Both stores are now written
       // together by the reset route (routes/auth/password-reset.ts), so they stay in step without this.
-      $setOnInsert: { _id: userId, createdAt: now, passwordHash: nurse.passwordHash || '' },
-      $set: {
-        // emailNormalized is the field v1 login (identity.ts POST /auth/sessions) matches on — WITHOUT it
-        // a bridged caregiver can never obtain a v1 session (401 despite a correct password), which locks
-        // every v1-gated screen behind "Sign in again". Keep it identical to `email` (lowercased).
-        tenantId, name: nurse.name || '', email: (nurse.email || '').trim().toLowerCase(),
-        emailNormalized: (nurse.email || '').trim().toLowerCase(),
-        phoneNumber: nurse.phoneNumber || '',
-        roles: ['caregiver', 'tenant_admin'], scopes: [], status: 'active',
+      // SEED-ONLY for anything PATCH /me can now change. These used to be re-$set on every legacy sign-in,
+      // which was fine while legacy was the only writer — but once a caregiver can edit their name, phone or
+      // notification preferences over v1, re-seeding from the legacy document silently reverts the edit on
+      // their next sign-in. The legacy settings route writes v1 directly instead (see
+      // routes/nurse-patient-config/settings.ts), so both surfaces stay in step without this overwriting.
+      $setOnInsert: {
+        _id: userId, createdAt: now, passwordHash: nurse.passwordHash || '',
+        name: nurse.name || '', phoneNumber: nurse.phoneNumber || '',
         notificationPreferences: {
           pushNotificationsEnabled: nurse.pushNotificationsEnabled ?? true,
           alertSensitivity: nurse.alertSensitivity || 'only_important_changes',
           preferredDailySummaryTime: nurse.preferredDailySummaryTime || '19:00',
         },
+      },
+      $set: {
+        // emailNormalized is the field v1 login (identity.ts POST /auth/sessions) matches on — WITHOUT it
+        // a bridged caregiver can never obtain a v1 session (401 despite a correct password), which locks
+        // every v1-gated screen behind "Sign in again". Keep it identical to `email` (lowercased).
+        // Identity and authorization stay legacy-owned: email is the login key and roles are not
+        // user-editable, so keeping these authoritative is correct.
+        //
+        // `caregiver` ONLY — deliberately not `tenant_admin`. A caregiver is the owner of one family's data,
+        // not an operator of the tenant, and `tenant_admin` is read as the latter in three places:
+        //   - platform/auth.ts authorizePatient() returns the patient immediately, so care_relationships
+        //     scopes are never enforced at all;
+        //   - v1/routes/patients.ts GET /patients stops filtering by relationship and lists every patient
+        //     in the tenant;
+        //   - v1/routes/monitoring.ts admits the holder to the clinical review queue (/review-cases), which
+        //     a caregiver must never reach, and to POST .../dispositions.
+        // Granting it here made all three true for every caregiver. It went unnoticed because the bridge
+        // derives tenantId from the nurse's own _id, so one tenant holds exactly one caregiver and "every
+        // patient in the tenant" happened to equal "my own family" — it would become a real cross-family
+        // read the moment two caregivers share a tenant. Access now comes from care_relationships alone.
+        tenantId, email: (nurse.email || '').trim().toLowerCase(),
+        emailNormalized: (nurse.email || '').trim().toLowerCase(),
+        roles: ['caregiver'], scopes: [], status: 'active',
         updatedAt: now,
       },
     },
@@ -143,12 +164,29 @@ export async function ensureV1TenantUser(db: Db, nurse: LegacyNurse): Promise<{ 
   // Archived rather than deleted: this is a data repair inferred from shape, so it stays reversible.
   const emailNormalized = (nurse.email || '').trim().toLowerCase()
   if (emailNormalized) {
+    // NEVER archive an operator or provider. The bootstrap script creates the console account with
+    // roles ['tenant_admin','provider','caregiver'] in its own tenant, and on a small team that is very
+    // likely the same email as a caregiver account — so an unguarded sweep would archive the operator the
+    // first time that person signed into the app, locking them out of admin-web entirely.
+    // Only a caregiver-shaped row is collapsible.
     const collapsed = await db.collection<any>(collections.users).updateMany(
-      { emailNormalized, status: 'active', _id: { $ne: userId } },
+      {
+        emailNormalized, status: 'active', _id: { $ne: userId },
+        roles: { $nin: ['operator', 'provider'] },
+      },
       { $set: { status: 'archived', archivedAt: now, archivedReason: 'duplicate_email_superseded_by_legacy_identity' } },
     )
     if (collapsed.modifiedCount) {
       console.warn(`[bridge] archived ${collapsed.modifiedCount} duplicate v1 user(s) for ${emailNormalized}; canonical is ${userId}`)
+    }
+
+    // A privileged duplicate is left alone but reported: sign-in resolves it correctly by verifying the
+    // password, so nothing is broken, but two accounts on one email stays a data question for a human.
+    const privileged = await db.collection<any>(collections.users).countDocuments({
+      emailNormalized, status: 'active', _id: { $ne: userId }, roles: { $in: ['operator', 'provider'] },
+    })
+    if (privileged) {
+      console.warn(`[bridge] ${emailNormalized} also has ${privileged} operator/provider account(s); left untouched`)
     }
   }
 
@@ -162,12 +200,11 @@ export async function ensureV1Patient(db: Db, tenantId: string, userId: string, 
   await db.collection<any>(collections.patients).updateOne(
     { _id: patientId },
     {
-      $setOnInsert: { _id: patientId, version: 1, createdAt: now },
-      $set: {
-        tenantId, displayName: patient.name || '', preferredLanguage: patient.preferredLanguage || 'english',
-        timezone: patient.timezone || 'Asia/Singapore', ageBand: ageBand(patient.age), status: 'active', updatedAt: now,
-        // Display-only profile the caregiver app renders; v1 previously modelled none of it, so it lived
-        // solely in the legacy document and was lost on migration.
+      $setOnInsert: {
+        _id: patientId, version: 1, createdAt: now,
+        // Seed-only, for the same reason as the caregiver's own fields: PATCH /patients can edit these, and
+        // re-asserting them from the legacy document on every sign-in would revert that edit. The legacy
+        // patient-settings route writes v1 directly instead.
         profile: {
           age: Number.isFinite(Number(patient.age)) && Number(patient.age) > 0 ? Number(patient.age) : null,
           gender: patient.gender || null,
@@ -175,6 +212,10 @@ export async function ensureV1Patient(db: Db, tenantId: string, userId: string, 
           phoneNumber: patient.phoneNumber || null,
           speechSpeed: normalizeSpeechSpeed(patient.speechSpeed),
         },
+      },
+      $set: {
+        tenantId, displayName: patient.name || '', preferredLanguage: patient.preferredLanguage || 'english',
+        timezone: patient.timezone || 'Asia/Singapore', ageBand: ageBand(patient.age), status: 'active', updatedAt: now,
       },
     },
     { upsert: true },

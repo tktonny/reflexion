@@ -7,6 +7,7 @@ import { badRequest, forbidden, notFound } from '../platform/errors.js'
 import { sendData, sendPage } from '../platform/http.js'
 import { newId } from '../platform/ids.js'
 import { executeIdempotent } from '../platform/idempotency.js'
+import { CAREGIVER_RELATIONSHIP_SCOPES } from '../platform/scopes.js'
 import { enumValue, objectBody, optionalString, pagination, requiredString } from '../platform/validation.js'
 
 // Admin / Onboarding backend (doc 1.1 — the third component). Reuses the v1 platform: same MongoDB,
@@ -107,7 +108,9 @@ adminRouter.post('/admin/patients', requireHuman, requireAdmin, asyncHandler(asy
       if (linkedCaregiver) {
         await transactionDb.collection<any>(collections.careRelationships).insertOne({
           _id: newId('rel'), tenantId: principal.tenantId, patientId: patient._id, userId: linkedCaregiver,
-          relationshipType: 'caregiver', scopes: ['patient:read', 'patient:write', 'monitoring:read', 'session:read', 'care_plan:read', 'care_plan:write'],
+          // Was a fourth hand-written list, and it was missing `device:assign` — a caregiver whose family
+          // member had been onboarded by an operator could not pair the mirror.
+          relationshipType: 'caregiver', scopes: [...CAREGIVER_RELATIONSHIP_SCOPES],
           status: 'active', validFrom: now, validTo: null, createdAt: now,
         }, { session })
       }

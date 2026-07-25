@@ -49,7 +49,9 @@ test('a caregiver can register, sign in and manage their own profile entirely ov
     assert.match(actor.tenantId, /^ten_/)
     assert.equal(actor.email, email, 'email is normalised')
     // Matches what the legacy bridge produces, so migrated and new accounts behave identically.
-    assert.deepEqual(actor.roles, ['caregiver', 'tenant_admin'])
+    // `caregiver` alone: `tenant_admin` makes authorizePatient skip the care_relationships check, unfilters
+    // GET /patients, and opens the clinical surfaces — see the note in lib/legacyV1Bridge.ts.
+    assert.deepEqual(actor.roles, ['caregiver'])
     accessToken = token
     userId = actor.userId
 

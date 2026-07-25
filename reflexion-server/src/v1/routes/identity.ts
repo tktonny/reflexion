@@ -70,8 +70,12 @@ const RELATIONSHIP_TYPES = ['parent', 'sibling', 'spouse', 'inlaw', 'grandpa', '
  *
  * The shape deliberately matches what legacyV1Bridge.ensureV1TenantUser produces, so a caregiver who signs
  * up here is indistinguishable from one who was migrated: one private tenant per caregiver, roles
- * ['caregiver','tenant_admin'] (every /admin route filters on principal.tenantId, so that grants nothing
- * outside their own tenant), and emailNormalized set — without which they could never sign in again.
+ * ['caregiver'] and emailNormalized set — without which they could never sign in again.
+ *
+ * `tenant_admin` is NOT granted. It reads as "operator of this tenant", not "owner of my own family's
+ * data": it makes authorizePatient skip the care_relationships check, unfilters GET /patients, and opens
+ * the clinical review queue. See the long note in lib/legacyV1Bridge.ts. A caregiver's access comes from
+ * their care_relationships rows and nothing else.
  *
  * Returns a session directly, because an account you cannot immediately use is not useful. Rate limiting
  * comes from the /api/v1/auth mount in app.ts.
@@ -113,7 +117,7 @@ identityRouter.post('/auth/registrations', asyncHandler(async (request, response
     passwordHash: hashPassword(password),
     phoneNumber: phoneNumber || '',
     relationshipToElderly,
-    roles: ['caregiver', 'tenant_admin'],
+    roles: ['caregiver'],
     scopes: [],
     status: 'active',
     notificationPreferences: {
