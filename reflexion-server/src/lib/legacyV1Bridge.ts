@@ -37,9 +37,17 @@ export type LegacyNurse = {
   _id: HexId; name?: string; email?: string; passwordHash?: string; phoneNumber?: string
   pushNotificationsEnabled?: boolean; alertSensitivity?: string; preferredDailySummaryTime?: string
 }
+/**
+ * The legacy embedded patient. Every field below exists only in NursePatientConfig — the migration is what
+ * gives them a v1 home: display-only ones go to `patients.profile`, and the ones that change how Aria talks
+ * go to the care plan, which is what the device is already wired to receive.
+ */
 export type LegacyPatient = {
   _id: HexId; name?: string; preferredLanguage?: string; timezone?: string; age?: number
   relationshipToElderly?: string; mirrorName?: string
+  gender?: string; photoUrl?: string; phoneNumber?: string; speechSpeed?: string
+  usualWakeTime?: string; speechOrHearingConditions?: string | null
+  keyTopics?: string[]; keyTopicsOtherText?: string | null
 }
 
 /** Idempotently upsert the v1 tenant + user for a legacy nurse. Returns { tenantId, userId }. */
@@ -158,6 +166,15 @@ export async function ensureV1Patient(db: Db, tenantId: string, userId: string, 
       $set: {
         tenantId, displayName: patient.name || '', preferredLanguage: patient.preferredLanguage || 'english',
         timezone: patient.timezone || 'Asia/Singapore', ageBand: ageBand(patient.age), status: 'active', updatedAt: now,
+        // Display-only profile the caregiver app renders; v1 previously modelled none of it, so it lived
+        // solely in the legacy document and was lost on migration.
+        profile: {
+          age: Number.isFinite(Number(patient.age)) && Number(patient.age) > 0 ? Number(patient.age) : null,
+          gender: patient.gender || null,
+          photoUrl: patient.photoUrl || null,
+          phoneNumber: patient.phoneNumber || null,
+          speechSpeed: normalizeSpeechSpeed(patient.speechSpeed),
+        },
       },
     },
     { upsert: true },
@@ -176,8 +193,57 @@ export async function ensureV1Patient(db: Db, tenantId: string, userId: string, 
   )
   // Without this the patient exists but every daily check-in is refused with 403 CONSENT_REQUIRED.
   await ensureCheckInConsent(db, { tenantId, patientId, actorId: userId })
+  await ensureCarePlanFromLegacyProfile(db, { tenantId, patientId, userId, patient })
 
   return patientId
+}
+
+function normalizeSpeechSpeed(value: unknown): 'slow' | 'normal' | 'fast' | null {
+  const speed = String(value || '').trim().toLowerCase()
+  return speed === 'slow' || speed === 'normal' || speed === 'fast' ? speed : null
+}
+
+/**
+ * Moves the fields that shape how Aria TALKS into the care plan, which is what the device actually receives
+ * (GET /devices/:deviceId/configuration ships carePlan.dailyRoutine and carePlan.communicationPreferences).
+ * Left in the legacy document they were invisible to the mirror, so a caregiver could set a wake time and
+ * favourite topics that nothing ever used.
+ *
+ * Only seeds a plan when none exists — a caregiver or clinician who has since edited the plan owns it.
+ */
+async function ensureCarePlanFromLegacyProfile(
+  db: Db,
+  input: { tenantId: string; patientId: string; userId: string; patient: LegacyPatient & Record<string, any> },
+): Promise<'created' | 'present' | 'nothing_to_seed'> {
+  const existing = await db.collection<any>(collections.carePlans).findOne({
+    tenantId: input.tenantId, patientId: input.patientId, status: 'active',
+  })
+  if (existing) return 'present'
+
+  const source = input.patient
+  const topics = Array.isArray(source.keyTopics) ? source.keyTopics.filter(Boolean) : []
+  const dailyRoutine: Record<string, unknown> = {}
+  const communicationPreferences: Record<string, unknown> = {}
+  if (source.usualWakeTime) dailyRoutine.wakeTime = String(source.usualWakeTime)
+  if (topics.length) communicationPreferences.topics = topics
+  if (source.keyTopicsOtherText) communicationPreferences.otherTopic = String(source.keyTopicsOtherText)
+  const speechSpeed = normalizeSpeechSpeed(source.speechSpeed)
+  if (speechSpeed) communicationPreferences.speechSpeed = speechSpeed
+  if (source.speechOrHearingConditions) {
+    communicationPreferences.speechOrHearingNotes = String(source.speechOrHearingConditions)
+  }
+  if (!Object.keys(dailyRoutine).length && !Object.keys(communicationPreferences).length) {
+    return 'nothing_to_seed'
+  }
+
+  const now = new Date()
+  await db.collection<any>(collections.carePlans).insertOne({
+    _id: newId('plan'), tenantId: input.tenantId, patientId: input.patientId, version: 1, status: 'active',
+    effectiveFrom: now, effectiveTo: null, ownerId: input.userId,
+    dailyRoutine, communicationPreferences, safetyNotes: null,
+    source: 'legacy_profile_migration', createdAt: now, updatedAt: now,
+  })
+  return 'created'
 }
 
 /** Combined: ensure tenant+user+patient+relationship. Returns the v1 ids (all = legacy hex). */

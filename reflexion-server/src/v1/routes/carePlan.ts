@@ -10,6 +10,31 @@ import { executeIdempotent } from '../platform/idempotency.js'
 import { appendOutbox } from '../platform/outbox.js'
 import { enumValue, isoDate, objectBody, optionalString, requiredString } from '../platform/validation.js'
 
+/**
+ * The care-plan keys the caregiver app writes and the mirror reads.
+ *
+ * These two objects are stored free-form (validObject), which is deliberate — the plan is meant to grow
+ * without a migration. The cost is that nothing stops the writer and the reader inventing different names
+ * for the same thing, so the caregiver-profile fields that shape how Aria talks are pinned here and both
+ * sides import from one place. They arrive at the device through
+ * GET /devices/:deviceId/configuration -> patient.carePlan.
+ *
+ *   dailyRoutine.wakeTime               "07:00" — when Aria greets them
+ *   communicationPreferences.topics     string[] — subjects they enjoy
+ *   communicationPreferences.otherTopic free text when `topics` includes 'others'
+ *   communicationPreferences.speechSpeed 'slow' | 'normal' | 'fast'
+ *   communicationPreferences.speechOrHearingNotes  what to allow for, in plain words
+ *
+ * safetyNotes stays what it is: something a human should read, not something Aria is told to act on.
+ */
+export const CARE_PLAN_KEYS = {
+  wakeTime: 'wakeTime',
+  topics: 'topics',
+  otherTopic: 'otherTopic',
+  speechSpeed: 'speechSpeed',
+  speechOrHearingNotes: 'speechOrHearingNotes',
+} as const
+
 export const carePlanRouter = Router()
 const requireCarePlanActor = requireActor('human', 'device')
 

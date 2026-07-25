@@ -20,6 +20,53 @@ const DEFAULT_RELATIONSHIP_SCOPES = [
  */
 export const DAILY_CHECKIN_CONSENT_PURPOSE = 'home_cognitive_monitoring'
 
+const GENDERS = ['male', 'female', 'other'] as const
+const SPEECH_SPEEDS = ['slow', 'normal', 'fast'] as const
+
+/**
+ * Where each part of a loved one's profile lives in v1, split by who consumes it.
+ *
+ * `patients.profile` holds what only the caregiver's app displays — exact age, gender, photo, a phone number
+ * to call. v1 previously modelled none of it (only a coarse `ageBand`), so it existed solely in the legacy
+ * document.
+ *
+ * Everything that changes how Aria TALKS belongs to the care plan instead, because that is what the device
+ * already receives: GET /devices/:deviceId/configuration ships carePlan.dailyRoutine and
+ * carePlan.communicationPreferences to the mirror. Putting wake time or topics in `patients` would mean
+ * inventing a second delivery path for data the mirror is already wired to read.
+ */
+export const PATIENT_PROFILE_FIELDS = ['age', 'gender', 'photoUrl', 'phoneNumber'] as const
+
+/** Derived from exact age so the coarse band the monitoring model uses can never disagree with it. */
+export function ageBandForAge(age: number | null | undefined): string | null {
+  const value = Number(age)
+  if (!Number.isFinite(value) || value <= 0) return null
+  if (value < 65) return 'under_65'
+  if (value < 75) return '65_74'
+  if (value < 85) return '75_84'
+  return '85_plus'
+}
+
+function validateProfile(input: unknown): Record<string, unknown> {
+  const body = objectBody(input)
+  const profile: Record<string, unknown> = {}
+  if ('age' in body) {
+    if (body.age === null) profile.age = null
+    else {
+      const age = Number(body.age)
+      if (!Number.isInteger(age) || age < 1 || age > 130) {
+        throw badRequest('VALIDATION_FAILED', 'age must be a whole number between 1 and 130.')
+      }
+      profile.age = age
+    }
+  }
+  if ('gender' in body) profile.gender = body.gender === null ? null : enumValue(body.gender, 'gender', GENDERS)
+  if ('photoUrl' in body) profile.photoUrl = optionalString(body, 'photoUrl', 2000) || null
+  if ('phoneNumber' in body) profile.phoneNumber = optionalString(body, 'phoneNumber', 40) || null
+  if ('speechSpeed' in body) profile.speechSpeed = body.speechSpeed === null ? null : enumValue(body.speechSpeed, 'speechSpeed', SPEECH_SPEEDS)
+  return profile
+}
+
 export const patientsRouter = Router()
 const requireHuman = requireActor('human')
 
@@ -55,14 +102,19 @@ patientsRouter.post('/patients', requireHuman, asyncHandler(async (request, resp
     const displayName = requiredString(body, 'displayName', 120)
     const preferredLanguage = requiredString(body, 'preferredLanguage', 40)
     const timezone = validateTimezone(requiredString(body, 'timezone', 80))
-    const ageBand = optionalString(body, 'ageBand', 40)
+    const profile = 'profile' in body ? validateProfile(body.profile) : {}
+    // An explicit ageBand is still accepted, but an exact age wins — deriving it here is what stops the
+    // coarse band the monitoring model reads from drifting away from the age the caregiver typed.
+    const ageBand = typeof profile.age === 'number'
+      ? ageBandForAge(profile.age)
+      : optionalString(body, 'ageBand', 40)
     const relationshipType = optionalString(body, 'relationshipType', 80) || 'caregiver'
     const patientId = newId('pat')
     const relationshipId = newId('rel')
     const now = new Date()
     const patient = {
       _id: patientId, tenantId: principal.tenantId, displayName, preferredLanguage, timezone,
-      ageBand: ageBand || null, status: 'active', version: 1, createdAt: now, updatedAt: now,
+      ageBand: ageBand || null, profile, status: 'active', version: 1, createdAt: now, updatedAt: now,
     }
     await inTransaction(async (db, session) => {
       await db.collection<any>(collections.patients).insertOne(patient, { session })
@@ -98,6 +150,13 @@ patientsRouter.patch('/patients/:patientId', requireHuman, asyncHandler(async (r
   if ('preferredLanguage' in body) update.preferredLanguage = requiredString(body, 'preferredLanguage', 40)
   if ('timezone' in body) update.timezone = validateTimezone(requiredString(body, 'timezone', 80))
   if ('status' in body) update.status = enumValue(body.status, 'status', PATIENT_STATUSES)
+  if ('profile' in body) {
+    // Dotted paths, so sending one profile key leaves the others alone — the same partial-update rule the
+    // rest of this API follows.
+    const profile = validateProfile(body.profile)
+    for (const [key, value] of Object.entries(profile)) update[`profile.${key}`] = value
+    if ('age' in profile) update.ageBand = ageBandForAge(profile.age as number | null)
+  }
   if (!Object.keys(update).length) throw badRequest('VALIDATION_FAILED', 'At least one supported patient field is required.')
   update.updatedAt = new Date()
   const db = await getDb()
@@ -199,6 +258,13 @@ export function serializePatient(patient: Record<string, unknown>) {
     preferredLanguage: String(patient.preferredLanguage || ''),
     timezone: String(patient.timezone || 'UTC'),
     ageBand: patient.ageBand || null,
+    profile: {
+      age: (patient.profile as Record<string, unknown> | undefined)?.age ?? null,
+      gender: (patient.profile as Record<string, unknown> | undefined)?.gender ?? null,
+      photoUrl: (patient.profile as Record<string, unknown> | undefined)?.photoUrl ?? null,
+      phoneNumber: (patient.profile as Record<string, unknown> | undefined)?.phoneNumber ?? null,
+      speechSpeed: (patient.profile as Record<string, unknown> | undefined)?.speechSpeed ?? null,
+    },
     status: String(patient.status || 'active'),
     version: Number(patient.version || 1),
   }
