@@ -4,7 +4,7 @@
 
 import { QWEN } from '../config/conversationMode'
 import { secureQwenAssetUrl } from '../orchestration/networkSecurity'
-import { getBearer, getQwenHttpBase } from './qwenToken'
+import { getBearer, getQwenHttpBase, getQwenHttpModel } from './qwenToken'
 
 /** Region host root for HTTP calls: the active ticket's httpBase (set by the backend per the device's
  *  region) once a ticket exists, else the build-time default. Read only AFTER getBearer() has resolved. */
@@ -48,7 +48,7 @@ export async function qwenVisionChat(
     method: 'POST',
     headers,
     body: JSON.stringify({
-      model: opts.model || QWEN.visionModel,
+      model: opts.model || getQwenHttpModel('vision') || QWEN.visionModel,
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: parts },
@@ -72,7 +72,7 @@ export async function qwenChat(
     method: 'POST',
     headers,
     body: JSON.stringify({
-      model: opts.model || QWEN.chatModel,
+      model: opts.model || getQwenHttpModel('chat') || QWEN.chatModel,
       messages,
       max_tokens: opts.maxTokens ?? 120,
       temperature: opts.temperature ?? 0.4,
@@ -100,7 +100,7 @@ export async function qwenTTS(
     method: 'POST',
     headers,
     body: JSON.stringify({
-      model: opts.model || QWEN.ttsModel,
+      model: opts.model || getQwenHttpModel('tts') || QWEN.ttsModel,
       input,
     }),
   })
@@ -130,7 +130,7 @@ export async function qwenASR(
     method: 'POST',
     headers,
     body: JSON.stringify({
-      model: opts.model || QWEN.asrModel,
+      model: opts.model || getQwenHttpModel('asr') || QWEN.asrModel,
       messages: [
         { role: 'user', content: [{ type: 'input_audio', input_audio: inputAudio }] },
       ],

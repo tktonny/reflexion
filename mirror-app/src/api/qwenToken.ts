@@ -1,6 +1,7 @@
 import {
   getActiveQwenEndpoint,
   getActiveQwenHttpBase,
+  getActiveQwenHttpModel,
   getActiveQwenModel,
   getActiveQwenTicket,
 } from './sessionSync'
@@ -22,3 +23,7 @@ export async function getBearer(): Promise<string> {
 export function getQwenRealtimeEndpoint(): string | undefined { return getActiveQwenEndpoint() }
 export function getQwenHttpBase(): string | undefined { return getActiveQwenHttpBase() }
 export function getQwenRealtimeModel(): string | undefined { return getActiveQwenModel() }
+/** Region-correct HTTP model name (tts/asr/chat/vision) from the active ticket, else undefined. */
+export function getQwenHttpModel(kind: 'tts' | 'asr' | 'chat' | 'vision'): string | undefined {
+  return getActiveQwenHttpModel(kind)
+}

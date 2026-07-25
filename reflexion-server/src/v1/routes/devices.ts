@@ -313,7 +313,7 @@ async function insertPairingWithUniqueCode(input: Record<string, unknown>) {
         _id: input.pairingId, deviceId: input.deviceId, codeHash: hmac(displayCode), codeHint: displayCode.slice(-2),
         state: 'pending', expiresAt: input.expiresAt, failedAttempts: 0, hardwareRevision: input.hardwareRevision,
         softwareVersion: input.softwareVersion, timezone: input.timezone, deviceNonce: input.deviceNonce,
-        createdAt: new Date(),
+        region: input.region, createdAt: new Date(),
       })
       return displayCode
     } catch (error) {

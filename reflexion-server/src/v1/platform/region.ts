@@ -22,8 +22,12 @@ function ipCountry(ip: string): string | null {
 /** Real client IP: X-Forwarded-For's first hop (we sit behind nginx, `trust proxy` is not set so
  *  request.ip would be the proxy), else request.ip, else the raw socket address. */
 export function getClientIp(request: Request): string {
-  const forwarded = String(request.headers['x-forwarded-for'] || '').split(',')[0]?.trim()
-  if (forwarded) return forwarded.replace(/^::ffff:/, '')
+  const real = String(request.headers['x-real-ip'] || '').trim()
+  if (real) return real.replace(/^::ffff:/, '')
+  // trust-proxy is off, so request.ip is nginx. Under `proxy_add_x_forwarded_for` (append) the LAST XFF
+  // hop is the client IP nginx actually saw; the LEFTMOST is client-spoofable, so never trust split[0].
+  const hops = String(request.headers['x-forwarded-for'] || '').split(',').map((h) => h.trim()).filter(Boolean)
+  if (hops.length) return hops[hops.length - 1].replace(/^::ffff:/, '')
   return String(request.ip || request.socket?.remoteAddress || '').replace(/^::ffff:/, '')
 }
 
@@ -46,8 +50,10 @@ function tzToRegion(tz?: string): QwenRegion | null {
   return null
 }
 
-function isRegion(value: unknown): value is QwenRegion {
-  return value === 'cn' || value === 'sg'
+/** Accepts the same region vocabulary as normalizeRegion (cn/sg/sea/singapore/ap-southeast-1, any case)
+ *  so the probe path treats a valid-but-aliased value as a signal instead of silently ignoring it. */
+function looksLikeRegion(value: unknown): boolean {
+  return ['cn', 'sg', 'sea', 'singapore', 'ap-southeast-1'].includes(String(value ?? '').trim().toLowerCase())
 }
 
 export type RegionSignals = {
@@ -66,7 +72,7 @@ export type RegionSignals = {
  * timezone is a last-resort fallback; then QWEN_DEFAULT_REGION (cn).
  */
 export function resolveDeviceRegion(input: { probedRegion?: unknown; ip?: string; timezone?: string }): RegionSignals {
-  const probed = isRegion(input.probedRegion) ? input.probedRegion : null
+  const probed = looksLikeRegion(input.probedRegion) ? normalizeRegion(input.probedRegion) : null
   const ip = input.ip ? ipToRegion(input.ip) : null
   const timezone = tzToRegion(input.timezone)
   let region: QwenRegion

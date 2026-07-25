@@ -51,6 +51,8 @@ export type ActiveMirrorSession = {
   endpoint?: string
   httpBase?: string
   model?: string
+  // Region-correct HTTP model names (SG serves TTS as qwen3-tts-flash, not qwen-tts).
+  httpModels?: { tts?: string; asr?: string; chat?: string; vision?: string }
 }
 
 type TranscriptPayload = {
@@ -201,12 +203,16 @@ export async function getActiveMirrorSession() {
 export async function getActiveQwenTicket() {
   let session = await getActiveMirrorSession()
   if (!session) session = await beginMirrorSession('companion', 'mandarin')
-  if (session.ticket && session.ticketExpiresAt && Date.parse(session.ticketExpiresAt) > Date.now() + 60_000) return session.ticket
+  // Also require the region endpoints: a ticket rehydrated from before this change (or an app upgrade
+  // over an old cache) has no endpoint/httpBase, so force a refetch rather than fall back to the China URL.
+  if (session.ticket && session.ticketExpiresAt && Date.parse(session.ticketExpiresAt) > Date.now() + 60_000
+    && session.endpoint && session.httpBase) return session.ticket
   const response = await deviceFetch(`/api/v1/sessions/${encodeURIComponent(session.sessionId)}/realtime-tickets`, {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': randomIdempotencyKey() }, body: '{}',
   })
   const ticket = await dataOrThrow<{
-    ticket: string; expiresAt: string; endpoint?: string; httpBase?: string; sessionPolicy?: { model?: string }
+    ticket: string; expiresAt: string; endpoint?: string; httpBase?: string
+    models?: { tts?: string; asr?: string; chat?: string; vision?: string }; sessionPolicy?: { model?: string }
   }>(response)
   session = {
     ...session,
@@ -215,6 +221,7 @@ export async function getActiveQwenTicket() {
     endpoint: ticket.endpoint,
     httpBase: ticket.httpBase,
     model: ticket.sessionPolicy?.model,
+    httpModels: ticket.models,
   }
   memorySession = session
   await AsyncStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, JSON.stringify(session))
@@ -226,6 +233,10 @@ export async function getActiveQwenTicket() {
 export function getActiveQwenEndpoint(): string | undefined { return memorySession?.endpoint }
 export function getActiveQwenHttpBase(): string | undefined { return memorySession?.httpBase }
 export function getActiveQwenModel(): string | undefined { return memorySession?.model }
+/** Region-correct HTTP model name for a turn-based call, or undefined → caller uses the build-time default. */
+export function getActiveQwenHttpModel(kind: 'tts' | 'asr' | 'chat' | 'vision'): string | undefined {
+  return memorySession?.httpModels?.[kind]
+}
 
 function resolveTimezone(): string {
   try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC' } catch { return 'UTC' }

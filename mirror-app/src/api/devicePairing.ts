@@ -27,22 +27,30 @@ export type DeviceConfiguration = {
   } | null
 }
 
-const CN_PROBE_URL = process.env.EXPO_PUBLIC_QWEN_CN_PROBE_URL || 'https://dashscope.aliyuncs.com'
-const SG_PROBE_URL = process.env.EXPO_PUBLIC_QWEN_SG_PROBE_URL || 'https://ws-s37sbnnxivio0l58.ap-southeast-1.maas.aliyuncs.com'
+// Host ROOTS (overridable). We probe each region's token-mint path, which returns 401 quickly WITHOUT
+// auth from the region's real origin — a fair, comparable RTT. (A plain GET to the SG realtime host,
+// which is WebSocket-only, can hang until timeout and make a reachable region look unreachable.)
+const CN_PROBE_URL = (process.env.EXPO_PUBLIC_QWEN_CN_PROBE_URL || 'https://dashscope.aliyuncs.com').replace(/\/+$/, '')
+const SG_PROBE_URL = (process.env.EXPO_PUBLIC_QWEN_SG_PROBE_URL || 'https://ws-s37sbnnxivio0l58.ap-southeast-1.maas.aliyuncs.com').replace(/\/+$/, '')
+const PROBE_TIMEOUT_MS = 1500
+const PROBE_MARGIN_MS = 120
 
 /**
- * One-time reachability/latency probe of the CN vs SG Qwen hosts, run at pairing. Returns the faster
- * reachable region, or undefined if neither answered (backend then falls back to IP-geo / timezone).
- * This is the "probe wins, IP validates" signal. Best-effort and bounded — never blocks pairing.
+ * One-time probe (at pairing) of the CN vs SG hosts. Returns a region ONLY when the signal is decisive —
+ * exactly one host reachable, or a clear latency margin — otherwise undefined so the backend decides by
+ * IP-geo (avoids a CDN-fronted CN edge beating the single-region SG origin on a device that is in SEA).
+ * Best-effort and bounded (~1.5s). The backend cross-validates this against IP.
  */
 async function probeRegion(): Promise<'cn' | 'sg' | undefined> {
-  const measure = async (url: string): Promise<number> => {
+  const measure = async (host: string): Promise<number> => {
     const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 3000)
+    const timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS)
     const start = Date.now()
     try {
-      // Any HTTP response (even 401/404) proves reachability; fetch only rejects on a network error/abort.
-      await fetch(url, { method: 'GET', signal: controller.signal })
+      // Any HTTP response (401 here) proves reachability; fetch only rejects on a network error/abort.
+      await fetch(`${host}/api/v1/tokens?expire_in_seconds=60`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}', signal: controller.signal,
+      })
       return Date.now() - start
     } catch {
       return Number.POSITIVE_INFINITY
@@ -51,7 +59,11 @@ async function probeRegion(): Promise<'cn' | 'sg' | undefined> {
     }
   }
   const [cn, sg] = await Promise.all([measure(CN_PROBE_URL), measure(SG_PROBE_URL)])
-  if (!Number.isFinite(cn) && !Number.isFinite(sg)) return undefined
+  const cnUp = Number.isFinite(cn)
+  const sgUp = Number.isFinite(sg)
+  if (!cnUp && !sgUp) return undefined              // neither reachable → backend uses IP/timezone
+  if (cnUp !== sgUp) return cnUp ? 'cn' : 'sg'      // exactly one reachable → decisive
+  if (Math.abs(cn - sg) < PROBE_MARGIN_MS) return undefined  // too close to call → defer to IP-geo
   return sg < cn ? 'sg' : 'cn'
 }
 
