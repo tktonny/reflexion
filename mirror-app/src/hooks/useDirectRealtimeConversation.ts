@@ -121,6 +121,9 @@ function numberFromEnv(raw: string | undefined, fallback: number): number {
 const BARGE_IN_ENABLED = (process.env.EXPO_PUBLIC_BARGEIN ?? 'on') !== 'off'
 // Compile the (mildly hot) per-chunk mic sampling out of production builds; only the debug HUD needs it.
 const DEBUG_MIC = process.env.EXPO_PUBLIC_DEBUG_OVERLAY === 'on'
+// Hidden user-role priming turn seeded before the companion opening response.create so SG accepts it
+// (see the seeding in session.updated). Input-only; never spoken, never in the recorded transcript.
+const COMPANION_OPENING_CUE = '(Please greet me warmly to begin our chat.)'
 const BARGE_IN_START_RMS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_START_RMS, 0.06)
 const BARGE_IN_MIN_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_MIN_MS, 700)
 const BARGE_IN_GRACE_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_GRACE_MS, 900)
@@ -921,6 +924,14 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
             responseRequestedRef.current = true
             audioRef.current?.setCaptureMuted(true)
             transition({ type: 'response_requested' })
+            // SG's qwen3.5-omni-flash-realtime rejects response.create on an empty conversation
+            // ("InvalidParameter: The input messages do not contain elements with the role of user");
+            // CN tolerates it. That is the whole reason companion (LLM-generated opening) dropped to the
+            // turn-based fallback on SG while screening (local-TTS opening, no response.create) stayed on
+            // omni. Seed a hidden user-role text item so the opening greeting is a valid assistant turn on
+            // both regions. It is input-only (never spoken); the transcript is built from audio ASR, so it
+            // never appears in the recorded conversation.
+            send({ type: 'conversation.item.create', item: { type: 'message', role: 'user', content: [{ type: 'input_text', text: COMPANION_OPENING_CUE }] } })
             send({ type: 'response.create' })
           }
         } else if (responseAfterSessionUpdateRef.current) {

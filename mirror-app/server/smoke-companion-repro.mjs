@@ -18,18 +18,28 @@ const HOST = process.env.REPRO_HOST || qwenConfig.realtimeUrlChina
 const DIRECT = process.env.REPRO_DIRECT === '1'
 const H = { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' }
 
-const TOOLS_FLAT = [{ type: 'function', name: 'get_weather', description: 'weather', parameters: { type: 'object', properties: { city: { type: 'string' } } } }]
-const TOOLS_NESTED = [{ type: 'function', function: { name: 'get_weather', description: 'weather', parameters: { type: 'object', properties: { city: { type: 'string' } } } } }]
-const SEMANTIC = { type: 'semantic_vad', threshold: 0.5, silence_duration_ms: 900, create_response: true, interrupt_response: false }
-const SERVER = { type: 'server_vad', threshold: 0.1, silence_duration_ms: 900, create_response: true, interrupt_response: false }
+// The device's REAL companion payload (src/orchestration/realtime.ts): voice Serena, max_tokens 256,
+// 4 flat tools, semantic_vad(0.5, 1200). Screening is identical minus tools + turn_detection:null.
+const DEV = { voice: 'Serena', max_tokens: 256, temperature: 0.25 }
+const TOOLS4 = [
+  { type: 'function', name: 'get_weather', description: "Current weather and a short forecast for a city. Omit `city` for the patient's home area.", parameters: { type: 'object', properties: { city: { type: 'string', description: 'City name, e.g. Tokyo.' } } } },
+  { type: 'function', name: 'web_search', description: 'Search the web for current facts, news, or a general question you are unsure about.', parameters: { type: 'object', properties: { query: { type: 'string', description: 'The search query.' } }, required: ['query'] } },
+  { type: 'function', name: 'list_medications', description: "List the patient's current medications and their schedules.", parameters: { type: 'object', properties: {} } },
+  { type: 'function', name: 'upcoming_reminders', description: "List the patient's reminders or medications due in the next 24 hours.", parameters: { type: 'object', properties: {} } },
+]
+const SEM = { type: 'semantic_vad', threshold: 0.5, silence_duration_ms: 1200, create_response: true, interrupt_response: false }
+const SERVER = { type: 'server_vad', threshold: 0.5, silence_duration_ms: 1200, create_response: true, interrupt_response: false }
 
 const VARIANTS = {
-  'baseline server_vad, no tools': { turn_detection: SERVER },
-  'semantic_vad, no tools': { turn_detection: SEMANTIC },
-  'server_vad + tools(flat)': { turn_detection: SERVER, tools: TOOLS_FLAT },
-  'semantic_vad + tools(flat)': { turn_detection: SEMANTIC, tools: TOOLS_FLAT },
-  'semantic_vad + tools(nested)': { turn_detection: SEMANTIC, tools: TOOLS_NESTED },
-  'semantic_vad, no interrupt_response field': { turn_detection: { type: 'semantic_vad', threshold: 0.5, silence_duration_ms: 900, create_response: true } },
+  'device SCREENING (Serena, td:null, no tools)': { ...DEV, turn_detection: null },
+  'device COMPANION FULL (Serena, semantic_vad, 4 tools)': { ...DEV, turn_detection: SEM, tools: TOOLS4 },
+  '  minus tools (Serena, semantic_vad)': { ...DEV, turn_detection: SEM },
+  '  minus semantic_vad (Serena, server_vad, 4 tools)': { ...DEV, turn_detection: SERVER, tools: TOOLS4 },
+  '  Cherry instead of Serena (FULL)': { voice: 'Cherry', max_tokens: 256, temperature: 0.25, turn_detection: SEM, tools: TOOLS4 },
+  '  each tool alone: web_search only': { ...DEV, turn_detection: SEM, tools: [TOOLS4[1]] },
+  '  each tool alone: get_weather only': { ...DEV, turn_detection: SEM, tools: [TOOLS4[0]] },
+  '  empty-params tools only (list_meds+reminders)': { ...DEV, turn_detection: SEM, tools: [TOOLS4[2], TOOLS4[3]] },
+  'FIX: COMPANION FULL + seeded user item': { ...DEV, turn_detection: SEM, tools: TOOLS4, __seed: true },
 }
 
 async function mintToken() {
@@ -39,6 +49,8 @@ async function mintToken() {
 }
 
 function testVariant(extra) {
+  const seed = extra.__seed
+  const sessionExtra = { ...extra }; delete sessionExtra.__seed
   return new Promise(async (resolve) => {
     const auth = DIRECT ? KEY : await mintToken()
     if (!auth) return resolve('no-token')
@@ -48,11 +60,18 @@ function testVariant(extra) {
     const timer = setTimeout(() => finish('OK (no error in 6s)'), 6000)
     ws.on('open', () => ws.send(JSON.stringify({
       event_id: 'evt_1', type: 'session.update',
-      session: { modalities: ['text', 'audio'], voice: qwenConfig.defaultVoice, instructions: 'You are a warm companion. Reply in English.', input_audio_format: 'pcm', output_audio_format: 'pcm', input_audio_transcription: { model: qwenConfig.transcriptionModel }, ...extra },
+      session: { modalities: ['text', 'audio'], voice: qwenConfig.defaultVoice, instructions: 'You are a warm companion. Reply in English.', input_audio_format: 'pcm', output_audio_format: 'pcm', input_audio_transcription: { model: qwenConfig.transcriptionModel }, ...sessionExtra },
     })))
     ws.on('message', (d) => { let m; try { m = JSON.parse(d.toString()) } catch { return }
       if (m.type === 'error') finish(`ERROR ${m.error?.code || '?'}: ${m.error?.message || JSON.stringify(m.error)}`)
-      if (m.type === 'session.updated') finish('session.updated ✓ (accepted)')
+      // Don't stop at session.updated — the device then sends response.create, and the rejection may
+      // land there. SG requires a user-role message to exist first; `seed` injects a hidden text item
+      // (input_text) before response.create — this is the candidate fix.
+      if (m.type === 'session.updated') {
+        if (seed) ws.send(JSON.stringify({ type: 'conversation.item.create', item: { type: 'message', role: 'user', content: [{ type: 'input_text', text: '(Please greet me warmly to begin.)' }] } }))
+        ws.send(JSON.stringify({ type: 'response.create' }))
+      }
+      if (m.type === 'response.created' || m.type === 'response.audio.delta' || m.type === 'response.output_item.added') finish('accepted ✓ (session.update + response.create)')
     })
     ws.on('error', (e) => finish(`ws-error ${e?.message}`))
     ws.on('unexpected-response', (_r, res) => finish(`handshake HTTP ${res.statusCode}`))
