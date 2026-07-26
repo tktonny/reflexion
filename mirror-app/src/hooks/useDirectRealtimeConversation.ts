@@ -29,6 +29,7 @@ import {
   type ConversationRuntimeLease,
 } from '../orchestration/conversationRuntime'
 import { createPushToTalkGesture } from '../orchestration/pushToTalkGesture'
+import { dbg, hostOf } from '../debug/debugOverlay'
 import {
   choosePostPlaybackAction,
   createTurnTakingState,
@@ -310,6 +311,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     // Non-__DEV__ breadcrumb (like [session-telemetry]) so the reason for a v3→fallback is visible in a
     // production logcat — critical for telling a real device startup failure from an echo/barge-in one.
     console.info(`[realtime] unavailable → turn-based fallback: ${reason}`)
+    dbg.patch({ conn: { state: 'failed', reason } })
+    dbg.log(`omni unavailable: ${reason}`)
     onUnavailableRef.current?.(reason)
   }, [])
 
@@ -1263,6 +1266,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       // RN WebSocket supports a 3rd `options.headers` arg (not in DOM types → cast). The endpoint +
       // model come from the region-adaptive ticket (getBearer above populated them); build-time defaults
       // apply until then.
+      const connectStartedAt = Date.now()
+      dbg.patch({ conn: { state: 'connecting', tier: resume ? 'resume' : 'omni' } })
+      dbg.log(`ws connecting ${hostOf(getQwenRealtimeEndpoint()) || '?'}${resume ? ' (resume)' : ''}`)
       const socket = new (WebSocket as any)(realtimeWsUrl(getQwenRealtimeEndpoint(), getQwenRealtimeModel()), undefined, {
         headers: { Authorization: `Bearer ${bearer}` },
       }) as WebSocket
@@ -1287,6 +1293,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       socket.onopen = () => {
         if (!runtimeLease.isCurrent()) { try { socket.close() } catch {}; return }
         openedRef.current = true
+        dbg.patch({ conn: { state: 'open', openMs: Date.now() - connectStartedAt } })
+        dbg.log(`ws OPEN ${((Date.now() - connectStartedAt) / 1000).toFixed(1)}s`)
         if (connectTimerRef.current) { clearTimeout(connectTimerRef.current); connectTimerRef.current = null }
         setSessionActive(true)
         setConnecting(false)

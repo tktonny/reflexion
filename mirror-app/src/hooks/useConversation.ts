@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
 import { CONVERSATION_MODE } from '../config/conversationMode'
+import { dbg } from '../debug/debugOverlay'
 import type { ConversationApi, ConversationOptions } from './conversationTypes'
 import { useDirectRealtimeConversation } from './useDirectRealtimeConversation'
 import { useWebRtcRealtimeConversation } from './useWebRtcRealtimeConversation'
@@ -56,6 +57,8 @@ function useResilientConversation(opts: ConversationOptions): ConversationApi {
   const onUnavailable = useCallback((_reason: string) => {
     if (fellBackRef.current) return
     fellBackRef.current = true
+    dbg.patch({ conn: { state: 'fallback', tier: 'turn-based' } })
+    dbg.log('→ fallback to turn-based')
     setUsingFallback(true)
     swapRef.current()
   }, [])
