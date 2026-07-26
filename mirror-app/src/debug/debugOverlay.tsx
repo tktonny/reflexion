@@ -18,6 +18,10 @@ export type DebugSnapshot = {
   persona?: string
   ticket: { obtained?: boolean; region?: string; variant?: string; host?: string; model?: string; backendMs?: number }
   conn: { state: ConnState; tier?: string; openMs?: number; reason?: string }
+  // Live mic picture for the barge-in / echo diagnosis: peak RMS seen recently vs the interruption
+  // threshold, whether capture is muted, whether talk-over is armed (Aria owns the audio), and how
+  // many times barge-in has actually fired this session.
+  mic?: { peak?: number; thr?: number; muted?: boolean; armed?: boolean; barges?: number; err?: string }
   llmMedianMs?: number | null
   lines: string[]
 }
@@ -52,10 +56,16 @@ export const dbg = {
     snap = { ...snap, lines: [`${stamp()} ${line}`, ...snap.lines].slice(0, 12) }
     emit()
   },
+  /** Live mic level / barge-in state. Callers throttle this (audio chunks arrive ~10x/s). */
+  mic(partial: NonNullable<DebugSnapshot['mic']>) {
+    if (!ENABLED) return
+    snap = { ...snap, mic: { ...snap.mic, ...partial } }
+    emit()
+  },
   /** Reset the per-conversation fields (ticket/conn) at the start of a new session; keep pairing + log. */
   startSession(persona?: string) {
     if (!ENABLED) return
-    snap = { ...snap, persona, ticket: {}, conn: { state: 'idle' } }
+    snap = { ...snap, persona, ticket: {}, conn: { state: 'idle' }, mic: { barges: 0 } }
     emit()
   },
   get(): DebugSnapshot { return snap },
@@ -81,7 +91,11 @@ export function DebugOverlay() {
       <Text style={styles.text} numberOfLines={1}>host {s.ticket.host || '—'}</Text>
       <Text style={styles.text} numberOfLines={1}>model {s.ticket.model || '—'}</Text>
       <Text style={[styles.text, connColor(s.conn.state)]}>conn {s.conn.state}{openS}{s.conn.tier ? ` [${s.conn.tier}]` : ''}</Text>
-      {s.conn.reason ? <Text style={styles.text} numberOfLines={1}>↳ {s.conn.reason}</Text> : null}
+      {s.conn.reason ? <Text style={[styles.text, { color: '#ff9f43' }]} numberOfLines={2}>↳ {s.conn.reason}</Text> : null}
+      {s.mic?.err ? <Text style={[styles.text, { color: '#ff6b6b' }]} numberOfLines={2}>err {s.mic.err}</Text> : null}
+      <Text style={styles.text}>
+        mic {micBar(s.mic?.peak)} {fmt(s.mic?.peak)}/{fmt(s.mic?.thr)} {s.mic?.muted ? 'MUTED' : 'open'} {s.mic?.armed ? 'armed' : 'idle'} b{s.mic?.barges ?? 0}
+      </Text>
       <Text style={styles.text}>llm median {s.llmMedianMs != null ? `${Math.round(s.llmMedianMs)}ms` : '—'}</Text>
       <View style={styles.sep} />
       {s.lines.slice(0, 6).map((line, index) => <Text key={`${line}-${index}`} style={styles.log} numberOfLines={1}>{line}</Text>)}
@@ -90,6 +104,13 @@ export function DebugOverlay() {
 }
 
 function tail(value?: string) { return value ? value.slice(-6) : '——' }
+function fmt(value?: number) { return value != null ? value.toFixed(3) : '—' }
+// 8-step bar for the mic peak (0..~0.12 → the useful barge-in range) so a live level is readable at a glance.
+function micBar(peak?: number) {
+  if (peak == null) return '········'
+  const n = Math.max(0, Math.min(8, Math.round((peak / 0.12) * 8)))
+  return '█'.repeat(n).padEnd(8, '·').slice(0, 8)
+}
 
 const styles = StyleSheet.create({
   box: { position: 'absolute', top: 8, left: 8, maxWidth: 268, backgroundColor: 'rgba(0,0,0,0.74)', borderRadius: 8, padding: 8, zIndex: 9999 },
