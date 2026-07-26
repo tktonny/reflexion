@@ -3,7 +3,7 @@ import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { dirname, resolve, sep } from 'node:path'
 import express, { type Express } from 'express'
 import { ApiError } from './errors.js'
-import type { ObjectStore, PreparedObject, UploadPlan } from './objectStore.js'
+import type { DownloadPlan, ObjectStore, PreparedObject, UploadPlan } from './objectStore.js'
 
 // Filesystem-backed object store for single-box / dev deployments (implementation baseline §6). It
 // keeps the SAME presigned-upload contract the mirror already speaks: prepareUpload() returns a
@@ -28,8 +28,9 @@ function objectPath(dir: string, objectKey: string) {
   return full
 }
 
-function sign(secret: string, objectKey: string, expiresAtMs: number) {
-  return createHmac('sha256', secret).update(`${objectKey}\n${expiresAtMs}`).digest('hex')
+// `op` scopes the signature to PUT vs GET so a download URL can never be replayed to overwrite an object.
+function sign(secret: string, objectKey: string, expiresAtMs: number, op: 'put' | 'get' = 'put') {
+  return createHmac('sha256', secret).update(`${objectKey}\n${expiresAtMs}\n${op}`).digest('hex')
 }
 
 function safeEqualHex(a: string, b: string) {
@@ -63,6 +64,16 @@ export class LocalObjectStore implements ObjectStore {
       return false
     }
   }
+
+  async prepareDownload(input: { objectKey: string; contentType?: string; expiresInSeconds?: number }): Promise<DownloadPlan> {
+    const { baseUrl, secret } = config()
+    const expiresInSeconds = Math.min(Math.max(input.expiresInSeconds || 900, 60), 3600)
+    const expiresAt = new Date(Date.now() + expiresInSeconds * 1000)
+    const signature = sign(secret, input.objectKey, expiresAt.getTime(), 'get')
+    const query = new URLSearchParams({ key: input.objectKey, exp: String(expiresAt.getTime()), sig: signature, op: 'get' })
+    if (input.contentType) query.set('ct', input.contentType)
+    return { url: `${baseUrl}/api/v1/object-store/objects?${query.toString()}`, expiresAt }
+  }
 }
 
 // Mounts the signed-URL PUT target. MUST be registered before express.json() so the raw binary body is
@@ -91,6 +102,29 @@ export function maybeMountLocalObjectStore(app: Express) {
       } catch (error) {
         const status = error instanceof ApiError ? error.status : 500
         return response.status(status).json({ error: error instanceof Error ? error.message : 'UPLOAD_FAILED' })
+      }
+    })()
+  })
+  // Signed GET target — serves a stored object to a holder of a valid download signature. Used so an
+  // external service (Qwen-Audio voiceprint enrollment) can fetch a past check-in WAV by its signed URL.
+  app.get('/api/v1/object-store/objects', (request, response) => {
+    void (async () => {
+      try {
+        const { dir, secret } = config()
+        const objectKey = String(request.query.key || '')
+        const exp = Number(request.query.exp)
+        const sig = String(request.query.sig || '')
+        if (!objectKey || !Number.isFinite(exp)) return response.status(400).json({ error: 'INVALID_DOWNLOAD_URL' })
+        if (exp < Date.now()) return response.status(403).json({ error: 'DOWNLOAD_URL_EXPIRED' })
+        if (!safeEqualHex(sig, sign(secret, objectKey, exp, 'get'))) return response.status(403).json({ error: 'DOWNLOAD_SIGNATURE_INVALID' })
+        const bytes = await readFile(objectPath(dir, objectKey))
+        response.setHeader('Content-Type', String(request.query.ct || 'application/octet-stream'))
+        response.setHeader('Content-Length', String(bytes.byteLength))
+        response.setHeader('Cache-Control', 'no-store')
+        return response.status(200).end(bytes)
+      } catch (error) {
+        const status = error instanceof ApiError ? error.status : 404
+        return response.status(status).json({ error: error instanceof Error ? error.message : 'DOWNLOAD_FAILED' })
       }
     })()
   })

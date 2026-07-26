@@ -15,9 +15,14 @@ export type PreparedObject = {
   expiresInSeconds?: number
 }
 
+export type DownloadPlan = { url: string; expiresAt: Date }
+
 export interface ObjectStore {
   prepareUpload(input: PreparedObject): Promise<UploadPlan>
   verify(input: { objectKey: string; hash: string; sizeBytes: number }): Promise<boolean>
+  /** A short-lived, signed, publicly-fetchable GET URL for a stored object — used to hand a voiceprint
+   *  audio (a past check-in WAV) to Qwen-Audio's `voiceprint_audio_urls` at session start. */
+  prepareDownload(input: { objectKey: string; contentType?: string; expiresInSeconds?: number }): Promise<DownloadPlan>
 }
 
 export function getObjectStore(): ObjectStore {
@@ -33,6 +38,9 @@ class UnconfiguredObjectStore implements ObjectStore {
   }
   async verify(): Promise<boolean> {
     return false
+  }
+  async prepareDownload(): Promise<DownloadPlan> {
+    throw new ApiError(503, 'OBJECT_STORE_NOT_CONFIGURED', 'Artifact storage is not configured on this server.', true)
   }
 }
 
@@ -68,7 +76,13 @@ class S3CompatibleObjectStore implements ObjectStore {
       && response.headers.get('x-amz-meta-sha256') === input.hash
   }
 
-  private presign(method: 'PUT' | 'HEAD', objectKey: string, expires: number, headers: Record<string, string>) {
+  async prepareDownload(input: { objectKey: string; contentType?: string; expiresInSeconds?: number }): Promise<DownloadPlan> {
+    const expiresInSeconds = Math.min(Math.max(input.expiresInSeconds || 900, 60), 3600)
+    // S3 GET returns the object's stored content-type; no signed headers needed for a plain GET.
+    return { url: this.presign('GET', input.objectKey, expiresInSeconds, {}), expiresAt: new Date(Date.now() + expiresInSeconds * 1000) }
+  }
+
+  private presign(method: 'PUT' | 'HEAD' | 'GET', objectKey: string, expires: number, headers: Record<string, string>) {
     const now = new Date()
     const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, '')
     const date = amzDate.slice(0, 8)

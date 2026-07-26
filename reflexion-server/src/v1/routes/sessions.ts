@@ -98,12 +98,33 @@ sessionsRouter.post('/sessions/:sessionId/realtime-tickets', requireSessionActor
     const variant: QwenVariant = body.variant === 'audio' ? 'audio' : 'omni'
     const region = normalizeRegion(body.region ?? device?.regionOverride ?? device?.region ?? process.env.QWEN_DEFAULT_REGION)
     const ticket = await createQwenRealtimeTicket(String(session.acquisition?.language || 'zh-CN'), region, variant)
+    // Audio-tier voiceprint: hand Qwen-Audio the patient's most recent verified check-in WAV (already
+    // 16kHz mono in the object store) so smart_turn locks onto the elder and rejects bystanders /
+    // background. Best-effort — no enrolled audio, or download-prep fails → ticket ships without a
+    // voiceprint and smart_turn still runs.
+    let data: Record<string, unknown> = ticket
+    if (variant === 'audio') {
+      const audio = await db.collection<any>(collections.artifacts).findOne(
+        { patientId: session.patientId, kind: 'audio', state: 'verified' },
+        { sort: { verifiedAt: -1 }, projection: { objectKey: 1, contentType: 1 } },
+      )
+      if (audio?.objectKey) {
+        try {
+          const dl = await getObjectStore().prepareDownload({
+            objectKey: String(audio.objectKey), contentType: String(audio.contentType || 'audio/wav'), expiresInSeconds: 1800,
+          })
+          data = { ...ticket, voiceprintAudioUrls: [dl.url] }
+        } catch (error) {
+          console.warn('[realtime-ticket] voiceprint prepareDownload failed', error instanceof Error ? error.message : error)
+        }
+      }
+    }
     if (session.state === 'created') {
       await db.collection<any>(collections.sessions).updateOne({ _id: session._id, state: 'created' }, {
         $set: { state: 'active', activatedAt: new Date(), updatedAt: new Date() }, $inc: { stateVersion: 1 },
       })
     }
-    return { status: 201, data: ticket }
+    return { status: 201, data }
   }, undefined, sealedJsonCodec)
   response.setHeader('Cache-Control', 'no-store')
   sendData(response, result.data, result.status)
