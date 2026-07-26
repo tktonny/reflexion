@@ -6,6 +6,11 @@ import { ApiError } from './errors.js'
  *  short-lived ticket + endpoints, never a key. */
 export type QwenRegion = 'cn' | 'sg' | 'jp'
 
+/** Which realtime model family the ticket is for. 'omni' = qwen3.5-omni-realtime (CN+SG, semantic_vad);
+ *  'audio' = qwen-audio-3.0-realtime (Beijing-only, smart_turn + voiceprint) — the tier-3 fallback in the
+ *  mirror's omni→cn→audio→turn-based ladder. */
+export type QwenVariant = 'omni' | 'audio'
+
 type QwenTokenResponse = { token?: string; expires_at?: string | number }
 
 /** HTTP model names the device uses for turn-based/scripted calls. Region-dependent: verified live that
@@ -112,9 +117,11 @@ function regionConfig(region: QwenRegion): QwenRegionConfig {
  * realtime endpoint + HTTP base, so the device connects to the right host without ever holding a key.
  * The token-exchange is identical across regions (POST {host}/api/v1/tokens — verified on ap-southeast-1).
  */
-export async function createQwenRealtimeTicket(language?: string, region: QwenRegion = 'cn') {
-  let effectiveRegion = region
-  let cfg = regionConfig(region)
+export async function createQwenRealtimeTicket(language?: string, region: QwenRegion = 'cn', variant: QwenVariant = 'omni') {
+  // qwen-audio-3.0-realtime is Beijing-only, so the 'audio' fallback tier always routes to cn regardless
+  // of the device's region.
+  let effectiveRegion: QwenRegion = variant === 'audio' ? 'cn' : region
+  let cfg = regionConfig(effectiveRegion)
   // Graceful degrade: if the resolved region isn't configured yet (e.g. SG creds not set during
   // rollout), fall back to cn instead of hard-503 bricking the device — and log it loudly.
   if (!cfg.apiKey && effectiveRegion !== 'cn') {
@@ -137,9 +144,16 @@ export async function createQwenRealtimeTicket(language?: string, region: QwenRe
     throw new ApiError(502, 'QWEN_TICKET_FAILED', 'Unable to create a Qwen session ticket.', true)
   }
   const expiresAt = normalizeExpiry(body.expires_at, lifetime)
+  // omni: qwen3.5-omni-realtime + semantic_vad + video. audio: qwen-audio-3.0-realtime + smart_turn,
+  // audio/text only (no video), and it's the tier that supports voiceprint speaker enhancement.
+  const realtimeModel = variant === 'audio'
+    ? (process.env.QWEN_CN_AUDIO_MODEL || 'qwen-audio-3.0-realtime-flash')
+    : (process.env.QWEN_REALTIME_MODEL || 'qwen3.5-omni-flash-realtime')
   return {
     provider: 'qwen' as const,
     region: effectiveRegion,
+    // Which model family this ticket is for — the mirror configures session.update accordingly.
+    variant,
     // Realtime WS endpoint (the device MUST use this rather than a build-time URL to be region-correct).
     endpoint: cfg.realtimeEndpoint,
     // HTTP host root for the device's turn-based TTS/ASR/chat/vision calls (same region as the token).
@@ -149,9 +163,11 @@ export async function createQwenRealtimeTicket(language?: string, region: QwenRe
     ticket: body.token,
     expiresAt: expiresAt.toISOString(),
     sessionPolicy: {
-      model: process.env.QWEN_REALTIME_MODEL || 'qwen3.5-omni-flash-realtime',
+      model: realtimeModel,
+      // The mirror uses this to set turn_detection: omni→semantic_vad, audio→smart_turn.
+      turnDetection: variant === 'audio' ? 'smart_turn' : 'semantic_vad',
       language: language || 'zh-CN',
-      modalities: ['audio', 'text', 'video'],
+      modalities: variant === 'audio' ? ['audio', 'text'] : ['audio', 'text', 'video'],
       clientMaySelectModel: false,
       clinicalDiagnosisAllowed: false,
     },
