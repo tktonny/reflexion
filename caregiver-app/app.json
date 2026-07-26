@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Reflexion",
-    "slug": "reflexion-app",
+    "slug": "reflexion",
     "scheme": "reflexion",
     "version": "1.0.1",
     "orientation": "portrait",
@@ -28,6 +28,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.reflexion.caregiver",
+      "googleServicesFile": "./google-services.json",
       "versionCode": 4
     },
     "web": {
@@ -44,7 +45,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "2acc6cdd-8819-4f29-be1d-85d5b4080b0f"
+        "projectId": "fadd4a42-857b-4d96-813f-ee13e762db8a"
       }
     }
   }
