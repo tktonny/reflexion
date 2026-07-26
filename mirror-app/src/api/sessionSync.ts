@@ -11,6 +11,7 @@ import {
 } from '../orchestration/deterministicSpeech'
 import type { SessionTelemetry, TurnTelemetry } from '../orchestration/sessionTelemetry'
 import { deviceFetch, randomIdempotencyKey } from '../storage/deviceCredentials'
+import { dbg, hostOf } from '../debug/debugOverlay'
 import { dataOrThrow } from './devicePairing'
 
 const APP_VERSION = String((Constants.expoConfig as { version?: string } | null)?.version || process.env.EXPO_PUBLIC_APP_VERSION || 'unknown')
@@ -183,6 +184,8 @@ export async function beginMirrorSession(type: MirrorSessionType, language: stri
   const data = await dataOrThrow<{ sessionId: string; stateVersion: number }>(response)
   memorySession = { sessionId: data.sessionId, stateVersion: data.stateVersion, type, language, startedAt: new Date().toISOString(), dailyPlan }
   await AsyncStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, JSON.stringify(memorySession))
+  dbg.startSession(type === 'daily_checkin' ? 'screening' : type)
+  dbg.log(`session ${type} …${data.sessionId.slice(-6)}`)
   return memorySession
 }
 
@@ -211,14 +214,21 @@ export async function getActiveQwenTicket() {
   // Also require the region endpoints: a ticket rehydrated from before this change (or an app upgrade
   // over an old cache) has no endpoint/httpBase, so force a refetch rather than fall back to the China URL.
   if (session.ticket && session.ticketExpiresAt && Date.parse(session.ticketExpiresAt) > Date.now() + 60_000
-    && session.endpoint && session.httpBase) return session.ticket
+    && session.endpoint && session.httpBase) {
+    dbg.patch({ ticket: { obtained: true, host: hostOf(session.endpoint), model: session.model } })
+    return session.ticket
+  }
+  const ticketStartedAt = Date.now()
   const response = await deviceFetch(`/api/v1/sessions/${encodeURIComponent(session.sessionId)}/realtime-tickets`, {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': randomIdempotencyKey() }, body: '{}',
   })
   const ticket = await dataOrThrow<{
-    ticket: string; expiresAt: string; endpoint?: string; httpBase?: string
+    ticket: string; expiresAt: string; endpoint?: string; httpBase?: string; region?: string; variant?: string
     models?: { tts?: string; asr?: string; chat?: string; vision?: string }; sessionPolicy?: { model?: string }
   }>(response)
+  const ticketBackendMs = Date.now() - ticketStartedAt
+  dbg.patch({ ticket: { obtained: true, region: ticket.region, variant: ticket.variant, host: hostOf(ticket.endpoint), model: ticket.sessionPolicy?.model, backendMs: ticketBackendMs } })
+  dbg.log(`ticket ${ticket.region || '?'}${ticket.variant ? `/${ticket.variant}` : ''} ${ticketBackendMs}ms`)
   session = {
     ...session,
     ticket: ticket.ticket,

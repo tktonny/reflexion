@@ -30,6 +30,7 @@ import { createDailyConversationPlan } from '../src/orchestration/deterministicS
 import { clearDeviceCredential, deviceFetch, getDeviceCredential } from '../src/storage/deviceCredentials'
 import { getStoredMirrorProfile } from '../src/storage/mirrorStorage'
 import { mirrorColors as c, mirrorFonts as f } from '../src/theme/mirrorTheme'
+import { DebugOverlay, dbg } from '../src/debug/debugOverlay'
 
 type ClosingStage = 'idle' | 'buffering' | 'goodbye' | 'saving'
 type LocalProblem = 'offline' | 'microphone' | 'service' | null
@@ -370,6 +371,24 @@ export default function ConversationScreen() {
     () => startWith('screening'),
   )
 
+  // Debug HUD feeds (no-ops unless EXPO_PUBLIC_DEBUG_OVERLAY=on): pairing ids once on mount, and a poll
+  // of the LLM median response latency while a conversation is running (snapshot() is a pure read).
+  useEffect(() => {
+    let active = true
+    void getDeviceCredential().then((cred) => {
+      if (active && cred) dbg.patch({ pairing: { deviceId: cred.deviceId, patientId: cred.patientId } })
+    }).catch(() => undefined)
+    return () => { active = false }
+  }, [])
+  useEffect(() => {
+    if (!busy) return
+    const id = setInterval(() => {
+      const telemetry = getSessionTelemetry?.()
+      if (telemetry) dbg.patch({ llmMedianMs: telemetry.medianResponseLatencyMs })
+    }, 2000)
+    return () => clearInterval(id)
+  }, [busy, getSessionTelemetry])
+
   const finalize = useCallback(async () => {
     if (endingRef.current) return
     endingRef.current = true
@@ -569,6 +588,8 @@ export default function ConversationScreen() {
           </Text>
         </Pressable>
       ) : null}
+
+      <DebugOverlay />
     </View>
   )
 }
