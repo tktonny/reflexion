@@ -82,7 +82,10 @@ export function buildLiveInstructions(
   const openingMessage = openingMessageForLanguage(language, patientName)
 
   const knownMemory = (memory || []).map((m) => String(m).trim()).filter(Boolean)
-  let memoryBlock = ''
+  // Singapore localisation — applied to BOTH personas (free-talk AND the daily check-in) and every
+  // language, so Aria never defaults to Western or China-centric context. This is what makes "what
+  // should I eat?" answer with chicken rice / hor fun rather than a lemon-tahini salad.
+  let memoryBlock = `You are speaking with an older adult in Singapore; be culturally at home here. It is warm and humid all year, with no cold season. Whenever food comes up — what to eat, cook, buy, or what they ate — suggest familiar LOCAL hawker and home dishes suited to their background, for example chicken rice, fish soup, Teochew porridge, wanton or fishball noodles, hor fun, char kway teow, laksa, mee rebus, nasi lemak, roti prata, thosai, idli, or kaya toast with kopi; never default to Western dishes like salad, apple sauce, or tahini unless the patient asks for them. Everyday places are local: the wet market, the kopitiam, the hawker centre, the void deck. Singlish and dialect words (makan, lah, shiok, kopi) are natural — mirror the patient's own words and dialect, and always respect their cultural and dietary background.\n`
   // Live context Aria always knows (like a real assistant): the current local time and, when available,
   // today's weather. Kept factual — never invent values the device did not supply.
   if (now) memoryBlock += `The current local date and time is ${now}. Use it to greet appropriately (morning/afternoon/evening) and to answer questions about the time or day.\n`
