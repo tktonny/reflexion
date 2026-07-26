@@ -4,6 +4,7 @@ import { asyncHandler } from '../../lib/asyncHandler.js'
 import { getDb, inTransaction } from '../../lib/mongo.js'
 import { authorizePatient, getPrincipal, requireActor } from '../platform/auth.js'
 import { collections } from '../platform/collections.js'
+import { DAILY_CHECKIN_CONSENT_PURPOSE } from './patients.js'
 import { openSecret, sealSecret } from '../platform/crypto.js'
 import { ApiError, badRequest, conflict, forbidden, notFound } from '../platform/errors.js'
 import { sendData } from '../platform/http.js'
@@ -350,7 +351,7 @@ async function consentForSession(tenantId: string, patientId: string, type: type
   if (type === 'companion' || type === 'device_test') return null
   const db = await getDb()
   const consent = await db.collection<any>(collections.consents).findOne({
-    tenantId, patientId, purpose: 'home_cognitive_monitoring', status: 'granted', withdrawnAt: null,
+    tenantId, patientId, purpose: DAILY_CHECKIN_CONSENT_PURPOSE, status: 'granted', withdrawnAt: null,
   }, { sort: { signedAt: -1 } })
   if (!consent) throw new ApiError(403, 'CONSENT_REQUIRED', 'Active home monitoring consent is required for this session type.')
   return consent

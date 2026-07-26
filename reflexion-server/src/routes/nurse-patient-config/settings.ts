@@ -97,6 +97,7 @@ settingsRouter.patch('/', asyncHandler(async (request, response) => {
       response.status(404).json({ error: 'Nurse config not found' })
       return
     }
+    await mirrorCaregiverSettingsToV1(db, nurseObjectId.toHexString(), update)
     response.json(serializeSettings(result))
   })
 }))
@@ -198,6 +199,33 @@ settingsRouter.patch('/patients/:patientId', asyncHandler(async (request, respon
 }))
 
 /**
+ * Mirrors a legacy caregiver-settings write into the v1 `users` document.
+ *
+ * Both API surfaces are live during the migration, and the sign-in bridge now SEEDS these fields rather than
+ * re-asserting them (otherwise it would revert a v1 edit). That leaves exactly one gap: a legacy write would
+ * not reach v1. Writing both here closes it, so whichever surface the caregiver used, the other agrees —
+ * the same rule the password reset follows.
+ */
+async function mirrorCaregiverSettingsToV1(db: Db, userId: string, update: Record<string, unknown>) {
+  const v1Update: Record<string, unknown> = {}
+  if (typeof update.name === 'string') v1Update.name = update.name
+  if (typeof update.phoneNumber === 'string') v1Update.phoneNumber = update.phoneNumber
+  if (typeof update.pushNotificationsEnabled === 'boolean') {
+    v1Update['notificationPreferences.pushNotificationsEnabled'] = update.pushNotificationsEnabled
+  }
+  if (typeof update.alertSensitivity === 'string') {
+    v1Update['notificationPreferences.alertSensitivity'] = update.alertSensitivity
+  }
+  if (typeof update.preferredDailySummaryTime === 'string') {
+    v1Update['notificationPreferences.preferredDailySummaryTime'] = update.preferredDailySummaryTime
+  }
+  if (!Object.keys(v1Update).length) return
+  v1Update.updatedAt = new Date()
+  // Update-only: a caregiver with no v1 user yet gets one from the sign-in bridge, not from here.
+  await db.collection<any>(collections.users).updateOne({ _id: userId }, { $set: v1Update })
+}
+
+/**
  * Keeps the v1 `patients` read model from drifting on the two fields it shares with the legacy profile.
  * Updates only — never upserts: a v1 patient row (and its care relationship) is created by pairing a
  * mirror, and editing a name must not mint a new v1 identity as a side effect.
@@ -206,7 +234,15 @@ async function syncV1Patient(db: Db, patientId: string, patientUpdate: Record<st
   const v1Update: Record<string, unknown> = {}
   if (typeof patientUpdate.name === 'string') v1Update.displayName = patientUpdate.name
   if (typeof patientUpdate.preferredLanguage === 'string') v1Update.preferredLanguage = patientUpdate.preferredLanguage
-  if (typeof patientUpdate.age === 'number') v1Update.ageBand = ageBand(patientUpdate.age)
+  if (typeof patientUpdate.age === 'number') {
+    v1Update.ageBand = ageBand(patientUpdate.age)
+    v1Update['profile.age'] = patientUpdate.age
+  }
+  // The display-only profile now has a v1 home, so a legacy edit must land there as well or the two
+  // surfaces disagree about the same loved one.
+  if (typeof patientUpdate.gender === 'string') v1Update['profile.gender'] = patientUpdate.gender
+  if (typeof patientUpdate.photoUrl === 'string') v1Update['profile.photoUrl'] = patientUpdate.photoUrl || null
+  if (typeof patientUpdate.phoneNumber === 'string') v1Update['profile.phoneNumber'] = patientUpdate.phoneNumber || null
   if (!Object.keys(v1Update).length) return
   await db.collection<any>(collections.patients).updateOne(
     { _id: patientId },

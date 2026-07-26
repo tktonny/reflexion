@@ -9,23 +9,147 @@ import { requireActor, getPrincipal } from '../platform/auth.js'
 import { sendData } from '../platform/http.js'
 import { newId, randomSecret } from '../platform/ids.js'
 import { issueAccessToken } from '../platform/tokens.js'
-import { objectBody, requiredString } from '../platform/validation.js'
+import { enumValue, objectBody, optionalString, requiredString } from '../platform/validation.js'
 import { appendOutbox } from '../platform/outbox.js'
 
 const ACCESS_TTL_SECONDS = 15 * 60
+/** Bounded so a pathological duplicate set cannot turn one sign-in into an unbounded scan. */
+const MAX_LOGIN_CANDIDATES = 10
+
 const REFRESH_TTL_MS = 30 * 24 * 60 * 60 * 1000
 
 export const identityRouter = Router()
 
+/**
+ * Sign in.
+ *
+ * Resolves the account by trying EVERY user with this email, not the first one Mongo happens to return.
+ * That matters because email is only unique per tenant (`{tenantId, emailNormalized}` in platform/indexes.ts)
+ * while this lookup is deliberately tenant-less — the caller does not know their tenant yet — and the legacy
+ * bridge gives every caregiver a private tenant. So one email CAN legitimately have several user documents,
+ * and a plain findOne picked one arbitrarily: for an account with a stale duplicate that meant a 401 with the
+ * correct password, and in the worst case signing someone into the wrong account and therefore another
+ * family's tenant.
+ *
+ * Candidates are ordered newest-first so a repeat login is stable, and the first whose password verifies wins.
+ */
 identityRouter.post('/auth/sessions', asyncHandler(async (request, response) => {
   const body = objectBody(request.body)
   const email = requiredString(body, 'email', 320).toLowerCase()
   const password = requiredString(body, 'password', 500)
   const db = await getDb()
-  const user = await db.collection<any>(collections.users).findOne({ emailNormalized: email, status: 'active' })
-  if (!user?.passwordHash || !verifyPassword(password, String(user.passwordHash))) {
+  const candidates = await db.collection<any>(collections.users)
+    .find({ emailNormalized: email, status: 'active' })
+    .sort({ updatedAt: -1, _id: 1 })
+    .limit(MAX_LOGIN_CANDIDATES)
+    .toArray()
+
+  const user = candidates.find((candidate) => candidate?.passwordHash && verifyPassword(password, String(candidate.passwordHash)))
+  if (!user) {
     throw new ApiError(401, 'INVALID_CREDENTIALS', 'Email or password is incorrect.')
   }
+  if (candidates.length > 1) {
+    // Not fatal — the right account was found — but duplicate users for one email are a data defect that
+    // will keep producing confusing behaviour until they are merged.
+    console.warn(`[auth] ${candidates.length} active users share ${email}; signed in as ${user._id} (tenant ${user.tenantId})`)
+  }
+
+  const issued = await createHumanSession(user as HumanUser)
+  sendData(response, { ...issued, actor: serializeActor(user as HumanUser) }, 201)
+}))
+
+const MIN_PASSWORD_LENGTH = 12
+const RELATIONSHIP_TYPES = ['parent', 'sibling', 'spouse', 'inlaw', 'grandpa', 'grandma', 'other'] as const
+
+/**
+ * Caregiver self-registration — the one thing v1 could not do.
+ *
+ * Until now nothing in v1 could create a user over HTTP at all: `users` was written only by the CLI
+ * bootstrap script, the legacy sign-in bridge and the migration. Caregiver accounts were therefore created
+ * by legacy `POST /nurse-patient-config/create`, which is why the app could not leave the legacy API behind.
+ *
+ * The shape deliberately matches what legacyV1Bridge.ensureV1TenantUser produces, so a caregiver who signs
+ * up here is indistinguishable from one who was migrated: one private tenant per caregiver, roles
+ * ['caregiver'] and emailNormalized set — without which they could never sign in again.
+ *
+ * `tenant_admin` is NOT granted. It reads as "operator of this tenant", not "owner of my own family's
+ * data": it makes authorizePatient skip the care_relationships check, unfilters GET /patients, and opens
+ * the clinical review queue. See the long note in lib/legacyV1Bridge.ts. A caregiver's access comes from
+ * their care_relationships rows and nothing else.
+ *
+ * Returns a session directly, because an account you cannot immediately use is not useful. Rate limiting
+ * comes from the /api/v1/auth mount in app.ts.
+ */
+identityRouter.post('/auth/registrations', asyncHandler(async (request, response) => {
+  const body = objectBody(request.body)
+  const name = requiredString(body, 'name', 120)
+  const email = requiredString(body, 'email', 320).trim().toLowerCase()
+  const password = requiredString(body, 'password', 500)
+  const phoneNumber = optionalString(body, 'phoneNumber', 40)
+  const relationshipToElderly = 'relationshipToElderly' in body
+    ? enumValue(body.relationshipToElderly, 'relationshipToElderly', RELATIONSHIP_TYPES)
+    : null
+
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    throw badRequest('EMAIL_INVALID', 'Enter a valid email address.')
+  }
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    throw badRequest('PASSWORD_TOO_SHORT', `Choose a password of at least ${MIN_PASSWORD_LENGTH} characters.`)
+  }
+
+  const db = await getDb()
+  // Checked before writing AND enforced by the write below, because two simultaneous sign-ups for the same
+  // email would both pass this check.
+  const existing = await db.collection<any>(collections.users).findOne({ emailNormalized: email, status: 'active' })
+  if (existing) {
+    throw new ApiError(409, 'EMAIL_IN_USE', 'An account already exists for that email address.')
+  }
+
+  const userId = newId('usr')
+  const tenantId = newId('ten')
+  const now = new Date()
+  const user = {
+    _id: userId,
+    tenantId,
+    name,
+    email,
+    emailNormalized: email,
+    passwordHash: hashPassword(password),
+    phoneNumber: phoneNumber || '',
+    relationshipToElderly,
+    roles: ['caregiver'],
+    scopes: [],
+    status: 'active',
+    notificationPreferences: {
+      pushNotificationsEnabled: true,
+      alertSensitivity: 'only_important_changes',
+      preferredDailySummaryTime: '19:00',
+    },
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  try {
+    await inTransaction(async (transactionDb, session) => {
+      await transactionDb.collection<any>(collections.tenants).insertOne({
+        _id: tenantId, name: `${name} tenant`, status: 'active', createdAt: now, updatedAt: now,
+      }, { session })
+      await transactionDb.collection<any>(collections.users).insertOne(user, { session })
+      await transactionDb.collection<any>(collections.auditEvents).insertOne({
+        _id: newId('audit'), tenantId, actor: { type: 'user', id: userId },
+        action: 'caregiver.registered', object: { type: 'user', id: userId }, outcome: 'success',
+        correlationId: request.requestId, occurredAt: now,
+      }, { session })
+    })
+  } catch (error) {
+    // The unique index is {tenantId, emailNormalized}; a fresh tenant means it cannot catch a cross-tenant
+    // race, so the pre-check above is the real guard and this only reports a genuine write failure.
+    if ((error as { code?: number })?.code === 11000) {
+      throw new ApiError(409, 'EMAIL_IN_USE', 'An account already exists for that email address.')
+    }
+    throw error
+  }
+
   const issued = await createHumanSession(user as HumanUser)
   sendData(response, { ...issued, actor: serializeActor(user as HumanUser) }, 201)
 }))
@@ -122,7 +246,57 @@ identityRouter.get('/me', requireActor('human'), asyncHandler(async (request, re
     _id: principal.userId, tenantId: principal.tenantId, status: 'active',
   }) as HumanUser | null
   if (!user) throw unauthorized()
-  sendData(response, serializeActor(user))
+  sendData(response, serializeProfile(user))
+}))
+
+/**
+ * Update the caregiver's own profile. PARTIAL: only keys present in the body are written, so a client that
+ * has not loaded a field can never blank it — the same rule the legacy settings route follows.
+ *
+ * Email is deliberately NOT editable here. Changing it would move the account's login identity and, with
+ * email uniqueness only enforced per tenant, could silently create the duplicate-account situation that
+ * broke sign-in. It needs its own verified flow.
+ */
+identityRouter.patch('/me', requireActor('human'), asyncHandler(async (request, response) => {
+  const principal = getPrincipal(request)
+  if (principal.kind !== 'human') throw unauthorized()
+  const body = objectBody(request.body)
+  const update: Record<string, unknown> = {}
+
+  if ('name' in body) update.name = requiredString(body, 'name', 120)
+  if ('phoneNumber' in body) update.phoneNumber = (optionalString(body, 'phoneNumber', 40) || '')
+  if ('relationshipToElderly' in body) {
+    update.relationshipToElderly = body.relationshipToElderly === null
+      ? null
+      : enumValue(body.relationshipToElderly, 'relationshipToElderly', RELATIONSHIP_TYPES)
+  }
+  if ('notificationPreferences' in body) {
+    const preferences = objectBody(body.notificationPreferences)
+    if ('pushNotificationsEnabled' in preferences) {
+      if (typeof preferences.pushNotificationsEnabled !== 'boolean') {
+        throw badRequest('VALIDATION_FAILED', 'pushNotificationsEnabled must be a boolean.')
+      }
+      update['notificationPreferences.pushNotificationsEnabled'] = preferences.pushNotificationsEnabled
+    }
+    if ('alertSensitivity' in preferences) {
+      update['notificationPreferences.alertSensitivity'] = enumValue(preferences.alertSensitivity, 'alertSensitivity', ALERT_SENSITIVITIES)
+    }
+    if ('preferredDailySummaryTime' in preferences) {
+      update['notificationPreferences.preferredDailySummaryTime'] = enumValue(preferences.preferredDailySummaryTime, 'preferredDailySummaryTime', SUMMARY_TIMES)
+    }
+  }
+
+  if (!Object.keys(update).length) throw badRequest('VALIDATION_FAILED', 'No supported profile field was provided.')
+  update.updatedAt = new Date()
+
+  const db = await getDb()
+  const updated = await db.collection<any>(collections.users).findOneAndUpdate(
+    { _id: principal.userId, tenantId: principal.tenantId, status: 'active' },
+    { $set: update },
+    { returnDocument: 'after' },
+  )
+  if (!updated) throw unauthorized()
+  sendData(response, serializeProfile(updated as HumanUser))
 }))
 
 type HumanUser = {
@@ -180,5 +354,34 @@ function serializeActor(user: HumanUser) {
     name: user.name || '',
     email: user.email || user.emailNormalized || '',
     roles: user.roles || [],
+  }
+}
+
+const ALERT_SENSITIVITIES = ['notify_me_about_everything', 'only_important_changes', 'only_urgent_alerts'] as const
+const SUMMARY_TIMES = ['09:00', '19:00'] as const
+
+/**
+ * The caregiver's own profile, for their settings screen.
+ *
+ * `phoneNumber` and `notificationPreferences` were already being written into `users` by the legacy bridge,
+ * but no v1 route returned them and none could update them — so the settings screen had no choice but to
+ * stay on the legacy API. Defaults are applied here so a user document predating a preference still reads
+ * as something the UI can render.
+ */
+function serializeProfile(user: HumanUser & Record<string, any>) {
+  const preferences = (user.notificationPreferences || {}) as Record<string, unknown>
+  return {
+    ...serializeActor(user),
+    phoneNumber: user.phoneNumber || '',
+    relationshipToElderly: user.relationshipToElderly || null,
+    notificationPreferences: {
+      pushNotificationsEnabled: preferences.pushNotificationsEnabled !== false,
+      alertSensitivity: ALERT_SENSITIVITIES.includes(preferences.alertSensitivity as never)
+        ? preferences.alertSensitivity
+        : 'only_important_changes',
+      preferredDailySummaryTime: SUMMARY_TIMES.includes(preferences.preferredDailySummaryTime as never)
+        ? preferences.preferredDailySummaryTime
+        : '19:00',
+    },
   }
 }

@@ -200,7 +200,7 @@ monitoringRouter.get('/patients/:patientId/monitoring/baseline', requireHuman, a
   sendData(response, data)
 }))
 
-monitoringRouter.get('/review-cases', requireHuman, requireHumanRole('provider', 'reviewer', 'tenant_admin'), asyncHandler(async (request, response) => {
+monitoringRouter.get('/review-cases', requireHuman, requireHumanRole('provider', 'reviewer'), asyncHandler(async (request, response) => {
   const principal = getPrincipal(request)
   if (principal.kind !== 'human') throw forbidden()
   const { limit, cursor } = pagination(request.query as Record<string, unknown>)
@@ -221,7 +221,7 @@ monitoringRouter.get('/review-cases', requireHuman, requireHumanRole('provider',
   sendPage(response, page.map(serializeReviewCase), hasMore ? String(page.at(-1)?._id) : null)
 }))
 
-monitoringRouter.get('/review-cases/:caseId', requireHuman, requireHumanRole('provider', 'reviewer', 'tenant_admin'), asyncHandler(async (request, response) => {
+monitoringRouter.get('/review-cases/:caseId', requireHuman, requireHumanRole('provider', 'reviewer'), asyncHandler(async (request, response) => {
   const principal = getPrincipal(request)
   const db = await getDb()
   const reviewCase = await db.collection<any>(collections.reviewCases).findOne({ _id: request.params.caseId, tenantId: principal.tenantId })
@@ -232,7 +232,7 @@ monitoringRouter.get('/review-cases/:caseId', requireHuman, requireHumanRole('pr
   sendData(response, { ...serializeReviewCase(reviewCase), dispositions: dispositions.map(serializeDisposition) })
 }))
 
-monitoringRouter.post('/review-cases/:caseId/dispositions', requireHuman, requireHumanRole('provider', 'reviewer', 'tenant_admin'), asyncHandler(async (request, response) => {
+monitoringRouter.post('/review-cases/:caseId/dispositions', requireHuman, requireHumanRole('provider', 'reviewer'), asyncHandler(async (request, response) => {
   const result = await executeIdempotent(request, 'POST:/api/v1/review-cases/:caseId/dispositions', async () => {
     const principal = getPrincipal(request)
     if (principal.kind !== 'human') throw forbidden()
@@ -396,8 +396,21 @@ function serializeReviewCase(item: Record<string, unknown>) {
 function serializeDisposition(item: Record<string, unknown>) {
   return { dispositionId: item._id, caseId: item.caseId, reviewerId: item.reviewerId, outcome: item.outcome, createdAt: item.createdAt }
 }
+/**
+ * Gates `providerDetail` — baseline ids, pipeline versions, and the longitudinal_research baseline's
+ * scalarAggregates and embedding metadata — on the routes a caregiver reads for their own family.
+ *
+ * Clinical roles ONLY. `tenant_admin` used to count here, and the legacy sign-in bridge granted
+ * `tenant_admin` to every caregiver, so every caregiver was one `monitoring:read` call away from the
+ * research layer that is supposed to stay in shadow isolation and never reach them. Nothing had actually
+ * leaked, because providerDetail on /monitoring/baseline is also guarded by `&& research` and no research
+ * baseline has been built yet — it would have leaked as soon as one was. The bridge no longer mints tenant
+ * admins (see lib/legacyV1Bridge.ts); dropping the role here as well means a future accidental grant of an
+ * operations role cannot reopen a clinical surface. Operator accounts from bootstrapAdmin still qualify
+ * through `provider`.
+ */
 function isProvider(principal: ReturnType<typeof getPrincipal>): boolean {
-  return principal.kind === 'human' && principal.roles.some((role) => ['provider', 'reviewer', 'tenant_admin'].includes(role))
+  return principal.kind === 'human' && principal.roles.some((role) => ['provider', 'reviewer'].includes(role))
 }
 function dateOnly(value: unknown, field: string) {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00Z`))) throw badRequest('VALIDATION_FAILED', `${field} must be YYYY-MM-DD.`)

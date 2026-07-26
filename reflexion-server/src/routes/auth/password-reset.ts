@@ -2,7 +2,9 @@
 // Backed on v1 `users` + `password_reset_tokens`; the new password is written as legacy pbkdf2
 // (lib/password.hashPassword) so the legacy /auth/sign-in can verify it. See LEGACY_V1_ADAPTER.md.
 import { Router } from 'express'
+import { ObjectId } from 'mongodb'
 import { asyncHandler } from '../../lib/asyncHandler.js'
+import { NURSE_CONFIG_COLLECTION } from '../../lib/constants.js'
 import { getDb } from '../../lib/mongo.js'
 import { hashPassword } from '../../lib/password.js'
 import { collections } from '../../v1/platform/collections.js'
@@ -58,10 +60,20 @@ passwordResetRouter.post('/', asyncHandler(async (request, response) => {
     return
   }
   const now = new Date()
+  const passwordHash = hashPassword(newPassword)
+  // BOTH stores. Writing only the v1 user meant legacy sign-in still verified the old NursePatientConfig
+  // hash — so the caregiver's new password did not work — and the sign-in bridge then copied that stale hash
+  // back over the v1 one, silently undoing the reset in both places.
   await db.collection<any>(collections.users).updateOne(
     { _id: record.userId },
-    { $set: { passwordHash: hashPassword(newPassword), updatedAt: now } },
+    { $set: { passwordHash, updatedAt: now } },
   )
+  if (ObjectId.isValid(String(record.userId))) {
+    await db.collection<any>(NURSE_CONFIG_COLLECTION).updateOne(
+      { _id: new ObjectId(String(record.userId)) },
+      { $set: { passwordHash, updatedAt: now } },
+    )
+  }
   await db.collection<any>(collections.passwordResetTokens).updateOne(
     { _id: record._id },
     { $set: { state: 'used', usedAt: now } },
