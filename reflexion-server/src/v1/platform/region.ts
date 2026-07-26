@@ -34,11 +34,15 @@ export function getClientIp(request: Request): string {
 function ipToRegion(ip: string): QwenRegion | null {
   const country = ipCountry(ip)
   if (!country) return null
-  return country.toUpperCase() === 'CN' ? 'cn' : 'sg'
+  const c = country.toUpperCase()
+  if (c === 'CN') return 'cn'
+  if (c === 'JP') return 'jp'
+  return 'sg'
 }
 
 // Coarse timezone → region, used only as a fallback when neither probe nor IP is available.
 const CN_TZ = new Set(['Asia/Shanghai', 'Asia/Urumqi', 'Asia/Chongqing', 'Asia/Harbin', 'Asia/Kashgar', 'PRC'])
+const JP_TZ = new Set(['Asia/Tokyo', 'Japan'])
 const SG_TZ = new Set([
   'Asia/Singapore', 'Singapore', 'Asia/Kuala_Lumpur', 'Asia/Kuching', 'Asia/Jakarta', 'Asia/Pontianak',
   'Asia/Makassar', 'Asia/Jayapura', 'Asia/Bangkok', 'Asia/Ho_Chi_Minh', 'Asia/Manila', 'Asia/Brunei',
@@ -46,6 +50,7 @@ const SG_TZ = new Set([
 function tzToRegion(tz?: string): QwenRegion | null {
   if (!tz) return null
   if (CN_TZ.has(tz)) return 'cn'
+  if (JP_TZ.has(tz)) return 'jp'
   if (SG_TZ.has(tz)) return 'sg'
   return null
 }

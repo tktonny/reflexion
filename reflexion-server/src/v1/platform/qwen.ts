@@ -1,9 +1,10 @@
 import { ApiError } from './errors.js'
 
 /** Which Qwen region a device's traffic is routed to. 'cn' = mainland China (dashscope.aliyuncs.com),
- *  'sg' = Singapore / ap-southeast-1 workspace host. Chosen per device at pairing and stored on the
- *  device record; the device only ever receives a short-lived ticket + endpoints, never a key. */
-export type QwenRegion = 'cn' | 'sg'
+ *  'sg' = Singapore / ap-southeast-1 workspace host, 'jp' = Japan / ap-northeast-1 workspace host.
+ *  Chosen per device at pairing and stored on the device record; the device only ever receives a
+ *  short-lived ticket + endpoints, never a key. */
+export type QwenRegion = 'cn' | 'sg' | 'jp'
 
 type QwenTokenResponse = { token?: string; expires_at?: string | number }
 
@@ -21,7 +22,7 @@ type QwenRegionConfig = {
   models: QwenHttpModels
 }
 
-function regionModels(prefix: 'CN' | 'SG', ttsDefault: string): QwenHttpModels {
+function regionModels(prefix: 'CN' | 'SG' | 'JP', ttsDefault: string): QwenHttpModels {
   return {
     tts: firstEnv(`QWEN_${prefix}_TTS_MODEL`) || ttsDefault,
     asr: firstEnv(`QWEN_${prefix}_ASR_MODEL`) || 'qwen3-asr-flash',
@@ -32,6 +33,8 @@ function regionModels(prefix: 'CN' | 'SG', ttsDefault: string): QwenHttpModels {
 
 const DEFAULT_CN_HOST = 'https://dashscope.aliyuncs.com'
 const DEFAULT_SG_HOST = 'https://ws-s37sbnnxivio0l58.ap-southeast-1.maas.aliyuncs.com'
+// Placeholder fallback only — the real Japan (ap-northeast-1) workspace host comes from QWEN_JP_HTTP_BASE.
+const DEFAULT_JP_HOST = 'https://dashscope-intl.aliyuncs.com'
 
 const trimSlash = (value: string) => value.trim().replace(/\/+$/, '')
 const wsRealtimeFrom = (host: string) => `${trimSlash(host).replace(/^http/, 'ws')}/api-ws/v1/realtime`
@@ -54,11 +57,12 @@ function normalizeHost(raw: string, fallback: string): string {
   return trimSlash(withScheme).replace(/\/(api\/v1|compatible-mode\/v1)$/, '')
 }
 
-/** Coerce an arbitrary value (device field, env) to a valid region. Anything that looks like Singapore /
- *  Southeast Asia maps to 'sg'; everything else is 'cn' — the backward-compatible default, so a legacy
+/** Coerce an arbitrary value (device field, env) to a valid region. Japan-like → 'jp', Singapore /
+ *  Southeast-Asia-like → 'sg'; everything else is 'cn' — the backward-compatible default, so a legacy
  *  device with no region field keeps its current China routing. */
 export function normalizeRegion(value: unknown): QwenRegion {
   const v = String(value ?? '').trim().toLowerCase()
+  if (v === 'jp' || v === 'japan' || v === 'jpn' || v === 'tokyo' || v === 'ap-northeast-1') return 'jp'
   return v === 'sg' || v === 'sea' || v === 'singapore' || v === 'ap-southeast-1' ? 'sg' : 'cn'
 }
 
@@ -76,6 +80,20 @@ function regionConfig(region: QwenRegion): QwenRegionConfig {
       httpBase: host,
       realtimeEndpoint: firstEnv('QWEN_SG_REALTIME_ENDPOINT', 'QWEN_REALTIME_ENDPOINT_SINGAPORE') || wsRealtimeFrom(host),
       models: regionModels('SG', 'qwen3-tts-flash'),
+    }
+  }
+  if (region === 'jp') {
+    // Japan (ap-northeast-1 / Tokyo). New canonical: QWEN_JP_*. Legacy fallbacks: QWEN_API_KEY_JAPAN,
+    // QWEN_BASE_JAPAN | QWEN_API_HOST_JP. JP host from unambiguously JP-named vars only.
+    const host = normalizeHost(
+      firstEnv('QWEN_JP_HTTP_BASE', 'QWEN_BASE_JAPAN', 'QWEN_API_HOST_JP'),
+      DEFAULT_JP_HOST,
+    )
+    return {
+      apiKey: firstEnv('QWEN_JP_API_KEY', 'QWEN_API_KEY_JAPAN'),
+      httpBase: host,
+      realtimeEndpoint: firstEnv('QWEN_JP_REALTIME_ENDPOINT', 'QWEN_REALTIME_ENDPOINT_JAPAN') || wsRealtimeFrom(host),
+      models: regionModels('JP', 'qwen3-tts-flash'),
     }
   }
   // China. New canonical: QWEN_CN_*. Legacy fallbacks: QWEN_API_KEY / DASHSCOPE_API_KEY / QWEN_BASE /
