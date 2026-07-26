@@ -31,6 +31,7 @@ import { clearDeviceCredential, deviceFetch, getDeviceCredential } from '../src/
 import { getStoredMirrorProfile } from '../src/storage/mirrorStorage'
 import { mirrorColors as c, mirrorFonts as f } from '../src/theme/mirrorTheme'
 import { DebugOverlay, dbg } from '../src/debug/debugOverlay'
+import { isCheckinDoneToday, markCheckinDoneToday, wakeHourFrom } from '../src/storage/checkinState'
 
 type ClosingStage = 'idle' | 'buffering' | 'goodbye' | 'saving'
 type LocalProblem = 'offline' | 'microphone' | 'service' | null
@@ -308,7 +309,9 @@ export default function ConversationScreen() {
       const today = current.toDateString()
       if (hhmm === normalized && lastAutoStartDateRef.current !== today) {
         lastAutoStartDateRef.current = today
-        startWith('screening')
+        // Only proactively start the check-in if today's isn't already done (the elder may have woken early
+        // and checked in manually). Never auto-start an unsolicited free chat.
+        void (async () => { if (!(await isCheckinDoneToday(wakeHourFrom(usualWakeTime)))) startWith('screening') })()
       }
     }, 30_000)
     return () => clearInterval(timerId)
@@ -357,18 +360,28 @@ export default function ConversationScreen() {
     setPendingStart(true)
   }
 
+  // The mirror decides the conversation kind so the elder never chooses: the FIRST talk of the day (or a
+  // forced long-press) runs the check-in; once today's check-in is complete, further talks are free chat.
+  function startAuto(forceCheckin: boolean) {
+    if (busy || checkingPairing || preparingStartRef.current) return
+    void (async () => {
+      const runCheckin = forceCheckin || !(await isCheckinDoneToday(wakeHourFrom(usualWakeTime)))
+      startWith(runCheckin ? 'screening' : 'companion')
+    })()
+  }
+
   useEffect(() => {
     if (!pendingStart || busy) return
     setPendingStart(false)
     void handleStart()
   }, [busy, handleStart, pendingStart])
 
-  // Entry map: a short TAP on the ambient home starts free chat (companion); a long-PRESS/hold starts
-  // the deterministic 6-stage daily check-in (screening). The wake word "Hello Aria" and the scheduled
-  // morning auto-start also run the check-in for now (the wake word may move to free-talk later).
+  // Entry map: the mirror auto-decides. Wake word "Hello Aria" and a short TAP both AUTO-select — the
+  // first conversation of the day is the check-in, and once it's done they become free chat. A long-PRESS
+  // forces a check-in anytime. The elder never has to pick "check-in vs free talk".
   useWakeWord(
     Platform.OS !== 'web' && !checkingPairing && !busy && !localProblem,
-    () => startWith('screening'),
+    () => startAuto(false),
   )
 
   // Debug HUD feeds (no-ops unless EXPO_PUBLIC_DEBUG_OVERLAY=on): pairing ids once on mount, and a poll
@@ -422,6 +435,11 @@ export default function ConversationScreen() {
         telemetry,
         sessionAudio,
       })
+      // A real check-in (screening + at least one patient turn) marks today's check-in complete, so the
+      // mirror routes later conversations to free chat until the next wake-bounded day.
+      if (persona === 'screening' && messagesRef.current.some((message) => message.role === 'user')) {
+        void markCheckinDoneToday(wakeHourFrom(usualWakeTime))
+      }
       // Summarize this conversation into durable, non-clinical facts and merge them into backend memory
       // so Aria remembers the patient next time. Fire-and-forget — never delay the closing screen for an
       // LLM round-trip; a failure just leaves the prior memory untouched.
@@ -438,7 +456,7 @@ export default function ConversationScreen() {
       setClosingStage('idle')
       setLocalProblem(classifyError(error instanceof Error ? error.message : 'Unable to save the conversation.'))
     }
-  }, [language, nurseName, stopConversation])
+  }, [language, nurseName, persona, usualWakeTime, stopConversation])
 
   // A realtime failure before the patient ever answered (endReason='error', zero user turns) is a
   // startup/connection error, NOT a completed check-in. Don't run finalize (which would save a bogus
@@ -556,8 +574,8 @@ export default function ConversationScreen() {
         language={language}
         homeWidgets={homeWidgets}
         microphoneActive={sessionActive}
-        onBegin={() => startWith('companion')}
-        onBeginCheckin={() => startWith('screening')}
+        onBegin={() => startAuto(false)}
+        onBeginCheckin={() => startAuto(true)}
         onEnd={() => void finalize()}
         onRetry={() => void retryProblem()}
         patientName={patientName}
