@@ -1268,8 +1268,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       }) as WebSocket
       socketRef.current = socket
       startingRef.current = false
-      // Connection watchdog: if the socket never opens within 7s (dead region/network), fall back
-      // to the turn-based stack instead of hanging in "Connecting..." forever.
+      // Connection watchdog: if the socket never opens within 15s (dead region/network), fall back
+      // to the turn-based stack instead of hanging in "Connecting..." forever. 15s (not 7s) tolerates a
+      // slower cross-region omni handshake (e.g. a device routed to the far region) before degrading.
       if (connectTimerRef.current) clearTimeout(connectTimerRef.current)
       connectTimerRef.current = setTimeout(() => {
         connectTimerRef.current = null
@@ -1281,7 +1282,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           if (resume) failClosed('Realtime reconnect timed out before opening.')
           else { reportUnavailable('ws_connect_timeout'); cleanup() }
         }
-      }, 7000)
+      }, 15000)
 
       socket.onopen = () => {
         if (!runtimeLease.isCurrent()) { try { socket.close() } catch {}; return }
