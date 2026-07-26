@@ -875,8 +875,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         // Surface the ACTUAL provider error in the HUD (code + message) — 'ws_error_frame' alone can't
         // tell you whether omni was rejected for a bad model, a malformed session.update, quota, etc.
         const detail = `${providerCode}${providerMessage ? `: ${providerMessage}` : ''}`
-        dbg.log(`omni err ${detail}`.slice(0, 110))
-        dbg.mic({ err: detail.slice(0, 90) })
+        dbg.log(`omni err ${detail}`.slice(0, 200))
+        dbg.mic({ err: detail.slice(0, 260) })
         if (!hadResponseRef.current) {
           // Omni rejected the session before any response: hand off to the fallback AND tear this
           // transport down (close -> onclose -> cleanup stops the PCM bridge). Do NOT un-mute, or the

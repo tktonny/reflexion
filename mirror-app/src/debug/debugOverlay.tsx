@@ -92,7 +92,7 @@ export function DebugOverlay() {
       <Text style={styles.text} numberOfLines={1}>model {s.ticket.model || '—'}</Text>
       <Text style={[styles.text, connColor(s.conn.state)]}>conn {s.conn.state}{openS}{s.conn.tier ? ` [${s.conn.tier}]` : ''}</Text>
       {s.conn.reason ? <Text style={[styles.text, { color: '#ff9f43' }]} numberOfLines={2}>↳ {s.conn.reason}</Text> : null}
-      {s.mic?.err ? <Text style={[styles.text, { color: '#ff6b6b' }]} numberOfLines={2}>err {s.mic.err}</Text> : null}
+      {s.mic?.err ? <Text style={[styles.log, { color: '#ff6b6b' }]} numberOfLines={6}>err {s.mic.err}</Text> : null}
       <Text style={styles.text}>
         mic {micBar(s.mic?.peak)} {fmt(s.mic?.peak)}/{fmt(s.mic?.thr)} {s.mic?.muted ? 'MUTED' : 'open'} {s.mic?.armed ? 'armed' : 'idle'} b{s.mic?.barges ?? 0}
       </Text>
