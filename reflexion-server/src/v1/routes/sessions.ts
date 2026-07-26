@@ -12,7 +12,7 @@ import { newId } from '../platform/ids.js'
 import { executeIdempotent, type IdempotencyCodec } from '../platform/idempotency.js'
 import { getObjectStore } from '../platform/objectStore.js'
 import { appendOutbox } from '../platform/outbox.js'
-import { createQwenRealtimeTicket, normalizeRegion } from '../platform/qwen.js'
+import { createQwenRealtimeTicket, normalizeRegion, type QwenVariant } from '../platform/qwen.js'
 import { enumValue, isoDate, objectBody, optionalString, positiveInteger, requiredString, stringArray } from '../platform/validation.js'
 
 const SESSION_TYPES = ['companion', 'daily_checkin', 'clinic_assessment', 'device_test'] as const
@@ -91,8 +91,13 @@ sessionsRouter.post('/sessions/:sessionId/realtime-tickets', requireSessionActor
       { _id: principal.deviceId },
       { projection: { region: 1, regionOverride: 1 } },
     )
-    const region = normalizeRegion(device?.regionOverride ?? device?.region ?? process.env.QWEN_DEFAULT_REGION)
-    const ticket = await createQwenRealtimeTicket(String(session.acquisition?.language || 'zh-CN'), region)
+    // The mirror's fallback ladder (omni@fastest → omni@cn → audio@cn → turn-based) requests successive
+    // tickets: an explicit `region` override for the cn-retry tier, and `variant:'audio'` for the
+    // qwen-audio-3.0 tier (which forces cn internally). Absent both, use the device's own region.
+    const body = (request.body ?? {}) as { region?: unknown; variant?: unknown }
+    const variant: QwenVariant = body.variant === 'audio' ? 'audio' : 'omni'
+    const region = normalizeRegion(body.region ?? device?.regionOverride ?? device?.region ?? process.env.QWEN_DEFAULT_REGION)
+    const ticket = await createQwenRealtimeTicket(String(session.acquisition?.language || 'zh-CN'), region, variant)
     if (session.state === 'created') {
       await db.collection<any>(collections.sessions).updateOne({ _id: session._id, state: 'created' }, {
         $set: { state: 'active', activatedAt: new Date(), updatedAt: new Date() }, $inc: { stateVersion: 1 },
