@@ -202,7 +202,12 @@ export async function getActiveMirrorSession() {
 
 export async function getActiveQwenTicket() {
   let session = await getActiveMirrorSession()
-  if (!session) session = await beginMirrorSession('companion', 'mandarin')
+  // Never conjure a session here. A ticket is only ever minted for a session the caller already created
+  // via beginMirrorSession (conversation.tsx / realtime-test). The old `if(!session) beginMirrorSession(
+  // 'companion')` fallback spawned a GHOST companion session every time a stray reconnect / getBearer
+  // fired after a check-in completed and cleared the active session — one empty session per real
+  // conversation. If there is no active session, fail so that stray call is a no-op, not a new session.
+  if (!session) throw new Error('no_active_mirror_session')
   // Also require the region endpoints: a ticket rehydrated from before this change (or an app upgrade
   // over an old cache) has no endpoint/httpBase, so force a refetch rather than fall back to the China URL.
   if (session.ticket && session.ticketExpiresAt && Date.parse(session.ticketExpiresAt) > Date.now() + 60_000
