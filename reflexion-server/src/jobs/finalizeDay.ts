@@ -61,7 +61,9 @@ async function queueNotification(
     dedupeKey,
     source: { type: 'daily_check', id: dedupeKey },
     // Analytics/debug fields the status engine writes alongside the caregiver-facing copy.
-    extra: { statusAtSend: colorFor(status), reason, localDate, channel: 'push' },
+    extra: { statusAtSend: colorFor(status), reason, localDate },
+    // Deliver the missed/technical/streak alert to the caregiver's phone, not just the in-app feed.
+    push: true,
   })
   return created > 0
 }

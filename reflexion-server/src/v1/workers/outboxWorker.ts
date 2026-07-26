@@ -6,7 +6,7 @@ import { processCompletedSession, verifyArtifact } from '../monitoring/pipeline.
 import { collections } from '../platform/collections.js'
 import { openSecret } from '../platform/crypto.js'
 import { sendPasswordResetEmail } from '../notifications/email.js'
-import { materializeReviewCaseNotifications } from '../notifications/service.js'
+import { materializeReviewCaseNotifications, materializeSessionCompletionNotifications } from '../notifications/service.js'
 
 const CONSUMER_NAME = 'platform-v1-worker'
 const MAX_ATTEMPTS = 8
@@ -82,6 +82,8 @@ async function handleEvent(db: Db, event: Record<string, any>) {
       break
     case 'session.completed':
       await processCompletedSession(db, String(event.aggregateId), String(event.correlationId))
+      // Caregiver-facing "checked in today" (+ late follow-up) push, independent of monitoring inclusion.
+      await materializeSessionCompletionNotifications(db, String(event.aggregateId))
       break
     case 'medication_plan.changed':
       await materializeMedicationReminders(db, String(event.aggregateId))

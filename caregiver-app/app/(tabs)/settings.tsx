@@ -282,6 +282,7 @@ export default function SettingsScreen() {
             <SectionHeader title="Support" />
             <ActionRow label="FAQ & Guide" onPress={() => router.push('/faq')} />
             <ActionRow label="Chat with support" onPress={() => router.push('/chatbot')} />
+            <ActionRow label="Send feedback" onPress={() => router.push('/feedback')} />
             <ActionRow label="Subscription & Billing" onPress={() => Alert.alert('Billing', 'Billing portal coming soon.')} />
           </>
         )}

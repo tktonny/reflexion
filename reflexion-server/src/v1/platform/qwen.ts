@@ -150,3 +150,46 @@ function normalizeExpiry(value: string | number | undefined, fallbackSeconds: nu
   }
   return new Date(Date.now() + fallbackSeconds * 1000)
 }
+
+/**
+ * Server-side Qwen chat completion via the OpenAI-compatible endpoint ({host}/compatible-mode/v1/chat/
+ * completions). Used for caregiver-facing text generation (the daily patient summary) — the key stays on
+ * the backend and never reaches a device. Defaults to the CN region (the key prod is configured with) and
+ * degrades to CN if the requested region has no key, mirroring createQwenRealtimeTicket.
+ */
+export async function qwenChatCompletion(input: {
+  messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>
+  region?: QwenRegion
+  model?: string
+  temperature?: number
+  maxTokens?: number
+  timeoutMs?: number
+}): Promise<{ content: string; model: string; region: QwenRegion }> {
+  let region = input.region || 'cn'
+  let cfg = regionConfig(region)
+  if (!cfg.apiKey && region !== 'cn') { region = 'cn'; cfg = regionConfig('cn') }
+  if (!cfg.apiKey) {
+    throw new ApiError(503, 'QWEN_NOT_CONFIGURED', `Qwen credentials are not configured (region '${region}').`, true)
+  }
+  const model = input.model || cfg.models.chat
+  const upstream = await fetch(`${cfg.httpBase}/compatible-mode/v1/chat/completions`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${cfg.apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model,
+      messages: input.messages,
+      temperature: input.temperature ?? 0.2,
+      ...(input.maxTokens ? { max_tokens: input.maxTokens } : {}),
+    }),
+    signal: AbortSignal.timeout(input.timeoutMs ?? 30_000),
+  })
+  const body = await upstream.json().catch(() => null) as { choices?: Array<{ message?: { content?: string } }>; error?: { message?: string } } | null
+  if (!upstream.ok) {
+    throw new ApiError(502, 'QWEN_CHAT_FAILED', body?.error?.message || 'Qwen chat completion failed.', true)
+  }
+  const content = body?.choices?.[0]?.message?.content
+  if (typeof content !== 'string' || !content.trim()) {
+    throw new ApiError(502, 'QWEN_CHAT_EMPTY', 'Qwen returned an empty completion.', true)
+  }
+  return { content: content.trim(), model, region }
+}

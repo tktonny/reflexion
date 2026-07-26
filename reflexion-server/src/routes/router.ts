@@ -13,6 +13,7 @@ import { conversationSessionCountsRouter } from './conversation-session-counts.j
 import { conversationSessionsByDayRouter } from './conversation-sessions-by-day.js'
 import { patientSummaryRouter } from './patient-summary.js'
 import { patientTrendRouter } from './patient-trend.js'
+import { feedbackRouter } from './feedback.js'
 import { qwenTokenRouter } from './qwen-token.js'
 
 export const router = Router()
@@ -32,4 +33,5 @@ router.use('/conversation-session-counts', conversationSessionCountsRouter)
 router.use('/conversation-sessions-by-day', conversationSessionsByDayRouter)
 router.use('/patient-summary', patientSummaryRouter)
 router.use('/patient-trend', patientTrendRouter)
+router.use('/feedback', feedbackRouter)
 router.use('/api/qwen-token', qwenTokenRouter)

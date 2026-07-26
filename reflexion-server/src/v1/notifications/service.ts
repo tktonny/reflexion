@@ -36,6 +36,9 @@ export async function materializeNotifications(db: Db, input: {
   dedupeKey: string
   source: { type: string; id: string }
   extra?: Record<string, unknown>
+  /** When true the new row is queued for a phone push (pushState:'pending'); the dispatcher delivers it.
+   *  Set only on insert, so re-running a job never re-pushes an already-delivered notification. */
+  push?: boolean
 }): Promise<number> {
   const now = new Date()
   let created = 0
@@ -55,6 +58,8 @@ export async function materializeNotifications(db: Db, input: {
       body: input.body,
       dedupeKey: input.dedupeKey,
       source: input.source,
+      // pushState gates the dispatcher: 'pending' → deliver once to the phone, 'none' → in-app only.
+      pushState: input.push ? 'pending' : 'none',
       ...(input.extra || {}),
       createdAt: now,
       updatedAt: now,
@@ -109,6 +114,61 @@ export async function materializeReviewCaseNotifications(db: Db, caseId: string)
     body: 'A new review item is available for this patient.',
     dedupeKey: reviewCaseNotificationDedupeKey(caseId),
     source: { type: 'review_case', id: caseId },
+    push: true,
   })
+  return { created }
+}
+
+function localDateInTz(date: Date, timezone: string): string {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(date)
+  const value = Object.fromEntries(parts.map((part) => [part.type, part.value])) as Record<string, string>
+  return `${value.year}-${value.month}-${value.day}`
+}
+
+/**
+ * On a completed daily check-in, notify caregivers their loved one checked in today (the "daily summary
+ * ready" touchpoint — completion IS the ready signal; the app fetches the summary on tap). If a
+ * `missed_7pm` alert already went out for the same local day, ALSO fire a warmer late_completion follow-up
+ * so a caregiver told "no check-in yet" learns it happened after all. Both are deduped per
+ * (patient, localDate, type) and pushed. Companion / non-check-in sessions never notify, and a zero-turn
+ * (abandoned) session is not a completion.
+ */
+export async function materializeSessionCompletionNotifications(db: Db, sessionId: string) {
+  const session = await db.collection<any>(collections.sessions).findOne({ _id: sessionId })
+  if (!session || session.type !== 'daily_checkin') return { created: 0 }
+  if (Number(session.acquisition?.patientTurns || 0) < 1) return { created: 0 }
+  const tenantId = String(session.tenantId)
+  const patientId = String(session.patientId)
+  const patient = await db.collection<any>(collections.patients).findOne({ _id: patientId }, { projection: { displayName: 1, timezone: 1 } })
+  const timezone = String(session.acquisition?.timezone || patient?.timezone || 'Asia/Singapore')
+  const when = session.localCompletedAt ? new Date(session.localCompletedAt)
+    : session.processingSummary?.completedAt ? new Date(session.processingSummary.completedAt) : new Date()
+  const localDate = localDateInTz(when, timezone)
+  const recipientUserIds = await notificationRecipients(db, tenantId, patientId)
+  if (!recipientUserIds.length) return { created: 0 }
+  const displayName = patient?.displayName
+  let created = 0
+  const completion = dailyCheckNotificationCopy('completion', displayName)
+  created += await materializeNotifications(db, {
+    tenantId, patientId, recipientUserIds, type: 'completion',
+    title: completion.title, body: completion.body,
+    dedupeKey: `${patientId}:${localDate}:completion`,
+    source: { type: 'daily_check', id: `${patientId}:${localDate}:completion` },
+    extra: { localDate, channel: 'push' }, push: true,
+  })
+  // Warmer follow-up only when we already told the caregiver today was missed.
+  const missedAlreadySent = await db.collection<any>(collections.notifications).findOne({
+    tenantId, patientId, dedupeKey: `${patientId}:${localDate}:missed_7pm`,
+  })
+  if (missedAlreadySent) {
+    const late = dailyCheckNotificationCopy('late_completion', displayName)
+    created += await materializeNotifications(db, {
+      tenantId, patientId, recipientUserIds, type: 'late_completion',
+      title: late.title, body: late.body,
+      dedupeKey: `${patientId}:${localDate}:late_completion`,
+      source: { type: 'daily_check', id: `${patientId}:${localDate}:late_completion` },
+      extra: { localDate, channel: 'push' }, push: true,
+    })
+  }
   return { created }
 }

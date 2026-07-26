@@ -19,4 +19,5 @@ export const collections = {
   toolInvocations: 'tool_invocations',
   patientMemory: 'patient_memory',
   supportThreads: 'support_threads', supportMessages: 'support_messages',
+  dailySummaries: 'daily_summaries', feedback: 'feedback',
 } as const
