@@ -83,11 +83,15 @@ sessionsRouter.post('/sessions/:sessionId/realtime-tickets', requireSessionActor
     const db = await getDb()
     // Route the ticket (key + endpoint + HTTP base) to the device's region, decided at pairing and
     // stored on the device. Missing region → QWEN_DEFAULT_REGION → 'cn' (backward-compatible).
+    // regionOverride is a deliberate operator override that WINS over the auto-decided region and — unlike
+    // `region` — is never rewritten by a re-pair. It exists for the "manufactured/paired in CN, deployed in
+    // SG" case: the pairing probe/IP/timezone all read CN, so without an override the device would forever
+    // get the China realtime endpoint and time out the omni WS from Singapore (→ push-to-talk fallback).
     const device = await db.collection<any>(collections.devices).findOne(
       { _id: principal.deviceId },
-      { projection: { region: 1 } },
+      { projection: { region: 1, regionOverride: 1 } },
     )
-    const region = normalizeRegion(device?.region ?? process.env.QWEN_DEFAULT_REGION)
+    const region = normalizeRegion(device?.regionOverride ?? device?.region ?? process.env.QWEN_DEFAULT_REGION)
     const ticket = await createQwenRealtimeTicket(String(session.acquisition?.language || 'zh-CN'), region)
     if (session.state === 'created') {
       await db.collection<any>(collections.sessions).updateOne({ _id: session._id, state: 'created' }, {
