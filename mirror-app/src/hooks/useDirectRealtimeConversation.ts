@@ -669,6 +669,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
 
     transition({ type: 'assistant_interrupted' })
     telemetryRef.current.onInterrupt('user_barge_in')
+    // HUD marker for the echo test: this fires ONLY when talk-over actually cuts Aria off. If it fires
+    // while nobody is speaking, her speaker output is leaking into the mic (echo) — that's the bug.
+    dbg.log(`barge-in fired +${Date.now() - playbackStartedAtRef.current}ms`)
     bargeInActiveRef.current = true
     setBargeInActive(true)
     vadSpeakingRef.current = true
