@@ -18,6 +18,7 @@ import {
   getStatusLabel,
   getReasonText,
   getBaselineProgressText,
+  getConversationsTodayText,
   formatLastInteraction,
 } from '../../src/lib/v1Status';
 import {
@@ -190,11 +191,12 @@ export default function HomeScreen() {
                 : getReasonText(v1.primaryReason, patient.name)
               : patient.lastSpokenLabel;
             const lastInteractionLine = v1 ? formatLastInteraction(v1.lastInteractionAt) : '';
+            const conversationsLine = v1 ? getConversationsTodayText(v1) : null;
             return (
               <TouchableOpacity
                 // One label for the whole row. Read as separate elements this card is six fragments —
                 // initials, name, a dot, a status, a reason, a chevron — which is unusable by voice.
-                accessibilityLabel={[patient.name, label, metaLine, lastInteractionLine]
+                accessibilityLabel={[patient.name, label, metaLine, conversationsLine, lastInteractionLine]
                   .filter(Boolean)
                   .join('. ')}
                 accessibilityRole="button"
@@ -237,6 +239,9 @@ export default function HomeScreen() {
                     <Text style={styles.patientStatusText}>{label}</Text>
                   </View>
                   <Text style={styles.patientMeta}>{metaLine}</Text>
+                  {conversationsLine ? (
+                    <Text style={styles.patientSubMeta}>{conversationsLine}</Text>
+                  ) : null}
                   {v1 ? (
                     <Text style={styles.patientSubMeta}>{lastInteractionLine}</Text>
                   ) : null}

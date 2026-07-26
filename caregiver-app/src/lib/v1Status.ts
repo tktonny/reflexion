@@ -15,6 +15,11 @@ export type V1PatientStatus = {
   completedToday: boolean;
   technicalState: V1TechnicalState;
   lastInteractionAt: string | null;
+  // Total interaction today (both check-ins and free chats). Optional: older backends omit them, so
+  // treat absent as "unknown" and render nothing rather than a misleading "0".
+  conversationsToday?: number;
+  checkinsToday?: number;
+  chatsToday?: number;
   updatedAt: string;
 };
 
@@ -83,6 +88,21 @@ export function getBaselineProgressText(progress: V1PatientStatus['baselineProgr
   const completed = Number(progress?.completedSessions || 0);
   const required = Number(progress?.requiredSessions || 7);
   return `${completed} of ${required} sessions recorded`;
+}
+
+// "3 conversations today · 1 check-in" — total interaction, both check-ins and free chats. Returns
+// null when the backend didn't send the counts (older deploy) or the day is still empty, so callers
+// can simply skip the line instead of showing a bare "0".
+export function getConversationsTodayText(
+  status: Pick<V1PatientStatus, 'conversationsToday' | 'checkinsToday'> | null | undefined,
+): string | null {
+  const total = Number(status?.conversationsToday || 0);
+  if (total <= 0) return null;
+  const times = total === 1 ? '1 conversation' : `${total} conversations`;
+  const checkins = Number(status?.checkinsToday || 0);
+  if (checkins <= 0) return `${times} today`;
+  const ci = checkins === 1 ? '1 check-in' : `${checkins} check-ins`;
+  return `${times} today · ${ci}`;
 }
 
 // "Today, 8:15am" / "Yesterday, 7:52am" / "2 days ago" / "No check-in yet".
