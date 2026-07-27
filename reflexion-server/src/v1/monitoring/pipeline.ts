@@ -159,12 +159,33 @@ async function evaluateIdentity(db: Db, session: Record<string, any>) {
   // assurance, and the modest confidence caps (not 1.0) reflect that a household member could speak.
   // Real enrollment matching is a future Phase-6 item (implementation baseline §7 Phase 6).
   if (!session.deviceId) return { verdict: 'manual_review', confidence: 0.3, method: 'device_assignment_only', reasons: ['NO_DEVICE_ASSIGNMENT'], enrollmentRef: null }
+
+  // Judged as of the moment the conversation happened, not as of now.
+  //
+  // This asked for an assignment that is active TODAY, which quietly made unpairing a mirror destructive:
+  // every session that loved one had ever recorded became `exclude` the next time it was processed, because
+  // the assignment behind it had since been revoked or replaced. Their whole baseline history evaporated —
+  // and swapping or re-pairing a mirror is a normal thing to do, with a button for it in the app.
+  //
+  // A later unpair cannot un-happen a conversation. The mirror authenticated with a device credential to
+  // create the session in the first place; that is the evidence, and it does not expire retroactively. So
+  // the assignment only has to have covered the capture instant.
+  const capturedAt = new Date(session.localCompletedAt || session.createdAt || Date.now())
   const assignment = await db.collection<any>(collections.assignments).findOne({
-    tenantId: session.tenantId, patientId: session.patientId, deviceId: session.deviceId, status: 'active',
-  })
-  return assignment
-    ? { verdict: 'linked', confidence: 0.7, method: 'device_assignment_only', reasons: ['ACTIVE_DEVICE_ASSIGNMENT_NOT_BIOMETRIC'], enrollmentRef: null }
-    : { verdict: 'exclude', confidence: 0, method: 'device_assignment_only', reasons: ['DEVICE_ASSIGNMENT_INVALID'], enrollmentRef: null }
+    tenantId: session.tenantId, patientId: session.patientId, deviceId: session.deviceId,
+    assignedAt: { $lte: capturedAt },
+    // Still active, or revoked/replaced only after this session was captured.
+    $or: [{ revokedAt: null }, { revokedAt: { $exists: false } }, { revokedAt: { $gt: capturedAt } }],
+  }, { sort: { assignedAt: -1 } })
+
+  if (!assignment) {
+    return { verdict: 'exclude', confidence: 0, method: 'device_assignment_only', reasons: ['DEVICE_ASSIGNMENT_INVALID'], enrollmentRef: null }
+  }
+  // The reason names which of the two it was, so a reviewer can tell a live pairing from a historical one.
+  const reason = assignment.status === 'active'
+    ? 'ACTIVE_DEVICE_ASSIGNMENT_NOT_BIOMETRIC'
+    : 'DEVICE_ASSIGNMENT_ACTIVE_AT_CAPTURE_NOT_BIOMETRIC'
+  return { verdict: 'linked', confidence: 0.7, method: 'device_assignment_only', reasons: [reason], enrollmentRef: null }
 }
 
 /**
