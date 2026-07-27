@@ -115,6 +115,12 @@ The platform has one backend (`reflexion-server`, Express + MongoDB, `/api/v1` s
 - `qrcode-generator` (pairing QR), `ws` + `mongodb` (used only by the local relay dev server under `server/`, not the device app).
 - A separate `server/` orchestration bundle exists (esbuild `build:orch`, `relay`, smoke scripts) for local turn-taking/realtime development; the device app itself is Expo Router.
 
+**Platforms (one codebase, two builds):**
+- **Android** (`com.reflexion.mirror`) — the primary smart-mirror unit. Native path: `expo-pcm-audio` (16 kHz PCM), onnxruntime wake word, `ws`/`webrtc` direct realtime to Qwen. Ships as a local-Gradle APK.
+- **Linux / Ubuntu** — the same app compiled for web (`react-native-web`) and wrapped in **Electron** (`electron/`, `npm run electron:build` → AppImage/deb). Functionally lighter: `relay` transport + Web-Audio capture, tap-to-start (no native wake word), and the relay holds a Qwen key as appliance config. See **`docs/mirror-app/linux-electron.md`** for the architecture, build/run, and production-hardening list.
+
+(Sibling matrix: **caregiver-app** ships **iOS + Android**; **admin-web** is a browser SPA.)
+
 **Directory structure**:
 - `app/` — Expo Router routes. Registered in `app/_layout.tsx:49-56`: `index`, `conversation`, `conversation-closing`, `settings`, `test-device`, `realtime-test`, `hardware-check`, `visual-acceptance`. `app/api/` holds a route-served endpoint.
 - `src/` — layered: `api/`, `storage/`, `hooks/`, `orchestration/`, `components/mirror/`, `native/`, `config/`, `constants/`, `prompts/`, `theme/`, `lib/`.
