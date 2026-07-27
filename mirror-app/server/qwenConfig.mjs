@@ -17,7 +17,9 @@ export const qwenConfig = {
   apiKey: env.QWEN_API_KEY || env.DASHSCOPE_API_KEY || null,
   realtimeUrl: str('REFLEXION_QWEN_OMNI_REALTIME_URL', 'wss://dashscope-intl.aliyuncs.com/api-ws/v1/realtime'),
   realtimeUrlChina: str('REFLEXION_QWEN_OMNI_REALTIME_URL_CHINA', 'wss://dashscope.aliyuncs.com/api-ws/v1/realtime'),
-  realtimeModel: str('REFLEXION_QWEN_OMNI_REALTIME_MODEL', 'qwen3-omni-flash-realtime'),
+  // Matches the model the backend issues in session tickets (qwen3.5 = semantic_vad, echo-rejecting).
+  // Only a fallback: the keyless path uses the ticket's own model, not this default.
+  realtimeModel: str('REFLEXION_QWEN_OMNI_REALTIME_MODEL', 'qwen3.5-omni-flash-realtime'),
   transcriptionModel: str('REFLEXION_QWEN_OMNI_REALTIME_TRANSCRIPTION_MODEL', 'gummy-realtime-v1'),
   defaultVoice: str('REFLEXION_QWEN_OMNI_REALTIME_DEFAULT_VOICE', 'Cherry'),
   englishVoice: str('REFLEXION_QWEN_OMNI_REALTIME_ENGLISH_VOICE', 'Cherry'),

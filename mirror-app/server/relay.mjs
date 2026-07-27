@@ -16,6 +16,7 @@ import {
   languageInputValue,
   promptStepCount,
   shouldRestartResponseForLanguageSwitch,
+  realtimeVoiceForLanguageKey,
   voiceProfileForSession,
   voiceProfileFromRecentSignals,
 } from './generated/orchestration.mjs'
@@ -55,7 +56,12 @@ function buildLiveSessionUpdate(patientId, language, { voice, wrapUp = false, pe
     type: 'session.update',
     session: {
       modalities: ['text', 'audio'],
-      voice: voice || voiceProfileForSession(language).voice,
+      // qwen3.5-omni (the ticket/semantic_vad path) has its OWN voice list and REJECTS the qwen-tts
+      // voices with `<400> Voice 'Cherry' is not supported` — which would kill every keyless session.
+      // Map to the realtime voice there; the legacy raw-key path keeps the old voices.
+      voice: turnDetection === 'semantic_vad'
+        ? realtimeVoiceForLanguageKey(voiceProfileForSession(language).languageKey)
+        : (voice || voiceProfileForSession(language).voice),
       instructions,
       max_tokens: qwenConfig.maxTokens,
       temperature: qwenConfig.temperature,

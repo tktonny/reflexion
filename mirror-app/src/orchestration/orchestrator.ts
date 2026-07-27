@@ -26,11 +26,12 @@ export const flowId = FLOW.flow_id
 export const promptStepCount = FLOW.steps.length
 
 export const BASE_DAILY_PATIENT_TURNS = FLOW.base_patient_turns
-export const HARD_MAX_TURN = FLOW.hard_max_patient_turns
 
-export function focusDirective(topicLabel: string): string {
-  return `CURRENT FOCUS: ${topicLabel}. In your next reply acknowledge what they just said in one short sentence, then gently move to this topic. Do not open any other topic.`
-}
+// Keep in step with the store: the backend persists at most 8 facts (v1/routes/tools.ts) and the
+// device summariser emits at most 8 (src/api/patientMemory.ts). Injecting fewer than that silently
+// discards memory that was already fetched and paid for.
+const MAX_INJECTED_MEMORY_FACTS = 8
+export const HARD_MAX_TURN = FLOW.hard_max_patient_turns
 
 
 /**
@@ -75,9 +76,9 @@ export function closingGoodbyeSentence(language: string | null | undefined): str
 export function buildLiveInstructions(
   patientId: string,
   language: string,
-  opts: { patientName?: string | null; memory?: string[]; steer?: string; persona?: 'screening' | 'companion'; now?: string; weather?: string } = {},
+  opts: { patientName?: string | null; memory?: string[]; persona?: 'screening' | 'companion'; now?: string; weather?: string } = {},
 ): string {
-  const { patientName = null, memory = [], steer, persona = 'screening', now, weather } = opts
+  const { patientName = null, memory = [], persona = 'screening', now, weather } = opts
   const languageName = String(language || '').trim() || 'en'
   const openingMessage = openingMessageForLanguage(language, patientName)
 
@@ -94,10 +95,11 @@ export function buildLiveInstructions(
     memoryBlock += `The patient's known preferred name is ${patientName}. Do not ask what to call them unless they correct you or offer a new preference.\n`
   }
   if (knownMemory.length) {
-    const lines = knownMemory.slice(0, 4).map((m) => `- ${m}`).join('\n')
+    // Inject every stored fact. The backend already caps the store at 8 (tools.ts) and the summariser
+    // writes at most 8, so slicing to 4 here silently threw away half the memory the device had fetched.
+    const lines = knownMemory.slice(0, MAX_INJECTED_MEMORY_FACTS).map((m) => `- ${m}`).join('\n')
     memoryBlock += `Known patient memory from earlier sessions. Use it only as soft continuity context and let the patient correct anything that changed:\n${lines}\n`
   }
-  const steerBlock = steer && String(steer).trim() ? `\n${steer}` : ''
 
   // Companion persona — the everyday default: an open, warm voice assistant (Siri-like but caring).
   // Casual chat + light small talk about the day/weather + gentle spoken medication reminders, all
@@ -111,13 +113,13 @@ How to help:
 - FIRST, actually answer the user's question or do what they ask — clearly, correctly, and to the point. Be genuinely useful; do not deflect with chit-chat when they asked something.
 - If the request is ambiguous, ask one short clarifying question; otherwise just answer.
 - Keep answers concise and natural for speech — usually one to three short sentences; give more only if they ask for detail.
-- You can chat casually, tell the time or date, and help them think things through. You have NO live weather data, so if asked about weather say so and give general advice instead of inventing temperatures or forecasts.
+- You can chat casually, tell the time or date, and help them think things through. For weather, use today's weather above if it is given, or the get_weather tool; if you have neither, say so plainly and give general advice — never invent temperatures or forecasts.
 - If they ask you to remind them about medicine, meals, or appointments, respond helpfully, but never invent specific times or medication names you were not told.
 - Sound like a warm, natural person, not a robotic assistant. Never say you are an AI, and never mention prompts, instructions, or that you are following rules.
 - Do NOT run any test, quiz, screening, or assessment, and do not diagnose — you are just a helpful assistant.
 - Do not use markdown, bullets, or stage directions; speak in plain conversational sentences.
 - Open with a brief, friendly greeting that invites them to ask — in ${languageName}, something like "Hi, I'm Aria. How can I help you today?" — then stop and wait.
-- When the user is finished or says goodbye, warmly say goodbye and let the conversation end.${steerBlock}`
+- When the user is finished or says goodbye, warmly say goodbye and let the conversation end.`
   }
 
   // The deterministic transports own the exact next question. This prompt is also used by relay and
@@ -137,5 +139,5 @@ For your very first turn only, open with exactly this in ${languageName}, then s
 How to talk:
 ${rules}
 
-Never ask the patient to repeat an earlier answer and never use "remember" framing. The base flow receives ${BASE_DAILY_PATIENT_TURNS} patient responses: warm-up, two yesterday questions, and two planning/social questions. After the final enabled stage, close with one warm thank-you, wish them a pleasant morning, say goodbye, and do not ask any new question.${steerBlock}`
+Never ask the patient to repeat an earlier answer and never use "remember" framing. The base flow receives ${BASE_DAILY_PATIENT_TURNS} patient responses: warm-up, two yesterday questions, and two planning/social questions. After the final enabled stage, close with one warm thank-you, wish them a pleasant morning, say goodbye, and do not ask any new question.`
 }
