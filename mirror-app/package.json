@@ -61,8 +61,13 @@
     "appId": "com.reflexion.mirror",
     "productName": "Reflexion Mirror",
     "extraMetadata": { "main": "electron/main.js" },
-    "files": ["electron/**/*", "dist/**/*", "server/**/*", "package.json"],
+    "files": [
+      "electron/**/*", "dist/**/*", "server/**/*", "package.json", "!**/*.map",
+      "!node_modules/**", "node_modules/ws/**"
+    ],
     "directories": { "output": "dist-linux" },
+    "npmRebuild": false,
+    "electronLanguages": ["en-US"],
     "linux": {
       "target": ["AppImage", "deb"],
       "category": "Utility",
