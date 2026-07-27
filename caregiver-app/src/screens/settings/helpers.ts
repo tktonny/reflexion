@@ -39,6 +39,8 @@ export function normalizeSettingsPatient(patient: Partial<SettingsPatient>): Set
   return {
     id: patient.id || patient.patientId || '',
     patientId: patient.patientId || patient.id || '',
+    version: Number(patient.version || 1),
+    planVersion: Number(patient.planVersion || 0),
     name: patient.name || '',
     phoneNumber: patient.phoneNumber || '',
     age: Number(patient.age || 0),

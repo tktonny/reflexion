@@ -35,6 +35,8 @@ export type V1CaregiverProfile = {
   phoneNumber: string;
   relationshipToElderly: string | null;
   notificationPreferences: V1NotificationPreferences;
+  /** Privacy, not notifications: whether a session's summary text is kept at all. */
+  storeSessionSummaries: boolean;
 };
 
 export function getCaregiverProfileV1(): Promise<V1CaregiverProfile> {
@@ -47,6 +49,7 @@ export async function updateCaregiverProfileV1(input: {
   phoneNumber?: string;
   relationshipToElderly?: string | null;
   notificationPreferences?: Partial<V1NotificationPreferences>;
+  storeSessionSummaries?: boolean;
 }): Promise<V1CaregiverProfile> {
   return v1Patch<V1CaregiverProfile>('/me', input);
 }
@@ -237,6 +240,35 @@ export function generateSessionSummaryV1(patientId: string, date?: string): Prom
   return v1Post(`/patients/${encodeURIComponent(patientId)}/session-summaries`, date ? { date } : {}, {
     idempotencyKey: generateIdempotencyKey(),
   });
+}
+
+// ── The settings view: the home assembly plus each loved one's care plan
+
+export type CaregiverSettingsPatient = CaregiverHomePatient & {
+  /** null when this loved one has no plan yet; putCarePlanV1 takes 0 as the version for a first write. */
+  carePlan: V1CarePlan | null;
+};
+
+export type CaregiverSettings = { caregiver: V1CaregiverProfile; patients: CaregiverSettingsPatient[] };
+
+/**
+ * Settings edits two resources per loved one — the patient record and the care plan — and both writes are
+ * versioned, so the screen has to render from the versions it will send back. Loading them together is what
+ * makes that possible; fetching the plan lazily when a row is opened would race an edit made on another
+ * device between the list load and the save.
+ *
+ * A plan that fails to load is null rather than fatal: the loved one is still editable, and a first
+ * putCarePlanV1 writes version 1.
+ */
+export async function loadCaregiverSettings(): Promise<CaregiverSettings> {
+  const home = await loadCaregiverHome();
+  const plans = await Promise.all(home.patients.map((patient) =>
+    getCarePlanV1(patient.patientId).catch(() => null),
+  ));
+  return {
+    caregiver: home.caregiver,
+    patients: home.patients.map((patient, index) => ({ ...patient, carePlan: plans[index] })),
+  };
 }
 
 // ── Feedback (replaces the tokenless legacy POST /feedback, which took a nurseId in the body)
