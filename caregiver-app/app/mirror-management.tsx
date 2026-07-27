@@ -18,7 +18,7 @@ import { EmptyState, ErrorState, LoadingState } from '../src/components/ScreenSt
 import { apiGet, apiSend } from '../src/lib/apiClient';
 import { getStoredAuthSession } from '../src/lib/authSession';
 import { invalidateCaregiverConfig } from '../src/lib/queryKeys';
-import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../src/theme';
+import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
 
 type MirrorPatient = {
   patientId: string;
@@ -143,7 +143,7 @@ export default function MirrorManagementScreen() {
           </TouchableOpacity>
           <View style={styles.headerTextBlock}>
             <Text style={styles.eyebrow}>Voice Companion</Text>
-            <Text style={styles.title}>Manage linked mirrors</Text>
+            <Text maxFontSizeMultiplier={1.3} style={styles.title}>Manage linked mirrors</Text>
           </View>
         </View>
 
@@ -164,7 +164,7 @@ export default function MirrorManagementScreen() {
                   {/* flex:1 so a long name wraps instead of being squeezed off-card once the pill grows
                       with the system font size. */}
                   <View style={styles.cardHeaderTextBlock}>
-                    <Text style={styles.patientName}>{patient.patientName}</Text>
+                    <Text maxFontSizeMultiplier={1.3} style={styles.patientName}>{patient.patientName}</Text>
                     <Text style={styles.mirrorName}>{patient.mirrorName || 'No mirror linked'}</Text>
                   </View>
                   {/* One spoken phrase for the pill, so a reader does not announce a bare word "Unpaired"
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.surface.card,
     borderColor: colors.border.default,
-    borderRadius: 22,
+    borderRadius: MIN_TOUCH_TARGET / 2,
     borderWidth: 1,
     height: MIN_TOUCH_TARGET,
     justifyContent: 'center',
@@ -339,17 +339,17 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text.primary,
     fontFamily: fontFamily.display,
-    fontSize: 28,
+    fontSize: scaleSize(28),
     fontWeight: '500',
     marginTop: spacing.xs,
   },
   card: {
     backgroundColor: colors.surface.card,
     borderColor: colors.border.default,
-    borderRadius: 18,
+    borderRadius: scaleSize(18),
     borderWidth: 1,
     gap: spacing.md,
-    padding: 18,
+    padding: scaleSize(18),
     // Deliberately deeper and warmer than the shared cardShadow — these cards carry a whole connection,
     // so the literal stays until the theme has a token for it.
     shadowColor: '#6E5B4B',
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   },
   cardHeader: { alignItems: 'flex-start', flexDirection: 'row', gap: spacing.md, justifyContent: 'space-between' },
   cardHeaderTextBlock: { flex: 1 },
-  patientName: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 24, fontWeight: '500' },
+  patientName: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(24), fontWeight: '500' },
   mirrorName: { color: colors.text.secondary, fontSize: fontSize.subheading, marginTop: spacing.xs },
   statusPill: {
     borderRadius: radius.pill,
@@ -383,14 +383,14 @@ const styles = StyleSheet.create({
     // gap keeps the label and the right-aligned value from colliding once both grow at large font sizes.
     gap: spacing.md,
     justifyContent: 'space-between',
-    paddingTop: 10,
+    paddingTop: scaleSize(10),
   },
   infoLabel: { color: '#786C5C', fontSize: fontSize.body, fontWeight: '600' },
   infoValue: { color: colors.text.primary, flex: 1, fontSize: fontSize.bodyLarge, textAlign: 'right' },
   primaryButton: {
     alignItems: 'center',
     backgroundColor: colors.accent,
-    borderRadius: 12,
+    borderRadius: scaleSize(12),
     flexDirection: 'row',
     gap: spacing.sm,
     justifyContent: 'center',
@@ -404,12 +404,12 @@ const styles = StyleSheet.create({
   deleteButton: {
     alignItems: 'center',
     borderColor: '#E6C8C4',
-    borderRadius: 12,
+    borderRadius: scaleSize(12),
     borderWidth: 1,
     flexDirection: 'row',
     gap: spacing.sm,
     justifyContent: 'center',
-    minHeight: 46,
+    minHeight: scaleSize(46),
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },

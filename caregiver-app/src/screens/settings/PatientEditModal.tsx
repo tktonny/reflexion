@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { colors, fontFamily, fontSize, radius, spacing, MIN_TOUCH_TARGET } from '../../theme';
+import { colors, fontFamily, fontSize, radius, spacing, scaleSize, MIN_TOUCH_TARGET } from '../../theme';
 import { isTopicSelected, normalizeKeyTopics } from './helpers';
 import { PILL_HIT_SLOP, pillStyles } from './optionPills';
 import type { Gender, KeyTopic, Language, PatientForm } from './types';
@@ -70,7 +70,7 @@ export function PatientEditModal({
         {/* Keeps a screen reader inside the sheet instead of wandering into the settings list behind it. */}
         <View accessibilityViewIsModal style={styles.modalSheet}>
           <View style={styles.modalHeader}>
-            <Text accessibilityRole="header" style={styles.modalTitle}>Edit loved one</Text>
+            <Text accessibilityRole="header" maxFontSizeMultiplier={1.3} style={styles.modalTitle}>Edit loved one</Text>
             <TouchableOpacity
               accessibilityLabel="Close without saving"
               accessibilityRole="button"
@@ -79,7 +79,7 @@ export function PatientEditModal({
               onPress={onClose}
               style={styles.iconButton}
             >
-              <Feather name="x" size={20} color={colors.accent} />
+              <Feather name="x" size={scaleSize(20)} color={colors.accent} />
             </TouchableOpacity>
           </View>
           <ScrollView contentContainerStyle={styles.modalContent}>
@@ -297,9 +297,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     justifyContent: 'center',
     marginHorizontal: spacing.xl,
-    marginTop: 14,
-    minHeight: 46,
-    borderRadius: 12,
+    marginTop: spacing.md,
+    minHeight: MIN_TOUCH_TARGET,
+    borderRadius: radius.md,
   },
   saveBtnDisabled: { opacity: 0.7 },
   saveBtnText: { color: colors.text.onAccent, fontSize: fontSize.subheading, fontWeight: '700' },
@@ -310,8 +310,8 @@ const styles = StyleSheet.create({
   },
   modalSheet: {
     backgroundColor: colors.surface.page,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: scaleSize(20),
+    borderTopRightRadius: scaleSize(20),
     maxHeight: '88%',
     overflow: 'hidden',
   },
@@ -322,19 +322,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.lg,
   },
-  modalTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 22, fontWeight: '600' },
+  modalTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(22), flexShrink: 1, fontWeight: '600' },
   iconButton: {
     alignItems: 'center',
     backgroundColor: colors.surface.card,
     borderColor: colors.border.default,
-    borderRadius: 18,
+    borderRadius: scaleSize(18),
     borderWidth: 1,
-    height: 36,
+    height: scaleSize(36),
     justifyContent: 'center',
-    width: 36,
+    width: scaleSize(36),
   },
-  modalContent: { padding: spacing.xl, paddingBottom: 32 },
-  modalField: { marginBottom: 14 },
+  modalContent: { padding: spacing.xl, paddingBottom: scaleSize(32) },
+  modalField: { marginBottom: scaleSize(14) },
   modalLabel: { color: colors.text.primary, fontSize: fontSize.bodyLarge, fontWeight: '700', marginBottom: spacing.sm },
   modalInput: {
     backgroundColor: colors.surface.card,
@@ -344,22 +344,22 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     fontSize: fontSize.subheading,
     paddingHorizontal: spacing.md,
-    paddingVertical: 10,
+    paddingVertical: scaleSize(10),
   },
-  modalTextArea: { minHeight: 82, textAlignVertical: 'top' },
+  modalTextArea: { minHeight: scaleSize(82), textAlignVertical: 'top' },
   modalPhotoBox: {
     alignItems: 'center',
     backgroundColor: colors.surface.card,
     borderColor: colors.border.default,
-    borderRadius: 12,
+    borderRadius: radius.md,
     borderWidth: 1,
-    gap: 10,
-    padding: 14,
+    gap: scaleSize(10),
+    padding: scaleSize(14),
   },
   modalPhotoPreview: {
     borderRadius: 12,
-    height: 120,
-    width: 120,
+    height: scaleSize(120),
+    width: scaleSize(120),
   },
   modalPhotoPlaceholder: {
     alignItems: 'center',
@@ -367,9 +367,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     gap: 6,
     // minHeight, not height: the caption inside is text and clipped at large font sizes.
-    minHeight: 120,
+    minHeight: scaleSize(120),
     justifyContent: 'center',
-    width: 120,
+    width: scaleSize(120),
   },
   modalPhotoPlaceholderText: { color: colors.text.tertiary, fontSize: fontSize.caption, fontWeight: '600', textAlign: 'center' },
   modalPhotoButton: {
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     justifyContent: 'center',
     minHeight: MIN_TOUCH_TARGET,
-    paddingHorizontal: 14,
+    paddingHorizontal: scaleSize(14),
     width: '100%',
   },
   modalPhotoButtonText: { color: colors.text.onAccent, fontSize: fontSize.bodyLarge, fontWeight: '700' },

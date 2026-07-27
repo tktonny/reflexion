@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { Image, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { colors, fontFamily, fontSize, radius, spacing } from '../../theme';
+import { colors, fontFamily, fontSize, radius, spacing, scaleSize } from '../../theme';
 import { getInitials } from './helpers';
 import { PILL_HIT_SLOP, pillStyles } from './optionPills';
 
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.surface.card,
     paddingHorizontal: spacing.xl,
-    paddingVertical: 15,
+    paddingVertical: scaleSize(15),
     borderBottomWidth: 1,
     borderBottomColor: colors.border.subtle,
   },
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     flex: 1,
     fontSize: fontSize.subheading,
-    lineHeight: 20,
+    lineHeight: scaleSize(20),
     marginLeft: spacing.md,
     minWidth: 0,
     textAlign: 'right',
@@ -198,25 +198,25 @@ const styles = StyleSheet.create({
     fontSize: fontSize.subheading,
     marginTop: spacing.sm,
     paddingHorizontal: spacing.md,
-    paddingVertical: 9,
+    paddingVertical: scaleSize(9),
   },
-  rowLeft: { alignItems: 'center', flex: 1, flexDirection: 'row', gap: 10, minWidth: 0 },
-  rowRight: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  rowLeft: { alignItems: 'center', flex: 1, flexDirection: 'row', gap: scaleSize(10), minWidth: 0 },
+  rowRight: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(6) },
   patientAvatar: {
     alignItems: 'center',
     backgroundColor: '#EEE7DE',
-    borderRadius: 17,
-    height: 34,
+    borderRadius: scaleSize(17),
+    height: scaleSize(34),
     justifyContent: 'center',
     overflow: 'hidden',
-    width: 34,
+    width: scaleSize(34),
   },
   patientAvatarImage: { height: '100%', width: '100%' },
   patientAvatarText: { color: colors.accent, fontFamily: fontFamily.display, fontSize: fontSize.bodyLarge, fontWeight: '600' },
   pickerBlock: {
     backgroundColor: colors.surface.card,
     paddingHorizontal: spacing.xl,
-    paddingVertical: 15,
+    paddingVertical: scaleSize(15),
     borderBottomWidth: 1,
     borderBottomColor: colors.border.subtle,
   },

@@ -9,7 +9,7 @@ import { Feather } from '@expo/vector-icons';
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
 import { apiGet } from '../../src/lib/apiClient';
 import {
-  MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, spacing,
+  MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, scaleSize, spacing,
 } from '../../src/theme';
 
 type ConversationLog = {
@@ -185,7 +185,7 @@ export default function SessionReplayScreen() {
           <>
         <View style={styles.card}>
           <View style={styles.metaRow}>
-            <Text style={styles.metaName}>{todaySessions.patientName}</Text>
+            <Text maxFontSizeMultiplier={1.4} style={styles.metaName}>{todaySessions.patientName}</Text>
           </View>
           <Text style={styles.metaDate}>{formatDateTime(selectedSession.createdAt)}</Text>
           <View style={styles.statsRow}>
@@ -389,12 +389,12 @@ const styles = StyleSheet.create({
     ...cardShadow,
   },
   metaRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xs },
-  metaName: { fontSize: 18, fontWeight: '500', color: colors.text.primary, fontFamily: fontFamily.display },
+  metaName: { fontSize: scaleSize(18), fontWeight: '500', color: colors.text.primary, fontFamily: fontFamily.display },
   metaDate: { fontSize: fontSize.body, color: colors.text.tertiary, marginBottom: spacing.lg },
 
-  statsRow: { flexDirection: 'row', gap: spacing.sm },
+  statsRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: spacing.sm },
   statChip: {
-    flex: 1,
+    width: '47%',
     backgroundColor: colors.surface.page,
     borderRadius: 12,
     padding: 10,

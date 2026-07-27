@@ -20,7 +20,7 @@ import { EmptyState, ErrorState, LoadingState } from '../../src/components/Scree
 import { apiGet, apiSend } from '../../src/lib/apiClient';
 import { getStoredAuthSession } from '../../src/lib/authSession';
 import { invalidateCaregiverConfig } from '../../src/lib/queryKeys';
-import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../../src/theme';
+import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../../src/theme';
 
 type MirrorPatient = {
   patientId: string;
@@ -197,7 +197,7 @@ export default function AddMirrorConnectionScreen() {
           </TouchableOpacity>
           <View style={styles.headerTextBlock}>
             <Text style={styles.eyebrow}>Mirror pairing</Text>
-            <Text style={styles.title}>Add connection</Text>
+            <Text maxFontSizeMultiplier={1.3} style={styles.title}>Add connection</Text>
           </View>
         </View>
 
@@ -213,7 +213,7 @@ export default function AddMirrorConnectionScreen() {
         ) : patient ? (
           <>
             <View style={styles.infoBox}>
-              <Text style={styles.infoTitle}>{patient.patientName}</Text>
+              <Text maxFontSizeMultiplier={1.3} style={styles.infoTitle}>{patient.patientName}</Text>
               <Text style={styles.infoText}>
                 On the mirror, open setup and enter the 6-digit pairing code shown there.
               </Text>
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.surface.card,
     borderColor: colors.border.default,
-    borderRadius: 22,
+    borderRadius: MIN_TOUCH_TARGET / 2,
     borderWidth: 1,
     height: MIN_TOUCH_TARGET,
     justifyContent: 'center',
@@ -433,45 +433,45 @@ const styles = StyleSheet.create({
   title: {
     color: colors.text.primary,
     fontFamily: fontFamily.display,
-    fontSize: 28,
+    fontSize: scaleSize(28),
     fontWeight: '500',
     marginTop: spacing.xs,
   },
   card: {
     backgroundColor: colors.surface.card,
     borderColor: colors.border.default,
-    borderRadius: 18,
+    borderRadius: scaleSize(18),
     borderWidth: 1,
     gap: spacing.md,
-    padding: 18,
+    padding: scaleSize(18),
   },
   infoBox: {
     backgroundColor: '#FFF6EA',
     borderColor: colors.border.default,
-    borderRadius: 18,
+    borderRadius: scaleSize(18),
     borderWidth: 1,
     gap: spacing.sm,
-    padding: 18,
+    padding: scaleSize(18),
   },
-  infoTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 24, fontWeight: '500' },
-  infoText: { color: colors.text.secondary, fontSize: fontSize.subheading, lineHeight: 22 },
+  infoTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(24), fontWeight: '500' },
+  infoText: { color: colors.text.secondary, fontSize: fontSize.subheading, lineHeight: scaleSize(22) },
   label: { color: colors.text.secondary, fontSize: fontSize.body, fontWeight: '700', marginTop: spacing.xs },
-  notice: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: 19 },
+  notice: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: scaleSize(19) },
   input: {
     backgroundColor: '#FFFDF8',
     borderColor: colors.border.strong,
-    borderRadius: 12,
+    borderRadius: scaleSize(12),
     borderWidth: 1,
     color: colors.text.primary,
-    fontSize: 18,
+    fontSize: scaleSize(18),
     fontWeight: '600',
-    paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingHorizontal: scaleSize(14),
+    paddingVertical: scaleSize(13),
   },
   primaryButton: {
     alignItems: 'center',
     backgroundColor: colors.accent,
-    borderRadius: 12,
+    borderRadius: scaleSize(12),
     flexDirection: 'row',
     gap: spacing.sm,
     justifyContent: 'center',
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
   secondaryButton: {
     alignItems: 'center',
     borderColor: colors.border.strong,
-    borderRadius: 12,
+    borderRadius: scaleSize(12),
     borderWidth: 1,
     flexDirection: 'row',
     gap: spacing.sm,
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   secondaryButtonText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
   disabledButton: { opacity: 0.7 },
   scanButton: {
-    alignItems: 'center', borderColor: colors.border.strong, borderRadius: 12, borderWidth: 1,
+    alignItems: 'center', borderColor: colors.border.strong, borderRadius: scaleSize(12), borderWidth: 1,
     flexDirection: 'row', gap: spacing.sm, justifyContent: 'center', minHeight: 46,
   },
   scanButtonText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
@@ -501,16 +501,16 @@ const styles = StyleSheet.create({
   // Padded so the hint still has margins when it wraps to two or three lines at large system text sizes.
   scannerOverlay: {
     alignItems: 'center',
-    bottom: 48,
+    bottom: scaleSize(48),
     gap: spacing.lg,
     left: 0,
-    paddingHorizontal: 24,
+    paddingHorizontal: scaleSize(24),
     position: 'absolute',
     right: 0,
   },
   scannerHint: {
     backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: radius.md, color: colors.text.onAccent,
-    fontSize: fontSize.subheading, fontWeight: '700', overflow: 'hidden', paddingHorizontal: 14,
+    fontSize: fontSize.subheading, fontWeight: '700', overflow: 'hidden', paddingHorizontal: scaleSize(14),
     paddingVertical: spacing.sm,
   },
   scannerCancel: {

@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { EmptyState } from '../src/components/ScreenState';
 import { FAQ_ITEMS } from '../src/data/faqContent';
-import { colors, spacing, radius, fontSize } from '../src/theme';
+import { colors, spacing, radius, fontSize, scaleSize } from '../src/theme';
 
 export default function FAQScreen() {
   const router = useRouter();
@@ -80,21 +80,21 @@ export default function FAQScreen() {
 // (#AAA on white, 2.32:1) failed WCAG AA outright.
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface.page },
-  content: { padding: spacing.xl, paddingBottom: 48 },
-  intro: { fontSize: fontSize.subheading, color: colors.text.secondary, marginBottom: spacing.xl, lineHeight: 22 },
+  content: { padding: spacing.xl, paddingBottom: scaleSize(48) },
+  intro: { fontSize: fontSize.subheading, color: colors.text.secondary, marginBottom: spacing.xl, lineHeight: scaleSize(22) },
   card: {
-    backgroundColor: colors.surface.card, borderRadius: radius.xl, padding: spacing.lg, marginBottom: 10,
+    backgroundColor: colors.surface.card, borderRadius: radius.xl, padding: spacing.lg, marginBottom: scaleSize(10),
     borderWidth: 1.5, borderColor: colors.border.default,
     shadowColor: colors.shadow, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 3, elevation: 1,
   },
   cardOpen: { borderColor: colors.accent },
   question: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing.sm },
-  questionText: { fontSize: fontSize.subheading, fontWeight: '700', color: colors.text.primary, flex: 1, lineHeight: 22 },
+  questionText: { fontSize: fontSize.subheading, fontWeight: '700', color: colors.text.primary, flex: 1, lineHeight: scaleSize(22) },
   chevron: { fontSize: fontSize.caption, color: colors.accent, marginTop: spacing.xs },
-  answerText: { fontSize: fontSize.bodyLarge, color: colors.text.secondary, marginTop: spacing.md, lineHeight: 22 },
+  answerText: { fontSize: fontSize.bodyLarge, color: colors.text.secondary, marginTop: spacing.md, lineHeight: scaleSize(22) },
   bottomCard: {
     backgroundColor: colors.surface.muted, borderRadius: radius.xl, padding: spacing.xl, marginTop: spacing.sm, alignItems: 'center',
   },
-  bottomTitle: { fontSize: 16, fontWeight: '700', color: colors.accent, marginBottom: 6 },
-  bottomText: { fontSize: fontSize.bodyLarge, color: colors.text.secondary, textAlign: 'center', lineHeight: 20 },
+  bottomTitle: { fontSize: scaleSize(16), fontWeight: '700', color: colors.accent, marginBottom: spacing.xs },
+  bottomText: { fontSize: fontSize.bodyLarge, color: colors.text.secondary, textAlign: 'center', lineHeight: scaleSize(20) },
 });

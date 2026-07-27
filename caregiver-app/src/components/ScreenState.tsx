@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors, spacing, radius, fontSize, fontFamily, MIN_TOUCH_TARGET } from '../theme';
+import { colors, spacing, radius, fontSize, fontFamily, scaleSize, MIN_TOUCH_TARGET } from '../theme';
 
 // Shared loading / empty / failed placeholders.
 //
@@ -29,7 +29,7 @@ export function LoadingState({ title = 'Bear with us', message }: { title?: stri
   return (
     <View accessibilityRole="progressbar" accessibilityLabel={title} style={styles.wrap}>
       <ActivityIndicator color={colors.accent} />
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title} maxFontSizeMultiplier={1.3}>{title}</Text>
       {message ? <Text style={styles.message}>{message}</Text> : null}
     </View>
   );
@@ -39,9 +39,9 @@ export function EmptyState({ title, message, icon = 'inbox', compact }: StatePro
   return (
     <View style={[styles.wrap, compact && styles.wrapCompact]}>
       <View style={styles.iconWrap}>
-        <Feather name={icon} size={26} color={colors.accent} />
+        <Feather name={icon} size={scaleSize(26)} color={colors.accent} />
       </View>
-      {title ? <Text style={styles.title}>{title}</Text> : null}
+      {title ? <Text style={styles.title} maxFontSizeMultiplier={1.3}>{title}</Text> : null}
       {message ? <Text style={styles.message}>{message}</Text> : null}
     </View>
   );
@@ -58,9 +58,9 @@ export function ErrorState({
   return (
     <View style={[styles.wrap, compact && styles.wrapCompact]}>
       <View style={styles.iconWrap}>
-        <Feather name={icon} size={26} color={colors.accent} />
+        <Feather name={icon} size={scaleSize(26)} color={colors.accent} />
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title} maxFontSizeMultiplier={1.3}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
       {onRetry ? (
         <TouchableOpacity
@@ -85,27 +85,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: spacing.sm,
     marginBottom: spacing.lg,
-    paddingHorizontal: 24,
+    paddingHorizontal: scaleSize(24),
     paddingVertical: spacing.xxl,
   },
   wrapCompact: { paddingVertical: spacing.xl },
   iconWrap: {
     alignItems: 'center',
     backgroundColor: colors.surface.muted,
-    borderRadius: 28,
-    height: 56,
+    borderRadius: scaleSize(28),
+    height: scaleSize(56),
     justifyContent: 'center',
     marginBottom: spacing.xs,
-    width: 56,
+    width: scaleSize(56),
   },
   title: {
     color: colors.text.primary,
     fontFamily: fontFamily.display,
-    fontSize: 19,
+    fontSize: scaleSize(19),
     fontWeight: '500',
     textAlign: 'center',
   },
-  message: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 21, textAlign: 'center' },
+  message: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: scaleSize(21), textAlign: 'center' },
   retry: {
     alignItems: 'center',
     backgroundColor: colors.accent,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     // 44pt is the smallest reliable touch target; caregivers use this one-handed and often in a hurry.
     minHeight: MIN_TOUCH_TARGET,
-    paddingHorizontal: 24,
+    paddingHorizontal: scaleSize(24),
   },
   retryText: { color: colors.text.onAccent, fontSize: fontSize.subheading, fontWeight: '700' },
 });

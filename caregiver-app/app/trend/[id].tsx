@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
@@ -10,8 +10,6 @@ import { EmptyState, ErrorState, LoadingState } from '../../src/components/Scree
 import type { TrendDay } from '../../src/lib/patientTrendClient';
 import { fetchPatientTrend } from '../../src/lib/patientTrendClient';
 import { colors, spacing, radius, fontSize, cardShadow, MIN_TOUCH_TARGET } from '../../src/theme';
-
-const SCREEN_WIDTH = Dimensions.get('window').width;
 
 // Chart fills — a data-visualisation language of its own, deliberately outside the theme, which covers UI
 // chrome. Not the status palette either: src/lib/v1Status.ts owns that.
@@ -97,7 +95,6 @@ export default function TrendScreen() {
   }
 
   const CHART_HEIGHT = 120;
-  const barW = Math.max(3, (SCREEN_WIDTH - 56) / Math.max(trend.length, 1) - 2);
 
   function barColor(d: TrendDay): string {
     if (d.missed) return CHART_FILL.missed;
@@ -188,7 +185,7 @@ export default function TrendScreen() {
                       const h = d.missed ? 3 : Math.max(6, (d.duration / maxDuration) * CHART_HEIGHT);
                       return (
                         <View key={i} style={[styles.barWrap, { height: CHART_HEIGHT }]}>
-                          <View style={[styles.bar, { height: h, width: barW, backgroundColor: barColor(d) }]} />
+                          <View style={[styles.bar, { height: h, backgroundColor: barColor(d) }]} />
                         </View>
                       );
                     })}
@@ -358,8 +355,8 @@ const styles = StyleSheet.create({
   chart: { flexDirection: 'row', alignItems: 'flex-end', gap: 1 },
   emptyChart: { alignItems: 'center', justifyContent: 'center' },
   emptyChartText: { color: colors.text.tertiary, fontSize: fontSize.body, fontWeight: '600' },
-  barWrap: { justifyContent: 'flex-end' },
-  bar: { borderRadius: 3 },
+  barWrap: { flex: 1, justifyContent: 'flex-end' },
+  bar: { borderRadius: 3, width: '100%' },
   chartLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.sm },
   chartLabel: { fontSize: fontSize.caption, color: colors.text.tertiary },
   legend: { flexDirection: 'row', gap: spacing.lg, marginTop: 14, flexWrap: 'wrap' },

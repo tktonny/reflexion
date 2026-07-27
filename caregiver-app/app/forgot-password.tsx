@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { apiSend } from '../src/lib/apiClient';
-import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../src/theme';
+import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
 
 // Reserved forgot-password request screen. The backend always accepts (no account enumeration); the
 // reset email itself is dormant until Postmark is configured on the server (launch-time).
@@ -43,7 +43,7 @@ export default function ForgotPasswordScreen() {
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboard}>
         <View style={styles.card}>
-          <Text style={styles.title}>Reset password</Text>
+          <Text maxFontSizeMultiplier={1.3} style={styles.title}>Reset password</Text>
           {sent ? (
             <>
               {/* The confirmation replaces the form in place, so it is announced rather than left silent. */}
@@ -105,27 +105,27 @@ export default function ForgotPasswordScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface.page },
-  keyboard: { flex: 1, justifyContent: 'center', padding: 24 },
+  keyboard: { flex: 1, justifyContent: 'center', padding: scaleSize(24) },
   card: {
     backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: 18,
-    borderWidth: 1, padding: 24,
+    borderWidth: 1, padding: scaleSize(24),
   },
-  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 34, fontWeight: '500' },
-  subtitle: { color: colors.text.secondary, fontSize: 16, lineHeight: 23, marginBottom: 24, marginTop: spacing.sm },
+  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(34), fontWeight: '500' },
+  subtitle: { color: colors.text.secondary, fontSize: scaleSize(16), lineHeight: scaleSize(23), marginBottom: scaleSize(24), marginTop: spacing.sm },
   label: {
     color: colors.text.secondary, fontSize: fontSize.bodyLarge, fontWeight: '700',
-    marginBottom: spacing.sm, marginTop: 14,
+    marginBottom: spacing.sm, marginTop: scaleSize(14),
   },
   input: {
     backgroundColor: colors.surface.input, borderColor: colors.border.default, borderRadius: 12, borderWidth: 1,
-    color: colors.text.primary, fontSize: 16, paddingHorizontal: 14, paddingVertical: spacing.md,
+    color: colors.text.primary, fontSize: scaleSize(16), paddingHorizontal: scaleSize(14), paddingVertical: spacing.md,
   },
   primaryBtn: {
     alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.lg, justifyContent: 'center',
-    marginTop: 24, minHeight: 50,
+    marginTop: scaleSize(24), minHeight: scaleSize(50),
   },
-  primaryText: { color: colors.text.onAccent, fontSize: 16, fontWeight: '700' },
+  primaryText: { color: colors.text.onAccent, fontSize: scaleSize(16), fontWeight: '700' },
   // 44pt: the text link is only ~20pt tall on its own, which is an easy miss one-handed.
-  linkBtn: { alignItems: 'center', justifyContent: 'center', marginTop: 18, minHeight: MIN_TOUCH_TARGET },
+  linkBtn: { alignItems: 'center', justifyContent: 'center', marginTop: scaleSize(18), minHeight: MIN_TOUCH_TARGET },
   linkText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
 });

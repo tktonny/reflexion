@@ -19,7 +19,7 @@ import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { v1Login } from '../src/lib/v1Client';
 import { clearV1Session } from '../src/lib/v1AuthSession';
 import { clearCaregiverCache } from '../src/lib/queryKeys';
-import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../src/theme';
+import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
 
 type SignInResponse = {
   nurseId: string;
@@ -98,7 +98,7 @@ export default function SignInScreen() {
         style={styles.keyboard}
       >
         <View style={styles.card}>
-          <Text style={styles.title}>Sign in</Text>
+          <Text maxFontSizeMultiplier={1.3} style={styles.title}>Sign in</Text>
           <Text style={styles.subtitle}>Use your caregiver account to continue.</Text>
 
           {error ? (
@@ -184,25 +184,25 @@ const styles = StyleSheet.create({
   keyboard: {
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: scaleSize(24),
   },
   card: {
     backgroundColor: colors.surface.card,
     borderColor: colors.border.default,
     borderRadius: 18,
     borderWidth: 1,
-    padding: 24,
+    padding: scaleSize(24),
   },
   title: {
     color: colors.text.primary,
     fontFamily: fontFamily.display,
-    fontSize: 34,
+    fontSize: scaleSize(34),
     fontWeight: '500',
   },
   subtitle: {
     color: colors.text.secondary,
-    fontSize: 16,
-    marginBottom: 24,
+    fontSize: scaleSize(16),
+    marginBottom: scaleSize(24),
     marginTop: spacing.sm,
   },
   errorBox: {
@@ -212,20 +212,20 @@ const styles = StyleSheet.create({
     borderColor: colors.error.border,
     borderRadius: 12,
     borderWidth: 1,
-    marginBottom: 18,
+    marginBottom: scaleSize(18),
     padding: spacing.md,
   },
   errorText: {
     color: colors.error.text,
     fontSize: fontSize.bodyLarge,
-    lineHeight: 20,
+    lineHeight: scaleSize(20),
   },
   label: {
     color: colors.text.secondary,
     fontSize: fontSize.bodyLarge,
     fontWeight: '700',
     marginBottom: spacing.sm,
-    marginTop: 14,
+    marginTop: scaleSize(14),
   },
   input: {
     backgroundColor: colors.surface.input,
@@ -233,8 +233,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     color: colors.text.primary,
-    fontSize: 16,
-    paddingHorizontal: 14,
+    fontSize: scaleSize(16),
+    paddingHorizontal: scaleSize(14),
     paddingVertical: spacing.md,
   },
   signInBtn: {
@@ -242,18 +242,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     borderRadius: radius.lg,
     justifyContent: 'center',
-    marginTop: 24,
-    minHeight: 50,
+    marginTop: scaleSize(24),
+    minHeight: scaleSize(50),
   },
   signInText: {
     color: colors.text.onAccent,
-    fontSize: 16,
+    fontSize: scaleSize(16),
     fontWeight: '700',
   },
   signUpBtn: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 18,
+    marginTop: scaleSize(18),
     // These two are plain text links about 20pt tall; 44pt keeps them tappable one-handed without
     // changing how they look.
     minHeight: MIN_TOUCH_TARGET,

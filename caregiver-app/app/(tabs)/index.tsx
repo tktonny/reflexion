@@ -22,7 +22,7 @@ import {
   formatLastInteraction,
 } from '../../src/lib/v1Status';
 import {
-  colors, spacing, radius, fontSize, fontFamily, cardShadow, MIN_TOUCH_TARGET,
+  colors, spacing, radius, fontSize, fontFamily, cardShadow, MIN_TOUCH_TARGET, scaleSize,
 } from '../../src/theme';
 
 // Summary-strip dots use the authoritative Option-1 status palette (baseline §2.9).
@@ -128,7 +128,7 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerText}>
-            <Text style={styles.greeting}>{getGreeting()}, {displayName}</Text>
+            <Text maxFontSizeMultiplier={1.3} style={styles.greeting}>{getGreeting()}, {displayName}</Text>
             <Text style={styles.date}>{today}</Text>
           </View>
           <TouchableOpacity
@@ -164,7 +164,7 @@ export default function HomeScreen() {
         )}
 
         {/* Loved One Cards */}
-        <Text style={styles.sectionTitle}>Your loved ones</Text>
+        <Text maxFontSizeMultiplier={1.4} style={styles.sectionTitle}>Your loved ones</Text>
         {configuredPatients.length ? (
           configuredPatients.map((patient, index) => {
             const statusResult = statusResults[index];
@@ -229,7 +229,7 @@ export default function HomeScreen() {
                   )}
                 </View>
                 <View style={styles.patientInfo}>
-                  <Text style={styles.patientName}>{patient.name}</Text>
+                  <Text maxFontSizeMultiplier={1.3} style={styles.patientName}>{patient.name}</Text>
                   <View style={styles.patientStatusRow}>
                     <View
                       accessibilityElementsHidden
@@ -249,6 +249,7 @@ export default function HomeScreen() {
                 <Text
                   accessibilityElementsHidden
                   importantForAccessibility="no"
+                  maxFontSizeMultiplier={1.3}
                   style={styles.chevron}
                 >
                   ›
@@ -270,7 +271,7 @@ export default function HomeScreen() {
         )}
 
         {/* Quick Links */}
-        <Text style={styles.sectionTitle}>Quick links</Text>
+        <Text maxFontSizeMultiplier={1.4} style={styles.sectionTitle}>Quick links</Text>
         <View style={styles.quickGrid}>
           <QuickLink icon="book-open" label="Guide" sub="Tips and resources" onPress={() => router.push('/faq')} />
           <QuickLink icon="headphones" label="Support" sub="Get help anytime" onPress={() => router.push('/chatbot')} />
@@ -460,13 +461,13 @@ function QuickLink({ icon, label, sub, onPress }: { icon: any; label: string; su
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface.page },
   scroll: { flex: 1 },
-  content: { paddingHorizontal: spacing.xl, paddingTop: spacing.xl, paddingBottom: 48 },
+  content: { paddingHorizontal: spacing.xl, paddingTop: spacing.xl, paddingBottom: scaleSize(48) },
 
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 22,
+    marginBottom: scaleSize(22),
   },
   // flex (RN does not shrink flex items by default) so a scaled-up greeting wraps instead of pushing the
   // add button off the right edge.
@@ -490,7 +491,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border.default,
-    paddingHorizontal: 10,
+    paddingHorizontal: scaleSize(10),
     paddingVertical: spacing.lg,
     marginBottom: spacing.xxl,
     alignItems: 'center',
@@ -506,11 +507,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: spacing.sm,
     marginBottom: spacing.xxl,
-    paddingHorizontal: 18,
-    paddingVertical: 18,
+    paddingHorizontal: scaleSize(18),
+    paddingVertical: scaleSize(18),
   },
   statusUnavailableText: {
-    color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 21, textAlign: 'center',
+    color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: scaleSize(21), textAlign: 'center',
   },
   statusRetry: {
     alignItems: 'center', justifyContent: 'center', minHeight: MIN_TOUCH_TARGET, paddingHorizontal: spacing.lg,
@@ -518,7 +519,7 @@ const styles = StyleSheet.create({
   statusRetryText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
   chip: { alignItems: 'center', flex: 1, gap: 5, minWidth: 0 },
   chipCount: {
-    fontSize: 24, fontWeight: '500', color: colors.text.primary, fontFamily: fontFamily.display, lineHeight: 29,
+    fontSize: scaleSize(24), fontWeight: '500', color: colors.text.primary, fontFamily: fontFamily.display, lineHeight: scaleSize(29),
   },
   chipDot: { width: 7, height: 7, borderRadius: radius.pill },
   chipLabel: {
@@ -526,19 +527,19 @@ const styles = StyleSheet.create({
     // Was 11px capped at 82pt wide and clipped to two lines: "Needs attention" was the first thing on the
     // dashboard to lose a word at large system text. minHeight only aligns the three chips, it never caps.
     fontSize: fontSize.body,
-    lineHeight: 17,
-    minHeight: 28,
+    lineHeight: scaleSize(17),
+    minHeight: scaleSize(28),
     textAlign: 'center',
   },
   divider: {
-    width: 1, height: 46, backgroundColor: colors.border.default, marginHorizontal: spacing.xs,
+    width: 1, height: scaleSize(46), backgroundColor: colors.border.default, marginHorizontal: spacing.xs,
   },
 
   sectionTitle: {
     fontSize: fontSize.heading,
     fontWeight: '600',
     color: colors.text.primary,
-    marginBottom: 14,
+    marginBottom: scaleSize(14),
     marginTop: spacing.xs,
   },
   patientCard: {
@@ -557,10 +558,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.surface.muted,
     borderRadius: radius.pill,
-    height: 56,
+    height: scaleSize(56),
     justifyContent: 'center',
     overflow: 'hidden',
-    width: 56,
+    width: scaleSize(56),
   },
   patientAvatarImage: {
     height: '100%',
@@ -569,7 +570,7 @@ const styles = StyleSheet.create({
   patientAvatarText: {
     color: colors.text.secondary,
     fontFamily: fontFamily.display,
-    fontSize: 18,
+    fontSize: scaleSize(18),
     fontWeight: '500',
   },
   patientInfo: { flex: 1 },
@@ -591,8 +592,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border.default,
-    padding: 18,
-    gap: 6,
+    padding: scaleSize(18),
+    gap: scaleSize(6),
     ...cardShadow,
   },
   quickLabel: { fontSize: fontSize.bodyLarge, fontWeight: '600', color: colors.text.primary },

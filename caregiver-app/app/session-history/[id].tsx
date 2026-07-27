@@ -13,7 +13,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { apiGet } from '../../src/lib/apiClient';
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
 import {
-  MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, spacing,
+  MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, scaleSize, spacing,
 } from '../../src/theme';
 
 type CalendarDay = {
@@ -106,7 +106,7 @@ export default function SessionHistoryScreen() {
               />
             </TouchableOpacity>
             <View style={styles.monthTitleWrap}>
-              <Text style={styles.monthTitle}>{formatMonthTitle(month)}</Text>
+              <Text maxFontSizeMultiplier={1.4} style={styles.monthTitle}>{formatMonthTitle(month)}</Text>
               {/* Read out on its own after a month change or a failed load, so the caregiver hears which
                   month they landed on without going looking for it. */}
               <Text accessibilityLiveRegion="polite" style={styles.monthSubtitle}>
@@ -337,12 +337,12 @@ const styles = StyleSheet.create({
     borderColor: colors.border.default,
     borderRadius: radius.pill,
     borderWidth: 1,
-    height: 32,
+    height: scaleSize(32),
     justifyContent: 'center',
-    width: 32,
+    width: scaleSize(32),
   },
   monthTitleWrap: { alignItems: 'center', flex: 1 },
-  monthTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 18, fontWeight: '500' },
+  monthTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(18), fontWeight: '500' },
   monthSubtitle: { color: colors.text.tertiary, fontSize: fontSize.body, marginTop: 3 },
   weekdayRow: { flexDirection: 'row', marginBottom: spacing.sm },
   weekdayText: {
@@ -387,10 +387,9 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     fontSize: fontSize.caption,
     fontWeight: '800',
-    lineHeight: 15,
     textAlign: 'center',
   },
-  dayCount: { fontSize: fontSize.body, fontWeight: '900', lineHeight: 15, textAlign: 'center' },
+  dayCount: { fontSize: fontSize.body, fontWeight: '900', textAlign: 'center' },
   dayCountGood: { color: '#617A58' },
   dayCountQuiet: { color: colors.text.secondary },
   hintCard: {
