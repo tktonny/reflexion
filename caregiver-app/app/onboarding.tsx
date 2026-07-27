@@ -13,7 +13,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiGet, apiSend } from '../src/lib/apiClient';
+import {
+  claimDevicePairingV1,
+  createLovedOneV1,
+  loadCaregiverHome,
+  registerCaregiverV1,
+  updateCaregiverProfileV1,
+} from '../src/lib/v1Caregiver';
+import { setV1Session } from '../src/lib/v1AuthSession';
 import { getStoredAuthSession, setStoredAuthSession } from '../src/lib/authSession';
 import { caregiverConfigKey, refreshCaregiverConfig } from '../src/lib/queryKeys';
 import {
@@ -93,10 +100,7 @@ export default function OnboardingScreen() {
   const existingConfigQuery = useQuery({
     enabled: isAddPatientMode && Boolean(storedSession?.userId),
     queryKey: caregiverConfigKey(storedSession?.userId),
-    queryFn: () =>
-      apiGet<LatestConfigResponse>(
-        `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(storedSession?.userId || '')}`,
-      ),
+    queryFn: loadCaregiverHome,
   });
   const { refetch: refetchExistingConfig } = existingConfigQuery;
 
@@ -110,9 +114,7 @@ export default function OnboardingScreen() {
 
   useEffect(() => {
     if (!existingConfigQuery.data) return;
-    setExistingPatientCount(
-      Array.isArray(existingConfigQuery.data.patients) ? existingConfigQuery.data.patients.length : 0,
-    );
+    setExistingPatientCount(existingConfigQuery.data.patients.length);
   }, [existingConfigQuery.data]);
 
   // The raw error stays in the log only. What the caregiver sees is <ExistingProfilesState> below: the
@@ -123,34 +125,79 @@ export default function OnboardingScreen() {
     }
   }, [existingConfigQuery.error]);
 
+  // One loved one, from the form onto v1's three resources — patient, care plan, consent. The pairing code
+  // typed here is claimed after the patient exists, since a claim needs a patientId to bind the mirror to.
+  async function saveLovedOne(patient: PatientForm) {
+    const created = await createLovedOneV1({
+      displayName: patient.name.trim(),
+      preferredLanguage: patient.preferredLanguage || 'english',
+      timezone: patient.timezone || 'Asia/Singapore',
+      relationshipType: account.relationshipToElderly || 'caregiver',
+      profile: {
+        age: Number(patient.age) || null,
+        gender: patient.gender || null,
+        photoUrl: patient.photoUrl || null,
+        phoneNumber: patient.phoneNumber || null,
+      },
+      wakeTime: patient.usualWakeTime,
+      topics: patient.keyTopics,
+      otherTopic: patient.keyTopicsOtherText,
+      speechOrHearingNotes: patient.speechOrHearingConditions,
+    });
+
+    const pairingCode = patient.mirrorPairingCode.replace(/\D/g, '');
+    if (pairingCode.length === 6) {
+      // A mirror that will not pair must not undo a loved one who was created successfully — they can pair
+      // later from Mirror management, which is exactly what that screen is for.
+      await claimDevicePairingV1({
+        patientId: created.patientId,
+        pairingCode,
+        mirrorName: patient.mirrorName.trim() || `Mirror for ${patient.name.trim()}`,
+      }).catch((error) => {
+        console.warn('[Onboarding] mirror pairing failed; the loved one was still created', error);
+      });
+    }
+    return created;
+  }
+
   const createConfigMutation = useMutation({
-    mutationFn: ({ pushDeviceRegistration }: CreateConfigVariables) =>
-      apiSend<CreateConfigResponse>('/api/nurse-patient-config/create', {
-        method: 'POST',
-        body: JSON.stringify({
-          account,
-          patients: patients.map((patient) => ({
-            ...patient,
-            age: Number(patient.age),
-          })),
-          notifications,
-          caregiverDevice: pushDeviceRegistration?.device,
-        }),
-      }),
+    mutationFn: async (_variables: CreateConfigVariables) => {
+      const registration = await registerCaregiverV1({
+        name: account.name.trim(),
+        email: account.email.trim().toLowerCase(),
+        password: account.password,
+        phoneNumber: account.phoneNumber.trim(),
+        relationshipToElderly: account.relationshipToElderly || null,
+      });
+      // Hold the session before the next call: every write below is authorised by this token.
+      await setV1Session({
+        accessToken: registration.accessToken,
+        refreshToken: registration.refreshToken,
+        actor: registration.actor,
+      });
+
+      await updateCaregiverProfileV1({ notificationPreferences: notifications });
+      // Sequential rather than parallel: each loved one is three writes, and a burst of them from a phone
+      // on a Singapore connection to a China-region backend is how idempotency keys start racing.
+      for (const patient of patients) {
+        await saveLovedOne(patient);
+      }
+      return {
+        nurseId: registration.actor.userId,
+        name: registration.actor.name || account.name.trim(),
+        email: registration.actor.email || account.email.trim().toLowerCase(),
+        patientCount: patients.length,
+      } satisfies CreateConfigResponse;
+    },
   });
 
   const addPatientsMutation = useMutation({
-    mutationFn: () =>
-      apiSend<AddPatientsResponse>('/api/nurse-patient-config/add-patients', {
-        method: 'PATCH',
-        body: JSON.stringify({
-          nurseId: getStoredAuthSession()?.userId,
-          patients: patients.map((patient) => ({
-            ...patient,
-            age: Number(patient.age),
-          })),
-        }),
-      }),
+    mutationFn: async () => {
+      for (const patient of patients) {
+        await saveLovedOne(patient);
+      }
+      return { patientCount: patients.length } satisfies AddPatientsResponse;
+    },
   });
 
   function updatePatient(index: number, updates: Partial<PatientForm>) {

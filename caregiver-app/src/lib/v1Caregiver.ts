@@ -156,6 +156,9 @@ export function getConsentStateV1(patientId: string): Promise<V1ConsentState> {
   return v1Get<V1ConsentState>(`/patients/${encodeURIComponent(patientId)}/consents`);
 }
 
+/** The purpose POST /sessions checks before it will start a daily check-in. */
+export const CHECKIN_CONSENT_PURPOSE = 'home_cognitive_monitoring';
+
 /** The document version the onboarding consent screen presents. Bump when that wording changes. */
 export const CHECKIN_CONSENT_DOCUMENT_VERSION = 'checkin-consent-2026-07';
 
@@ -269,6 +272,72 @@ export async function loadCaregiverSettings(): Promise<CaregiverSettings> {
     caregiver: home.caregiver,
     patients: home.patients.map((patient, index) => ({ ...patient, carePlan: plans[index] })),
   };
+}
+
+// ── Onboarding (replaces /nurse-patient-config/create and add-patients)
+
+export type V1Registration = {
+  actor: { userId: string; tenantId: string; name?: string; email?: string; roles?: string[] };
+  accessToken: string;
+  refreshToken: string;
+};
+
+/** Creates the caregiver, their private tenant, and a usable session in one call. */
+export function registerCaregiverV1(input: {
+  name: string;
+  email: string;
+  password: string;
+  phoneNumber?: string;
+  relationshipToElderly?: string | null;
+}): Promise<V1Registration> {
+  return v1Post<V1Registration>('/auth/registrations', input);
+}
+
+export type NewLovedOne = {
+  displayName: string;
+  preferredLanguage: string;
+  timezone: string;
+  profile?: Partial<V1PatientProfile>;
+  relationshipType?: string;
+  wakeTime?: string;
+  topics?: string[];
+  otherTopic?: string;
+  speechOrHearingNotes?: string;
+};
+
+/**
+ * Adding a loved one is three writes, and the third is the one that was never made.
+ *
+ * A daily check-in is refused with 403 CONSENT_REQUIRED unless a granted home_cognitive_monitoring consent
+ * exists, and the monitoring pipeline drops any session without a consentRef. No creation path in this app
+ * has ever written one — not legacy onboarding, not the operator console — so the product's core function
+ * could not start for anybody, and the mirror surfaced only a generic error. Consent is granted here, as
+ * part of adding a loved one, because that is the moment the caregiver is actually being asked.
+ *
+ * The care plan carries everything that changes how Aria talks, which is what the mirror reads from its
+ * device configuration; those fields previously sat unread in the legacy patient document.
+ */
+export async function createLovedOneV1(input: NewLovedOne): Promise<V1PatientRecord> {
+  const patient = await createPatientV1({
+    displayName: input.displayName,
+    preferredLanguage: input.preferredLanguage,
+    timezone: input.timezone,
+    profile: input.profile,
+    relationshipType: input.relationshipType,
+  });
+
+  await putCarePlanV1(patient.patientId, 0, {
+    dailyRoutine: { wakeTime: input.wakeTime || '' },
+    communicationPreferences: {
+      topics: input.topics || [],
+      otherTopic: input.otherTopic || '',
+      speechOrHearingNotes: input.speechOrHearingNotes || '',
+      speechSpeed: input.profile?.speechSpeed || 'normal',
+    },
+  });
+
+  await grantCheckInConsentV1(patient.patientId, CHECKIN_CONSENT_PURPOSE);
+  return patient;
 }
 
 // ── Feedback (replaces the tokenless legacy POST /feedback, which took a nurseId in the body)
