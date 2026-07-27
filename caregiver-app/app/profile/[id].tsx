@@ -9,7 +9,7 @@ import { Feather } from '@expo/vector-icons';
 import MiniSparkline from '../../src/components/MiniSparkline';
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
 import { fetchPatientTrend, type TrendDay } from '../../src/lib/patientTrendClient';
-import { apiSend } from '../../src/lib/apiClient';
+import { generateSessionSummaryV1 } from '../../src/lib/v1Caregiver';
 import { hasV1Session } from '../../src/lib/v1AuthSession';
 import {
   createAwayPeriodV1,
@@ -88,12 +88,11 @@ export default function ProfileScreen() {
   );
   const realTrend = trendQuery.data || [];
   const summaryMutation = useMutation({
-    mutationFn: () => apiSend<{ summary?: string }>('/api/patient-summary', {
-      method: 'POST',
-      body: JSON.stringify({ patientId: id }),
-    }),
+    mutationFn: () => generateSessionSummaryV1(id),
     onSuccess: async (body) => {
-      setGeneratedSummary(body?.summary || 'No summary generated.');
+      // A quiet day answers with summary:null and a reason rather than failing, so it is a normal outcome
+      // to render, not an error to alert on.
+      setGeneratedSummary(body?.summary || 'There was no conversation to summarise for this day.');
       await queryClient.invalidateQueries({ queryKey: ['sessionDay', id] });
     },
     onError: (err) => {

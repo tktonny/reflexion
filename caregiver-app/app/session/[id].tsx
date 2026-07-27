@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
-import { apiGet } from '../../src/lib/apiClient';
+import { getSessionDayV1 } from '../../src/lib/v1Caregiver';
 import {
   MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, scaleSize, spacing,
 } from '../../src/theme';
@@ -44,15 +44,16 @@ export default function SessionReplayScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [selectedSessionIndex, setSelectedSessionIndex] = useState(0);
   const [showTranscript, setShowTranscript] = useState(true);
-  const shouldLoadRealSession = Boolean(id && /^[0-9a-f]{24}$/i.test(id));
+  // Any non-empty id is real. This used to test /^[0-9a-f]{24}$/, which was the legacy nurse/patient
+  // ObjectId hex — but v1 mints `pat_…` ids for loved ones created since the migration, and CLAUDE.md is
+  // explicit that v1 ids are opaque strings. The old guard silently blanked the screen for them.
+  const shouldLoadRealSession = Boolean(id);
   const today = getSingaporeDateKey(new Date());
   const todaySessionsQuery = useQuery({
     enabled: shouldLoadRealSession,
     queryKey: ['sessionDay', id, today],
     queryFn: async () => {
-      const body = await apiGet<Partial<TodaySessionsResponse>>(
-        `/api/conversation-sessions-by-day?id=${encodeURIComponent(id)}&date=${encodeURIComponent(today)}`,
-      );
+      const body = await getSessionDayV1(id, today);
       return {
         date: body?.date || today,
         patientId: body?.patientId || id,
