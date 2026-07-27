@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import {
   CAPTURE_SAMPLE_RATE,
   PLAYBACK_SAMPLE_RATE,
   getRealtimeWsUrl,
 } from '../constants/realtime'
-import { DEVICE_AUTH_TOKEN_STORAGE_KEY, DEVICE_ID_STORAGE_KEY } from '../constants/nursePatientConfig'
+import { getBearer, getQwenRealtimeEndpoint, getQwenRealtimeModel } from '../api/qwenToken'
 import { looksLikeGoodbye, looksLikeUserGoodbye } from '../orchestration/orchestrator'
 import { createDailyConversationPlan, dailyConversationPatientTurns } from '../orchestration/deterministicSpeech'
 import { randomId } from '../utils/id'
@@ -288,15 +287,19 @@ export function useQwenRealtimeConversation(options: ConversationOptions = {}) {
       const stream = await (navigator as any).mediaDevices.getUserMedia({ audio: true, video: false })
       mediaStreamRef.current = stream
 
-      const [deviceId, authToken] = await Promise.all([
-        AsyncStorage.getItem(DEVICE_ID_STORAGE_KEY),
-        AsyncStorage.getItem(DEVICE_AUTH_TOKEN_STORAGE_KEY),
-      ])
-      const url = getRealtimeWsUrl(patientId, language, { deviceId, authToken, persona })
+      // Keyless auth (parity with the Android APK): mint a short-lived Qwen realtime ticket from the
+      // backend for the active device session — NO provider key on the device. getBearer() resolves the
+      // ticket and populates the region-correct endpoint/model, which we hand to the local relay in the
+      // first WS message (never in the URL/logs). The screen calls beginMirrorSession() before this.
+      const ticket = await getBearer()
+      const endpoint = getQwenRealtimeEndpoint()
+      const model = getQwenRealtimeModel()
+      const url = getRealtimeWsUrl(patientId, language, { persona })
       const socket = new WebSocket(url)
       socketRef.current = socket
 
       socket.onopen = () => {
+        socket.send(JSON.stringify({ type: 'reflexion.auth', ticket, endpoint, model }))
         initAudioPipeline(stream)
       }
       socket.onmessage = (event) => {
