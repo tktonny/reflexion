@@ -98,9 +98,25 @@ export async function getPushNotificationDeviceRegistration(): Promise<{
       },
     };
   } catch (error) {
-    console.warn('[pushNotifications] push registration unavailable (FCM not configured?)', error);
-    return { ok: false, reason: error instanceof Error ? error.message : 'Push registration unavailable.' };
+    console.warn('[pushNotifications] push registration unavailable', error);
+    return { ok: false, reason: friendlyPushError(error) };
   }
+}
+
+// FCM token retrieval fails on devices WITHOUT Google Play Services (many Android emulators, some
+// Huawei / China-ROM phones) with MISSING_INSTANCEID_SERVICE / SERVICE_NOT_AVAILABLE — a device
+// limitation, not a bug or a build problem. Surfacing the raw Java/Firebase stack trace to a caregiver
+// is alarming and unhelpful, so map the known cases to a plain, reassuring line. Alerts still land in the
+// Notifications tab regardless of whether this phone can register for push.
+function friendlyPushError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  if (/MISSING_INSTANCEID_SERVICE|SERVICE_NOT_AVAILABLE|play[\s_-]*services|google[\s_-]*play/i.test(message)) {
+    return "This device doesn't have Google Play Services, so push can't be enabled here. Your alerts still appear in the Notifications tab.";
+  }
+  if (/FirebaseApp is not initialized|google-services|googleServicesFile/i.test(message)) {
+    return 'Push is not set up in this build.';
+  }
+  return 'Push is unavailable on this device right now. Your alerts still appear in the Notifications tab.';
 }
 
 async function loadNotifications() {
