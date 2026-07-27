@@ -140,9 +140,15 @@ sessionsRouter.post('/sessions/:sessionId/event-batches', requireSessionActor, a
         duplicates++
       }
     }
+    const ingestedAt = new Date()
     await db.collection<any>(collections.sessions).updateOne({ _id: session._id, state: 'created' }, {
-      $set: { state: 'active', activatedAt: new Date(), updatedAt: new Date() }, $inc: { stateVersion: 1 },
+      $set: { state: 'active', activatedAt: ingestedAt, updatedAt: ingestedAt }, $inc: { stateVersion: 1 },
     })
+    // Touch the timestamp on every batch, not just the first. The stale-session sweeper in jobs/finalizeDay
+    // keys on updatedAt, and until now an active session's never moved again after activation — a long
+    // conversation would have looked abandoned while it was still happening.
+    await db.collection<any>(collections.sessions).updateOne({ _id: session._id, state: 'active' },
+      { $set: { updatedAt: ingestedAt } })
     return { status: 202, data: { accepted, duplicates, nextExpectedSequence: await nextExpectedSequence(String(session._id)) } }
   })
   sendData(response, result.data, result.status)

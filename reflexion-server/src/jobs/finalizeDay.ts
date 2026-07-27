@@ -3,6 +3,7 @@ import type { Db } from 'mongodb'
 import { withMongo } from '../lib/mongo.js'
 import { collections } from '../v1/platform/collections.js'
 import { newId } from '../v1/platform/ids.js'
+import { appendOutbox } from '../v1/platform/outbox.js'
 import {
   dailyCheckNotificationCopy,
   materializeNotifications,
@@ -139,10 +140,63 @@ export async function finalizeDay(db: Db, options: { patientId?: string; now?: D
 }
 
 // Runnable supervisor loop (idempotent; both functions gate on local time internally).
+/**
+ * How long a session may sit in `created` or `active` with nothing arriving before it is written off.
+ *
+ * Generous on purpose: a daily check-in runs a minute or two, and a companion chat rarely holds a
+ * continuous half hour. The cost of being wrong in one direction is abandoning a conversation somebody is
+ * still having; in the other, a row that never resolves.
+ */
+const STALE_SESSION_MS = 30 * 60 * 1000
+
+/**
+ * Writes off sessions the mirror never finished.
+ *
+ * A session only left `created`/`active` when the client called POST /sessions/:id/abandonments. A mirror
+ * that loses power, drops off the network mid-conversation or is killed never makes that call, so the row
+ * stayed open forever — production had 31 of 72 sessions in that state, the oldest two days old. Nothing
+ * downstream was corrupted (a stuck session has no localCompletedAt, so it never counted as a completed
+ * check-in, and POST /sessions does not refuse a new one) but the session list was steadily filling with
+ * rows that would never resolve, and per-day counts included conversations that never happened.
+ *
+ * Abandoning them here goes through the same state change and the same outbox event a client abandon does,
+ * so consumers cannot tell the two apart and no special case is needed downstream.
+ */
+export async function abandonStaleSessions(db: Db) {
+  const cutoff = new Date(Date.now() - STALE_SESSION_MS)
+  const stale = await db.collection<any>(collections.sessions).find({
+    state: { $in: ['created', 'active'] },
+    updatedAt: { $lt: cutoff },
+  }).limit(200).toArray()
+
+  const abandoned: string[] = []
+  for (const session of stale) {
+    const now = new Date()
+    // Re-checked in the filter: the mirror may have come back and finished it since the read above.
+    const changed = await db.collection<any>(collections.sessions).findOneAndUpdate({
+      _id: session._id, state: { $in: ['created', 'active'] },
+    }, {
+      $set: { state: 'abandoned', abandonedAt: now, abandonReason: 'stale_no_client_activity', updatedAt: now },
+      $inc: { stateVersion: 1 },
+    }, { returnDocument: 'after' })
+    if (!changed) continue
+
+    await appendOutbox(db, {
+      eventType: 'session.abandoned', tenantId: String(session.tenantId), patientId: String(session.patientId),
+      aggregateType: 'session', aggregateId: String(session._id), correlationId: `stale-sweep:${session._id}`,
+      payload: { reason: 'stale_no_client_activity' },
+    })
+    abandoned.push(String(session._id))
+  }
+  if (abandoned.length) console.log(`[finalizeDay] abandoned ${abandoned.length} stale session(s)`)
+  return { abandoned }
+}
+
 async function runOnce() {
   try {
     await withMongo(async (client) => {
       const db = client.db()
+      await abandonStaleSessions(db)
       await evaluate7pm(db)
       await finalizeDay(db)
     })

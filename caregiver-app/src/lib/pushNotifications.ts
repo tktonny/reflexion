@@ -108,7 +108,7 @@ export async function getPushNotificationDeviceRegistration(): Promise<{
 // limitation, not a bug or a build problem. Surfacing the raw Java/Firebase stack trace to a caregiver
 // is alarming and unhelpful, so map the known cases to a plain, reassuring line. Alerts still land in the
 // Notifications tab regardless of whether this phone can register for push.
-function friendlyPushError(error: unknown): string {
+export function friendlyPushError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error ?? '');
   if (/MISSING_INSTANCEID_SERVICE|SERVICE_NOT_AVAILABLE|play[\s_-]*services|google[\s_-]*play/i.test(message)) {
     return "This device doesn't have Google Play Services, so push can't be enabled here. Your alerts still appear in the Notifications tab.";
