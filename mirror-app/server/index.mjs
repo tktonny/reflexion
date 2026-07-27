@@ -82,23 +82,54 @@ httpServer.on('upgrade', async (req, socket, head) => {
   })
 })
 
+// Keyless handshake: the client's FIRST message is { type:'reflexion.auth', ticket, endpoint, model } —
+// a short-lived Qwen ticket the backend minted for this device's session. We wait for it before opening
+// the upstream, so the ticket never rides in the WS URL or logs. Times out to null (local dev raw-key path).
+function waitForClientAuth(clientWs, timeoutMs) {
+  return new Promise((resolve) => {
+    let done = false
+    const finish = (value) => {
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      try { clientWs.off('message', onMsg) } catch {}
+      resolve(value)
+    }
+    const timer = setTimeout(() => finish(null), timeoutMs)
+    const onMsg = (data) => {
+      let m
+      try { m = JSON.parse(String(data)) } catch { return }
+      if (m && String(m.type) === 'reflexion.auth') finish({ ticket: m.ticket, endpoint: m.endpoint, model: m.model })
+    }
+    clientWs.on('message', onMsg)
+  })
+}
+
 async function handleSession(clientWs, { patientId, language, persona }) {
   const voice = voiceProfileForSession(language)
+  const auth = await waitForClientAuth(clientWs, 10000)
+  const keyless = Boolean(auth?.ticket)
   const status = {
     session_mode: 'live_qwen',
     conversation_provider: 'qwen_omni_realtime',
-    model_name: qwenConfig.realtimeModel,
-    live_relay_available: Boolean(qwenConfig.apiKey),
+    model_name: auth?.model || qwenConfig.realtimeModel,
+    live_relay_available: keyless || Boolean(qwenConfig.apiKey),
     selected_voice: voice.voice,
     selected_language: voice.languageLabel,
     persona,
     max_session_seconds: qwenConfig.maxSessionSeconds,
+    keyless,
   }
-  console.log(`[relay] session accepted patient_id=${patientId} language=${language} persona=${persona} voice=${voice.voice}`)
-  send(clientWs, { type: 'reflexion.session.ready', session: status })
+  console.log(`[relay] session accepted patient_id=${patientId} language=${language} persona=${persona} voice=${voice.voice} auth=${keyless ? 'ticket' : 'dev-key'}`)
 
   try {
-    await runLiveQwen(clientWs, { patientId, language, persona })
+    // Send `ready` only AFTER the ticket-authed upstream connects, so the client (which gates audio on
+    // ready) never streams into a not-yet-connected relay.
+    await runLiveQwen(clientWs, {
+      patientId, language, persona,
+      ticket: auth?.ticket, endpoint: auth?.endpoint, model: auth?.model,
+      onReady: () => send(clientWs, { type: 'reflexion.session.ready', session: status }),
+    })
   } catch (err) {
     console.error('[relay] live relay degraded:', err?.message)
     send(clientWs, {

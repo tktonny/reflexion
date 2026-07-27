@@ -3,14 +3,19 @@
 // The mirror app is a React Native / Expo app; its production Android path uses native modules
 // (expo-pcm-audio, onnxruntime wake word, direct-WS omni). Linux has no RN desktop target, so the Linux
 // build is the SAME app compiled for WEB (react-native-web) and wrapped in Electron (Chromium). The
-// conversation therefore runs the `relay` transport (browser <-WS-> local Node relay <-WS-> Qwen) with
-// Web-Audio capture — see docs/mirror-app/linux-electron.md for what differs from Android.
+// conversation runs the `relay` transport (browser <-WS-> local Node relay <-WS-> Qwen) with Web-Audio
+// capture — see docs/mirror-app/linux-electron.md for what differs from Android.
+//
+// KEYLESS (same security model as the Android APK): NO Qwen key lives on the device. The renderer pairs
+// with the backend using an embedded API URL + per-device bootstrap token, and per conversation mints a
+// short-lived Qwen realtime TICKET from the backend. It hands that ticket to the local relay (first WS
+// message), and the relay opens the header-authed Qwen WS with the ticket. Chromium WebSockets can't set
+// the Authorization header, which is the only reason a Node relay sits in the middle at all.
 //
 // Two local services run inside this process:
 //   1. a tiny static HTTP server for the exported SPA (dist/) — file:// breaks Expo Router history
 //      routing and relative asset URLs, so we serve it over http://127.0.0.1 instead;
-//   2. (optional) the Node relay (server/relay.mjs), spawned only when a Qwen key is present in the
-//      environment. The key is appliance config on the device, NEVER embedded in the distributed app.
+//   2. the Node relay (server/index.mjs) — keyless; it authenticates to Qwen with the renderer's ticket.
 
 const { app, BrowserWindow, session } = require('electron')
 const path = require('path')
@@ -50,19 +55,19 @@ function startWebServer() {
   return server
 }
 
-/** Spawn the bundled relay only if a Qwen key is configured. Without it the UI still loads; the
- *  conversation just reports the relay as unavailable (documented). Set REFLEXION_MIRROR_SKIP_RELAY=1
- *  to point at an external relay instead. */
+/** Spawn the bundled relay. KEYLESS: the relay no longer needs a Qwen key — the renderer mints a
+ *  short-lived ticket from the backend (device-authenticated) and hands it to the relay per session, so
+ *  the relay authenticates to Qwen with that ticket (same model as the Android APK; no key on device).
+ *  Set REFLEXION_MIRROR_SKIP_RELAY=1 to point at an external relay instead. */
 let relayProc = null
 function startRelay() {
   if (process.env.REFLEXION_MIRROR_SKIP_RELAY === '1') return
-  const hasKey = process.env.QWEN_API_KEY || process.env.DASHSCOPE_API_KEY
   // server/index.mjs is the relay entry (`npm run relay`). It needs the orchestration bundle
   // (server/generated/, produced by `npm run build:orch`) to exist — see the Linux build doc.
   const relayPath = path.join(__dirname, '..', 'server', 'index.mjs')
   const orchBuilt = fs.existsSync(path.join(__dirname, '..', 'server', 'generated', 'orchestration.mjs'))
-  if (!hasKey || !fs.existsSync(relayPath) || !orchBuilt) {
-    console.warn('[electron] relay not started (need QWEN_API_KEY + built server/generated/) — conversation unavailable; UI still loads')
+  if (!fs.existsSync(relayPath) || !orchBuilt) {
+    console.warn('[electron] relay not started (server/generated/ not built — run npm run build:orch); UI still loads')
     return
   }
   relayProc = spawn(process.execPath, [relayPath], {

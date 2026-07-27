@@ -40,7 +40,7 @@ function eventId() {
   return `event_${randomUUID().replace(/-/g, '').slice(0, 12)}`
 }
 
-function buildLiveSessionUpdate(patientId, language, { voice, wrapUp = false, persona = 'screening' } = {}) {
+function buildLiveSessionUpdate(patientId, language, { voice, wrapUp = false, persona = 'screening', turnDetection = 'server_vad' } = {}) {
   let instructions
   if (wrapUp) {
     const goodbye = closingGoodbyeSentence(language)
@@ -62,14 +62,24 @@ function buildLiveSessionUpdate(patientId, language, { voice, wrapUp = false, pe
       top_p: qwenConfig.topP,
       input_audio_format: 'pcm',
       output_audio_format: 'pcm',
-      turn_detection: {
-        type: 'server_vad',
-        threshold: qwenConfig.vadThreshold,
-        prefix_padding_ms: qwenConfig.vadPrefixPaddingMs,
-        silence_duration_ms: qwenConfig.vadSilenceDurationMs,
-        create_response: true,
-        interrupt_response: false,
-      },
+      // Ticket-issued qwen3.5-omni models use semantic_vad (rejects speaker echo, matches Android);
+      // the legacy raw-key path stays on server_vad. semantic_vad has no prefix_padding_ms.
+      turn_detection: turnDetection === 'semantic_vad'
+        ? {
+            type: 'semantic_vad',
+            threshold: qwenConfig.vadThreshold,
+            silence_duration_ms: qwenConfig.vadSilenceDurationMs,
+            create_response: true,
+            interrupt_response: false,
+          }
+        : {
+            type: 'server_vad',
+            threshold: qwenConfig.vadThreshold,
+            prefix_padding_ms: qwenConfig.vadPrefixPaddingMs,
+            silence_duration_ms: qwenConfig.vadSilenceDurationMs,
+            create_response: true,
+            interrupt_response: false,
+          },
       input_audio_transcription: { model: qwenConfig.transcriptionModel },
     },
   }
@@ -96,10 +106,10 @@ function realtimeUpstreamUrls() {
 
 // Open one upstream ws to DashScope; resolves to a connected socket, else rejects.
 // `statusCode` is attached to the error on handshake failure (for China-backup gating).
-function connectUpstream(url) {
+function connectUpstream(url, authToken) {
   return new Promise((resolve, reject) => {
     const socket = new WebSocket(url, {
-      headers: { Authorization: `Bearer ${qwenConfig.apiKey}` },
+      headers: { Authorization: `Bearer ${authToken}` },
       maxPayload: 0,
     })
     let settled = false
@@ -123,21 +133,37 @@ function connectUpstream(url) {
   })
 }
 
-export async function runLiveQwen(clientWs, { patientId, language, persona = 'screening' }) {
+export async function runLiveQwen(clientWs, { patientId, language, persona = 'screening', ticket, endpoint, model, onReady } = {}) {
+  const selectedVoiceProfile = voiceProfileForSession(language)
+
+  // KEYLESS PATH (production / Electron): the client obtained a short-lived Qwen ticket from the backend
+  // (device-authenticated) and passed it here. Connect to the ticket's region-correct endpoint with the
+  // ticket as the Bearer — no raw provider key on the device. semantic_vad matches the qwen3.5-omni ticket.
+  if (ticket && endpoint) {
+    const upstreamModel = model || qwenConfig.realtimeModel
+    const url = `${endpoint}${endpoint.includes('?') ? '&' : '?'}model=${encodeURIComponent(upstreamModel)}`
+    log(`opening upstream (ticket) patient_id=${patientId} language=${language} host=${new URL(endpoint).host} model=${upstreamModel}`)
+    const upstream = await connectUpstream(url, ticket)
+    log('upstream connected (ticket)')
+    if (onReady) onReady()
+    await relaySession(clientWs, upstream, { patientId, language, persona, selectedVoiceProfile, turnDetection: 'semantic_vad' })
+    return
+  }
+
+  // LEGACY RAW-KEY PATH (local web dev only). Never used by the shipped Electron/Android builds.
   if (!qwenConfig.apiKey) {
-    throw new Error('missing_qwen_api_key (set QWEN_API_KEY or DASHSCOPE_API_KEY)')
+    throw new Error('no_credentials (client sent no ticket and no QWEN_API_KEY/DASHSCOPE_API_KEY is set)')
   }
   const urls = realtimeUpstreamUrls()
-  const selectedVoiceProfile = voiceProfileForSession(language)
   let lastError = null
-
   for (let i = 0; i < urls.length; i += 1) {
     const url = `${urls[i]}?model=${qwenConfig.realtimeModel}`
-    log(`opening upstream patient_id=${patientId} language=${language} url=${urls[i]} model=${qwenConfig.realtimeModel} attempt=${i + 1}/${urls.length}`)
+    log(`opening upstream (dev key) patient_id=${patientId} language=${language} url=${urls[i]} model=${qwenConfig.realtimeModel} attempt=${i + 1}/${urls.length}`)
     try {
-      const upstream = await connectUpstream(url)
+      const upstream = await connectUpstream(url, qwenConfig.apiKey)
       log(`upstream connected url=${urls[i]}`)
-      await relaySession(clientWs, upstream, { patientId, language, persona, selectedVoiceProfile })
+      if (onReady) onReady()
+      await relaySession(clientWs, upstream, { patientId, language, persona, selectedVoiceProfile, turnDetection: 'server_vad' })
       return
     } catch (err) {
       lastError = err
@@ -152,7 +178,7 @@ export async function runLiveQwen(clientWs, { patientId, language, persona = 'sc
   if (lastError) throw lastError
 }
 
-function relaySession(clientWs, upstream, { patientId, language, persona, selectedVoiceProfile }) {
+function relaySession(clientWs, upstream, { patientId, language, persona, selectedVoiceProfile, turnDetection = 'server_vad' }) {
   return new Promise((resolve, reject) => {
     let selected = selectedVoiceProfile
     let deferredVoiceProfile = null
@@ -175,7 +201,7 @@ function relaySession(clientWs, upstream, { patientId, language, persona, select
     }
     const sendSessionUpdate = (profile, reason) => {
       log(`session.update flow_id=${flowId} steps=${promptStepCount} voice=${profile.voice} language=${profile.languageLabel} reason=${reason}`)
-      sendUpstream(buildLiveSessionUpdate(patientId, profile.languageLabel, { voice: profile.voice, persona }))
+      sendUpstream(buildLiveSessionUpdate(patientId, profile.languageLabel, { voice: profile.voice, persona, turnDetection }))
     }
     const applyVoiceProfile = (profile, reason) => {
       sendSessionUpdate(profile, reason)
@@ -191,7 +217,7 @@ function relaySession(clientWs, upstream, { patientId, language, persona, select
     }
     const sendWrapUp = () => {
       log(`wrap-up patient_id=${patientId} voice=${selected.voice} language=${selected.languageLabel}`)
-      sendUpstream(buildLiveSessionUpdate(patientId, selected.languageLabel, { voice: selected.voice, wrapUp: true, persona }))
+      sendUpstream(buildLiveSessionUpdate(patientId, selected.languageLabel, { voice: selected.voice, wrapUp: true, persona, turnDetection }))
       sendUpstream({ type: 'response.create' })
     }
 
