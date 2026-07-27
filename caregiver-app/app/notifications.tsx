@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { apiGet } from '../src/lib/apiClient';
+import { loadCaregiverHome } from '../src/lib/v1Caregiver';
 import { getStoredAuthSession } from '../src/lib/authSession';
 import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { caregiverConfigKey, notificationsQueryKey } from '../src/lib/queryKeys';
@@ -95,17 +95,16 @@ export default function NotificationsScreen() {
   const directoryQuery = useQuery({
     enabled: Boolean(session?.userId),
     queryKey: caregiverConfigKey(session?.userId),
-    queryFn: () => apiGet<LatestConfigResponse>(
-      `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(session?.userId || '')}`,
-    ),
+    queryFn: loadCaregiverHome,
   });
 
   const directory = useMemo(() => {
     const map = new Map<string, PatientDirectoryEntry>();
     for (const patient of directoryQuery.data?.patients || []) {
-      const entry = { name: patient.name || '', phoneNumber: patient.phoneNumber || '' };
-      if (patient.patientId) map.set(patient.patientId, entry);
-      if (patient.id) map.set(patient.id, entry);
+      map.set(patient.patientId, {
+        name: patient.displayName || '',
+        phoneNumber: patient.profile.phoneNumber || '',
+      });
     }
     return map;
   }, [directoryQuery.data]);

@@ -54,13 +54,16 @@ const AVATAR_TEXT: Record<V1Status, string> = {
 // authoritative v1 status itself, and a caller-supplied colour would silently win the race on first paint
 // — the old default was 'needs_attention', which is how a patient still establishing their baseline could
 // be shown as red in violation of the product rule.
+/**
+ * Handed over from the loved-one card: identity only. Last-interaction and duration used to ride along too,
+ * sourced from the legacy list, and were rendered whenever the v1 status had not arrived — telling the
+ * caregiver something about a person from a surface this screen no longer reads. Both now come from v1:
+ * the time from the status read model, the duration from the trend.
+ */
 type RealPatientProfile = {
   name: string;
   phoneNumber: string;
   photoUrl?: string;
-  lastSpokenAt: string | null;
-  lastSpokenLabel: string;
-  duration: number;
 };
 
 export default function ProfileScreen() {
@@ -207,8 +210,10 @@ export default function ProfileScreen() {
     const technicalNote = v1Status ? getTechnicalNote(v1Status.technicalState) : null;
     const lastInteractionText = v1Status
       ? formatLastInteraction(v1Status.lastInteractionAt)
-      : formatProfileLastSpoken(realProfile.lastSpokenLabel);
-    const durationText = formatDuration(realProfile.duration);
+      : 'Status updating';
+    // Today is the last entry the trend returns; it is the same figure the chart draws, so the two cannot
+    // disagree the way a route parameter and a freshly fetched trend could.
+    const durationText = formatDuration(realTrend[realTrend.length - 1]?.duration ?? 0);
     const talkedDays = realTrend.filter((day) => !day.missed).length;
     const avgDuration = talkedDays
       ? Math.round(realTrend.filter((day) => !day.missed).reduce((sum, day) => sum + day.duration, 0) / talkedDays)
@@ -671,9 +676,6 @@ function parsePatientParam(value?: string): RealPatientProfile | null {
       name: parsed.name,
       phoneNumber: parsed.phoneNumber || '',
       photoUrl: parsed.photoUrl || '',
-      lastSpokenAt: parsed.lastSpokenAt || null,
-      lastSpokenLabel: parsed.lastSpokenLabel || 'No interaction yet',
-      duration: Number(parsed.duration || 0),
     };
   } catch {
     return null;

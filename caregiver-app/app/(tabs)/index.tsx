@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
-import { apiGet } from '../../src/lib/apiClient';
+import { loadCaregiverHome, type CaregiverHomePatient } from '../../src/lib/v1Caregiver';
 import { getStoredAuthSession } from '../../src/lib/authSession';
 import { hasV1Session } from '../../src/lib/v1AuthSession';
 import { caregiverConfigKey } from '../../src/lib/queryKeys';
@@ -36,39 +36,49 @@ const STATUS_DOT: Record<string, string> = {
 // every status the caregiver sees comes from src/lib/v1Status.ts via the v1 read model.
 type PatientStatus = 'doing_well' | 'worth_checking' | 'needs_attention';
 
+/**
+ * What a card needs, derived from the v1 loved-one record.
+ *
+ * The legacy list also carried `status`, `statusLabel`, `lastSpokenAt`, `lastSpokenLabel` and
+ * `duration`. None survive: the first two were never rendered (the legacy bucket calls a loved one who is
+ * still establishing a baseline red), and the last three were only a fallback for when the v1 status could
+ * not be read — a fallback that told the caregiver something about a person, sourced from a surface this
+ * screen no longer trusts. When v1 has nothing to say, the screen now says so instead.
+ */
 type DashboardPatient = {
   id: string;
   patientId: string;
   name: string;
   phoneNumber: string;
-  age: number;
-  mirrorName: string;
   photoUrl?: string;
-  status: PatientStatus;
-  statusLabel: string;
-  lastSpokenAt: string | null;
-  lastSpokenLabel: string;
-  duration: number;
+  mirrorName: string;
+  needsConsent: boolean;
 };
 
-type LatestConfigResponse = {
-  caregiverName?: string;
-  patients?: DashboardPatient[];
-  error?: string;
-};
+function toDashboardPatient(patient: CaregiverHomePatient): DashboardPatient {
+  return {
+    id: patient.patientId,
+    patientId: patient.patientId,
+    name: patient.displayName,
+    phoneNumber: patient.profile.phoneNumber || '',
+    photoUrl: patient.profile.photoUrl || undefined,
+    mirrorName: patient.mirrorName || '',
+    needsConsent: patient.needsConsent,
+  };
+}
 
 export default function HomeScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const session = getStoredAuthSession();
+  // One call assembles what the legacy fat document used to return: the caregiver from /me, the loved
+  // ones from /patients, their mirrors from /device-assignments, and whether each is still waiting on a
+  // consent. Identity comes from the bearer token, so there is no id to pass and no way to ask for
+  // "whoever is newest" — which is what the legacy endpoint did when the nurseId was omitted.
   const latestConfigQuery = useQuery({
-    // The endpoint requires an explicit nurseId — without one it used to return an arbitrary caregiver's
-    // record, so the query stays disabled rather than asking for "whoever is newest".
     enabled: Boolean(session?.userId),
     queryKey: caregiverConfigKey(session?.userId),
-    queryFn: () => apiGet<LatestConfigResponse>(
-      `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(session?.userId || '')}`,
-    ),
+    queryFn: loadCaregiverHome,
   });
   const { refetch: refetchLatestConfig } = latestConfigQuery;
 
@@ -81,15 +91,15 @@ export default function HomeScreen() {
       void invalidatePatientStatuses(queryClient);
     }, [queryClient, refetchLatestConfig, session?.userId]),
   );
-  const configuredPatients = Array.isArray(latestConfigQuery.data?.patients) ? latestConfigQuery.data.patients : [];
-  const caregiverName = typeof latestConfigQuery.data?.caregiverName === 'string' ? latestConfigQuery.data.caregiverName : '';
+  const configuredPatients = (latestConfigQuery.data?.patients || []).map(toDashboardPatient);
+  const caregiverName = latestConfigQuery.data?.caregiver.name || '';
   const today = new Date().toLocaleDateString('en-SG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const displayName = getFirstName(caregiverName) || 'there';
 
   // Authoritative status comes from the v1 read model (baseline §4), keyed by the same id the legacy
   // list returns (the migration reuses the legacy ObjectId hex as the v1 patient _id). We never bucket
   // off the legacy days-since-conversation status, which reports establishing patients as red.
-  const patientIds = configuredPatients.map((patient) => patient.patientId || patient.id);
+  const patientIds = configuredPatients.map((patient) => patient.patientId);
   const statusResults = usePatientStatusesV1(patientIds);
   const statusValues = statusResults.map((result) => result.data?.status);
 
@@ -185,11 +195,17 @@ export default function HomeScreen() {
                     : statusResult?.isError
                       ? "Today's update did not reach us"
                       : 'Status updating';
-            const metaLine = v1
-              ? v1.status === 'establishing'
-                ? getBaselineProgressText(v1.baselineProgress)
-                : getReasonText(v1.primaryReason, patient.name)
-              : patient.lastSpokenLabel;
+            // Consent outranks everything else on this line: without it the daily check-in is refused
+            // outright, so any other explanation the card could offer would be describing a symptom. It was
+            // invisible before — a loved one waiting on consent looked exactly like one whose baseline was
+            // still building, and in production most of them sat in that state with nobody able to tell.
+            const metaLine = patient.needsConsent
+              ? 'Waiting for your go-ahead to start daily check-ins'
+              : v1
+                ? v1.status === 'establishing'
+                  ? getBaselineProgressText(v1.baselineProgress)
+                  : getReasonText(v1.primaryReason, patient.name)
+                : '';
             const lastInteractionLine = v1 ? formatLastInteraction(v1.lastInteractionAt) : '';
             const conversationsLine = v1 ? getConversationsTodayText(v1) : null;
             return (
@@ -359,9 +375,6 @@ function toProfileRoutePatient(patient: DashboardPatient) {
     name: patient.name,
     phoneNumber: patient.phoneNumber,
     photoUrl: patient.photoUrl,
-    lastSpokenAt: patient.lastSpokenAt,
-    lastSpokenLabel: patient.lastSpokenLabel,
-    duration: patient.duration,
   };
 }
 
