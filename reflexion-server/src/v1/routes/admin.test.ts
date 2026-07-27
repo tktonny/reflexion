@@ -220,6 +220,27 @@ test('the admin and support router enforces its two gates and onboards a patient
       .send({ body: 'Hello?' }).expect(404)
   })
 
+  await t.test('feedback is authored by the token, not by a nurseId in the body', async () => {
+    const sent = await app.post('/api/v1/feedback').set(caregiver)
+      .send({ message: 'The wake word does not always hear my mother.', category: 'mirror' }).expect(201)
+    assert.match(sent.body.data.feedbackId, /^fbk_/)
+
+    const row = await db.collection<any>(collections.feedback).findOne({ _id: sent.body.data.feedbackId })
+    assert.equal(row?.userId, CAREGIVER_ID)
+    assert.equal(row?.tenantId, TENANT_ID)
+    // Mirrored so the legacy {nurseId, createdAt} index and any legacy reader still see v1 rows.
+    assert.equal(row?.nurseId, CAREGIVER_ID)
+    assert.equal(row?.category, 'mirror')
+
+    await app.post('/api/v1/feedback').set(caregiver).send({ message: '   ' }).expect(400)
+    await app.post('/api/v1/feedback').set(caregiver).send({ message: 'x'.repeat(5001) }).expect(400)
+    await app.post('/api/v1/feedback').send({ message: 'anonymous' }).expect(401)
+
+    const plainSend = await app.post('/api/v1/feedback').set(caregiver).send({ message: 'Just a note.' }).expect(201)
+    const plain = await db.collection<any>(collections.feedback).findOne({ _id: plainSend.body.data.feedbackId })
+    assert.equal(plain?.category, null)
+  })
+
   await t.test('the operator sees every thread, can filter, reply, and close it', async () => {
     const all = await app.get('/api/v1/admin/support/threads').set(admin).expect(200)
     assert.equal(all.body.data.length, 1)

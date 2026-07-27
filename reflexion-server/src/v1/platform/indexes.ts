@@ -83,7 +83,11 @@ const indexes: IndexSet[] = [
     // One cached AI daily summary per patient per local calendar day.
     { key: { patientId: 1, dateKey: 1 }, unique: true },
   ]],
-  [c.feedback, [{ key: { nurseId: 1, createdAt: -1 } }]],
+  [c.feedback, [
+    { key: { nurseId: 1, createdAt: -1 } },
+    // v1 rows (POST /api/v1/feedback) are tenant-scoped and keyed by the authenticated user.
+    { key: { tenantId: 1, createdAt: -1 } },
+  ]],
   [c.notificationDevices, [
     // One row per physical device: the Expo token is the device identity, and re-registering after an
     // account switch moves the row to the new user rather than creating a second one.
