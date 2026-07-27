@@ -17,17 +17,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
-import { apiGet, apiSend } from '../../src/lib/apiClient';
+import { claimDevicePairingV1, listDeviceAssignmentsV1, type V1DeviceAssignment } from '../../src/lib/v1Caregiver';
 import { getStoredAuthSession } from '../../src/lib/authSession';
 import { invalidateCaregiverConfig } from '../../src/lib/queryKeys';
 import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../../src/theme';
 
-type MirrorPatient = {
-  patientId: string;
-  patientName: string;
-  mirrorName: string;
-  timezone: string;
-};
+type MirrorPatient = V1DeviceAssignment;
 
 // Four different situations, four different things to say. This screen used to show one loading card and
 // then the headline "Patient not found", so a failed request read as news about the person instead of a
@@ -49,10 +44,7 @@ export default function AddMirrorConnectionScreen() {
     enabled: Boolean(session?.userId),
     queryKey: ['mirrors', session?.userId || ''],
     queryFn: async () => {
-      const body = await apiGet<{ patients?: MirrorPatient[] }>(
-        `/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session?.userId || '')}`,
-      );
-      return Array.isArray(body?.patients) ? body.patients : [];
+      return listDeviceAssignmentsV1();
     },
   });
   const { refetch: refetchMirrors } = mirrorsQuery;
@@ -64,10 +56,8 @@ export default function AddMirrorConnectionScreen() {
     }, [refetchMirrors, session?.userId]),
   );
   const connectMirrorMutation = useMutation({
-    mutationFn: (body: unknown) => apiSend('/api/nurse-patient-config/mirrors/connect', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    }),
+    mutationFn: (body: { patientId: string; pairingCode: string; mirrorName?: string }) =>
+      claimDevicePairingV1(body),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.userId || ''] });
       await invalidateCaregiverConfig(queryClient);
@@ -123,12 +113,12 @@ export default function AddMirrorConnectionScreen() {
       return;
     }
 
+    // The timezone belongs to the loved one, not to the pairing, so it is not part of the claim — it is
+    // edited on the profile screen and already lives on the patient record.
     connectMirrorMutation.mutate({
-      nurseId: session.userId,
       patientId: patient.patientId,
       mirrorName: mirrorName.trim() || `Mirror for ${patient.patientName}`,
       pairingCode: normalizedPairingCode,
-      timezone: timezone.trim() || 'Asia/Singapore',
     });
   }
 

@@ -169,6 +169,8 @@ export function grantCheckInConsentV1(patientId: string, purpose: string): Promi
 export type V1DeviceAssignment = {
   patientId: string;
   patientName: string;
+  /** Denormalised from the patient record so the pairing screen can seed its field without a second call. */
+  timezone: string;
   assignmentId: string | null;
   deviceId: string | null;
   mirrorName: string | null;
