@@ -2,6 +2,7 @@
 // validator. Nothing here touches state or the network, so each one is directly testable.
 
 import type { AccountForm, PatientForm } from './types';
+import { MIN_PASSWORD_LENGTH } from '../../lib/authMessages';
 
 // Hermes builds without full Intl timezone data throw on resolvedOptions().timeZone. blankPatient runs
 // at mount (useState initializer), so an unguarded throw crashes the whole onboarding/sign-up screen.
@@ -50,8 +51,8 @@ export function validateStep(step: number, account: AccountForm, patients: Patie
     if (!account.email.includes('@')) {
       return 'Enter a valid email address.';
     }
-    if (account.password.length < 8) {
-      return 'Use a password with at least 8 characters.';
+    if (account.password.length < MIN_PASSWORD_LENGTH) {
+      return `Use a password with at least ${MIN_PASSWORD_LENGTH} characters.`;
     }
   }
 

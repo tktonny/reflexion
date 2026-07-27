@@ -157,6 +157,18 @@ export async function v1Get<T>(path: string): Promise<T> {
   return (await v1Fetch<T>(path, { method: 'GET' })).data;
 }
 
+/**
+ * The escape hatch for verbs that need to set their own headers — PATCH and PUT on versioned resources,
+ * which v1 requires an `If-Match` on. Same auth, refresh-once and envelope handling as every other call;
+ * only the header control differs. Used by v1Caregiver's write helpers.
+ */
+export async function v1FetchWithHeaders<T>(
+  path: string,
+  init: { method?: string; body?: unknown; headers?: Record<string, string> },
+): Promise<{ data: T; meta?: { requestId?: string; nextCursor?: string | null } }> {
+  return v1Fetch<T>(path, init);
+}
+
 export async function v1Post<T>(
   path: string,
   body?: unknown,

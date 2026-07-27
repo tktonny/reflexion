@@ -286,6 +286,16 @@ identityRouter.patch('/me', requireActor('human'), asyncHandler(async (request, 
     }
   }
 
+  // A privacy choice, not a notification one: it governs whether a session's summary text is kept at all.
+  // The legacy settings route already offered this switch, and dropping it on the way to v1 would have
+  // quietly removed a control a caregiver had used.
+  if ('storeSessionSummaries' in body) {
+    if (typeof body.storeSessionSummaries !== 'boolean') {
+      throw badRequest('VALIDATION_FAILED', 'storeSessionSummaries must be a boolean.')
+    }
+    update.storeSessionSummaries = body.storeSessionSummaries
+  }
+
   if (!Object.keys(update).length) throw badRequest('VALIDATION_FAILED', 'No supported profile field was provided.')
   update.updatedAt = new Date()
 
@@ -383,5 +393,9 @@ function serializeProfile(user: HumanUser & Record<string, any>) {
         ? preferences.preferredDailySummaryTime
         : '19:00',
     },
+    // Defaults to on for accounts that predate the field, the same way the legacy reader treated it
+    // (`!== false`). Defaulting a privacy switch the other way would silently stop keeping summaries a
+    // caregiver had chosen to keep; defaulting it on preserves what they had and leaves it theirs to change.
+    storeSessionSummaries: user.storeSessionSummaries !== false,
   }
 }

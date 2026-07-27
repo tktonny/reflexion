@@ -216,6 +216,33 @@ adminRouter.post('/support/threads/:threadId/messages', requireHuman, asyncHandl
   sendData(response, serializeMessage(await postMessage(request, request.params.threadId, 'caregiver')), 201)
 }))
 
+/**
+ * Free-text feedback, the v1 counterpart of the tokenless legacy `POST /feedback`.
+ *
+ * It lives beside the support threads because it is the same act — a caregiver sending something to the
+ * operator — just without a conversation attached. The author comes from the token rather than a `nurseId`
+ * in the body, which is the whole point of the migration: the legacy route accepts any caller who can name
+ * a valid nurse id.
+ *
+ * `nurseId` is written alongside `userId` so the existing {nurseId, createdAt} index and anything reading
+ * legacy rows keep working. For a bridged caregiver the two are the same value — the v1 user id IS the
+ * legacy nurse ObjectId hex — so the collection stays queryable as one set regardless of which surface
+ * wrote the row.
+ */
+adminRouter.post('/feedback', requireHuman, asyncHandler(async (request, response) => {
+  const principal = humanPrincipal(request)
+  const body = objectBody(request.body)
+  const message = requiredString(body, 'message', 5000)
+  const category = optionalString(body, 'category', 80)
+  const now = new Date()
+  const feedbackId = newId('fbk')
+  await (await getDb()).collection<any>(collections.feedback).insertOne({
+    _id: feedbackId, tenantId: principal.tenantId, userId: principal.userId, nurseId: principal.userId,
+    message, category: category || null, createdAt: now, updatedAt: now,
+  })
+  sendData(response, { feedbackId, createdAt: now.toISOString() }, 201)
+}))
+
 // Admin side: see every thread in the tenant, read a thread, reply, open/close.
 adminRouter.get('/admin/support/threads', requireHuman, requireAdmin, asyncHandler(async (request, response) => {
   const { tenantId } = humanPrincipal(request)

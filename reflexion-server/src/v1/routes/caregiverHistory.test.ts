@@ -128,6 +128,26 @@ test('the caregiver history read models work over v1 and enforce the care relati
     await app.get(`/api/v1/patients/${PATIENT_ID}/session-trend?days=90`).set(caregiver).expect(400)
   })
 
+  await t.test('the per-day colour is the finaliser\'s, passed through untouched', async () => {
+    // The chart used to colour its own bars from a legacy per-day status. The app must never decide that a
+    // day looked bad — it renders what jobs/finalizeDay.ts wrote. A day with no finalised row yet (today
+    // before the evening finalise) has to arrive as null rather than defaulting to a colour.
+    const dated = await app.get(`/api/v1/patients/${PATIENT_ID}/session-trend?days=7`).set(caregiver).expect(200)
+    const days: { date: string; status: string | null }[] = dated.body.data.trend
+    assert.ok(days.every((entry) => entry.status === null), 'no finalised statuses exist yet')
+
+    const target = days[days.length - 2].date
+    await db.collection<any>(collections.dailyStatuses).insertOne({
+      _id: 'day_trend_colour', tenantId: TENANT_ID, patientId: PATIENT_ID, localDate: target,
+      dailyStatus: 'completed', finalStatus: 'amber', primaryReason: 'SPOKE_LESS_THAN_USUAL',
+    })
+
+    const coloured = await app.get(`/api/v1/patients/${PATIENT_ID}/session-trend?days=7`).set(caregiver).expect(200)
+    const row = coloured.body.data.trend.find((entry: { date: string }) => entry.date === target)
+    assert.equal(row.status, 'amber', 'the finaliser wrote amber, so the chart is told amber')
+    assert.ok(coloured.body.data.trend.filter((entry: { status: string | null }) => entry.status).length === 1)
+  })
+
   await t.test('a caregiver with no relationship to this patient is refused, unlike the legacy routes', async () => {
     for (const path of [
       `/api/v1/patients/${PATIENT_ID}/session-days?month=2026-07`,

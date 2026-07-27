@@ -10,6 +10,13 @@ export type KeyTopic = 'family' | 'food' | 'travel' | 'work' | 'others';
 export type SettingsPatient = {
   id: string;
   patientId?: string;
+  /**
+   * The versions this row was rendered from. v1 requires If-Match on both writes, so a save carries the
+   * version it read — if another device edited the same loved one meanwhile, the server rejects it with a
+   * conflict instead of letting the later save silently overwrite the earlier one.
+   */
+  version: number;
+  planVersion: number;
   name: string;
   phoneNumber: string;
   age: number;

@@ -27,7 +27,9 @@ export default function TrendScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [range, setRange] = useState<Range>(30);
 
-  const shouldLoadRealTrend = Boolean(id && /^[0-9a-f]{24}$/i.test(id));
+  // Any non-empty id is real: v1 mints `pat_…` for loved ones created since the migration, and v1 ids are
+  // opaque strings. The old 24-hex test was the legacy ObjectId shape and blanked the chart for them.
+  const shouldLoadRealTrend = Boolean(id);
   const realRangeImplemented = range === 7 || range === 30;
   const trendQuery = useQuery({
     enabled: shouldLoadRealTrend && realRangeImplemented,
@@ -89,7 +91,7 @@ export default function TrendScreen() {
       missStreak++;
       if (missStreak === 2) notable.push({ date: d.date, note: 'No check-in two days running' });
     } else {
-      if (d.status === 'yellow') notable.push({ date: d.date, note: 'A shorter check-in than usual' });
+      if (d.status === 'amber') notable.push({ date: d.date, note: 'A shorter check-in than usual' });
       missStreak = 0;
     }
   }
@@ -98,7 +100,8 @@ export default function TrendScreen() {
 
   function barColor(d: TrendDay): string {
     if (d.missed) return CHART_FILL.missed;
-    if (d.status === 'yellow') return CHART_FILL.worthChecking;
+    // 'amber' is the finaliser's own wording (jobs/finalizeDay.ts colorFor); the legacy route said 'yellow'.
+    if (d.status === 'amber') return CHART_FILL.worthChecking;
     if (d.status === 'red') return CHART_FILL.attention;
     return CHART_FILL.doingWell;
   }

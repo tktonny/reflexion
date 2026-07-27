@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import { apiGet } from '../../src/lib/apiClient';
+import { listSessionDaysV1 } from '../../src/lib/v1Caregiver';
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
 import {
   MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, scaleSize, spacing,
@@ -36,15 +36,15 @@ export default function SessionHistoryScreen() {
   // Compared against the server's own date keys, so "future" is decided in the patient's calendar rather
   // than the phone's timezone.
   const todayKey = getSingaporeDateKey(new Date());
-  const shouldLoadRealSession = Boolean(id && /^[0-9a-f]{24}$/i.test(id));
+  // Any non-empty id is real. This used to test /^[0-9a-f]{24}$/, which was the legacy nurse/patient
+  // ObjectId hex — but v1 mints `pat_…` ids for loved ones created since the migration, and CLAUDE.md is
+  // explicit that v1 ids are opaque strings. The old guard silently blanked the screen for them.
+  const shouldLoadRealSession = Boolean(id);
   const monthQuery = useQuery({
     enabled: shouldLoadRealSession,
     queryKey: ['sessionCounts', id, month],
     queryFn: async () => {
-      const body = await apiGet<{ days?: CalendarDay[] }>(
-        `/api/conversation-session-counts?id=${encodeURIComponent(id)}&month=${encodeURIComponent(month)}`,
-      );
-      return Array.isArray(body?.days) ? body.days : [];
+      return listSessionDaysV1(id, month);
     },
   });
   const { refetch: refetchMonth } = monthQuery;

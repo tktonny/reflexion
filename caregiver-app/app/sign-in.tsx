@@ -27,6 +27,18 @@ type SignInResponse = {
   email?: string;
 };
 
+type SignInResult = { userId: string; name: string; email: string };
+
+/**
+ * Only a rejected credential may fall through to the legacy surface. A 500, a timeout or an offline
+ * device must not be retried there: the second attempt would fail for its own reason and the user would be
+ * told their password was wrong.
+ */
+function isCredentialRejection(error: unknown): boolean {
+  const status = (error as { status?: number } | null)?.status;
+  return status === 401 || status === 404;
+}
+
 export default function SignInScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -34,32 +46,41 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const signInMutation = useMutation({
-    mutationFn: async () => {
-      // Primary auth is the caregiver account (legacy sign-in) — accounts are still created via the
-      // legacy onboarding, so this must succeed for a freshly-signed-up user to get in. The v1 login
-      // is BEST-EFFORT: it unlocks the authoritative v1 status/flag/away routes when the account also
-      // exists in v1, but a v1 failure must never block sign-in (the status UI degrades to "updating").
-      const body = await apiSend<SignInResponse>('/api/auth/sign-in', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-      });
+    mutationFn: async (): Promise<SignInResult> => {
+      // v1 is primary now: every screen reads v1, so a session without a v1 token is not a usable session.
+      //
+      // The legacy fallback stays for one case only — an account that exists in NursePatientConfig but has
+      // no v1 user yet, which the sign-in bridge repairs on the way through. It is deliberately BOUNDED:
+      // only a credential rejection (401/404) falls through. A 500 or a network failure must surface as
+      // itself rather than being retried against a second surface and reported as a wrong password.
       try {
-        await v1Login(email, password);
+        const session = await v1Login(email, password);
+        return { userId: session.actor.userId, name: session.actor.name || '', email: session.actor.email || email.trim().toLowerCase() };
       } catch (v1Error) {
-        console.warn('[SignInScreen] v1 login unavailable; caregiver status may be delayed', v1Error);
+        if (!isCredentialRejection(v1Error)) throw v1Error;
+        // Legacy sign-in bridges the account into v1; the retry then succeeds and we hold a v1 token.
+        const legacy = await apiSend<SignInResponse>('/api/auth/sign-in', {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+        });
+        const bridged = await v1Login(email, password).catch(() => null);
+        return {
+          userId: bridged?.actor.userId || legacy.nurseId,
+          name: bridged?.actor.name || legacy.name || '',
+          email: bridged?.actor.email || legacy.email || email.trim().toLowerCase(),
+        };
       }
-      return body;
     },
     onSuccess: async (body) => {
       await setStoredAuthSession({
-        nurseId: body.nurseId,
-        name: body.name || '',
-        email: body.email || email.trim().toLowerCase(),
+        userId: body.userId,
+        name: body.name,
+        email: body.email,
       });
       // Defensive: the previous session may have ended without a clean sign-out (app killed, or the
       // sign-up path), which would otherwise leave that caregiver's data cached under gcTime: Infinity.
       clearCaregiverCache(queryClient);
-      const registration = await registerPushNotificationDevice({ nurseId: body.nurseId });
+      const registration = await registerPushNotificationDevice({ nurseId: body.userId });
       if (!registration.ok) {
         console.warn('[SignInScreen] push registration failed', registration.reason);
       }

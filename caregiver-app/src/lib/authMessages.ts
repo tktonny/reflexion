@@ -17,6 +17,13 @@ function describe(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+/**
+ * Mirrors MIN_PASSWORD_LENGTH in reflexion-server/src/v1/routes/identity.ts. The screens checked 8, so a
+ * caregiver could type a password the client accepted and the server then refused with a 400 — the worst
+ * place to learn a rule, because the form has already been submitted.
+ */
+export const MIN_PASSWORD_LENGTH = 12;
+
 export function signInMessage(error: unknown): string {
   console.warn('[auth] sign-in failed:', describe(error));
   const status = statusOf(error);

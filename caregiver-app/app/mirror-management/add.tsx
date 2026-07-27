@@ -17,17 +17,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
-import { apiGet, apiSend } from '../../src/lib/apiClient';
+import { claimDevicePairingV1, listDeviceAssignmentsV1, type V1DeviceAssignment } from '../../src/lib/v1Caregiver';
 import { getStoredAuthSession } from '../../src/lib/authSession';
 import { invalidateCaregiverConfig } from '../../src/lib/queryKeys';
 import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../../src/theme';
 
-type MirrorPatient = {
-  patientId: string;
-  patientName: string;
-  mirrorName: string;
-  timezone: string;
-};
+type MirrorPatient = V1DeviceAssignment;
 
 // Four different situations, four different things to say. This screen used to show one loading card and
 // then the headline "Patient not found", so a failed request read as news about the person instead of a
@@ -46,30 +41,25 @@ export default function AddMirrorConnectionScreen() {
   const [cameraNotice, setCameraNotice] = useState('');
   const [permission, requestPermission] = useCameraPermissions();
   const mirrorsQuery = useQuery({
-    enabled: Boolean(session?.nurseId),
-    queryKey: ['mirrors', session?.nurseId || ''],
+    enabled: Boolean(session?.userId),
+    queryKey: ['mirrors', session?.userId || ''],
     queryFn: async () => {
-      const body = await apiGet<{ patients?: MirrorPatient[] }>(
-        `/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session?.nurseId || '')}`,
-      );
-      return Array.isArray(body?.patients) ? body.patients : [];
+      return listDeviceAssignmentsV1();
     },
   });
   const { refetch: refetchMirrors } = mirrorsQuery;
   useFocusEffect(
     useCallback(() => {
-      if (session?.nurseId) {
+      if (session?.userId) {
         void refetchMirrors();
       }
-    }, [refetchMirrors, session?.nurseId]),
+    }, [refetchMirrors, session?.userId]),
   );
   const connectMirrorMutation = useMutation({
-    mutationFn: (body: unknown) => apiSend('/api/nurse-patient-config/mirrors/connect', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    }),
+    mutationFn: (body: { patientId: string; pairingCode: string; mirrorName?: string }) =>
+      claimDevicePairingV1(body),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.nurseId || ''] });
+      await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.userId || ''] });
       await invalidateCaregiverConfig(queryClient);
       router.replace('/mirror-management');
     },
@@ -89,7 +79,7 @@ export default function AddMirrorConnectionScreen() {
   // otherwise replace the whole pairing form — mirror name, the code the caregiver has already typed, the
   // Scan QR button — with an error card, even though everything needed to pair is right there and the
   // POST would still succeed.
-  const pairingState: PairingState = !session?.nurseId
+  const pairingState: PairingState = !session?.userId
     ? 'signed-out'
     : patient
       ? 'ready'
@@ -115,7 +105,7 @@ export default function AddMirrorConnectionScreen() {
   }
 
   async function saveConnection() {
-    if (!session?.nurseId || !patient || connectMirrorMutation.isPending) return;
+    if (!session?.userId || !patient || connectMirrorMutation.isPending) return;
 
     const normalizedPairingCode = pairingCode.replace(/\D/g, '');
     if (normalizedPairingCode.length !== 6) {
@@ -123,12 +113,12 @@ export default function AddMirrorConnectionScreen() {
       return;
     }
 
+    // The timezone belongs to the loved one, not to the pairing, so it is not part of the claim — it is
+    // edited on the profile screen and already lives on the patient record.
     connectMirrorMutation.mutate({
-      nurseId: session.nurseId,
       patientId: patient.patientId,
       mirrorName: mirrorName.trim() || `Mirror for ${patient.patientName}`,
       pairingCode: normalizedPairingCode,
-      timezone: timezone.trim() || 'Asia/Singapore',
     });
   }
 

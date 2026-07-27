@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { EmptyState, ErrorState, LoadingState } from '../../../src/components/ScreenState';
-import { apiGet, apiSend } from '../../../src/lib/apiClient';
+import { generateSessionSummaryV1, getSessionDayV1 } from '../../../src/lib/v1Caregiver';
 import {
   MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, scaleSize, spacing,
 } from '../../../src/theme';
@@ -52,21 +52,22 @@ export default function SessionHistoryDayScreen() {
   const [selectedSessionIndex, setSelectedSessionIndex] = useState(0);
   const [generatedSummary, setGeneratedSummary] = useState('');
   const [showTranscript, setShowTranscript] = useState(true);
-  const shouldLoadRealSession = Boolean(
-    id && /^[0-9a-f]{24}$/i.test(id) && date && /^\d{4}-\d{2}-\d{2}$/.test(date),
-  );
+  // Any non-empty id is real. This used to test /^[0-9a-f]{24}$/, which was the legacy nurse/patient
+  // ObjectId hex — but v1 mints `pat_…` ids for loved ones created since the migration, and CLAUDE.md is
+  // explicit that v1 ids are opaque strings. The old guard silently blanked the screen for them.
+  const shouldLoadRealSession = Boolean(id && date && /^\d{4}-\d{2}-\d{2}$/.test(date));
   const daySessionsQuery = useQuery({
     enabled: shouldLoadRealSession,
     queryKey: ['sessionDay', id, date],
     queryFn: async () => {
-      const body = await apiGet<Partial<SessionsByDayResponse>>(
-        `/api/conversation-sessions-by-day?id=${encodeURIComponent(id)}&date=${encodeURIComponent(date)}`,
-      );
+      const body = await getSessionDayV1(id, date);
       return {
         date: body?.date || date,
         patientId: body?.patientId || id,
         patientName: body?.patientName || 'Patient',
-        aiSummary: body?.aiSummary || '',
+        // v1 has no cached summary on the day resource — it is generated on demand by the button below,
+        // which is why the legacy field was usually empty here anyway.
+        aiSummary: '',
         sessions: Array.isArray(body?.sessions) ? body.sessions : [],
       } satisfies SessionsByDayResponse;
     },
@@ -81,12 +82,10 @@ export default function SessionHistoryDayScreen() {
   );
   const daySessions = daySessionsQuery.data || null;
   const summaryMutation = useMutation({
-    mutationFn: () => apiSend<{ summary?: string }>('/api/patient-summary', {
-      method: 'POST',
-      body: JSON.stringify({ patientId: id, date }),
-    }),
+    mutationFn: () => generateSessionSummaryV1(id, date),
     onSuccess: async (body) => {
-      setGeneratedSummary(body?.summary || 'No summary generated.');
+      // summary:null with a reason is how a quiet day answers — a result to show, not a failure.
+      setGeneratedSummary(body?.summary || 'There was no conversation to summarise for this day.');
       await queryClient.invalidateQueries({ queryKey: ['sessionDay', id, date] });
     },
     onError: (err) => {

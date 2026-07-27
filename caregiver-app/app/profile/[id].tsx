@@ -9,7 +9,7 @@ import { Feather } from '@expo/vector-icons';
 import MiniSparkline from '../../src/components/MiniSparkline';
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
 import { fetchPatientTrend, type TrendDay } from '../../src/lib/patientTrendClient';
-import { apiSend } from '../../src/lib/apiClient';
+import { generateSessionSummaryV1 } from '../../src/lib/v1Caregiver';
 import { hasV1Session } from '../../src/lib/v1AuthSession';
 import {
   createAwayPeriodV1,
@@ -54,13 +54,16 @@ const AVATAR_TEXT: Record<V1Status, string> = {
 // authoritative v1 status itself, and a caller-supplied colour would silently win the race on first paint
 // — the old default was 'needs_attention', which is how a patient still establishing their baseline could
 // be shown as red in violation of the product rule.
+/**
+ * Handed over from the loved-one card: identity only. Last-interaction and duration used to ride along too,
+ * sourced from the legacy list, and were rendered whenever the v1 status had not arrived — telling the
+ * caregiver something about a person from a surface this screen no longer reads. Both now come from v1:
+ * the time from the status read model, the duration from the trend.
+ */
 type RealPatientProfile = {
   name: string;
   phoneNumber: string;
   photoUrl?: string;
-  lastSpokenAt: string | null;
-  lastSpokenLabel: string;
-  duration: number;
 };
 
 export default function ProfileScreen() {
@@ -88,12 +91,11 @@ export default function ProfileScreen() {
   );
   const realTrend = trendQuery.data || [];
   const summaryMutation = useMutation({
-    mutationFn: () => apiSend<{ summary?: string }>('/api/patient-summary', {
-      method: 'POST',
-      body: JSON.stringify({ patientId: id }),
-    }),
+    mutationFn: () => generateSessionSummaryV1(id),
     onSuccess: async (body) => {
-      setGeneratedSummary(body?.summary || 'No summary generated.');
+      // A quiet day answers with summary:null and a reason rather than failing, so it is a normal outcome
+      // to render, not an error to alert on.
+      setGeneratedSummary(body?.summary || 'There was no conversation to summarise for this day.');
       await queryClient.invalidateQueries({ queryKey: ['sessionDay', id] });
     },
     onError: (err) => {
@@ -208,8 +210,10 @@ export default function ProfileScreen() {
     const technicalNote = v1Status ? getTechnicalNote(v1Status.technicalState) : null;
     const lastInteractionText = v1Status
       ? formatLastInteraction(v1Status.lastInteractionAt)
-      : formatProfileLastSpoken(realProfile.lastSpokenLabel);
-    const durationText = formatDuration(realProfile.duration);
+      : 'Status updating';
+    // Today is the last entry the trend returns; it is the same figure the chart draws, so the two cannot
+    // disagree the way a route parameter and a freshly fetched trend could.
+    const durationText = formatDuration(realTrend[realTrend.length - 1]?.duration ?? 0);
     const talkedDays = realTrend.filter((day) => !day.missed).length;
     const avgDuration = talkedDays
       ? Math.round(realTrend.filter((day) => !day.missed).reduce((sum, day) => sum + day.duration, 0) / talkedDays)
@@ -672,9 +676,6 @@ function parsePatientParam(value?: string): RealPatientProfile | null {
       name: parsed.name,
       phoneNumber: parsed.phoneNumber || '',
       photoUrl: parsed.photoUrl || '',
-      lastSpokenAt: parsed.lastSpokenAt || null,
-      lastSpokenLabel: parsed.lastSpokenLabel || 'No interaction yet',
-      duration: Number(parsed.duration || 0),
     };
   } catch {
     return null;

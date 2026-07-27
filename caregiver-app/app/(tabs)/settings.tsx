@@ -11,7 +11,13 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { apiGet, apiSend } from '../../src/lib/apiClient';
+import {
+  loadCaregiverSettings,
+  putCarePlanV1,
+  updateCaregiverProfileV1,
+  updatePatientV1,
+  type CaregiverSettingsPatient,
+} from '../../src/lib/v1Caregiver';
 import { clearStoredAuthSession, getStoredAuthSession, setStoredAuthSession } from '../../src/lib/authSession';
 import { v1Logout } from '../../src/lib/v1Client';
 import { registerPushNotificationDevice } from '../../src/lib/pushNotifications';
@@ -42,6 +48,27 @@ import type {
 } from '../../src/screens/settings/types';
 import { colors, fontFamily, fontSize, radius, spacing, scaleSize, MIN_TOUCH_TARGET } from '../../src/theme';
 
+/** The v1 loved one, flattened into the row the form edits. */
+function toSettingsPatient(patient: CaregiverSettingsPatient): SettingsPatient {
+  const communication = patient.carePlan?.communicationPreferences;
+  return normalizeSettingsPatient({
+    id: patient.patientId,
+    patientId: patient.patientId,
+    version: patient.version,
+    planVersion: patient.carePlan?.version ?? 0,
+    name: patient.displayName,
+    phoneNumber: patient.profile.phoneNumber || '',
+    age: patient.profile.age ?? 0,
+    gender: patient.profile.gender ?? '',
+    preferredLanguage: patient.preferredLanguage as SettingsPatient['preferredLanguage'],
+    photoUrl: patient.profile.photoUrl || '',
+    usualWakeTime: String(patient.carePlan?.dailyRoutine?.wakeTime || ''),
+    speechOrHearingConditions: String(communication?.speechOrHearingNotes || ''),
+    keyTopics: (communication?.topics || []) as SettingsPatient['keyTopics'],
+    keyTopicsOtherText: String(communication?.otherTopic || ''),
+  });
+}
+
 export default function SettingsScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -56,53 +83,58 @@ export default function SettingsScreen() {
   const [editingPatient, setEditingPatient] = useState<PatientForm | null>(null);
   const latestConfigQuery = useQuery({
     // nurseId is required by the endpoint — asking without one used to return an arbitrary caregiver.
-    enabled: Boolean(session?.nurseId),
-    queryKey: settingsConfigKey(session?.nurseId),
+    enabled: Boolean(session?.userId),
+    queryKey: settingsConfigKey(session?.userId),
     queryFn: async () => {
-      const query = `?nurseId=${encodeURIComponent(session?.nurseId || '')}`;
-      const body = await apiGet<Record<string, unknown> & { patients?: unknown[] }>(`/api/nurse-patient-config/latest${query}`);
+      const view = await loadCaregiverSettings();
       return {
-        nurseId: String(body?.nurseId || ''),
-        caregiverName: String(body?.caregiverName || ''),
-        email: String(body?.email || ''),
-        phoneNumber: String(body?.phoneNumber || ''),
-        pushNotificationsEnabled: Boolean(body?.pushNotificationsEnabled),
-        alertSensitivity: String(body?.alertSensitivity || 'only_important_changes') as AlertSensitivity,
-        preferredDailySummaryTime: String(body?.preferredDailySummaryTime || '09:00') as SummaryTime,
-        storeSessionSummaries: body?.storeSessionSummaries !== false,
-        patients: Array.isArray(body?.patients) ? body.patients.map((patient) => normalizeSettingsPatient(patient as Partial<SettingsPatient>)) : [],
+        nurseId: view.caregiver.userId,
+        caregiverName: view.caregiver.name,
+        email: view.caregiver.email,
+        phoneNumber: view.caregiver.phoneNumber,
+        pushNotificationsEnabled: view.caregiver.notificationPreferences.pushNotificationsEnabled,
+        alertSensitivity: view.caregiver.notificationPreferences.alertSensitivity as AlertSensitivity,
+        preferredDailySummaryTime: view.caregiver.notificationPreferences.preferredDailySummaryTime as SummaryTime,
+        storeSessionSummaries: view.caregiver.storeSessionSummaries,
+        patients: view.patients.map(toSettingsPatient),
       } satisfies SettingsConfig;
     },
   });
   const { refetch: refetchLatestConfig } = latestConfigQuery;
   useFocusEffect(
     useCallback(() => {
-      if (session?.nurseId) void refetchLatestConfig();
-    }, [refetchLatestConfig, session?.nurseId]),
+      if (session?.userId) void refetchLatestConfig();
+    }, [refetchLatestConfig, session?.userId]),
   );
   const saveNurseMutation = useMutation({
-    mutationFn: (body: unknown) => apiSend<SettingsConfig>('/api/nurse-patient-config/settings', {
-      method: 'PATCH',
-      body: JSON.stringify(body),
-    }),
+    mutationFn: (input: {
+      name: string;
+      phoneNumber: string;
+      notificationPreferences: {
+        pushNotificationsEnabled: boolean;
+        alertSensitivity: AlertSensitivity;
+        preferredDailySummaryTime: SummaryTime;
+      };
+      storeSessionSummaries: boolean;
+    }) => updateCaregiverProfileV1(input),
     onSuccess: async (body) => {
-      if (body.pushNotificationsEnabled) {
-        const registration = await registerPushNotificationDevice({ nurseId: body.nurseId || config?.nurseId || '' });
+      if (body.notificationPreferences.pushNotificationsEnabled) {
+        const registration = await registerPushNotificationDevice({ nurseId: body.userId });
         if (!registration.ok) console.warn('[SettingsScreen] push registration failed', registration.reason);
       }
       await setStoredAuthSession({
-        nurseId: body.nurseId || config?.nurseId || '',
-        name: body.caregiverName || caregiverName,
-        email: body.email || config?.email || '',
+        userId: body.userId,
+        name: body.name || caregiverName,
+        email: body.email,
       });
       setConfig((current) => current ? {
         ...current,
-        caregiverName: body.caregiverName || caregiverName,
+        caregiverName: body.name || caregiverName,
         phoneNumber: body.phoneNumber || phoneNumber,
-        pushNotificationsEnabled: Boolean(body.pushNotificationsEnabled),
-        alertSensitivity: body.alertSensitivity || alertLevel,
-        preferredDailySummaryTime: body.preferredDailySummaryTime || summaryTime,
-        storeSessionSummaries: body.storeSessionSummaries !== false,
+        pushNotificationsEnabled: body.notificationPreferences.pushNotificationsEnabled,
+        alertSensitivity: body.notificationPreferences.alertSensitivity as AlertSensitivity,
+        preferredDailySummaryTime: body.notificationPreferences.preferredDailySummaryTime as SummaryTime,
+        storeSessionSummaries: body.storeSessionSummaries,
       } : current);
       await invalidateCaregiverConfig(queryClient);
       Alert.alert('Saved', 'Settings updated.');
@@ -111,12 +143,33 @@ export default function SettingsScreen() {
       Alert.alert('Unable to save', err instanceof Error ? err.message : 'Unable to save settings.');
     },
   });
+  // Two resources, because v1 splits them by who consumes them: the loved one's own details on the patient
+  // record, and everything that changes how Aria talks on the care plan — which is what the mirror already
+  // receives through GET /devices/:id/configuration. The legacy route wrote both into one document where the
+  // conversational half sat unread.
   const savePatientMutation = useMutation({
-    mutationFn: ({ patientId, body }: { patientId: string; body: unknown }) =>
-      apiSend<{ patient: SettingsPatient }>(`/api/nurse-patient-config/settings/patients/${patientId}`, {
-        method: 'PATCH',
-        body: JSON.stringify(body),
-      }),
+    mutationFn: async ({ patient }: { patient: SettingsPatient }) => {
+      const patientId = patient.patientId || patient.id;
+      const saved = await updatePatientV1(patientId, patient.version, {
+        displayName: patient.name,
+        preferredLanguage: patient.preferredLanguage || 'english',
+        profile: {
+          age: patient.age || null,
+          gender: patient.gender || null,
+          photoUrl: patient.photoUrl || null,
+          phoneNumber: patient.phoneNumber || null,
+        },
+      });
+      const plan = await putCarePlanV1(patientId, patient.planVersion, {
+        dailyRoutine: { wakeTime: patient.usualWakeTime || '' },
+        communicationPreferences: {
+          topics: patient.keyTopics,
+          otherTopic: patient.keyTopicsOtherText || '',
+          speechOrHearingNotes: patient.speechOrHearingConditions || '',
+        },
+      });
+      return { patient: { ...patient, version: saved.version, planVersion: plan.version } };
+    },
     onSuccess: async (body) => {
       const normalized = normalizeSettingsPatient(body.patient);
       setConfig((current) => current ? {
@@ -148,13 +201,15 @@ export default function SettingsScreen() {
 
   async function saveNurseSettings() {
     if (saveNurseMutation.isPending || !config) return;
+    // No id in the body: PATCH /me writes the account the bearer token belongs to.
     saveNurseMutation.mutate({
-      nurseId: config.nurseId,
       name: caregiverName,
       phoneNumber,
-      pushNotificationsEnabled: notifs,
-      alertSensitivity: alertLevel,
-      preferredDailySummaryTime: summaryTime,
+      notificationPreferences: {
+        pushNotificationsEnabled: notifs,
+        alertSensitivity: alertLevel,
+        preferredDailySummaryTime: summaryTime,
+      },
       storeSessionSummaries: storeSummaries,
     });
   }
@@ -168,14 +223,7 @@ export default function SettingsScreen() {
       return;
     }
 
-    savePatientMutation.mutate({
-      patientId: editingPatient.patientId || editingPatient.id,
-      body: {
-        nurseId: config.nurseId,
-        ...editingPatient,
-        age,
-      },
-    });
+    savePatientMutation.mutate({ patient: { ...editingPatient, age } });
   }
 
   async function logout() {
@@ -187,7 +235,7 @@ export default function SettingsScreen() {
   }
 
   const settingsState = resolveSettingsState({
-    hasNurseId: Boolean(session?.nurseId),
+    hasNurseId: Boolean(session?.userId),
     hasFailed: Boolean(latestConfigQuery.error),
     hasSettings: Boolean(config?.nurseId || latestConfigQuery.data?.nurseId),
     isLoading: latestConfigQuery.isLoading,

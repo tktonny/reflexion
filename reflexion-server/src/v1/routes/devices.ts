@@ -222,7 +222,7 @@ devicesRouter.get('/device-assignments', requireActor('human'), asyncHandler(asy
     patientFilter._id = { $in: [...new Set(relationships.map((relationship) => String(relationship.patientId)))] }
   }
   const patients = await db.collection<any>(collections.patients).find(patientFilter)
-    .project({ displayName: 1 }).sort({ _id: 1 }).toArray()
+    .project({ displayName: 1, timezone: 1 }).sort({ _id: 1 }).toArray()
   if (!patients.length) {
     sendData(response, { assignments: [] })
     return
@@ -248,6 +248,9 @@ devicesRouter.get('/device-assignments', requireActor('human'), asyncHandler(asy
       return {
         patientId: String(patient._id),
         patientName: String(patient.displayName || ''),
+        // Denormalised like patientName: the pairing screen seeds its timezone field from this, and the
+        // alternative is a second round trip per loved one just to read one string.
+        timezone: String(patient.timezone || 'Asia/Singapore'),
         // Null when this loved one has no mirror yet — the screen needs that row to offer pairing.
         assignmentId: assignment ? String(assignment._id) : null,
         deviceId: assignment ? String(assignment.deviceId) : null,

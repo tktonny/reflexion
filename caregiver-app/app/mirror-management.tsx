@@ -15,55 +15,33 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState, ErrorState, LoadingState } from '../src/components/ScreenState';
-import { apiGet, apiSend } from '../src/lib/apiClient';
+import { listDeviceAssignmentsV1, revokeDeviceV1, type V1DeviceAssignment } from '../src/lib/v1Caregiver';
 import { getStoredAuthSession } from '../src/lib/authSession';
 import { invalidateCaregiverConfig } from '../src/lib/queryKeys';
 import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
 
-type MirrorPatient = {
-  patientId: string;
-  patientName: string;
-  mirrorId: string;
-  mirrorName: string;
-  mirrorVerified: boolean;
-  mirrorPairingStatus: string;
-  mirrorPairingCode: string;
-  mirrorPairedAt: string | null;
-  deviceAuthTokenPresent: boolean;
-  timezone: string;
-};
+type MirrorPatient = V1DeviceAssignment;
 
 export default function MirrorManagementScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const session = getStoredAuthSession();
   const mirrorsQuery = useQuery({
-    enabled: Boolean(session?.nurseId),
-    queryKey: ['mirrors', session?.nurseId || ''],
+    enabled: Boolean(session?.userId),
+    queryKey: ['mirrors', session?.userId || ''],
     queryFn: async () => {
-      const body = await apiGet<{ patients?: MirrorPatient[] }>(
-        `/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session?.nurseId || '')}`,
-      );
-      return Array.isArray(body?.patients) ? body.patients : [];
+      return listDeviceAssignmentsV1();
     },
   });
   const patchMirrorMutation = useMutation({
-    mutationFn: (body: { action: 'unlink'; patientId: string }) => apiSend<{
-      deletedMirrorMapCount?: number;
-      deletedPairingSessionCount?: number;
-    }>('/api/nurse-patient-config/mirrors', {
-      method: 'PATCH',
-      body: JSON.stringify({
-        ...body,
-        nurseId: session?.nurseId,
-      }),
-    }),
-    onSuccess: async (result) => {
-      await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.nurseId || ''] });
+    mutationFn: (body: { action: 'unlink'; patientId: string; deviceId: string }) =>
+      revokeDeviceV1(body.deviceId, 'Unlinked by the caregiver from mirror management.'),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.userId || ''] });
       await invalidateCaregiverConfig(queryClient);
       showMessage(
         'Mirror unlinked',
-        `Removed ${result?.deletedMirrorMapCount ?? 0} mirror map and ${result?.deletedPairingSessionCount ?? 0} pairing session(s). You can add a new connection for this patient.`,
+        'The mirror can no longer reach this account. You can pair a new one for this loved one whenever you are ready.',
       );
     },
     onError: (err) => {
@@ -79,14 +57,14 @@ export default function MirrorManagementScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (session?.nurseId) {
+      if (session?.userId) {
         void refetchMirrors();
       }
-    }, [refetchMirrors, session?.nurseId]),
+    }, [refetchMirrors, session?.userId]),
   );
 
   function confirmUnlink(patient: MirrorPatient) {
-    const unlink = () => void patchMirror({ action: 'unlink', patientId: patient.patientId });
+    const unlink = () => void patchMirror({ action: 'unlink', patientId: patient.patientId, deviceId: patient.deviceId || '' });
 
     if (Platform.OS === 'web') {
       const confirmed = window.confirm(
@@ -115,8 +93,10 @@ export default function MirrorManagementScreen() {
   async function patchMirror(body: {
     action: 'unlink';
     patientId: string;
+    deviceId: string;
   }) {
-    if (!session?.nurseId || patchMirrorMutation.isPending) return;
+    // Without a deviceId there is nothing to revoke — the card only offers the control when one is paired.
+    if (!session?.userId || !body.deviceId || patchMirrorMutation.isPending) return;
     patchMirrorMutation.mutate(body);
   }
 
@@ -149,7 +129,7 @@ export default function MirrorManagementScreen() {
 
         {patients.length === 0 ? (
           <MirrorsPlaceholder
-            isSignedIn={Boolean(session?.nurseId)}
+            isSignedIn={Boolean(session?.userId)}
             isLoading={mirrorsQuery.isLoading}
             hasError={Boolean(mirrorsQuery.error)}
             onRetry={() => void mirrorsQuery.refetch()}
@@ -157,7 +137,7 @@ export default function MirrorManagementScreen() {
         ) : (
           patients.map((patient) => {
             const isSavingThisPatient = savingPatientId === patient.patientId;
-            const isPaired = patient.mirrorVerified && patient.mirrorPairingStatus === 'paired';
+            const isPaired = Boolean(patient.deviceId) && patient.device?.status === 'active';
             return (
               <View key={patient.patientId} style={styles.card}>
                 <View style={styles.cardHeader}>
@@ -180,10 +160,13 @@ export default function MirrorManagementScreen() {
                   </View>
                 </View>
 
-                <InfoRow label="Mirror ID" value={patient.mirrorId ? compactId(patient.mirrorId) : 'None'} />
-                <InfoRow label="Pairing code" value={patient.mirrorPairingCode || 'None'} />
-                <InfoRow label="Paired at" value={formatDate(patient.mirrorPairedAt)} />
-                <InfoRow label="Device token" value={patient.deviceAuthTokenPresent ? 'Saved' : 'None'} />
+                <InfoRow label="Mirror ID" value={patient.deviceId ? compactId(patient.deviceId) : 'None'} />
+                <InfoRow label="Paired at" value={formatDate(patient.assignedAt)} />
+                {/* "Last seen" replaces the old "Device token: Saved". Whether a credential row exists is an
+                    implementation detail; whether the mirror has checked in recently is the thing a caregiver
+                    can act on. The pairing code is gone on purpose — it is a one-time secret the mirror
+                    displays, already spent by the time this screen can show it, and v1 does not return it. */}
+                <InfoRow label="Last seen" value={formatDate(patient.device?.lastHeartbeatAt ?? null)} />
 
                 {isPaired ? (
                   <TouchableOpacity
