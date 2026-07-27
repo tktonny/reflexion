@@ -16,6 +16,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { loadCaregiverHome } from '../src/lib/v1Caregiver';
 import { getStoredAuthSession } from '../src/lib/authSession';
+import { useTabBarClearance } from '../src/lib/useTabBarClearance';
 import { friendlyPushError, registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { caregiverConfigKey, notificationsQueryKey } from '../src/lib/queryKeys';
 import { hasV1Session } from '../src/lib/v1AuthSession';
@@ -25,7 +26,7 @@ import {
   markNotificationReadV1,
   type V1Notification,
 } from '../src/lib/v1Client';
-import { colors, spacing, radius, fontSize, fontFamily, scaleSize, MIN_TOUCH_TARGET } from '../src/theme';
+import { contentColumn, colors, spacing, radius, fontSize, fontFamily, scaleSize, MIN_TOUCH_TARGET } from '../src/theme';
 
 // The alert feed is the authoritative v1 read model (GET /api/v1/notifications), produced by the
 // server's end-of-day evaluation. It replaced a legacy `/notifications?nurseId=` endpoint that never
@@ -46,10 +47,10 @@ type TypeMeta = { color: string; icon: keyof typeof Feather.glyphMap; label: str
 // a second status vocabulary starts drifting away from the one the doc fixes (§2.9).
 const TYPE_META: Record<string, TypeMeta> = {
   completion: { color: STATUS_META.doing_well.dot, icon: 'check-circle', label: 'Checked in' },
-  late_completion: { color: '#8B6A92', icon: 'clock', label: 'Later than usual' },
+  late_completion: { color: colors.alertAccent.laterThanUsual, icon: 'clock', label: 'Later than usual' },
   missed_7pm: { color: STATUS_META.worth_checking.dot, icon: 'alert-circle', label: 'No check-in yet' },
   red_missed_streak: { color: STATUS_META.needs_attention.dot, icon: 'alert-triangle', label: 'Worth a call' },
-  technical_issue: { color: '#6F7F92', icon: 'wifi-off', label: 'Connection issue' },
+  technical_issue: { color: colors.alertAccent.connection, icon: 'wifi-off', label: 'Connection issue' },
   worth_checking: { color: STATUS_META.worth_checking.dot, icon: 'eye', label: 'Worth checking' },
   needs_attention: { color: STATUS_META.needs_attention.dot, icon: 'alert-triangle', label: 'Needs attention' },
 };
@@ -70,6 +71,7 @@ export default function NotificationsScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const session = getStoredAuthSession();
+  const bottomClearance = useTabBarClearance();
   const canReadAlerts = hasV1Session();
   const [selectedTab, setSelectedTab] = useState<NotificationsTab>('alerts');
   const [deviceMessage, setDeviceMessage] = useState('');
@@ -244,7 +246,7 @@ export default function NotificationsScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <FlatList
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: bottomClearance }]}
         data={notifications}
         keyExtractor={(item) => item.notificationId}
         ListHeaderComponent={header}
@@ -437,15 +439,19 @@ function AlertCard({
             </View>
           ) : null}
           {showDayDetailAction ? (
-            <TouchableOpacity
-              accessibilityRole="button"
-              activeOpacity={0.82}
-              onPress={() => router.push(`/session-history/${notification.patientId}/${notification.localDate}`)}
-              style={styles.summaryButton}
-            >
-              <Feather name="book-open" size={15} color={colors.text.onAccent} />
-              <Text style={styles.summaryButtonText}>View that day</Text>
-            </TouchableOpacity>
+            // Same container as the two-button case: a lone action used to size itself to its text while a
+            // pair stretched, so the same list showed two different button widths.
+            <View style={styles.actionRow}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                activeOpacity={0.82}
+                onPress={() => router.push(`/session-history/${notification.patientId}/${notification.localDate}`)}
+                style={styles.profileButton}
+              >
+                <Feather name="book-open" size={15} color={colors.accent} />
+                <Text style={styles.profileButtonText}>View that day</Text>
+              </TouchableOpacity>
+            </View>
           ) : null}
         </View>
       </View>
@@ -516,7 +522,9 @@ function formatAlertTime(value: string | null) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface.page },
-  content: { padding: spacing.xl, paddingBottom: 104 },
+  // paddingBottom comes from useTabBarClearance at render time; 104 was a guess that happened to be
+  // large enough on one phone and is wrong as soon as the bar grows with the system font size.
+  content: { ...contentColumn, padding: spacing.xl },
   headerBlock: { marginBottom: 18 },
   header: {
     alignItems: 'center',
@@ -641,11 +649,15 @@ const styles = StyleSheet.create({
   metaRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm, marginTop: 14 },
   metaText: { color: '#746B63', fontSize: fontSize.caption, fontWeight: '600' },
   metaDot: { backgroundColor: colors.border.strong, borderRadius: 2, height: 4, width: 4 },
-  actionRow: { flexDirection: 'row', gap: spacing.md, marginTop: 18 },
+  // Two levels of action, and no third: accent for the one that reaches the person (Call now), outlined for
+  // anything that only navigates inside the app (View profile, View that day). "View that day" used to be a
+  // slate-blue typed straight into the stylesheet — a third button vocabulary, and it borrowed the
+  // connection-issue accent for something that had nothing to do with a connection.
+  actionRow: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.lg },
   callButton: {
     alignItems: 'center',
     backgroundColor: colors.accent,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
     flex: 1,
     flexDirection: 'row',
     gap: spacing.sm,
@@ -658,7 +670,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.surface.card,
     borderColor: colors.border.default,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
     borderWidth: 1,
     flex: 1,
     justifyContent: 'center',
@@ -666,18 +678,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   profileButtonText: { color: '#3C342E', fontSize: fontSize.bodyLarge, fontWeight: '700' },
-  summaryButton: {
-    alignItems: 'center',
-    backgroundColor: '#6F7F92',
-    borderRadius: radius.sm,
-    flexDirection: 'row',
-    gap: spacing.sm,
-    justifyContent: 'center',
-    marginTop: 18,
-    minHeight: MIN_TOUCH_TARGET,
-    paddingHorizontal: spacing.md,
-  },
-  summaryButtonText: { color: colors.text.onAccent, fontSize: fontSize.bodyLarge, fontWeight: '700' },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',

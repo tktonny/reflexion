@@ -61,6 +61,21 @@ export const colors = {
     text: '#8A2E2E',
   },
 
+  /**
+   * Accents for the two alert types that are NOT a caregiver status.
+   *
+   * Every other alert type reads its colour from STATUS_META in v1Status.ts, which is the authoritative
+   * palette. These two have nothing to read: "later than usual" and "connection issue" describe an event and
+   * a device, not how somebody is — so borrowing a status colour would say the wrong thing, and inventing one
+   * per component is how a second status vocabulary starts. They live here instead, named for what they mean.
+   *
+   * Used for an icon and a card's left stripe only, never for words, so 3:1 is the bar they have to clear.
+   */
+  alertAccent: {
+    laterThanUsual: '#8B6A92',
+    connection: '#6F7F92',
+  },
+
   /** Unselected tab-bar label. Was #8D8278 (3.75:1 on white) — text, so it has to clear AA. */
   tabInactive: '#776C62',
 
@@ -115,6 +130,7 @@ export const radius = {
   pill: 999,
 } as const;
 
+
 /**
  * 12 is the floor. Anything smaller is unreadable for the caregivers this app is for — often middle-aged
  * to older, checking the app one-handed — and clips first when the system font size is raised.
@@ -143,3 +159,59 @@ export const cardShadow = {
   shadowRadius: 10,
   elevation: 2,
 } as const;
+
+/** The tab icon, sized from the label it sits above so the two scale together. */
+export function tabIconSize(): number {
+  return Math.round(fontSize.caption * 1.75 * PixelRatio.getFontScale());
+}
+
+/**
+ * How tall the tab bar has to be to hold its own content.
+ *
+ * Leaving the height unset does NOT make the bar adaptive: react-navigation falls back to a fixed 49px,
+ * which fits a 12px label on a 360dp phone and clips the same label on a 744dp tablet — where scaleSize
+ * takes the caption to 14 and the icon with it. So this follows the tokens the content is built from and the
+ * reader's font scale, which is what actually tracks.
+ */
+export function tabBarContentHeight(): number {
+  const labelHeight = fontSize.caption * 1.45 * PixelRatio.getFontScale();
+  // The last term is the navigator's own gap between icon and label, which it does not expose. Measured at
+  // 10px against a 38px content box that needed 48 — so it is allowed for rather than assumed away, and it
+  // scales with the type like everything else here. Without it the button box is short and the label spills
+  // past the bar into the last row of the screen.
+  const navigatorInternalGap = spacing.md;
+  return Math.round(tabIconSize() + labelHeight + spacing.sm + spacing.md + navigatorInternalGap);
+}
+
+/**
+ * Fallback clearance for a scrolling screen that cannot ask the navigator how tall the bar is.
+ *
+ * Three screens used to type their own number here — 48, 60 and 104 against a bar of 72+ — and two were
+ * short, which is how content ended up permanently under the bar. This is the same derivation the bar uses,
+ * so the two cannot disagree.
+ */
+export function tabBarClearanceFallback(): number {
+  return Math.round(tabBarContentHeight() * 1.12);
+}
+
+/**
+ * How wide the content column is allowed to get, so a card does not stretch across an unfolded foldable.
+ *
+ * Every screen filled the full viewport width, which is right on a phone and wrong the moment there is more
+ * of it: on a Pixel Fold or an unfolded Z Fold a loved-one card ran 700px with the text hugging the left
+ * edge and nothing on the right. Wide layouts here cap the column and centre it, which is what Gmail and
+ * Notion do on a tablet — a dashboard of one to three cards has nothing to put in a second column.
+ *
+ * Derived from typography rather than picked: a comfortable line is roughly 65 characters, and at this body
+ * size a character averages a little over half its em. So the cap follows the type — it moves if the type
+ * does, instead of freezing at whatever looked right on one device. Below the cap nothing changes, so phones
+ * are untouched.
+ */
+export const maxContentWidth = Math.round(fontSize.body * 0.58 * 65 + spacing.xl * 2);
+
+/** Centres a content column and caps it, while still filling a narrow screen edge to edge. */
+export const contentColumn = {
+  alignSelf: 'center' as const,
+  maxWidth: maxContentWidth,
+  width: '100%' as const,
+};

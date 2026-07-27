@@ -13,9 +13,7 @@ import { Feather } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { EmptyState, ErrorState, LoadingState } from '../../../src/components/ScreenState';
 import { generateSessionSummaryV1, getSessionDayV1 } from '../../../src/lib/v1Caregiver';
-import {
-  MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, scaleSize, spacing,
-} from '../../../src/theme';
+import { cardShadow, colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../../../src/theme';
 
 type ConversationLog = {
   sentence: string;
@@ -486,7 +484,7 @@ const styles = StyleSheet.create({
   },
   transcriptTitle: { flexShrink: 1 },
   transcript: { gap: 10, marginTop: 10 },
-  line: { borderRadius: 12, padding: spacing.md },
+  line: { borderRadius: radius.md, padding: spacing.md },
   lineAria: { backgroundColor: '#F3E8ED', borderLeftColor: colors.accent, borderLeftWidth: 3 },
   lineUser: { backgroundColor: colors.surface.muted, borderLeftColor: '#B9AA99', borderLeftWidth: 3 },
   lineLabel: { color: colors.text.tertiary, fontSize: fontSize.caption, fontWeight: '700', marginBottom: spacing.xs },

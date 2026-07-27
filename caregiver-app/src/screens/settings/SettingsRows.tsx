@@ -1,12 +1,30 @@
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import { Image, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { colors, fontFamily, fontSize, radius, spacing, scaleSize } from '../../theme';
+import { colors, fontFamily, fontSize, radius, scaleSize, spacing } from '../../theme';
 import { getInitials } from './helpers';
 import { PILL_HIT_SLOP, pillStyles } from './optionPills';
 
 export function SectionHeader({ title }: { title: string }) {
   return <Text accessibilityRole="header" style={styles.sectionHeader}>{title}</Text>;
+}
+
+/**
+ * Wraps a run of settings rows into one rounded, inset card.
+ *
+ * The rows were full-bleed white bands with square corners — the only place in the app built that way. Every
+ * other surface is a rounded card (the home dashboard, the alert cards, the chat bubbles, the sign-in panel),
+ * so settings read as a different app: two visual languages, one of them accidental.
+ *
+ * The group owns the shape and the rows keep only their hairline, which is why the card clips: `overflow`
+ * hidden makes the first and last row take the container's corners without either of them needing to know it
+ * is first or last. The final hairline is dropped the same way — by the container, not by asking each row.
+ *
+ * The radius is the same token the home cards use, so the two match by construction rather than by
+ * coincidence.
+ */
+export function SettingsGroup({ children }: { children: React.ReactNode }) {
+  return <View style={styles.group}>{children}</View>;
 }
 
 export function SettingRow({ label, value }: { label: string; value: string }) {
@@ -67,7 +85,7 @@ export function ActionRow({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View style={styles.rowLeft}>
+      <View style={styles.rowMain}>
         {fallbackName ? (
           // Avatar/initials only repeat the name already in the row label.
           <View accessibilityElementsHidden importantForAccessibility="no" style={styles.patientAvatar}>
@@ -79,10 +97,14 @@ export function ActionRow({
             )}
           </View>
         ) : null}
-        <Text style={styles.rowLabel}>{label}</Text>
+        <View style={styles.rowText}>
+          <Text style={styles.rowLabel}>{label}</Text>
+          {/* Full width to itself, so a long summary neither truncates nor pushes the label around. The row's
+              accessibilityLabel already reads the two together as one phrase. */}
+          {value ? <Text style={styles.rowValue}>{value}</Text> : null}
+        </View>
       </View>
       <View style={styles.rowRight}>
-        {value ? <Text style={styles.rowValue}>{value}</Text> : null}
         <Feather
           accessibilityElementsHidden
           importantForAccessibility="no"
@@ -151,6 +173,16 @@ export function PickerRow({ label, options, selected, onSelect }: {
 }
 
 const styles = StyleSheet.create({
+  group: {
+    backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    marginHorizontal: spacing.xl,
+    // What makes the first and last row take the container's corners without either knowing its position,
+    // and what hides the last row's hairline against the border.
+    overflow: 'hidden',
+  },
   sectionHeader: {
     fontSize: fontSize.caption,
     fontWeight: '600',
@@ -166,7 +198,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.surface.card,
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing.lg,
     paddingVertical: scaleSize(15),
     borderBottomWidth: 1,
     borderBottomColor: colors.border.subtle,
@@ -180,15 +212,13 @@ const styles = StyleSheet.create({
   },
   // flexShrink 1 (was 0): at large system font sizes a long label has to wrap instead of shoving the value
   // off the right edge of the row.
-  rowLabel: { color: colors.text.primary, flexShrink: 1, fontSize: fontSize.subheading, fontWeight: '500' },
+  rowLabel: { color: colors.text.primary, fontSize: fontSize.subheading, fontWeight: '500' },
+  // Left-aligned under the label, not right-aligned across from it. The right alignment was left over from
+  // when the two sat side by side; under the label it just looked like a second column that had collapsed.
   rowValue: {
     color: colors.text.tertiary,
-    flex: 1,
-    fontSize: fontSize.subheading,
-    lineHeight: scaleSize(20),
-    marginLeft: spacing.md,
+    fontSize: fontSize.body,
     minWidth: 0,
-    textAlign: 'right',
   },
   inlineInput: {
     borderColor: colors.border.default,
@@ -200,8 +230,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: scaleSize(9),
   },
-  rowLeft: { alignItems: 'center', flex: 1, flexDirection: 'row', gap: scaleSize(10), minWidth: 0 },
-  rowRight: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(6) },
+  rowMain: { alignItems: 'center', flex: 1, flexDirection: 'row', gap: scaleSize(10), minWidth: 0 },
+  // The label and its summary as one block, so the chevron sits beside the pair rather than between them.
+  rowText: { flex: 1, gap: scaleSize(2), minWidth: 0 },
+  rowRight: { alignItems: 'center', flexDirection: 'row' },
   patientAvatar: {
     alignItems: 'center',
     backgroundColor: '#EEE7DE',

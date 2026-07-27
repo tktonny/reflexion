@@ -19,7 +19,7 @@ import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { v1Login } from '../src/lib/v1Client';
 import { clearV1Session } from '../src/lib/v1AuthSession';
 import { clearCaregiverCache } from '../src/lib/queryKeys';
-import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
+import { colors, contentColumn, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
 
 type SignInResponse = {
   nurseId: string;
@@ -204,13 +204,20 @@ const styles = StyleSheet.create({
   },
   keyboard: {
     flex: 1,
-    justifyContent: 'center',
-    padding: scaleSize(24),
+    // Anchored near the top rather than geometrically centred. On a tall narrow screen — a Fold5 cover panel
+    // or an unfolded Flip5 — centring left roughly 400px empty above the card and 600px below it, which
+    // reads as a loading state rather than a form. 'center' still applies on a short screen, where the card
+    // fills most of the height anyway, because the padding only takes effect once there is slack.
+    justifyContent: 'flex-start',
+    paddingHorizontal: scaleSize(24),
+    paddingTop: '12%',
   },
   card: {
+    ...contentColumn,
     backgroundColor: colors.surface.card,
     borderColor: colors.border.default,
-    borderRadius: 18,
+    // The shared token rather than a literal 18, so the panel matches every other card in the app.
+    borderRadius: radius.xl,
     borderWidth: 1,
     padding: scaleSize(24),
   },
