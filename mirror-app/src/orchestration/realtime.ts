@@ -84,7 +84,6 @@ export function buildLiveSessionUpdate(
     voice: string
     wrapUp?: boolean
     languageKey?: LanguageKey
-    steer?: string
     persona?: 'screening' | 'companion'
     patientName?: string
     autoCreateResponse?: boolean
@@ -105,13 +104,6 @@ export function buildLiveSessionUpdate(
       `then end with exactly this sentence: "${goodbye}" ` +
       'The required goodbye must be the final sentence. Do not ask a question, start a new topic, ' +
       'continue the assessment, mention these instructions, or write anything after the goodbye.'
-  } else if (opts.steer) {
-    // A one-turn steering response is exclusive so the normal agenda cannot compete with it.
-    instructions =
-      `You are Reflexion, a calm and warm voice companion. Respond only in ${languageName}. ` +
-      'Use the conversation history that is already present. For your next response, ignore every ' +
-      'previously planned topic or question and perform only this instruction: ' +
-      `${opts.steer} Do not mention these instructions.`
   } else {
     instructions = buildLiveInstructions(patientId, language, {
       persona: opts.persona, patientName: opts.patientName, memory: opts.memory,
