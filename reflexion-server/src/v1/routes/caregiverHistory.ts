@@ -14,7 +14,8 @@ import {
   serializeV1Session,
 } from '../../lib/v1Conversations.js'
 import { getOpenAIApiKey } from '../../lib/env.js'
-import { authorizePatient, requireActor } from '../platform/auth.js'
+import { authorizePatient, getPrincipal, requireActor } from '../platform/auth.js'
+import { collections } from '../platform/collections.js'
 import { ApiError, badRequest } from '../platform/errors.js'
 import { sendData } from '../platform/http.js'
 import { objectBody } from '../platform/validation.js'
@@ -132,11 +133,27 @@ caregiverHistoryRouter.get('/patients/:patientId/session-trend', requireHuman, a
     dates.push(getSingaporeDayKey(day))
   }
 
+  // The per-day colour comes from the finaliser (jobs/jobs/finalizeDay.ts colorFor writes daily_statuses.finalStatus),
+  // never from anything the client could derive. A caregiver client that colours its own bars is exactly
+  // the drift this contract exists to prevent — it would be deciding, from a duration, that a day looked
+  // bad. Null for a day with no finalised status yet (today before 7pm, or a patient still establishing),
+  // which the chart renders in the neutral fill rather than inventing a colour.
+  const finalised = await db.collection<any>(collections.dailyStatuses)
+    .find({ tenantId: getPrincipal(request).tenantId, patientId, localDate: { $in: dates } })
+    .project({ localDate: 1, finalStatus: 1 }).toArray()
+  const colourByDate = new Map(finalised.map((row) => [String(row.localDate), row.finalStatus || null]))
+
   const trend = await Promise.all(dates.map(async (date) => {
     const { start, end } = getSingaporeDayBoundsFromKey(date)
     const stats = await getV1DailyStats(db, patientId, start, end)
     const missed = stats.completedSessionCount === 0
-    return { date, duration: stats.duration, sessionCount: stats.sessionCount, missed }
+    return {
+      date,
+      duration: stats.duration,
+      sessionCount: stats.sessionCount,
+      missed,
+      status: colourByDate.get(date) ?? null,
+    }
   }))
 
   sendData(response, { patientId, days: requested, trend })

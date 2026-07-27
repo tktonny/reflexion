@@ -1,29 +1,23 @@
-import { apiGet } from './apiClient';
+import { getSessionTrendV1 } from './v1Caregiver';
 
 /**
- * One day of the patient-trend read model (`GET /api/patient-trend`).
+ * One day of the trend read model (`GET /api/v1/patients/:id/session-trend`).
  *
- * Defined here, next to the request that produces it, rather than in the old mockData module — where the
- * app's fixtures and its shared domain types lived together and production screens ended up compiling
- * against a three-state legacy `status` vocabulary that no longer matches the authoritative four-state
- * V1Status (see src/lib/v1Status.ts).
+ * `status` is the colour the finaliser wrote to daily_statuses, passed through untouched. The app never
+ * derives it: colouring a bar from a duration would be the client deciding a day looked bad, which is the
+ * one thing the status contract forbids. Null means no finalised status for that day yet — today before the
+ * evening finalise, or a loved one still establishing a baseline — and the chart uses its neutral fill.
  */
 export type TrendDay = {
   date: string;
   duration: number;
-  /** Per-day colour as computed by the server. Not the caregiver-facing status — see v1Status.ts. */
-  status: 'green' | 'yellow' | 'red';
+  sessionCount: number;
+  status: 'green' | 'amber' | 'red' | null;
   missed: boolean;
 };
 
 type TrendRange = 7 | 30;
 
-export async function fetchPatientTrend(
-  patientId: string,
-  days: TrendRange,
-) {
-  const body = await apiGet<{ trend?: TrendDay[] }>(`/api/patient-trend?id=${encodeURIComponent(patientId)}&days=${days}`);
-
-  const trend = Array.isArray(body?.trend) ? body.trend : [];
-  return trend;
+export function fetchPatientTrend(patientId: string, days: TrendRange): Promise<TrendDay[]> {
+  return getSessionTrendV1(patientId, days) as Promise<TrendDay[]>;
 }

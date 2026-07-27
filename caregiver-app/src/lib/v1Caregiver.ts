@@ -223,7 +223,7 @@ export function getSessionDayV1(patientId: string, date: string): Promise<{ pati
   return v1Get(`/patients/${encodeURIComponent(patientId)}/session-days/${encodeURIComponent(date)}`);
 }
 
-export type V1TrendDay = { date: string; duration: number; sessionCount: number; missed: boolean };
+export type V1TrendDay = { date: string; duration: number; sessionCount: number; status: 'green' | 'amber' | 'red' | null; missed: boolean };
 
 export async function getSessionTrendV1(patientId: string, days: 7 | 30): Promise<V1TrendDay[]> {
   const body = await v1Get<{ trend: V1TrendDay[] }>(
