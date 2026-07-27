@@ -16,7 +16,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { loadCaregiverHome } from '../src/lib/v1Caregiver';
 import { getStoredAuthSession } from '../src/lib/authSession';
-import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
+import { friendlyPushError, registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { caregiverConfigKey, notificationsQueryKey } from '../src/lib/queryKeys';
 import { hasV1Session } from '../src/lib/v1AuthSession';
 import { STATUS_META } from '../src/lib/v1Status';
@@ -142,7 +142,10 @@ export default function NotificationsScreen() {
         : result.reason || 'Could not register this phone for alerts.');
     },
     onError: (error) => {
-      setDeviceMessage(error instanceof Error ? error.message : 'Could not register this phone for alerts.');
+      // Never the raw message. registerPushNotificationDevice maps its own failures, but a throw from the
+      // server call lands here, and a Firebase/Java string read aloud to a caregiver is alarming and tells
+      // them nothing they can act on.
+      setDeviceMessage(friendlyPushError(error));
     },
   });
 
