@@ -110,10 +110,14 @@ function pcm24kBase64DurationMs(base64: string): number {
 // can be calibrated on the real hardware without rebuilding the APK:
 //   EXPO_PUBLIC_BARGEIN=off            → disable talk-over entirely (half-duplex: the mic stays muted
 //                                        while Aria speaks). The most robust setting for a bad-AEC room.
-//   EXPO_PUBLIC_BARGEIN_START_RMS=0.06 → loudness (0..1) the mic must reach to count as an interruption.
-//   EXPO_PUBLIC_BARGEIN_MIN_MS=700     → how long that loudness must persist before we believe it.
+//   EXPO_PUBLIC_BARGEIN_START_RMS=0.04 → loudness (0..1) the mic must reach to count as an interruption.
+//   EXPO_PUBLIC_BARGEIN_MIN_MS=300     → how long that loudness must persist before we believe it (the VAD
+//                                        accumulates leakily, so brief syllable gaps no longer reset it).
 //   EXPO_PUBLIC_BARGEIN_GRACE_MS=900   → ignore barge-in for this long after Aria STARTS an utterance,
 //                                        where echo onset is loudest and a real interruption never is.
+// The floor/window were 0.06/700ms with a HARD reset: reliably echo-proof, but they never fired on real
+// (gappy) speech, so talk-over was effectively dead. Lowered + leaky accumulator (energyVad leakyStart) so
+// genuine speech triggers; grace still eats the loud onset, and a bad-AEC room can raise the floor via env.
 function numberFromEnv(raw: string | undefined, fallback: number): number {
   const value = Number(raw)
   return Number.isFinite(value) && value > 0 ? value : fallback
@@ -124,8 +128,8 @@ const DEBUG_MIC = process.env.EXPO_PUBLIC_DEBUG_OVERLAY === 'on'
 // Hidden user-role priming turn seeded before the companion opening response.create so SG accepts it
 // (see the seeding in session.updated). Input-only; never spoken, never in the recorded transcript.
 const COMPANION_OPENING_CUE = '(Please greet me warmly to begin our chat.)'
-const BARGE_IN_START_RMS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_START_RMS, 0.06)
-const BARGE_IN_MIN_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_MIN_MS, 700)
+const BARGE_IN_START_RMS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_START_RMS, 0.04)
+const BARGE_IN_MIN_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_MIN_MS, 300)
 const BARGE_IN_GRACE_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_GRACE_MS, 900)
 
 // Auto-reconnect a bounded number of times per turn-gap on a transient realtime WS drop (common on the
@@ -200,6 +204,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     speechContinueRms: 0.01,
     minSpeechMs: BARGE_IN_MIN_MS,
     silenceMs: 1200,
+    // Real speech dips between syllables; without this the long confirmation window resets on every gap
+    // and barge-in never fires (observed: mic peaks clear the floor but talk-over never triggers).
+    leakyStart: true,
   }))
   // Wall-clock (ms) when Aria's current utterance began playing; used for the start-of-utterance
   // barge-in grace window where echo onset is strongest.

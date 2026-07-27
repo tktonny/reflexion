@@ -18,6 +18,12 @@ type Options = {
   minSpeechMs?: number
   silenceMs?: number
   maxTurnMs?: number
+  // When true, a sub-threshold frame DECAYS the pre-speech accumulator instead of hard-zeroing it, so a
+  // brief dip between syllables no longer forgets the speech that came just before. Required for barge-in,
+  // whose long confirmation window (minSpeechMs) could otherwise never be reached by real, gappy speech —
+  // a single quiet frame reset the count every time. Off by default: ordinary turn VAD keeps its crisp
+  // two-frame onset. Transient echo blips (mostly sub-threshold) still decay away to zero.
+  leakyStart?: boolean
 }
 
 /** Decode little-endian PCM16 emitted by expo-pcm-audio. */
@@ -58,6 +64,7 @@ export function createEnergyVad(options: Options = {}): EnergyVad {
   const minSpeechMs = options.minSpeechMs ?? 200
   const silenceMs = options.silenceMs ?? 1200
   const maxTurnMs = options.maxTurnMs ?? 30_000
+  const leakyStart = options.leakyStart ?? false
 
   let speaking = false
   let candidateSpeechMs = 0
@@ -80,7 +87,9 @@ export function createEnergyVad(options: Options = {}): EnergyVad {
       if (rms >= startThreshold) {
         candidateSpeechMs += frameMs
       } else {
-        candidateSpeechMs = 0
+        // Hard reset by default; with leakyStart, only decay — a syllable gap subtracts one frame but
+        // does not erase the accumulated evidence, so real (gappy) speech still reaches minSpeechMs.
+        candidateSpeechMs = leakyStart ? Math.max(0, candidateSpeechMs - frameMs) : 0
       }
       if (candidateSpeechMs >= minSpeechMs) {
         speaking = true
