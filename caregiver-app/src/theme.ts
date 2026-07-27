@@ -116,6 +116,28 @@ export const radius = {
 } as const;
 
 /**
+ * The bottom tab bar's geometry, in one place, because three screens used to guess it.
+ *
+ * `(tabs)/_layout.tsx` styles the bar from these, and every scrolling tab screen reserves
+ * `tabBar.clearance` at the bottom of its content. They were separate numbers before — the bar was 72+ tall
+ * while Home reserved 48, Settings 60, and the alerts list 104 — so the last row of content sat under the bar
+ * on two of the three screens and could not be scrolled out from under it.
+ *
+ * `minHeight` on purpose, not `height`: the bar has to grow when the system font size does, which is the
+ * first setting an older caregiver changes. `clearance` therefore has to be derived from the same tokens
+ * rather than typed as a literal, so the two cannot drift apart again. Screens that can use the navigator's
+ * measured height (see useTabBarClearance) prefer it, since it also carries the safe-area inset.
+ */
+export const tabBar = {
+  minHeight: scaleSize(72),
+  paddingTop: scaleSize(8),
+  paddingBottom: scaleSize(12),
+  get clearance() {
+    return this.minHeight + this.paddingBottom + scaleSize(8);
+  },
+} as const;
+
+/**
  * 12 is the floor. Anything smaller is unreadable for the caregivers this app is for — often middle-aged
  * to older, checking the app one-handed — and clips first when the system font size is raised.
  */

@@ -9,6 +9,7 @@ import { Feather } from '@expo/vector-icons';
 import { EmptyState, ErrorState, LoadingState } from '../../src/components/ScreenState';
 import { loadCaregiverHome, type CaregiverHomePatient } from '../../src/lib/v1Caregiver';
 import { getStoredAuthSession } from '../../src/lib/authSession';
+import { useTabBarClearance } from '../../src/lib/useTabBarClearance';
 import { hasV1Session } from '../../src/lib/v1AuthSession';
 import { caregiverConfigKey } from '../../src/lib/queryKeys';
 import { invalidatePatientStatuses, usePatientStatusesV1 } from '../../src/lib/v1Client';
@@ -71,6 +72,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const session = getStoredAuthSession();
+  const bottomClearance = useTabBarClearance();
   // One call assembles what the legacy fat document used to return: the caregiver from /me, the loved
   // ones from /patients, their mirrors from /device-assignments, and whether each is still waiting on a
   // consent. Identity comes from the bearer token, so there is no id to pass and no way to ask for
@@ -134,7 +136,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+      <ScrollView style={styles.scroll} contentContainerStyle={[styles.content, { paddingBottom: bottomClearance }]}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerText}>
@@ -474,7 +476,8 @@ function QuickLink({ icon, label, sub, onPress }: { icon: any; label: string; su
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface.page },
   scroll: { flex: 1 },
-  content: { paddingHorizontal: spacing.xl, paddingTop: spacing.xl, paddingBottom: scaleSize(48) },
+  // paddingBottom comes from useTabBarClearance at render time — a literal here was shorter than the bar.
+  content: { paddingHorizontal: spacing.xl, paddingTop: spacing.xl },
 
   header: {
     flexDirection: 'row',

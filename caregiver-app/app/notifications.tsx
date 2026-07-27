@@ -16,6 +16,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { loadCaregiverHome } from '../src/lib/v1Caregiver';
 import { getStoredAuthSession } from '../src/lib/authSession';
+import { useTabBarClearance } from '../src/lib/useTabBarClearance';
 import { friendlyPushError, registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { caregiverConfigKey, notificationsQueryKey } from '../src/lib/queryKeys';
 import { hasV1Session } from '../src/lib/v1AuthSession';
@@ -70,6 +71,7 @@ export default function NotificationsScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const session = getStoredAuthSession();
+  const bottomClearance = useTabBarClearance();
   const canReadAlerts = hasV1Session();
   const [selectedTab, setSelectedTab] = useState<NotificationsTab>('alerts');
   const [deviceMessage, setDeviceMessage] = useState('');
@@ -244,7 +246,7 @@ export default function NotificationsScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <FlatList
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: bottomClearance }]}
         data={notifications}
         keyExtractor={(item) => item.notificationId}
         ListHeaderComponent={header}
@@ -516,7 +518,9 @@ function formatAlertTime(value: string | null) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface.page },
-  content: { padding: spacing.xl, paddingBottom: 104 },
+  // paddingBottom comes from useTabBarClearance at render time; 104 was a guess that happened to be
+  // large enough on one phone and is wrong as soon as the bar grows with the system font size.
+  content: { padding: spacing.xl },
   headerBlock: { marginBottom: 18 },
   header: {
     alignItems: 'center',
