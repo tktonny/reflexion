@@ -14,7 +14,7 @@ import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { EmptyState, ErrorState, LoadingState } from '../../../src/components/ScreenState';
 import { apiGet, apiSend } from '../../../src/lib/apiClient';
 import {
-  MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, spacing,
+  MIN_TOUCH_TARGET, cardShadow, colors, fontFamily, fontSize, radius, scaleSize, spacing,
 } from '../../../src/theme';
 
 type ConversationLog = {
@@ -213,7 +213,7 @@ export default function SessionHistoryDayScreen() {
               {/* No status indicator here on purpose: this card is one day's raw conversation detail, and the
                   only status the app may show is the one the server computes on the dashboard/profile. */}
               <View style={styles.metaRow}>
-                <Text style={styles.metaName}>{daySessions.patientName}</Text>
+                <Text maxFontSizeMultiplier={1.4} style={styles.metaName}>{daySessions.patientName}</Text>
               </View>
               <Text style={styles.metaDate}>{formatDateTime(selectedSession.createdAt)}</Text>
               <View style={styles.statsRow}>
@@ -371,9 +371,9 @@ const styles = StyleSheet.create({
   placeholder: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 14,
+    paddingHorizontal: spacing.md,
   },
-  content: { paddingBottom: 48, paddingHorizontal: 14, paddingTop: spacing.lg },
+  content: { paddingBottom: 48, paddingHorizontal: spacing.md, paddingTop: spacing.lg },
   card: {
     backgroundColor: colors.surface.card,
     borderColor: colors.border.default,
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
   sessionTabText: { color: colors.text.secondary, fontSize: fontSize.body, fontWeight: '700' },
   sessionTabTextActive: { color: colors.text.onAccent },
   metaRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xs },
-  metaName: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 18, fontWeight: '500' },
+  metaName: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(18), fontWeight: '500' },
   metaDate: { color: colors.text.tertiary, fontSize: fontSize.body, marginBottom: spacing.lg },
   statsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, justifyContent: 'space-between' },
   statChip: {

@@ -8,7 +8,7 @@ import { useRouter } from 'expo-router';
 import { useMutation } from '@tanstack/react-query';
 import { apiSend } from '../src/lib/apiClient';
 import { getStoredAuthSession } from '../src/lib/authSession';
-import { colors, spacing, radius, fontSize, fontFamily, cardShadow } from '../src/theme';
+import { colors, spacing, radius, fontSize, fontFamily, cardShadow, scaleSize } from '../src/theme';
 
 export default function FeedbackScreen() {
   const router = useRouter();
@@ -37,7 +37,7 @@ export default function FeedbackScreen() {
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>Send feedback</Text>
+          <Text style={styles.title} maxFontSizeMultiplier={1.3}>Send feedback</Text>
           <Text style={styles.intro}>
             Tell us what is working well or what could be better. This goes straight to the Reflexion team.
           </Text>
@@ -75,12 +75,12 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: { paddingHorizontal: spacing.xl, paddingTop: spacing.xl, paddingBottom: spacing.xxl, gap: spacing.md },
   title: { fontSize: fontSize.display, fontWeight: '500', color: colors.text.primary, fontFamily: fontFamily.display },
-  intro: { fontSize: fontSize.bodyLarge, color: colors.text.secondary, lineHeight: 20 },
+  intro: { fontSize: fontSize.bodyLarge, color: colors.text.secondary, lineHeight: scaleSize(20) },
   card: {
     backgroundColor: colors.surface.card, borderRadius: radius.lg, padding: spacing.md,
     borderWidth: 1, borderColor: colors.border.default, ...cardShadow,
   },
-  input: { minHeight: 160, fontSize: fontSize.bodyLarge, color: colors.text.primary },
+  input: { minHeight: scaleSize(160), fontSize: fontSize.bodyLarge, color: colors.text.primary },
   submitBtn: {
     backgroundColor: colors.accent, borderRadius: radius.lg, paddingVertical: spacing.lg,
     alignItems: 'center', justifyContent: 'center', marginTop: spacing.sm,

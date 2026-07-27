@@ -29,7 +29,7 @@ import {
   formatLastInteraction,
 } from '../../src/lib/v1Status';
 import {
-  colors, spacing, radius, fontSize, fontFamily, cardShadow, MIN_TOUCH_TARGET,
+  colors, spacing, radius, fontSize, fontFamily, cardShadow, MIN_TOUCH_TARGET, scaleSize,
 } from '../../src/theme';
 
 // Keyed on the authoritative four-state status, not the legacy green/yellow/red vocabulary. Keeping a
@@ -228,7 +228,13 @@ export default function ProfileScreen() {
                   importantForAccessibility="no"
                   style={[styles.statusPillDot, { backgroundColor: pillColor }]}
                 />
-                <Text style={styles.statusPillText}>{pillLabel}</Text>
+                <Text
+                  maxFontSizeMultiplier={1.4}
+                  numberOfLines={1}
+                  style={styles.statusPillText}
+                >
+                  {pillLabel}
+                </Text>
               </View>
               <View
                 accessibilityElementsHidden
@@ -248,7 +254,7 @@ export default function ProfileScreen() {
                 )}
               </View>
             </View>
-            <Text style={styles.bannerName}>{realProfile.name}</Text>
+            <Text maxFontSizeMultiplier={1.3} style={styles.bannerName}>{realProfile.name}</Text>
             {reasonLine ? <Text style={styles.reasonLine}>{reasonLine}</Text> : null}
             <Text style={styles.lastSeen}>{lastInteractionText}</Text>
             <Text style={styles.duration}>Duration: {durationText}</Text>
@@ -505,7 +511,7 @@ export default function ProfileScreen() {
           size={28}
           color={colors.accent}
         />
-        <Text style={styles.placeholderTitle}>Bear with us</Text>
+        <Text maxFontSizeMultiplier={1.3} style={styles.placeholderTitle}>Bear with us</Text>
         <Text style={styles.placeholderText}>This profile is not ready to show yet.</Text>
       </View>
     </SafeAreaView>
@@ -539,7 +545,7 @@ function WeekTrendBody({
   if (trend.length > 0) {
     return (
       <>
-        <MiniSparkline data={trend} days={7} height={52} />
+        <MiniSparkline data={trend} days={7} height={scaleSize(52)} />
         <Text style={styles.weekStat}>
           Talked {talkedDays} of 7 days · Avg {formatDuration(avgDuration)}
         </Text>
@@ -718,10 +724,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: spacing.xxl,
   },
-  placeholderTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 24, fontWeight: '500' },
+  placeholderTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(24), fontWeight: '500' },
   placeholderText: { color: colors.text.secondary, fontSize: fontSize.subheading, lineHeight: 22, textAlign: 'center' },
 
-  content: { paddingHorizontal: spacing.xl, paddingBottom: 48, paddingTop: spacing.lg },
+  content: { paddingHorizontal: spacing.xl, paddingBottom: scaleSize(48), paddingTop: spacing.lg },
 
   banner: {
     backgroundColor: colors.surface.card,
@@ -739,16 +745,16 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   avatar: {
-    width: 52,
-    height: 52,
+    width: scaleSize(52),
+    height: scaleSize(52),
     borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
   avatarImage: { height: '100%', width: '100%' },
-  avatarText: { fontSize: 18, fontWeight: '500', fontFamily: fontFamily.display },
-  bannerName: { fontSize: 22, fontWeight: '500', color: colors.text.primary, fontFamily: fontFamily.display, marginBottom: spacing.xs },
+  avatarText: { fontSize: scaleSize(18), fontWeight: '500', fontFamily: fontFamily.display },
+  bannerName: { fontSize: scaleSize(22), fontWeight: '500', color: colors.text.primary, fontFamily: fontFamily.display, marginBottom: spacing.xs },
   reasonLine: { fontSize: fontSize.bodyLarge, color: '#4A433C', lineHeight: 20, marginBottom: spacing.xs },
   lastSeen: { fontSize: fontSize.bodyLarge, color: colors.text.secondary },
   duration: { fontSize: fontSize.body, color: colors.text.tertiary, marginTop: 2 },
@@ -756,6 +762,8 @@ const styles = StyleSheet.create({
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 1,
+    maxWidth: '78%',
     gap: 7,
     paddingHorizontal: spacing.md,
     paddingVertical: 6,
@@ -858,7 +866,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.accent,
-    borderRadius: 12,
+    borderRadius: scaleSize(12),
     paddingVertical: 13,
     marginTop: spacing.md,
     minHeight: 46,
@@ -872,7 +880,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing.sm,
     backgroundColor: colors.accent,
-    borderRadius: 12,
+    borderRadius: scaleSize(12),
     paddingVertical: 15,
     marginBottom: 14,
   },
@@ -883,8 +891,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border.default,
-    padding: 18,
-    marginBottom: 14,
+    padding: scaleSize(18),
+    marginBottom: scaleSize(14),
     ...cardShadow,
   },
   // 13pt uppercase + letterSpacing: at large system text sizes this title is the widest thing in the

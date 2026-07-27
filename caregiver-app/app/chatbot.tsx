@@ -12,7 +12,7 @@ import {
 } from '../src/lib/v1Client';
 import { hasV1Session } from '../src/lib/v1AuthSession';
 import { STATUS_META } from '../src/lib/v1Status';
-import { colors, spacing, radius, fontSize, MIN_TOUCH_TARGET } from '../src/theme';
+import { colors, spacing, radius, fontSize, scaleSize, MIN_TOUCH_TARGET } from '../src/theme';
 
 interface Message {
   id: string;
@@ -171,19 +171,19 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface.page },
   agentBanner: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
-    paddingHorizontal: spacing.lg, paddingVertical: 10, backgroundColor: colors.surface.card,
+    paddingHorizontal: spacing.lg, paddingVertical: scaleSize(10), backgroundColor: colors.surface.card,
     borderBottomWidth: 1, borderBottomColor: colors.border.default,
   },
   agentDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: STATUS_META.doing_well.dot },
-  agentText: { fontSize: fontSize.body, color: colors.text.secondary },
-  list: { padding: spacing.lg, gap: 10, paddingBottom: spacing.sm },
+  agentText: { fontSize: fontSize.body, color: colors.text.secondary, flexShrink: 1, minWidth: 0 },
+  list: { padding: spacing.lg, gap: scaleSize(10), paddingBottom: spacing.sm },
   bubble: {
     maxWidth: '80%', borderRadius: radius.xl, padding: spacing.md,
     shadowColor: colors.shadow, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 2, elevation: 1,
   },
   bubbleUser: { alignSelf: 'flex-end', backgroundColor: colors.accent, borderBottomRightRadius: 4 },
   bubbleSupport: { alignSelf: 'flex-start', backgroundColor: colors.surface.card, borderBottomLeftRadius: 4 },
-  bubbleText: { fontSize: fontSize.subheading, color: colors.text.primary, lineHeight: 21 },
+  bubbleText: { fontSize: fontSize.subheading, color: colors.text.primary, lineHeight: scaleSize(21) },
   bubbleTextUser: { color: colors.text.onAccent },
   bubbleTime: { fontSize: fontSize.caption, color: colors.text.tertiary, marginTop: spacing.xs, textAlign: 'right' },
   bubbleTimeUser: { color: 'rgba(255,255,255,0.65)' },
@@ -194,8 +194,8 @@ const styles = StyleSheet.create({
   input: {
     // 44pt floor so the field is easy to hit one-handed, and a taller cap so two lines still fit when the
     // system text size is turned up — at 100 the caregiver could only see part of one line.
-    flex: 1, backgroundColor: colors.surface.input, borderRadius: 22, paddingHorizontal: spacing.lg, paddingVertical: 10,
-    fontSize: fontSize.subheading, minHeight: MIN_TOUCH_TARGET, maxHeight: 132, borderWidth: 1, borderColor: colors.border.default,
+    flex: 1, backgroundColor: colors.surface.input, borderRadius: 22, paddingHorizontal: spacing.lg, paddingVertical: scaleSize(10),
+    fontSize: fontSize.subheading, minHeight: MIN_TOUCH_TARGET, maxHeight: scaleSize(132), borderWidth: 1, borderColor: colors.border.default,
   },
   sendBtn: {
     alignItems: 'center', backgroundColor: colors.accent, borderRadius: 22, justifyContent: 'center',

@@ -287,10 +287,15 @@ export async function computeCaregiverStatus(tenantId: string, patientId: string
   // Away-adjusted missed-day streak: days since the last completed session, minus calendar days
   // covered by a flagged away period (doc §5.3 — away days never count toward the streak).
   const weekStart = new Date(dayStart.getTime() - 6 * DAY_MS)
-  const [weeklyCompletedCount, awayList, recentDaily] = await Promise.all([
+  // Today's REAL conversations (patient actually spoke), so the caregiver sees total interaction — both
+  // the daily check-in AND free-talk chats — not just the check-in progress. Excludes 0-turn/ghost sessions.
+  const todayConvoFilter = { tenantId, patientId, 'acquisition.patientTurns': { $gte: 1 }, createdAt: { $gte: dayStart, $lt: dayEnd } }
+  const [weeklyCompletedCount, awayList, recentDaily, conversationsToday, checkinsToday] = await Promise.all([
     db.collection<any>(collections.sessions).countDocuments({ tenantId, patientId, type: 'daily_checkin', localCompletedAt: { $gte: weekStart, $lt: dayEnd } }),
     db.collection<any>(collections.awayPeriods).find({ tenantId, patientId, state: 'active' }).toArray(),
     db.collection<any>(collections.dailyStatuses).find({ tenantId, patientId }).sort({ localDate: -1 }).limit(3).toArray(),
+    db.collection<any>(collections.sessions).countDocuments({ ...todayConvoFilter, type: { $in: ['daily_checkin', 'companion'] } }),
+    db.collection<any>(collections.sessions).countDocuments({ ...todayConvoFilter, type: 'daily_checkin' }),
   ])
   let missedStreak = 0
   if (!today && lastSession?.localCompletedAt) {
@@ -327,6 +332,8 @@ export async function computeCaregiverStatus(tenantId: string, patientId: string
     status: evaluation.status, primaryReason: evaluation.primaryReason, secondaryReasons: evaluation.secondaryReasons,
     ruleVersion: evaluation.ruleVersion,
     completedToday: Boolean(today), technicalState,
+    // Total interaction today (both types) so the caregiver sees "talked N times", not just check-ins.
+    conversationsToday, checkinsToday, chatsToday: Math.max(0, conversationsToday - checkinsToday),
     lastInteractionAt: lastSession?.localCompletedAt ? new Date(lastSession.localCompletedAt).toISOString() : null,
     updatedAt: now.toISOString(),
     // Internal fields used by the finalize/7pm jobs (not part of the frozen §4 read model, harmless to clients).

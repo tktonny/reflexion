@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, fontSize, radius, spacing } from '../../theme';
+import { colors, fontSize, radius, spacing, scaleSize } from '../../theme';
 
 // The option chip look, shared by the picker rows in the settings list and the pickers inside the edit sheet.
 
@@ -8,10 +8,10 @@ import { colors, fontSize, radius, spacing } from '../../theme';
 export const PILL_HIT_SLOP = { bottom: 8, left: 8, right: 8, top: 8 };
 
 export const pillStyles = StyleSheet.create({
-  pickerOptions: { flexDirection: 'row', gap: spacing.sm, marginTop: 10, flexWrap: 'wrap' },
+  pickerOptions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm, flexWrap: 'wrap' },
   pill: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
+    paddingHorizontal: spacing.md,
+    paddingVertical: scaleSize(7),
     borderRadius: radius.pill,
     backgroundColor: colors.surface.muted,
     borderWidth: 1,

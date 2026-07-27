@@ -40,7 +40,7 @@ import type {
   SettingsPatient,
   SummaryTime,
 } from '../../src/screens/settings/types';
-import { colors, fontFamily, fontSize, radius, spacing } from '../../src/theme';
+import { colors, fontFamily, fontSize, radius, spacing, scaleSize, MIN_TOUCH_TARGET } from '../../src/theme';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -197,7 +197,7 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         <View style={styles.titleRow}>
-          <Text style={styles.pageTitle}>Settings</Text>
+          <Text maxFontSizeMultiplier={1.3} style={styles.pageTitle}>Settings</Text>
         </View>
 
         {settingsState !== 'ready' ? (
@@ -305,7 +305,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface.page },
   scroll: { flex: 1 },
-  content: { paddingBottom: 60 },
+  content: { paddingBottom: scaleSize(60) },
   titleRow: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -323,15 +323,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     justifyContent: 'center',
     marginHorizontal: spacing.xl,
-    marginTop: 14,
-    minHeight: 46,
-    borderRadius: 12,
+    marginTop: spacing.md,
+    minHeight: MIN_TOUCH_TARGET,
+    borderRadius: radius.md,
   },
   saveBtnDisabled: { opacity: 0.7 },
   saveBtnText: { color: colors.text.onAccent, fontSize: fontSize.subheading, fontWeight: '700' },
   logoutBtn: {
     margin: spacing.xl,
-    marginTop: 36,
+    marginTop: scaleSize(36),
     padding: spacing.lg,
     backgroundColor: colors.surface.card,
     borderRadius: radius.lg,

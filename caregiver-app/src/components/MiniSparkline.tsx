@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import type { TrendDay } from '../lib/patientTrendClient';
+import { scaleSize } from '../theme';
 
 interface Props {
   data: TrendDay[];
@@ -26,7 +27,7 @@ function describeWeek(slice: TrendDay[]): string {
   return `Check-ins on ${talked} of the last ${slice.length} ${slice.length === 1 ? 'day' : 'days'}.${missedPart}`;
 }
 
-export default function MiniSparkline({ data, days = 7, height = 32 }: Props) {
+export default function MiniSparkline({ data, days = 7, height = scaleSize(32) }: Props) {
   const slice = data.slice(-days);
   const maxDuration = Math.max(...slice.map(d => d.duration), 1);
 
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: 3,
+    gap: scaleSize(3),
   },
   barWrapper: { flex: 1, justifyContent: 'flex-end' },
   bar: { borderRadius: 3, width: '100%' },

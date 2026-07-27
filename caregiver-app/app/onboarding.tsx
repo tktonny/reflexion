@@ -27,7 +27,7 @@ import { MirrorStep } from '../src/screens/onboarding/MirrorStep';
 import { NotificationStep } from '../src/screens/onboarding/NotificationStep';
 import { blankPatient, getStepSubtitle, validateStep } from '../src/screens/onboarding/helpers';
 import type { AccountForm, NotificationForm, PatientForm } from '../src/screens/onboarding/types';
-import { colors, fontSize, radius, spacing } from '../src/theme';
+import { colors, fontSize, radius, scaleSize, spacing } from '../src/theme';
 
 type LatestConfigResponse = {
   patients?: unknown[];
@@ -292,7 +292,7 @@ export default function OnboardingScreen() {
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
             <Text style={styles.eyebrow}>Step {displayStep} of {totalSteps}</Text>
-            <Text accessibilityRole="header" style={styles.title}>{stepTitle}</Text>
+            <Text accessibilityRole="header" maxFontSizeMultiplier={1.3} style={styles.title}>{stepTitle}</Text>
             <Text style={styles.subtitle}>{getStepSubtitle(step, displayedTotalPatientCount)}</Text>
           </View>
 
@@ -406,7 +406,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   safe: { flex: 1, backgroundColor: colors.surface.page },
-  content: { padding: spacing.xl, paddingBottom: 24 },
+  content: { padding: spacing.xl, paddingBottom: scaleSize(24) },
   header: { marginBottom: spacing.lg },
   eyebrow: {
     color: colors.accent,
@@ -415,12 +415,12 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textTransform: 'uppercase',
   },
-  title: { color: colors.text.primary, fontSize: 27, fontWeight: '800', marginTop: spacing.xs },
-  subtitle: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 20, marginTop: 6 },
+  title: { color: colors.text.primary, fontSize: scaleSize(27), fontWeight: '800', marginTop: spacing.xs },
+  subtitle: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: scaleSize(20), marginTop: scaleSize(6) },
   progressTrack: {
     flexDirection: 'row',
     gap: spacing.sm,
-    marginBottom: 18,
+    marginBottom: scaleSize(18),
   },
   progressStep: {
     backgroundColor: colors.border.default,
@@ -432,9 +432,9 @@ const styles = StyleSheet.create({
   notice: {
     borderRadius: radius.sm,
     borderWidth: 1,
-    marginBottom: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    marginBottom: scaleSize(14),
+    paddingHorizontal: scaleSize(14),
+    paddingVertical: scaleSize(10),
   },
   // The success/error notice tints are this screen's own pair and have no theme token; the error text
   // reuses the brand accent.
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
   noticeText: {
     fontSize: fontSize.body,
     fontWeight: '700',
-    lineHeight: 18,
+    lineHeight: scaleSize(18),
   },
   noticeSuccessText: {
     color: '#1A7A4A',

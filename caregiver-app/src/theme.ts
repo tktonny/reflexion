@@ -1,3 +1,5 @@
+import { Dimensions, PixelRatio } from 'react-native';
+
 // The single source of truth for colour in the caregiver app.
 //
 // Before this module there were ~570 hard-coded hex literals across 19 separate StyleSheet.create blocks,
@@ -77,13 +79,32 @@ export const colors = {
  * still learning their routine be painted red.
  */
 
+// --- Responsive scaling -------------------------------------------------------------------------
+// Android ships on a huge range of screen sizes; fixed-pixel type + spacing look cramped on a 360dp phone
+// and lost on a 430dp+ phone or a tablet. Scale both to the device's SHORTER side against a 390dp design
+// baseline, MODERATED (factor 0.5 — type moves half as much as raw width) and CLAMPED so a small phone
+// never drops the type below the readability floor and a tablet never balloons. Computed once at module
+// load: fine for phones, which don't resize; a split-screen tablet keeps the launch size until relaunch.
+const BASELINE_WIDTH = 390;
+const shortestSide = Math.min(Dimensions.get('window').width, Dimensions.get('window').height);
+const widthScale = Math.min(1.3, Math.max(0.9, shortestSide / BASELINE_WIDTH));
+
+/** Moderate, clamped, pixel-snapped scale of a base size. factor 0 = no scaling, 1 = full width scaling. */
+export function scaleSize(size: number, factor = 0.5): number {
+  return PixelRatio.roundToNearestPixel(size + (size * widthScale - size) * factor);
+}
+/** Type scale — same as scaleSize but never below the 12px readability floor (see fontSize note). */
+function fontScale(size: number): number {
+  return Math.max(12, scaleSize(size));
+}
+
 export const spacing = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  xxl: 28,
+  xs: scaleSize(4),
+  sm: scaleSize(8),
+  md: scaleSize(12),
+  lg: scaleSize(16),
+  xl: scaleSize(20),
+  xxl: scaleSize(28),
 } as const;
 
 export const radius = {
@@ -99,13 +120,13 @@ export const radius = {
  * to older, checking the app one-handed — and clips first when the system font size is raised.
  */
 export const fontSize = {
-  caption: 12,
-  body: 13,
-  bodyLarge: 14,
-  subheading: 15,
-  heading: 17,
-  title: 20,
-  display: 26,
+  caption: fontScale(12),
+  body: fontScale(13),
+  bodyLarge: fontScale(14),
+  subheading: fontScale(15),
+  heading: fontScale(17),
+  title: fontScale(20),
+  display: fontScale(26),
 } as const;
 
 /** Serif display face used for names, greetings and card titles. */

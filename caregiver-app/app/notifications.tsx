@@ -25,7 +25,7 @@ import {
   markNotificationReadV1,
   type V1Notification,
 } from '../src/lib/v1Client';
-import { colors, spacing, radius, fontSize, fontFamily, MIN_TOUCH_TARGET } from '../src/theme';
+import { colors, spacing, radius, fontSize, fontFamily, scaleSize, MIN_TOUCH_TARGET } from '../src/theme';
 
 // The alert feed is the authoritative v1 read model (GET /api/v1/notifications), produced by the
 // server's end-of-day evaluation. It replaced a legacy `/notifications?nurseId=` endpoint that never
@@ -161,7 +161,7 @@ export default function NotificationsScreen() {
   const header = (
     <View style={styles.headerBlock}>
       <View style={styles.header}>
-        <Text style={styles.title}>Alerts</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={1.3}>Alerts</Text>
         <TouchableOpacity
           accessibilityLabel="Refresh alerts"
           accessibilityRole="button"
@@ -208,7 +208,7 @@ export default function NotificationsScreen() {
             <View style={styles.testIcon}>
               <Feather name="bell" size={24} color={colors.accent} />
             </View>
-            <Text style={styles.testTitle}>Alerts on this phone</Text>
+            <Text style={styles.testTitle} maxFontSizeMultiplier={1.3}>Alerts on this phone</Text>
             <Text style={styles.testText}>
               Register this phone so Reflexion can reach you here. Your alerts always appear in the list on
               the Notifications tab, whether or not this phone is registered.
@@ -316,7 +316,7 @@ function AlertsPlaceholder({
     return (
       <View style={styles.emptyState}>
         <ActivityIndicator color={colors.accent} />
-        <Text style={styles.emptyTitle}>Loading alerts</Text>
+        <Text style={styles.emptyTitle} maxFontSizeMultiplier={1.3}>Loading alerts</Text>
       </View>
     );
   }
@@ -327,7 +327,7 @@ function AlertsPlaceholder({
         <View style={styles.emptyIcon}>
           <Feather name="lock" size={28} color={colors.accent} />
         </View>
-        <Text style={styles.emptyTitle}>Sign in again to see alerts</Text>
+        <Text style={styles.emptyTitle} maxFontSizeMultiplier={1.3}>Sign in again to see alerts</Text>
         <Text style={styles.emptyText}>
           Your alerts are kept private to your account. Signing out and back in will reconnect them.
         </Text>
@@ -341,7 +341,7 @@ function AlertsPlaceholder({
         <View style={styles.emptyIcon}>
           <Feather name="cloud-off" size={28} color={colors.accent} />
         </View>
-        <Text style={styles.emptyTitle}>We could not load your alerts</Text>
+        <Text style={styles.emptyTitle} maxFontSizeMultiplier={1.3}>We could not load your alerts</Text>
         <Text style={styles.emptyText}>
           This is usually a connection problem, not something about your loved one.
         </Text>
@@ -357,7 +357,7 @@ function AlertsPlaceholder({
       <View style={styles.emptyIcon}>
         <Feather name="bell" size={28} color={colors.accent} />
       </View>
-      <Text style={styles.emptyTitle}>No alerts yet</Text>
+      <Text style={styles.emptyTitle} maxFontSizeMultiplier={1.3}>No alerts yet</Text>
       <Text style={styles.emptyText}>
         Nothing needs your attention right now. We will let you know here if that changes.
       </Text>
@@ -573,8 +573,8 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     width: 56,
   },
-  testTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 21, fontWeight: '600' },
-  testText: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 20, marginTop: spacing.sm, textAlign: 'center' },
+  testTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(21), fontWeight: '600' },
+  testText: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: scaleSize(20), marginTop: spacing.sm, textAlign: 'center' },
   testButton: {
     alignItems: 'center',
     backgroundColor: colors.accent,
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
   },
   testButtonDisabled: { opacity: 0.72 },
   testButtonText: { color: colors.text.onAccent, fontSize: fontSize.bodyLarge, fontWeight: '700' },
-  testMessage: { color: '#5E554E', fontSize: fontSize.body, lineHeight: 19, marginTop: spacing.md, textAlign: 'center' },
+  testMessage: { color: '#5E554E', fontSize: fontSize.body, lineHeight: scaleSize(19), marginTop: spacing.md, textAlign: 'center' },
   card: {
     backgroundColor: colors.surface.card,
     borderColor: '#ECE4D9',
@@ -623,9 +623,9 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     flex: 1,
     fontFamily: fontFamily.display,
-    fontSize: 18,
+    fontSize: scaleSize(18),
     fontWeight: '600',
-    lineHeight: 23,
+    lineHeight: scaleSize(23),
   },
   unreadDot: {
     backgroundColor: colors.accent,
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
     width: 9,
   },
   patientName: { color: '#5E554E', fontSize: fontSize.body, fontWeight: '700', marginTop: 3 },
-  bodyText: { color: '#3C342E', fontSize: fontSize.bodyLarge, lineHeight: 20, marginTop: 10 },
+  bodyText: { color: '#3C342E', fontSize: fontSize.bodyLarge, lineHeight: scaleSize(20), marginTop: 10 },
   metaRow: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm, marginTop: 14 },
   metaText: { color: '#746B63', fontSize: fontSize.caption, fontWeight: '600' },
   metaDot: { backgroundColor: colors.border.strong, borderRadius: 2, height: 4, width: 4 },
@@ -693,8 +693,8 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     width: 68,
   },
-  emptyTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: 22, fontWeight: '600', marginTop: 10 },
-  emptyText: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 20, marginTop: spacing.sm, textAlign: 'center' },
+  emptyTitle: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(22), fontWeight: '600', marginTop: 10 },
+  emptyText: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: scaleSize(20), marginTop: spacing.sm, textAlign: 'center' },
   footer: { alignItems: 'center', minHeight: 58, paddingTop: 10 },
   loadMoreButton: {
     backgroundColor: colors.accent,
