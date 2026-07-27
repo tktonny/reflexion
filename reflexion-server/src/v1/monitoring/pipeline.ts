@@ -167,19 +167,65 @@ async function evaluateIdentity(db: Db, session: Record<string, any>) {
     : { verdict: 'exclude', confidence: 0, method: 'device_assignment_only', reasons: ['DEVICE_ASSIGNMENT_INVALID'], enrollmentRef: null }
 }
 
+/**
+ * Two tiers per signal: a floor below which there is genuinely nothing to analyse, and an "ideal" bar that
+ * only marks a session as thin. Falling under the ideal bar is a caveat, not a rejection.
+ *
+ * The single-tier version of this rejected 5 of 8 real daily check-ins in production (38% usable), and it
+ * was rejecting good ones. Two examples from `quality_assessments` on 2026-07-26:
+ *
+ *   4 turns, 26 tokens, 14_971 ms  -> rejected, 29 milliseconds under the 15 s bar
+ *   3 turns, 25 tokens, 13_626 ms  -> rejected on duration alone
+ *
+ * The first had MORE words than a session that passed with 22. Duration and word count are largely redundant
+ * measures of "did they say enough", so requiring both to clear a high bar, with any single miss discarding
+ * the whole session, throws away conversations that plainly happened.
+ *
+ * That matters because the operational baseline needs 12 usable sessions before it leaves `establishing`,
+ * and a discarded session contributes nothing — at 38% the caregiver would sit on a colourless status for
+ * months. `include_with_caveats` already feeds the baseline (routes/monitoring.ts filters on
+ * `include` OR `include_with_caveats`) while keeping the thinness on the record, so a short-but-real check-in
+ * can count without pretending it was a rich one.
+ *
+ * The floors stay strict enough to drop what is actually empty: the one production session at
+ * 3 turns / 9 tokens / 6_355 ms is still rejected, as is every session where the person never spoke.
+ *
+ * These bars are tuned for Singaporean elderly answering briefly in Singlish and Mandarin — `tokenCount`
+ * counts word-like segments, and the same answer yields fewer of them in Mandarin than in English, so a
+ * word floor set for English prose is the wrong instrument here.
+ */
+const MIN_PATIENT_TURNS = 3
+const TOKENS_FLOOR = 10
+const TOKENS_IDEAL = 15
+const SPEECH_MS_FLOOR = 8_000
+const SPEECH_MS_IDEAL = 15_000
+const MAX_CAREGIVER_SPEECH_RATIO = 0.35
+
+/** Flags that discard the session. Everything else rides along as a caveat and still reaches the baseline. */
+const SEVERE_QUALITY_FLAGS = [
+  'PATIENT_TURNS_INSUFFICIENT',
+  'TRANSCRIPT_COVERAGE_UNUSABLE',
+  'PATIENT_SPEECH_DURATION_UNUSABLE',
+  'LANGUAGE_MISMATCH',
+]
+
 export function evaluateSessionQuality(session: Record<string, any>, turns: TranscriptTurn[]) {
   const acquisition = session.acquisition || {}
   const patientTurns = turns.filter((turn) => turn.role === 'patient' && turn.text?.trim())
   const tokenCount = patientTurns.flatMap((turn) => Array.from(new Intl.Segmenter(undefined, { granularity: 'word' }).segment(turn.text || '')).filter((part) => part.isWordLike)).length
   const speechMs = typeof acquisition.patientSpeechMs === 'number' ? acquisition.patientSpeechMs : undefined
   const flags: string[] = []
-  if (patientTurns.length < 3) flags.push('PATIENT_TURNS_INSUFFICIENT')
-  if (tokenCount < 15) flags.push('TRANSCRIPT_COVERAGE_INSUFFICIENT')
+  if (patientTurns.length < MIN_PATIENT_TURNS) flags.push('PATIENT_TURNS_INSUFFICIENT')
+  // Each signal contributes at most one flag, so `flags.length` stays a count of distinct problems and the
+  // `overall` score below does not double-penalise a session for being far under one bar.
+  if (tokenCount < TOKENS_FLOOR) flags.push('TRANSCRIPT_COVERAGE_UNUSABLE')
+  else if (tokenCount < TOKENS_IDEAL) flags.push('TRANSCRIPT_COVERAGE_INSUFFICIENT')
   if (speechMs === undefined) flags.push('PATIENT_SPEECH_DURATION_UNAVAILABLE')
-  else if (speechMs < 15_000) flags.push('PATIENT_SPEECH_DURATION_INSUFFICIENT')
+  else if (speechMs < SPEECH_MS_FLOOR) flags.push('PATIENT_SPEECH_DURATION_UNUSABLE')
+  else if (speechMs < SPEECH_MS_IDEAL) flags.push('PATIENT_SPEECH_DURATION_INSUFFICIENT')
   if (acquisition.languageMismatch === true) flags.push('LANGUAGE_MISMATCH')
-  if (typeof acquisition.caregiverSpeechRatio === 'number' && acquisition.caregiverSpeechRatio > 0.35) flags.push('CAREGIVER_SPEECH_HIGH')
-  const severe = flags.some((flag) => ['PATIENT_TURNS_INSUFFICIENT', 'TRANSCRIPT_COVERAGE_INSUFFICIENT', 'PATIENT_SPEECH_DURATION_INSUFFICIENT', 'LANGUAGE_MISMATCH'].includes(flag))
+  if (typeof acquisition.caregiverSpeechRatio === 'number' && acquisition.caregiverSpeechRatio > MAX_CAREGIVER_SPEECH_RATIO) flags.push('CAREGIVER_SPEECH_HIGH')
+  const severe = flags.some((flag) => SEVERE_QUALITY_FLAGS.includes(flag))
   const overall = Math.max(0, 1 - flags.length * 0.2)
   return { verdict: severe ? 'repeat_requested' : flags.length ? 'include_with_caveats' : 'include',
     scores: { overall, patientTurns: patientTurns.length, tokenCount, patientSpeechMs: speechMs }, flags,
