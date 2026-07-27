@@ -39,4 +39,16 @@ npm run test:turn-taking
 
 The checked-out `android/` project includes the local `expo-pcm-audio` native module and release-signing guard. See [`docs/ANDROID_BUILD.md`](./docs/ANDROID_BUILD.md) for configuration, signing and APK/AAB commands.
 
+## Linux (Ubuntu) via Electron
+
+The same app also ships as a Linux desktop app — the web build (`react-native-web`) wrapped in Electron (`electron/`).
+
+```bash
+npm install                 # electron + electron-builder devDeps
+QWEN_API_KEY=sk-... npm run electron:dev     # run locally (export dist/ first: npm run electron:export)
+npm run electron:build      # → dist-linux/*.AppImage + *.deb
+```
+
+It's functionally lighter than Android (relay transport + Web Audio, tap-to-start, no native wake word). See [`../docs/mirror-app/linux-electron.md`](../docs/mirror-app/linux-electron.md) for the architecture, deployment and production-hardening notes.
+
 The production path is `ws` or `webrtc`. The local Node relay remains a web-development diagnostic only and is not needed by the Android release.

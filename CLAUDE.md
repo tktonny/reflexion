@@ -50,7 +50,10 @@ npm run test:turn-taking   # esbuild-bundle + node --test (only server/turn-taki
 npm run relay              # build src/orchestration bundle + start Node relay on :8787 (reads .env.server.local)
 node --env-file=.env.server.local server/smoke.mjs   # headless relay→Qwen check, no mic (more smoke-*.mjs alongside)
 cd android && ./gradlew assembleRelease              # signed release APK (fails by design without REFLEXION_MIRROR_* signing env/Keychain)
+npm run electron:build     # Linux (Ubuntu) app: web build wrapped in Electron → dist-linux/*.AppImage + *.deb (see docs/mirror-app/linux-electron.md)
 ```
+
+The mirror ships on two platforms from one codebase: **Android** (native APK) and **Linux/Ubuntu** (Electron wrapping the `react-native-web` build — `electron/`, `web.output: single`). The Linux build is functionally lighter: `relay` transport + Web-Audio (no native PCM/wake-word/direct-WS), and the relay holds a Qwen key as appliance config. Full detail in `docs/mirror-app/linux-electron.md`.
 
 Wake-word retraining lives in `wakeword-training/` (own Python venv, fully local Apple-Silicon pipeline) — see its README; the custom "Hello Aria" model is already swapped into `assets/wakeword/wakeword.onnx`.
 

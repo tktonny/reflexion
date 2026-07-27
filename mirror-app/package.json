@@ -16,7 +16,10 @@
     "smoke:turn-taking-provider": "esbuild server/smoke-turn-taking-provider.ts --bundle --platform=node --format=esm --packages=external --outfile=server/generated/smoke-turn-taking-provider.mjs && node --env-file=.env.server.local server/generated/smoke-turn-taking-provider.mjs",
     "smoke:vision": "node --env-file=.env.server.local server/smoke-vision.mjs",
     "test:turn-taking": "esbuild server/turn-taking.test.ts --bundle --platform=node --format=esm --sourcemap --outfile=server/generated/turn-taking.test.mjs && node --test --experimental-test-coverage server/generated/turn-taking.test.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "electron:export": "expo export --platform web",
+    "electron:dev": "electron electron/main.js",
+    "electron:build": "npm run electron:export && npm run build:orch && electron-builder --linux AppImage deb"
   },
   "dependencies": {
     "@config-plugins/react-native-webrtc": "^15.0.1",
@@ -49,7 +52,21 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
     "esbuild": "^0.28.1",
     "typescript": "~6.0.3"
+  },
+  "build": {
+    "appId": "com.reflexion.mirror",
+    "productName": "Reflexion Mirror",
+    "extraMetadata": { "main": "electron/main.js" },
+    "files": ["electron/**/*", "dist/**/*", "server/**/*", "package.json"],
+    "directories": { "output": "dist-linux" },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility",
+      "executableName": "reflexion-mirror"
+    }
   }
 }
