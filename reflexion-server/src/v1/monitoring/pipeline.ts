@@ -261,6 +261,32 @@ function combineGates(consent: string, identity: string, quality: string) {
   return 'include'
 }
 
+/**
+ * OPEN QUESTION, deliberately left alone (raised 2026-07-27, deferred for a product/clinical decision).
+ *
+ * The quality gate does not filter the baseline it exists to protect. The gate decides whether this function
+ * is called at all — an excluded session returns before reaching it — but once called, the rebuild recomputes
+ * over EVERY daily check-in carrying a `localCompletedAt`, taking no account of inclusion. So a session the
+ * gate rejected as unusable still contributes its speech duration, turn count and latency to the median+MAD
+ * that later decides whether someone "spoke less than usual". A real example from production: 3 turns,
+ * 9 tokens, 6.4 seconds — rejected by the gate, present in the aggregate.
+ *
+ * There are two notions of "baseline" here and only one is gated: this one reads raw `sessions.acquisition`,
+ * while the longitudinal/research baseline reads `feature_snapshots` filtered on
+ * `inclusion: {$in: ['include','include_with_caveats']}`.
+ *
+ * Not fixed on sight because it is a judgement, not an oversight to correct: adding an inclusion filter
+ * changes status computation for every patient, and it turns on what the baseline should represent — "how
+ * this person usually is" (exclude unusable samples) or "everything this person has said" (today's
+ * behaviour). A middle option is to exclude only the floor tier (`*_UNUSABLE`, essentially contentless) and
+ * keep the caveat tier, so near-empty sessions cannot drag the baseline down without shrinking the sample
+ * far enough to distort it. Whoever picks this up should produce the three-way comparison on real sessions
+ * first rather than deciding from the code.
+ *
+ * Unrelated and NOT a defect: a baseline sitting in `establishing` is usually waiting on
+ * operationalEligibility's `observedDays >= 14` — fourteen days since the first check-in — not on the
+ * session count.
+ */
 async function rebuildOperationalBaseline(db: Db, session: Record<string, any>, correlationId: string) {
   const rows = await db.collection<any>(collections.sessions).find({
     tenantId: session.tenantId, patientId: session.patientId, type: 'daily_checkin', localCompletedAt: { $exists: true },
