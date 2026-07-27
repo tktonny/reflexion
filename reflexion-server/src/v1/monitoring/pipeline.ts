@@ -393,9 +393,18 @@ async function upsertMonitoringWindow(db: Db, session: Record<string, any>, incl
     inclusion, status: displayState, action: displayState === 'repeat_needed' ? 'repeat_session' : displayState === 'review_pending' ? 'provider_review' : 'none',
     ruleVersion: RULE_VERSION, sourceScoreId: anomaly?._id, updatedAt: new Date(),
   }
+  // `_id` has to be split out. The filter is keyed on (tenant, patient, windowEnd, ruleVersion) with no
+  // revision in it, so re-running the pipeline over a session it has already processed MATCHES the existing
+  // window — and `$set` carrying a freshly minted `_id` then makes MongoDB throw "Performing an update on
+  // the path '_id' would modify the immutable field '_id'". Every retry hit the same wall, so the session
+  // exhausted its 8 attempts and landed in processing_failed with the event in the dead-letter queue.
+  //
+  // Nothing exercised this until a threshold change made re-processing worth doing, because the pipeline
+  // otherwise only ever sees a given session once.
+  const { _id, ...mutable } = document
   await db.collection<any>(collections.monitoringWindows).updateOne({
     tenantId: session.tenantId, patientId: session.patientId, windowEnd, ruleVersion: RULE_VERSION,
-  }, { $set: document }, { upsert: true })
+  }, { $set: mutable, $setOnInsert: { _id } }, { upsert: true })
   return document
 }
 
