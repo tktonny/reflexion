@@ -43,7 +43,12 @@ const SCREENS = [
   { id: 'f-session-history', route: `/session-history/${PATIENT_A}`,             wait: null },
   { id: 'g-day-detail',      route: `/session-history/${PATIENT_A}/2026-07-27`,  wait: null },
   { id: 'h-trend',           route: `/trend/${PATIENT_A}`,                       wait: null },
-  { id: 'i-sign-in',         route: '/sign-in',                                  wait: 'Sign in', anonymous: true },
+  { id: 'c2-set-account',    route: '/settings/account',                        wait: null },
+  { id: 'c3-set-notifs',     route: '/settings/notifications',                  wait: null },
+  { id: 'c4-set-loved',      route: '/settings/loved-ones',                     wait: null },
+  { id: 'c5-set-privacy',    route: '/settings/privacy',                        wait: null },
+  { id: 'c6-set-support',    route: '/settings/support',                        wait: null },
+  { id: 'i-sign-in',         route: '/sign-in',                                 wait: 'Sign in', anonymous: true },
   { id: 'j-onboarding',      route: '/onboarding',                               wait: null, anonymous: true },
 ]
 
@@ -95,7 +100,14 @@ const report = []
       })
       page.on('pageerror', (error) => report.push(`  ! ${device.id}/${screen.id} pageerror: ${String(error.message).slice(0, 120)}`))
 
-      if (!screen.anonymous) {
+      if (screen.anonymous) {
+        // Pages share one browser context, so a session written for an earlier screen is still in
+        // localStorage — which sent /sign-in straight to the dashboard and had every signed-out shot
+        // silently capture Home instead. Clearing it here is what makes "anonymous" actually anonymous.
+        await page.evaluateOnNewDocument(() => {
+          try { localStorage.clear() } catch { /* first document may have no storage yet */ }
+        })
+      } else {
         await page.evaluateOnNewDocument((v1, auth) => {
           localStorage.setItem('reflexion.v1Session', JSON.stringify(v1))
           localStorage.setItem('reflexion.authSession', JSON.stringify(auth))

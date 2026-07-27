@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { getStoredAuthSession } from '../../src/lib/authSession';
 import { PatientEditModal } from '../../src/screens/settings/PatientEditModal';
 import { SettingsPlaceholder } from '../../src/screens/settings/SettingsPlaceholder';
-import { ActionRow, SectionHeader } from '../../src/screens/settings/SettingsRows';
+import { ActionRow, SectionHeader, SettingsGroup } from '../../src/screens/settings/SettingsRows';
 import { SettingsSubPage } from '../../src/screens/settings/SettingsSubPage';
 import { formatLanguage, parsePatientAge, resolveSettingsState, toPatientForm } from '../../src/screens/settings/helpers';
 import type { PatientForm } from '../../src/screens/settings/types';
@@ -59,7 +59,8 @@ export default function LovedOnesSettingsScreen() {
       title="Your loved ones"
     >
       <SectionHeader title={patients.length === 1 ? '1 person' : `${patients.length} people`} />
-      {patients.map((patient) => (
+      <SettingsGroup>
+        {patients.map((patient) => (
         <ActionRow
           fallbackName={patient.name}
           imageUrl={patient.photoUrl}
@@ -70,11 +71,12 @@ export default function LovedOnesSettingsScreen() {
           onPress={() => setEditing(toPatientForm(patient))}
           value={describe(patient)}
         />
-      ))}
-      <ActionRow
-        label="Add a loved one"
-        onPress={() => router.push('/onboarding?mode=add-patient&returnTo=settings')}
-      />
+        ))}
+        <ActionRow
+          label="Add a loved one"
+          onPress={() => router.push('/onboarding?mode=add-patient&returnTo=settings')}
+        />
+      </SettingsGroup>
 
       <PatientEditModal
         isSaving={save.isPending}

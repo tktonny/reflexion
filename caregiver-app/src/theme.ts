@@ -61,6 +61,21 @@ export const colors = {
     text: '#8A2E2E',
   },
 
+  /**
+   * Accents for the two alert types that are NOT a caregiver status.
+   *
+   * Every other alert type reads its colour from STATUS_META in v1Status.ts, which is the authoritative
+   * palette. These two have nothing to read: "later than usual" and "connection issue" describe an event and
+   * a device, not how somebody is — so borrowing a status colour would say the wrong thing, and inventing one
+   * per component is how a second status vocabulary starts. They live here instead, named for what they mean.
+   *
+   * Used for an icon and a card's left stripe only, never for words, so 3:1 is the bar they have to clear.
+   */
+  alertAccent: {
+    laterThanUsual: '#8B6A92',
+    connection: '#6F7F92',
+  },
+
   /** Unselected tab-bar label. Was #8D8278 (3.75:1 on white) — text, so it has to clear AA. */
   tabInactive: '#776C62',
 

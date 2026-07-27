@@ -8,7 +8,7 @@ import { clearCaregiverCache } from '../../src/lib/queryKeys';
 import { useTabBarClearance } from '../../src/lib/useTabBarClearance';
 import { v1Logout } from '../../src/lib/v1Client';
 import { SettingsPlaceholder } from '../../src/screens/settings/SettingsPlaceholder';
-import { ActionRow, SectionHeader } from '../../src/screens/settings/SettingsRows';
+import { ActionRow, SectionHeader, SettingsGroup } from '../../src/screens/settings/SettingsRows';
 import { resolveSettingsState } from '../../src/screens/settings/helpers';
 import type { AlertSensitivity, SettingsConfig, SummaryTime } from '../../src/screens/settings/types';
 import { useCaregiverSettings } from '../../src/screens/settings/useCaregiverSettings';
@@ -102,31 +102,37 @@ export default function SettingsScreen() {
         ) : (
           <>
             <SectionHeader title="You" />
-            <ActionRow
-              label="Your account"
-              onPress={() => router.push('/settings/account')}
-              value={config?.caregiverName || session?.name || ''}
-            />
-            <ActionRow
-              label="Notifications"
-              onPress={() => router.push('/settings/notifications')}
-              value={config ? notificationSummary(config) : ''}
-            />
+            <SettingsGroup>
+              <ActionRow
+                label="Your account"
+                onPress={() => router.push('/settings/account')}
+                value={config?.caregiverName || session?.name || ''}
+              />
+              <ActionRow
+                label="Notifications"
+                onPress={() => router.push('/settings/notifications')}
+                value={config ? notificationSummary(config) : ''}
+              />
+            </SettingsGroup>
 
             <SectionHeader title="Care" />
-            <ActionRow
-              label="Your loved ones"
-              onPress={() => router.push('/settings/loved-ones')}
-              value={config ? lovedOnesSummary(config) : ''}
-            />
-            <ActionRow
-              label="Mirrors"
-              onPress={() => router.push('/mirror-management')}
-            />
+            <SettingsGroup>
+              <ActionRow
+                label="Your loved ones"
+                onPress={() => router.push('/settings/loved-ones')}
+                value={config ? lovedOnesSummary(config) : ''}
+              />
+              <ActionRow
+                label="Mirrors"
+                onPress={() => router.push('/mirror-management')}
+              />
+            </SettingsGroup>
 
             <SectionHeader title="More" />
-            <ActionRow label="Privacy & data" onPress={() => router.push('/settings/privacy')} />
-            <ActionRow label="Help & support" onPress={() => router.push('/settings/support')} />
+            <SettingsGroup>
+              <ActionRow label="Privacy & data" onPress={() => router.push('/settings/privacy')} />
+              <ActionRow label="Help & support" onPress={() => router.push('/settings/support')} />
+            </SettingsGroup>
 
             <TouchableOpacity
               accessibilityLabel="Sign out"

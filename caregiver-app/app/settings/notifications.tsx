@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { getStoredAuthSession } from '../../src/lib/authSession';
 import { SettingsPlaceholder } from '../../src/screens/settings/SettingsPlaceholder';
-import { PickerRow, SectionHeader, SwitchRow } from '../../src/screens/settings/SettingsRows';
+import { PickerRow, SectionHeader, SettingsGroup, SwitchRow } from '../../src/screens/settings/SettingsRows';
 import { SettingsSubPage } from '../../src/screens/settings/SettingsSubPage';
 import { resolveSettingsState } from '../../src/screens/settings/helpers';
 import type { AlertSensitivity, SummaryTime } from '../../src/screens/settings/types';
@@ -66,23 +66,29 @@ export default function NotificationSettingsScreen() {
       title="Notifications"
     >
       <SectionHeader title="On this phone" />
-      <SwitchRow label="Enable push notifications" onChange={setPushEnabled} value={pushEnabled} />
+      <SettingsGroup>
+        <SwitchRow label="Enable push notifications" onChange={setPushEnabled} value={pushEnabled} />
+      </SettingsGroup>
 
       <SectionHeader title="Daily summary" />
-      <PickerRow
-        label="When to send it"
-        onSelect={(value) => setSummaryTime(value as SummaryTime)}
-        options={SUMMARY_TIMES}
-        selected={summaryTime}
-      />
+      <SettingsGroup>
+        <PickerRow
+          label="When to send it"
+          onSelect={(value) => setSummaryTime(value as SummaryTime)}
+          options={SUMMARY_TIMES}
+          selected={summaryTime}
+        />
+      </SettingsGroup>
 
       <SectionHeader title="How much to tell you" />
-      <PickerRow
-        label="Alert sensitivity"
-        onSelect={(value) => setSensitivity(value as AlertSensitivity)}
-        options={SENSITIVITIES}
-        selected={sensitivity}
-      />
+      <SettingsGroup>
+        <PickerRow
+          label="Alert sensitivity"
+          onSelect={(value) => setSensitivity(value as AlertSensitivity)}
+          options={SENSITIVITIES}
+          selected={sensitivity}
+        />
+      </SettingsGroup>
     </SettingsSubPage>
   );
 }
