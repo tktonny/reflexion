@@ -47,15 +47,20 @@ async function main() {
 
   // ── 1. Reprocess the check-ins the old quality gate discarded ───────────────────────────────────
   heading('1. Re-run the pipeline on check-ins the old thresholds rejected')
+  // processing_failed is included on purpose. The first run of this script tripped a latent bug in
+  // upsertMonitoringWindow (a `$set` carrying a fresh _id matched the window the previous pass had written,
+  // which MongoDB refuses), so the sessions retried to death and landed there with their events in the
+  // dead-letter queue. They are still the sessions we want re-run, just from a different state now.
   const excluded = await db.collection('sessions').find({
-    type: 'daily_checkin', state: 'excluded',
-  }, { projection: { patientId: 1, createdAt: 1, processingSummary: 1, latestProcessingRevision: 1 } })
+    type: 'daily_checkin', state: { $in: ['excluded', 'processing_failed'] },
+  }, { projection: { patientId: 1, createdAt: 1, processingSummary: 1, latestProcessingRevision: 1, state: 1 } })
     .sort({ createdAt: 1 }).toArray()
 
   console.log(`excluded daily check-ins: ${excluded.length}`)
   for (const session of excluded) {
     const flags = session.processingSummary?.qualityFlags || []
-    console.log(`  ${iso(session.createdAt)}  ${session._id}  patient=${session.patientId}  flags=[${flags.join(',')}]`)
+    const failure = session.processingSummary?.lastError ? `  lastError=${String(session.processingSummary.lastError).slice(0, 70)}` : ''
+    console.log(`  ${iso(session.createdAt)}  ${session._id}  ${String(session.state).padEnd(17)} patient=${session.patientId}  flags=[${flags.join(',')}]${failure}`)
   }
   if (!excluded.length) {
     console.log('  nothing to do')
@@ -64,7 +69,7 @@ async function main() {
     // refuses to reprocess anything already completed/excluded/review_pending, which is why the state has to
     // move first. Every write it then makes is an upsert keyed by a fresh revision, so this is safe to repeat.
     for (const session of excluded) {
-      await db.collection('sessions').updateOne({ _id: session._id, state: 'excluded' }, {
+      await db.collection('sessions').updateOne({ _id: session._id, state: session.state }, {
         $set: { state: 'ingesting', updatedAt: new Date() }, $inc: { stateVersion: 1 },
       })
       await db.collection('outbox_events').insertOne({
