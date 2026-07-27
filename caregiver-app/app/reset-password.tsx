@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { apiSend } from '../src/lib/apiClient';
-import { passwordResetMessage } from '../src/lib/authMessages';
+import { v1Post } from '../src/lib/v1Client';
+import { MIN_PASSWORD_LENGTH, passwordResetMessage } from '../src/lib/authMessages';
 import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
 
 // Reset-completion screen. Reached from the emailed link caregiver-app://reset-password?token=... (or
@@ -29,14 +29,11 @@ export default function ResetPasswordScreen() {
   async function submit() {
     if (submitting) return;
     if (!token) { setError('This reset link is missing its token. Open the link from your email again.'); return; }
-    if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+    if (password.length < MIN_PASSWORD_LENGTH) { setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`); return; }
     setSubmitting(true);
     setError('');
     try {
-      await apiSend('/api/auth/password-resets', {
-        method: 'POST',
-        body: JSON.stringify({ token, newPassword: password }),
-      });
+      await v1Post('/auth/password-resets', { token, newPassword: password });
       Alert.alert('Password updated', 'You can now sign in with your new password.');
       router.replace('/sign-in');
     } catch (err) {

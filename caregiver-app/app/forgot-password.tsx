@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { apiSend } from '../src/lib/apiClient';
+import { v1Post } from '../src/lib/v1Client';
 import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
 
 // Reserved forgot-password request screen. The backend always accepts (no account enumeration); the
@@ -27,10 +27,7 @@ export default function ForgotPasswordScreen() {
     if (submitting || !email.trim()) return;
     setSubmitting(true);
     try {
-      await apiSend('/api/auth/password-reset-requests', {
-        method: 'POST',
-        body: JSON.stringify({ email: email.trim() }),
-      });
+      await v1Post('/auth/password-reset-requests', { email: email.trim() });
     } catch {
       // The request is designed to always succeed; ignore transient errors so we don't reveal accounts.
     } finally {

@@ -6,8 +6,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useMutation } from '@tanstack/react-query';
-import { apiSend } from '../src/lib/apiClient';
 import { getStoredAuthSession } from '../src/lib/authSession';
+import { submitFeedbackV1 } from '../src/lib/v1Caregiver';
 import { colors, spacing, radius, fontSize, fontFamily, cardShadow, scaleSize } from '../src/theme';
 
 export default function FeedbackScreen() {
@@ -16,10 +16,9 @@ export default function FeedbackScreen() {
   const [message, setMessage] = useState('');
 
   const submit = useMutation({
-    mutationFn: () => apiSend<{ feedbackId: string }>('/api/feedback', {
-      method: 'POST',
-      body: JSON.stringify({ nurseId: session?.userId, message: message.trim() }),
-    }),
+    // v1 takes the author from the bearer token; the legacy route took a nurseId in the body, which any
+    // caller who knew a valid id could supply.
+    mutationFn: () => submitFeedbackV1(message.trim()),
     onSuccess: () => {
       setMessage('');
       Alert.alert('Thank you', 'Your feedback has been sent. We read every message.', [

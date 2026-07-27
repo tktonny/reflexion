@@ -1,4 +1,5 @@
 import React from 'react';
+import { MIN_PASSWORD_LENGTH } from '../../lib/authMessages';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { colors, fontSize, MIN_TOUCH_TARGET } from '../../theme';
 import { fieldStyles, Label, OptionGrid } from './fields';
@@ -50,7 +51,7 @@ export function AccountStep({
 
       <Label>Password</Label>
       <TextInput
-        accessibilityLabel="Password, at least 8 characters"
+        accessibilityLabel={`Password, at least ${MIN_PASSWORD_LENGTH} characters`}
         autoCapitalize="none"
         onChangeText={(password) => setAccount((current) => ({ ...current, password }))}
         placeholder="Create a password"
