@@ -46,11 +46,11 @@ export default function AddMirrorConnectionScreen() {
   const [cameraNotice, setCameraNotice] = useState('');
   const [permission, requestPermission] = useCameraPermissions();
   const mirrorsQuery = useQuery({
-    enabled: Boolean(session?.nurseId),
-    queryKey: ['mirrors', session?.nurseId || ''],
+    enabled: Boolean(session?.userId),
+    queryKey: ['mirrors', session?.userId || ''],
     queryFn: async () => {
       const body = await apiGet<{ patients?: MirrorPatient[] }>(
-        `/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session?.nurseId || '')}`,
+        `/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session?.userId || '')}`,
       );
       return Array.isArray(body?.patients) ? body.patients : [];
     },
@@ -58,10 +58,10 @@ export default function AddMirrorConnectionScreen() {
   const { refetch: refetchMirrors } = mirrorsQuery;
   useFocusEffect(
     useCallback(() => {
-      if (session?.nurseId) {
+      if (session?.userId) {
         void refetchMirrors();
       }
-    }, [refetchMirrors, session?.nurseId]),
+    }, [refetchMirrors, session?.userId]),
   );
   const connectMirrorMutation = useMutation({
     mutationFn: (body: unknown) => apiSend('/api/nurse-patient-config/mirrors/connect', {
@@ -69,7 +69,7 @@ export default function AddMirrorConnectionScreen() {
       body: JSON.stringify(body),
     }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.nurseId || ''] });
+      await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.userId || ''] });
       await invalidateCaregiverConfig(queryClient);
       router.replace('/mirror-management');
     },
@@ -89,7 +89,7 @@ export default function AddMirrorConnectionScreen() {
   // otherwise replace the whole pairing form — mirror name, the code the caregiver has already typed, the
   // Scan QR button — with an error card, even though everything needed to pair is right there and the
   // POST would still succeed.
-  const pairingState: PairingState = !session?.nurseId
+  const pairingState: PairingState = !session?.userId
     ? 'signed-out'
     : patient
       ? 'ready'
@@ -115,7 +115,7 @@ export default function AddMirrorConnectionScreen() {
   }
 
   async function saveConnection() {
-    if (!session?.nurseId || !patient || connectMirrorMutation.isPending) return;
+    if (!session?.userId || !patient || connectMirrorMutation.isPending) return;
 
     const normalizedPairingCode = pairingCode.replace(/\D/g, '');
     if (normalizedPairingCode.length !== 6) {
@@ -124,7 +124,7 @@ export default function AddMirrorConnectionScreen() {
     }
 
     connectMirrorMutation.mutate({
-      nurseId: session.nurseId,
+      nurseId: session.userId,
       patientId: patient.patientId,
       mirrorName: mirrorName.trim() || `Mirror for ${patient.patientName}`,
       pairingCode: normalizedPairingCode,

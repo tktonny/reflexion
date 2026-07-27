@@ -64,10 +64,10 @@ export default function HomeScreen() {
   const latestConfigQuery = useQuery({
     // The endpoint requires an explicit nurseId — without one it used to return an arbitrary caregiver's
     // record, so the query stays disabled rather than asking for "whoever is newest".
-    enabled: Boolean(session?.nurseId),
-    queryKey: caregiverConfigKey(session?.nurseId),
+    enabled: Boolean(session?.userId),
+    queryKey: caregiverConfigKey(session?.userId),
     queryFn: () => apiGet<LatestConfigResponse>(
-      `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(session?.nurseId || '')}`,
+      `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(session?.userId || '')}`,
     ),
   });
   const { refetch: refetchLatestConfig } = latestConfigQuery;
@@ -77,9 +77,9 @@ export default function HomeScreen() {
   // (the previous behaviour) left the dots frozen for as long as the process stayed alive.
   useFocusEffect(
     useCallback(() => {
-      if (session?.nurseId) void refetchLatestConfig();
+      if (session?.userId) void refetchLatestConfig();
       void invalidatePatientStatuses(queryClient);
-    }, [queryClient, refetchLatestConfig, session?.nurseId]),
+    }, [queryClient, refetchLatestConfig, session?.userId]),
   );
   const configuredPatients = Array.isArray(latestConfigQuery.data?.patients) ? latestConfigQuery.data.patients : [];
   const caregiverName = typeof latestConfigQuery.data?.caregiverName === 'string' ? latestConfigQuery.data.caregiverName : '';
@@ -264,7 +264,7 @@ export default function HomeScreen() {
             <LovedOnesPlaceholder
               hasError={Boolean(latestConfigQuery.error)}
               isLoading={latestConfigQuery.isLoading}
-              isSignedIn={Boolean(session?.nurseId)}
+              isSignedIn={Boolean(session?.userId)}
               onRetry={() => void latestConfigQuery.refetch()}
             />
           </View>

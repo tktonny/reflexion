@@ -18,7 +18,7 @@ export default function FeedbackScreen() {
   const submit = useMutation({
     mutationFn: () => apiSend<{ feedbackId: string }>('/api/feedback', {
       method: 'POST',
-      body: JSON.stringify({ nurseId: session?.nurseId, message: message.trim() }),
+      body: JSON.stringify({ nurseId: session?.userId, message: message.trim() }),
     }),
     onSuccess: () => {
       setMessage('');
@@ -31,7 +31,7 @@ export default function FeedbackScreen() {
     },
   });
 
-  const canSubmit = message.trim().length > 0 && !submit.isPending && Boolean(session?.nurseId);
+  const canSubmit = message.trim().length > 0 && !submit.isPending && Boolean(session?.userId);
 
   return (
     <SafeAreaView style={styles.safe}>

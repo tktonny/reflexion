@@ -76,7 +76,7 @@ export default function NotificationsScreen() {
 
   const notificationsQuery = useInfiniteQuery({
     enabled: canReadAlerts,
-    queryKey: notificationsQueryKey(session?.nurseId),
+    queryKey: notificationsQueryKey(session?.userId),
     initialPageParam: null as string | null,
     queryFn: ({ pageParam }) => listNotificationsV1({ limit: PAGE_SIZE, cursor: pageParam }),
     getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -93,10 +93,10 @@ export default function NotificationsScreen() {
   // Names/phones for the alert cards. Reuses the dashboard's cache entry, so in practice this costs no
   // extra request; v1 notifications carry only a patientId.
   const directoryQuery = useQuery({
-    enabled: Boolean(session?.nurseId),
-    queryKey: caregiverConfigKey(session?.nurseId),
+    enabled: Boolean(session?.userId),
+    queryKey: caregiverConfigKey(session?.userId),
     queryFn: () => apiGet<LatestConfigResponse>(
-      `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(session?.nurseId || '')}`,
+      `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(session?.userId || '')}`,
     ),
   });
 
@@ -121,7 +121,7 @@ export default function NotificationsScreen() {
     mutationFn: markNotificationReadV1,
     onSuccess: (updated) => {
       // Patch in place so the list does not jump while the caregiver is reading it.
-      queryClient.setQueryData<typeof notificationsQuery.data>(notificationsQueryKey(session?.nurseId), (current) => {
+      queryClient.setQueryData<typeof notificationsQuery.data>(notificationsQueryKey(session?.userId), (current) => {
         if (!current) return current;
         return {
           ...current,
@@ -217,9 +217,9 @@ export default function NotificationsScreen() {
               accessibilityLabel="Register this phone for alerts"
               accessibilityRole="button"
               activeOpacity={0.84}
-              disabled={registerDeviceMutation.isPending || !session?.nurseId}
-              onPress={() => registerDeviceMutation.mutate({ nurseId: session?.nurseId || '' })}
-              style={[styles.testButton, (registerDeviceMutation.isPending || !session?.nurseId) && styles.testButtonDisabled]}
+              disabled={registerDeviceMutation.isPending || !session?.userId}
+              onPress={() => registerDeviceMutation.mutate({ nurseId: session?.userId || '' })}
+              style={[styles.testButton, (registerDeviceMutation.isPending || !session?.userId) && styles.testButtonDisabled]}
             >
               {registerDeviceMutation.isPending ? (
                 <ActivityIndicator color={colors.text.onAccent} />

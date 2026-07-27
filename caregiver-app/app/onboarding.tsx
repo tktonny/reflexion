@@ -91,21 +91,21 @@ export default function OnboardingScreen() {
   }, [displayedPatientNumber, isAddPatientMode, selectedPatientIndex, step]);
 
   const existingConfigQuery = useQuery({
-    enabled: isAddPatientMode && Boolean(storedSession?.nurseId),
-    queryKey: caregiverConfigKey(storedSession?.nurseId),
+    enabled: isAddPatientMode && Boolean(storedSession?.userId),
+    queryKey: caregiverConfigKey(storedSession?.userId),
     queryFn: () =>
       apiGet<LatestConfigResponse>(
-        `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(storedSession?.nurseId || '')}`,
+        `/api/nurse-patient-config/latest?nurseId=${encodeURIComponent(storedSession?.userId || '')}`,
       ),
   });
   const { refetch: refetchExistingConfig } = existingConfigQuery;
 
   useFocusEffect(
     useCallback(() => {
-      if (isAddPatientMode && storedSession?.nurseId) {
+      if (isAddPatientMode && storedSession?.userId) {
         void refetchExistingConfig();
       }
-    }, [isAddPatientMode, refetchExistingConfig, storedSession?.nurseId]),
+    }, [isAddPatientMode, refetchExistingConfig, storedSession?.userId]),
   );
 
   useEffect(() => {
@@ -144,7 +144,7 @@ export default function OnboardingScreen() {
       apiSend<AddPatientsResponse>('/api/nurse-patient-config/add-patients', {
         method: 'PATCH',
         body: JSON.stringify({
-          nurseId: getStoredAuthSession()?.nurseId,
+          nurseId: getStoredAuthSession()?.userId,
           patients: patients.map((patient) => ({
             ...patient,
             age: Number(patient.age),
@@ -224,7 +224,7 @@ export default function OnboardingScreen() {
 
       if (body?.nurseId && body?.email) {
         await setStoredAuthSession({
-          nurseId: body.nurseId,
+          userId: body.nurseId,
           name: body.name || account.name.trim(),
           email: body.email,
         });
@@ -326,7 +326,7 @@ export default function OnboardingScreen() {
 
           {isAddPatientMode ? (
             <ExistingProfilesState
-              hasSession={Boolean(storedSession?.nurseId)}
+              hasSession={Boolean(storedSession?.userId)}
               isLoading={existingConfigQuery.isLoading}
               hasError={Boolean(existingConfigQuery.error)}
               onRetry={() => void refetchExistingConfig()}

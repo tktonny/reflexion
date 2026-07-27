@@ -38,11 +38,11 @@ export default function MirrorManagementScreen() {
   const queryClient = useQueryClient();
   const session = getStoredAuthSession();
   const mirrorsQuery = useQuery({
-    enabled: Boolean(session?.nurseId),
-    queryKey: ['mirrors', session?.nurseId || ''],
+    enabled: Boolean(session?.userId),
+    queryKey: ['mirrors', session?.userId || ''],
     queryFn: async () => {
       const body = await apiGet<{ patients?: MirrorPatient[] }>(
-        `/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session?.nurseId || '')}`,
+        `/api/nurse-patient-config/mirrors?nurseId=${encodeURIComponent(session?.userId || '')}`,
       );
       return Array.isArray(body?.patients) ? body.patients : [];
     },
@@ -55,11 +55,11 @@ export default function MirrorManagementScreen() {
       method: 'PATCH',
       body: JSON.stringify({
         ...body,
-        nurseId: session?.nurseId,
+        nurseId: session?.userId,
       }),
     }),
     onSuccess: async (result) => {
-      await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.nurseId || ''] });
+      await queryClient.invalidateQueries({ queryKey: ['mirrors', session?.userId || ''] });
       await invalidateCaregiverConfig(queryClient);
       showMessage(
         'Mirror unlinked',
@@ -79,10 +79,10 @@ export default function MirrorManagementScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (session?.nurseId) {
+      if (session?.userId) {
         void refetchMirrors();
       }
-    }, [refetchMirrors, session?.nurseId]),
+    }, [refetchMirrors, session?.userId]),
   );
 
   function confirmUnlink(patient: MirrorPatient) {
@@ -116,7 +116,7 @@ export default function MirrorManagementScreen() {
     action: 'unlink';
     patientId: string;
   }) {
-    if (!session?.nurseId || patchMirrorMutation.isPending) return;
+    if (!session?.userId || patchMirrorMutation.isPending) return;
     patchMirrorMutation.mutate(body);
   }
 
@@ -149,7 +149,7 @@ export default function MirrorManagementScreen() {
 
         {patients.length === 0 ? (
           <MirrorsPlaceholder
-            isSignedIn={Boolean(session?.nurseId)}
+            isSignedIn={Boolean(session?.userId)}
             isLoading={mirrorsQuery.isLoading}
             hasError={Boolean(mirrorsQuery.error)}
             onRetry={() => void mirrorsQuery.refetch()}

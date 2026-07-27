@@ -56,10 +56,10 @@ export default function SettingsScreen() {
   const [editingPatient, setEditingPatient] = useState<PatientForm | null>(null);
   const latestConfigQuery = useQuery({
     // nurseId is required by the endpoint — asking without one used to return an arbitrary caregiver.
-    enabled: Boolean(session?.nurseId),
-    queryKey: settingsConfigKey(session?.nurseId),
+    enabled: Boolean(session?.userId),
+    queryKey: settingsConfigKey(session?.userId),
     queryFn: async () => {
-      const query = `?nurseId=${encodeURIComponent(session?.nurseId || '')}`;
+      const query = `?nurseId=${encodeURIComponent(session?.userId || '')}`;
       const body = await apiGet<Record<string, unknown> & { patients?: unknown[] }>(`/api/nurse-patient-config/latest${query}`);
       return {
         nurseId: String(body?.nurseId || ''),
@@ -77,8 +77,8 @@ export default function SettingsScreen() {
   const { refetch: refetchLatestConfig } = latestConfigQuery;
   useFocusEffect(
     useCallback(() => {
-      if (session?.nurseId) void refetchLatestConfig();
-    }, [refetchLatestConfig, session?.nurseId]),
+      if (session?.userId) void refetchLatestConfig();
+    }, [refetchLatestConfig, session?.userId]),
   );
   const saveNurseMutation = useMutation({
     mutationFn: (body: unknown) => apiSend<SettingsConfig>('/api/nurse-patient-config/settings', {
@@ -91,7 +91,7 @@ export default function SettingsScreen() {
         if (!registration.ok) console.warn('[SettingsScreen] push registration failed', registration.reason);
       }
       await setStoredAuthSession({
-        nurseId: body.nurseId || config?.nurseId || '',
+        userId: body.nurseId || config?.nurseId || '',
         name: body.caregiverName || caregiverName,
         email: body.email || config?.email || '',
       });
@@ -187,7 +187,7 @@ export default function SettingsScreen() {
   }
 
   const settingsState = resolveSettingsState({
-    hasNurseId: Boolean(session?.nurseId),
+    hasNurseId: Boolean(session?.userId),
     hasFailed: Boolean(latestConfigQuery.error),
     hasSettings: Boolean(config?.nurseId || latestConfigQuery.data?.nurseId),
     isLoading: latestConfigQuery.isLoading,

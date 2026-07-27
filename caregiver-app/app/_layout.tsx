@@ -58,8 +58,8 @@ function AuthGate({ children }: { children: ReactNode }) {
     void Promise.all([loadStoredAuthSession(), loadV1Session()]).then(() => {
       if (!isMounted) return;
       const session = getStoredAuthSession();
-      if (session?.nurseId) {
-        registerDevice({ nurseId: session.nurseId });
+      if (session?.userId) {
+        registerDevice({ nurseId: session.userId });
       }
       setIsHydrated(true);
     });
