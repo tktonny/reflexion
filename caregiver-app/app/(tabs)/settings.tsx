@@ -12,7 +12,7 @@ import { ActionRow, SectionHeader } from '../../src/screens/settings/SettingsRow
 import { resolveSettingsState } from '../../src/screens/settings/helpers';
 import type { AlertSensitivity, SettingsConfig, SummaryTime } from '../../src/screens/settings/types';
 import { useCaregiverSettings } from '../../src/screens/settings/useCaregiverSettings';
-import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../../src/theme';
+import { colors, contentColumn, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../../src/theme';
 
 /*
  * Settings is a hub: every row navigates, and nothing here holds an unsaved value.
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: spacing.xl, paddingTop: spacing.lg, paddingBottom: spacing.sm },
   title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.display },
   // paddingBottom is supplied at render time from useTabBarClearance; a literal here was shorter than the bar.
-  content: { paddingTop: spacing.sm },
+  content: { ...contentColumn, paddingTop: spacing.sm },
   signOutButton: {
     alignItems: 'center',
     borderColor: colors.border.strong,

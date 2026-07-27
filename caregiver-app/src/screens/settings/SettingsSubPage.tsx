@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../../theme';
+import { colors, contentColumn, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../../theme';
 
 /**
  * The chrome every settings sub-page shares: a back header, a scroll body, and — only for pages that own
@@ -57,7 +57,8 @@ export function SettingsSubPage({
       </ScrollView>
 
       {onSave ? (
-        <View style={styles.footer}>
+        <View style={styles.footerBar}>
+          <View style={styles.footer}>
           <TouchableOpacity
             // Spelled out because the spinner replaces the visible text while saving.
             accessibilityLabel={isSaving ? 'Saving' : saveLabel}
@@ -70,7 +71,8 @@ export function SettingsSubPage({
             {isSaving
               ? <ActivityIndicator color={colors.text.onAccent} />
               : <Text style={styles.saveButtonText}>{saveLabel}</Text>}
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
         </View>
       ) : null}
     </SafeAreaView>
@@ -98,7 +100,7 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.display,
     fontSize: fontSize.title,
   },
-  content: { paddingBottom: spacing.xxl },
+  content: { ...contentColumn, paddingBottom: spacing.xxl },
   subtitle: {
     color: colors.text.secondary,
     fontSize: fontSize.body,
@@ -108,10 +110,9 @@ const styles = StyleSheet.create({
   },
   // The button sits outside the ScrollView so it cannot be scrolled away from — on a short screen the old
   // in-flow button could be below the fold with nothing indicating it was there.
+  footerBar: { backgroundColor: colors.surface.page, borderTopColor: colors.border.default, borderTopWidth: 1 },
   footer: {
-    backgroundColor: colors.surface.page,
-    borderTopColor: colors.border.default,
-    borderTopWidth: 1,
+    ...contentColumn,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.md,
   },

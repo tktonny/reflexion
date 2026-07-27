@@ -4,7 +4,7 @@ import { useContext } from 'react';
 // that vendored copy; if an expo-router upgrade moves it, this falls back to the theme constant rather than
 // crashing, and the fallback is only wrong by the safe-area inset.
 import { BottomTabBarHeightContext } from 'expo-router/build/react-navigation/bottom-tabs';
-import { tabBar } from '../theme';
+import { tabBarClearanceFallback } from '../theme';
 
 /**
  * How much room a scrolling tab screen must leave at the bottom of its content.
@@ -18,5 +18,7 @@ import { tabBar } from '../theme';
  */
 export function useTabBarClearance(): number {
   const measured = useContext(BottomTabBarHeightContext);
-  return typeof measured === 'number' ? measured + tabBar.paddingBottom : tabBar.clearance;
+  // The measured height is the bar itself; a proportional margin on top keeps content that ends exactly at
+  // its edge from reading as clipped, and scales with the bar instead of being a typed constant.
+  return typeof measured === 'number' ? Math.round(measured * 1.12) : tabBarClearanceFallback();
 }

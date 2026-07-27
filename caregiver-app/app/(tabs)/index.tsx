@@ -23,7 +23,7 @@ import {
   formatLastInteraction,
 } from '../../src/lib/v1Status';
 import {
-  colors, spacing, radius, fontSize, fontFamily, cardShadow, MIN_TOUCH_TARGET, scaleSize,
+  colors, spacing, radius, fontSize, fontFamily, cardShadow, contentColumn, MIN_TOUCH_TARGET, scaleSize,
 } from '../../src/theme';
 
 // Summary-strip dots use the authoritative Option-1 status palette (baseline §2.9).
@@ -166,13 +166,12 @@ export default function HomeScreen() {
         {statusNotice !== 'none' ? (
           <StatusNotice notice={statusNotice} onRetry={retryStatuses} />
         ) : (
-          <View style={styles.summaryStrip}>
-            <SummaryChip dot={STATUS_DOT.green} count={doingWell} label="Doing well" pending={statusesLoading} />
-            <View style={styles.divider} />
-            <SummaryChip dot={STATUS_DOT.yellow} count={checkIn} label="Worth checking" pending={statusesLoading} />
-            <View style={styles.divider} />
-            <SummaryChip dot={STATUS_DOT.red} count={attention} label="Needs attention" pending={statusesLoading} />
-          </View>
+          <StatusSummary
+            attention={attention}
+            doingWell={doingWell}
+            pending={statusesLoading}
+            worthChecking={checkIn}
+          />
         )}
 
         {/* Loved One Cards */}
@@ -434,25 +433,89 @@ function StatusNotice({
   );
 }
 
-function SummaryChip({ dot, count, label, pending }: { dot: string; count: number; label: string; pending?: boolean }) {
+/**
+ * The dashboard's status summary.
+ *
+ * This was three equal columns — Doing well / Worth checking / Needs attention — each with a count, a
+ * coloured dot and a label, split by two dividers. Three problems, and the visible one was the least of them:
+ *
+ *   1. "Needs attention" wrapped to two lines at EVERY width from 320dp to 744dp while its two siblings fit
+ *      on one, so the row never looked level. A minHeight on the label hid that by padding the short ones.
+ *   2. With one to three loved ones, two of the three counts are usually 0 — and "0 needs attention" is not
+ *      information, it is the default. It cost a third of the most valuable strip on the screen.
+ *   3. A red dot beside a 0 still pulls the eye to red. On a screen whose whole job is answering "is Mum
+ *      okay today", the resting state should not draw attention to the alarming word.
+ *
+ * So it leads with the reassuring sentence and shows only what is not fine — the pattern Nest, Ring and
+ * Google Home use for a household of devices. Everything well says so in words; anything else names the
+ * exception first, because that is the thing to act on.
+ *
+ * Nothing here has a fixed width, height or column count: one to three pills in a wrapping row, each sized
+ * to its own text. It reads the same at 320dp and at 744dp, and at any system font size, because there is no
+ * geometry to outgrow.
+ */
+function StatusSummary({ attention, doingWell, pending, worthChecking }: {
+  attention: number;
+  doingWell: number;
+  pending?: boolean;
+  worthChecking: number;
+}) {
+  const total = doingWell + worthChecking + attention;
+
+  if (pending) {
+    return (
+      <View accessible accessibilityLabel="Checking on everyone" style={styles.summaryCard}>
+        <Text style={styles.summaryHeadline}>Checking in…</Text>
+      </View>
+    );
+  }
+
+  // Ordered by what needs doing, not by severity as a scale: whatever the caregiver may have to act on comes
+  // first, and the reassuring count trails it.
+  const exceptions = [
+    { count: attention, dot: STATUS_DOT.red, label: 'needs attention' },
+    { count: worthChecking, dot: STATUS_DOT.yellow, label: 'worth checking' },
+  ].filter((item) => item.count > 0);
+
+  const allWell = exceptions.length === 0 && doingWell > 0;
+  // "1 of 2 worth checking" rather than "1 worth checking": the pills below already say the second, and a
+  // headline that repeats a pill verbatim wastes the one line a caregiver actually reads. Saying it out of
+  // the total is also the more useful sentence — it answers "how many are fine" at the same time.
+  const headline = allWell
+    ? doingWell === 1 ? 'Everyone is doing well' : `All ${doingWell} are doing well`
+    : exceptions.length
+      ? `${exceptions[0].count} of ${total} ${exceptions[0].label}`
+      : 'No status yet';
+
   return (
-    // One reading per chip ("2 worth checking"); otherwise the strip announces a bare number, a coloured
-    // dot and a label as three unrelated stops. While statuses are still arriving the count is not
-    // asserted at all — a half-loaded strip must not be read as a finished tally.
     <View
       accessible
-      accessibilityLabel={pending ? `${label}, still loading` : `${count} ${label.toLowerCase()}`}
-      style={styles.chip}
+      // One reading for the whole card. Read as separate elements it announces bare numbers, coloured dots
+      // and fragments of labels with nothing tying them together.
+      accessibilityLabel={allWell
+        ? headline
+        : [...exceptions.map((item) => `${item.count} ${item.label}`),
+          doingWell ? `${doingWell} doing well` : null].filter(Boolean).join(', ')}
+      style={styles.summaryCard}
     >
-      {/* The count sits between two fixed dividers and is at most two digits, so it is the one place a cap
-          loses nothing. The label below it stays uncapped and wraps. */}
-      <Text maxFontSizeMultiplier={1.6} style={styles.chipCount}>{pending ? '–' : count}</Text>
-      <View
-        accessibilityElementsHidden
-        importantForAccessibility="no"
-        style={[styles.chipDot, { backgroundColor: dot }]}
-      />
-      <Text style={styles.chipLabel}>{label}</Text>
+      <Text maxFontSizeMultiplier={1.4} style={styles.summaryHeadline}>{headline}</Text>
+
+      {allWell || total === 0 ? null : (
+        <View style={styles.summaryPills}>
+          {exceptions.map((item) => (
+            <View key={item.label} style={styles.summaryPill}>
+              <View style={[styles.summaryDot, { backgroundColor: item.dot }]} />
+              <Text style={styles.summaryPillText}>{item.count} {item.label}</Text>
+            </View>
+          ))}
+          {doingWell > 0 ? (
+            <View style={styles.summaryPill}>
+              <View style={[styles.summaryDot, { backgroundColor: STATUS_DOT.green }]} />
+              <Text style={styles.summaryPillText}>{doingWell} doing well</Text>
+            </View>
+          ) : null}
+        </View>
+      )}
     </View>
   );
 }
@@ -477,7 +540,9 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface.page },
   scroll: { flex: 1 },
   // paddingBottom comes from useTabBarClearance at render time — a literal here was shorter than the bar.
-  content: { paddingHorizontal: spacing.xl, paddingTop: spacing.xl },
+  // Capped and centred: on an unfolded foldable a full-width card ran 700px with the text hugging the
+  // left edge. Below the cap this is a no-op, so phones are unchanged.
+  content: { ...contentColumn, paddingHorizontal: spacing.xl, paddingTop: spacing.xl },
 
   header: {
     flexDirection: 'row',
@@ -501,18 +566,41 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  summaryStrip: {
-    flexDirection: 'row',
+  summaryCard: {
     backgroundColor: colors.surface.card,
+    borderColor: colors.border.default,
     borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.border.default,
-    paddingHorizontal: scaleSize(10),
-    paddingVertical: spacing.lg,
+    gap: spacing.md,
     marginBottom: spacing.xxl,
-    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
     ...cardShadow,
   },
+  summaryHeadline: {
+    color: colors.text.primary,
+    fontFamily: fontFamily.display,
+    // No lineHeight: the line box is whatever the reader's text size needs, so nothing can clip.
+    fontSize: fontSize.title,
+  },
+  // Wraps rather than dividing a fixed number of columns, so one to three pills read the same at any width.
+  summaryPills: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  summaryPill: {
+    alignItems: 'center',
+    backgroundColor: colors.surface.muted,
+    borderRadius: radius.pill,
+    flexDirection: 'row',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  // Sized from the text it sits beside, so it stays proportional when the reader scales the type.
+  summaryDot: {
+    borderRadius: radius.pill,
+    height: Math.round(fontSize.body * 0.55),
+    width: Math.round(fontSize.body * 0.55),
+  },
+  summaryPillText: { color: colors.text.secondary, fontSize: fontSize.body },
   // Shown in place of the strip when no status could be read at all, so a zero is never mistaken for a
   // finding. Deliberately neutral (no status colour) — it is a connection notice, not a status.
   statusUnavailable: {
@@ -533,23 +621,6 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', minHeight: MIN_TOUCH_TARGET, paddingHorizontal: spacing.lg,
   },
   statusRetryText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
-  chip: { alignItems: 'center', flex: 1, gap: 5, minWidth: 0 },
-  chipCount: {
-    fontSize: scaleSize(24), fontWeight: '500', color: colors.text.primary, fontFamily: fontFamily.display, lineHeight: scaleSize(29),
-  },
-  chipDot: { width: 7, height: 7, borderRadius: radius.pill },
-  chipLabel: {
-    color: colors.text.secondary,
-    // Was 11px capped at 82pt wide and clipped to two lines: "Needs attention" was the first thing on the
-    // dashboard to lose a word at large system text. minHeight only aligns the three chips, it never caps.
-    fontSize: fontSize.body,
-    lineHeight: scaleSize(17),
-    minHeight: scaleSize(28),
-    textAlign: 'center',
-  },
-  divider: {
-    width: 1, height: scaleSize(46), backgroundColor: colors.border.default, marginHorizontal: spacing.xs,
-  },
 
   sectionTitle: {
     fontSize: fontSize.heading,

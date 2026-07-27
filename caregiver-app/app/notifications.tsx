@@ -26,7 +26,7 @@ import {
   markNotificationReadV1,
   type V1Notification,
 } from '../src/lib/v1Client';
-import { colors, spacing, radius, fontSize, fontFamily, scaleSize, MIN_TOUCH_TARGET } from '../src/theme';
+import { contentColumn, colors, spacing, radius, fontSize, fontFamily, scaleSize, MIN_TOUCH_TARGET } from '../src/theme';
 
 // The alert feed is the authoritative v1 read model (GET /api/v1/notifications), produced by the
 // server's end-of-day evaluation. It replaced a legacy `/notifications?nurseId=` endpoint that never
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.surface.page },
   // paddingBottom comes from useTabBarClearance at render time; 104 was a guess that happened to be
   // large enough on one phone and is wrong as soon as the bar grows with the system font size.
-  content: { padding: spacing.xl },
+  content: { ...contentColumn, padding: spacing.xl },
   headerBlock: { marginBottom: 18 },
   header: {
     alignItems: 'center',
