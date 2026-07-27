@@ -9,7 +9,7 @@ import {
 } from '../orchestration/orchestrator'
 import { buildLiveSessionUpdate, realtimeWsUrl, REALTIME_TOOL_BACKEND } from '../orchestration/realtime'
 import { invokeSessionTool, getPatientMemory } from '../api/sessionSync'
-import { createEnergyVad, decodeBase64Pcm16 } from '../orchestration/energyVad'
+import { createEnergyVad, decodeBase64Pcm16, pcm16Rms } from '../orchestration/energyVad'
 import {
   acknowledgementForLanguage,
   base64ToBytes,
@@ -119,6 +119,11 @@ function numberFromEnv(raw: string | undefined, fallback: number): number {
   return Number.isFinite(value) && value > 0 ? value : fallback
 }
 const BARGE_IN_ENABLED = (process.env.EXPO_PUBLIC_BARGEIN ?? 'on') !== 'off'
+// Compile the (mildly hot) per-chunk mic sampling out of production builds; only the debug HUD needs it.
+const DEBUG_MIC = process.env.EXPO_PUBLIC_DEBUG_OVERLAY === 'on'
+// Hidden user-role priming turn seeded before the companion opening response.create so SG accepts it
+// (see the seeding in session.updated). Input-only; never spoken, never in the recorded transcript.
+const COMPANION_OPENING_CUE = '(Please greet me warmly to begin our chat.)'
 const BARGE_IN_START_RMS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_START_RMS, 0.06)
 const BARGE_IN_MIN_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_MIN_MS, 700)
 const BARGE_IN_GRACE_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_GRACE_MS, 900)
@@ -203,6 +208,10 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const audioPreRollRef = useRef<string[]>([])
   const bargeInPreRollRef = useRef<string[]>([])
   const bargeInActiveRef = useRef(false)
+  // Debug-HUD mic telemetry: rolling peak RMS + throttle clock + how many times barge-in fired.
+  const micPeakRef = useRef(0)
+  const micEmitAtRef = useRef(0)
+  const bargeCountRef = useRef(0)
   const voiceRef = useRef<VoiceProfile>(voiceProfileForSession(language))
   // Latest ambient weather line (refreshes ~30 min), injected into each session.update so Aria knows it.
   const weatherRef = useRef(options.weather)
@@ -669,6 +678,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
 
     transition({ type: 'assistant_interrupted' })
     telemetryRef.current.onInterrupt('user_barge_in')
+    // HUD marker for the echo test: this fires ONLY when talk-over actually cuts Aria off. If it fires
+    // while nobody is speaking, her speaker output is leaking into the mic (echo) — that's the bug.
+    bargeCountRef.current += 1
+    dbg.log(`barge-in fired +${Date.now() - playbackStartedAtRef.current}ms`)
+    dbg.mic({ barges: bargeCountRef.current })
     bargeInActiveRef.current = true
     setBargeInActive(true)
     vadSpeakingRef.current = true
@@ -679,6 +693,22 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
 
   const handleCaptureChunk = useCallback((base64Pcm16: string) => {
     if (!runtimeLeaseRef.current?.isCurrent()) return
+    // Debug HUD only: sample the live mic level on every chunk so the field tester can see whether the
+    // user's voice actually reaches the barge-in threshold (why talk-over does / doesn't fire), and
+    // whether the mic is muted or armed right now. Throttled to ~3/s; a rolling peak between emits.
+    if (DEBUG_MIC) {
+      try {
+        const level = pcm16Rms(decodeBase64Pcm16(base64Pcm16))
+        if (level > micPeakRef.current) micPeakRef.current = level
+        const now = Date.now()
+        if (now - micEmitAtRef.current > 300) {
+          const owns = turnTakingRef.current.responseInFlight || turnTakingRef.current.awaitingPlayback
+          dbg.mic({ peak: micPeakRef.current, thr: BARGE_IN_START_RMS, muted: turnTakingRef.current.captureMuted, armed: Boolean(owns) && BARGE_IN_ENABLED, barges: bargeCountRef.current })
+          micPeakRef.current = 0
+          micEmitAtRef.current = now
+        }
+      } catch {}
+    }
     // Record patient audio for the session WAV. Only while the mic is open (Aria's playback mutes
     // capture), so her voice is excluded, per the doc's "record patient speech only".
     if (!turnTakingRef.current.captureMuted && sessionAudioFramesRef.current.length < MAX_AUDIO_FRAMES) {
@@ -838,17 +868,23 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
 
       if (type === 'error') {
         const providerMessage = String(payload?.error?.message || '')
+        const providerCode = String(payload?.error?.code || payload?.error?.type || 'error')
         if (cancelledProviderResponseIdRef.current && /cancel|active response/i.test(providerMessage)) {
           cancelledProviderResponseIdRef.current = null
           return
         }
         // Qwen delivers app-level errors as in-band frames over the OPEN socket (not socket.onerror).
         clearDrain()
+        // Surface the ACTUAL provider error in the HUD (code + message) — 'ws_error_frame' alone can't
+        // tell you whether omni was rejected for a bad model, a malformed session.update, quota, etc.
+        const detail = `${providerCode}${providerMessage ? `: ${providerMessage}` : ''}`
+        dbg.log(`omni err ${detail}`.slice(0, 200))
+        dbg.mic({ err: detail.slice(0, 260) })
         if (!hadResponseRef.current) {
           // Omni rejected the session before any response: hand off to the fallback AND tear this
           // transport down (close -> onclose -> cleanup stops the PCM bridge). Do NOT un-mute, or the
           // still-open v3 mic would capture concurrently with the v2 fallback.
-          reportUnavailable('ws_error_frame')
+          reportUnavailable(`ws_error_frame ${providerCode}`)
           try { socketRef.current?.close() } catch {}
           return
         }
@@ -888,6 +924,14 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
             responseRequestedRef.current = true
             audioRef.current?.setCaptureMuted(true)
             transition({ type: 'response_requested' })
+            // SG's qwen3.5-omni-flash-realtime rejects response.create on an empty conversation
+            // ("InvalidParameter: The input messages do not contain elements with the role of user");
+            // CN tolerates it. That is the whole reason companion (LLM-generated opening) dropped to the
+            // turn-based fallback on SG while screening (local-TTS opening, no response.create) stayed on
+            // omni. Seed a hidden user-role text item so the opening greeting is a valid assistant turn on
+            // both regions. It is input-only (never spoken); the transcript is built from audio ASR, so it
+            // never appears in the recorded conversation.
+            send({ type: 'conversation.item.create', item: { type: 'message', role: 'user', content: [{ type: 'input_text', text: COMPANION_OPENING_CUE }] } })
             send({ type: 'response.create' })
           }
         } else if (responseAfterSessionUpdateRef.current) {

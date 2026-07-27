@@ -44,27 +44,37 @@ export const REALTIME_TOOL_BACKEND: Record<string, string> = {
   list_medications: 'medication.list',
   upcoming_reminders: 'reminders.upcoming',
 }
+// Qwen omni realtime follows the OpenAI *Realtime* protocol, whose session.update tools are FLAT
+// ({type,name,description,parameters}) — NOT the Chat-Completions nested {type,function:{...}} shape.
+// The nested shape is rejected by the realtime server with an in-band error frame right after open,
+// which (before this fix) knocked companion sessions — the only persona that sends tools — off omni
+// and down to the turn-based fallback. Screening sends no tools, so it stayed on omni; that asymmetry
+// was the tell. The incoming tool call is keyed by top-level `name`, so the response path is unchanged.
 const COMPANION_TOOLS = [
-  { type: 'function', function: {
+  {
+    type: 'function',
     name: 'get_weather',
     description: "Current weather and a short forecast for a city. Omit `city` for the patient's home area (already in your context).",
     parameters: { type: 'object', properties: { city: { type: 'string', description: 'City name, e.g. Tokyo.' } } },
-  } },
-  { type: 'function', function: {
+  },
+  {
+    type: 'function',
     name: 'web_search',
     description: 'Search the web for current facts, news, or a general question you are unsure about.',
     parameters: { type: 'object', properties: { query: { type: 'string', description: 'The search query.' } }, required: ['query'] },
-  } },
-  { type: 'function', function: {
+  },
+  {
+    type: 'function',
     name: 'list_medications',
     description: "List the patient's current medications and their schedules.",
     parameters: { type: 'object', properties: {} },
-  } },
-  { type: 'function', function: {
+  },
+  {
+    type: 'function',
     name: 'upcoming_reminders',
     description: "List the patient's reminders or medications due in the next 24 hours.",
     parameters: { type: 'object', properties: {} },
-  } },
+  },
 ] as const
 
 export function buildLiveSessionUpdate(
