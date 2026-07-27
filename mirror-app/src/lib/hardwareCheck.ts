@@ -1,8 +1,10 @@
 import { Platform } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { CONVERSATION_MODE, type ConversationMode } from '../config/conversationMode'
 import { DEFAULT_RELAY_PORT } from '../constants/realtime'
 import { isNativePcmAvailable } from '../native/pcmAudio'
+import { probeSpeakerLoopback } from './speakerCheck'
 import { recommendMode } from './recommendMode'
 
 // Startup hardware / capability self-check. Runs on every launch (see app/_layout + the
@@ -22,6 +24,46 @@ export type HardwareReport = {
   recommendedMode: ConversationMode | 'none'
   recommendedReason: string
   configuredMode: ConversationMode
+}
+
+// Cached acoustic-loopback result. The probe plays an audible tone, and runHardwareChecks() is called
+// up to three times per launch (layout + settings + the report screen), so it is NEVER run implicitly —
+// it is opt-in via runSpeakerProbe() and everything else reads this cache. A result older than the TTL
+// degrades to `unknown` rather than being trusted forever.
+export type SpeakerProbeRecord = { status: 'ok' | 'fail'; detail: string; at: number }
+const SPEAKER_PROBE_STORAGE_KEY = 'reflexion:speakerProbe'
+const SPEAKER_PROBE_TTL_MS = 24 * 60 * 60 * 1000
+
+async function readSpeakerProbe(): Promise<SpeakerProbeRecord | null> {
+  try {
+    const raw = await AsyncStorage.getItem(SPEAKER_PROBE_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as SpeakerProbeRecord
+    return parsed && (parsed.status === 'ok' || parsed.status === 'fail') && typeof parsed.at === 'number' ? parsed : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Run the real speaker loopback (audible tone) and cache the verdict. Call only when no conversation or
+ * wake-word listener owns the audio device. `unknown` results are not cached — they mean "could not
+ * test", so the next opportunity should try again rather than inherit a non-answer.
+ */
+export async function runSpeakerProbe(): Promise<HardwareCheck> {
+  const result = await probeSpeakerLoopback()
+  if (result.status !== 'unknown') {
+    const record: SpeakerProbeRecord = { status: result.status, detail: result.detail, at: Date.now() }
+    try { await AsyncStorage.setItem(SPEAKER_PROBE_STORAGE_KEY, JSON.stringify(record)) } catch { /* best effort */ }
+  }
+  return { key: 'speaker', label: '扬声器 / 音频输出', status: result.status, detail: result.detail }
+}
+
+/** True when there is no usable (fresh) loopback verdict, i.e. the mirror should probe when it can. */
+export async function speakerProbeIsStale(): Promise<boolean> {
+  if (Platform.OS === 'web' || !HAS_NATIVE_PCM_STREAM) return false
+  const probe = await readSpeakerProbe()
+  return !probe || Date.now() - probe.at > SPEAKER_PROBE_TTL_MS
 }
 
 function relayHttpBase(): string {
@@ -52,9 +94,12 @@ async function checkMicrophone(): Promise<HardwareCheck> {
     const current = await audio.getRecordingPermissionsAsync?.()
     if (current?.granted) return { key: 'mic', label, status: 'ok', detail: '已授权' }
     const req = await audio.requestRecordingPermissionsAsync?.()
+    // Denied is `fail`, not `warn`: without the mic Aria cannot hear anything, the check-in captures
+    // silence, and the heartbeat only reports `permission_denied` for `fail` — as a warn it was invisible
+    // to the caregiver AND to the readiness gate.
     return req?.granted
       ? { key: 'mic', label, status: 'ok', detail: '已授权' }
-      : { key: 'mic', label, status: 'warn', detail: '未授权(需在系统设置允许)' }
+      : { key: 'mic', label, status: 'fail', detail: '未授权(需在系统设置允许)' }
   } catch {
     return { key: 'mic', label, status: 'unknown', detail: '无法探测(需真机)' }
   }
@@ -97,16 +142,32 @@ async function checkCamera(): Promise<HardwareCheck> {
   }
 }
 
-function checkSpeaker(): HardwareCheck {
+function checkSpeaker(probe?: SpeakerProbeRecord | null): HardwareCheck {
   const label = '扬声器 / 音频输出'
   if (Platform.OS === 'web') {
     const has = typeof window !== 'undefined' && Boolean((window as any).AudioContext || (window as any).webkitAudioContext)
     return { key: 'speaker', label, status: has ? 'ok' : 'warn', detail: has ? 'Web Audio 可用' : '无 AudioContext' }
   }
-  return { key: 'speaker', label, status: 'ok', detail: '假定可用(设备扬声器)' }
+  // This used to return a hardcoded `ok, 假定可用` — a claim nothing had verified, which made the
+  // caregiver-visible heartbeat report a healthy speaker on a mirror whose speaker was dead or muted.
+  // Now the only `ok` comes from a real acoustic loopback (src/lib/speakerCheck.ts); with no recent
+  // probe we say `unknown`, because "not tested" and "working" are different things.
+  if (!probe) return { key: 'speaker', label, status: 'unknown', detail: '尚未做回环自检' }
+  const age = Math.max(0, Date.now() - probe.at)
+  if (age > SPEAKER_PROBE_TTL_MS) {
+    return { key: 'speaker', label, status: 'unknown', detail: `上次回环自检已过期(${Math.round(age / 3_600_000)} 小时前)` }
+  }
+  return { key: 'speaker', label, status: probe.status, detail: probe.detail }
 }
 
 function checkNetwork(): HardwareCheck {
+  // React Native has no navigator.onLine, so on the actual mirror this was structurally always `ok`
+  // (`undefined !== false`). Report `unknown` there instead of inventing an online state — real
+  // reachability is what the heartbeat measures (deviceHeartbeat publishes online/offline from a live
+  // request), and the boot gate uses an actual /health ping.
+  if (Platform.OS !== 'web') {
+    return { key: 'network', label: '网络', status: 'unknown', detail: '由心跳/后端探测判定' }
+  }
   const online = typeof navigator !== 'undefined' ? (navigator as any).onLine !== false : true
   return { key: 'network', label: '网络', status: online ? 'ok' : 'fail', detail: online ? '在线' : '离线' }
 }
@@ -156,17 +217,18 @@ function recommend(platform: string, byKey: Record<string, HardwareCheck>): { mo
 
 export async function runHardwareChecks(): Promise<HardwareReport> {
   const platform = Platform.OS
-  const [mic, camera, backend, turn] = await Promise.all([
+  const [mic, camera, backend, turn, speakerProbe] = await Promise.all([
     checkMicrophone(),
     checkCamera(),
     checkBackend(),
     checkTurnAudio(),
+    readSpeakerProbe(),
   ])
   const checks: HardwareCheck[] = [
     checkNetwork(),
     backend,
     mic,
-    checkSpeaker(),
+    checkSpeaker(speakerProbe),
     camera,
     turn,
     checkRealtimeAudio(),

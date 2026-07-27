@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar'
 
 import { startDeviceHeartbeat, subscribeDeviceHeartbeat } from '../src/api/deviceHeartbeat'
 import { flushPendingConversations } from '../src/storage/conversationQueue'
-import { runHardwareChecks } from '../src/lib/hardwareCheck'
+import { runHardwareChecks, runSpeakerProbe, speakerProbeIsStale } from '../src/lib/hardwareCheck'
 import { mirrorColors } from '../src/theme/mirrorTheme'
 
 export default function RootLayout() {
@@ -12,7 +12,15 @@ export default function RootLayout() {
   // real mirror reports its own hardware status at startup (no physical device needed to wire it).
   useEffect(() => {
     let stopHeartbeat: (() => void) | undefined
-    void runHardwareChecks().then((r) => {
+    // Verify the speaker for REAL before reporting anything about it. This is the one moment we know the
+    // audio device is idle (the wake-word listener and the conversation both come later), and it has to
+    // run BEFORE runHardwareChecks so the report — which the heartbeat then captures for the whole
+    // session — carries a measured verdict instead of an assumption. The probe is audible, so it
+    // self-limits to once per 24h via its cache and never runs on web / without the native module.
+    const probeIfStale = speakerProbeIsStale()
+      .then((stale) => (stale ? runSpeakerProbe() : null))
+      .catch(() => null)
+    void probeIfStale.then(() => runHardwareChecks()).then((r) => {
       console.log(`[hardware] platform=${r.platform} recommendedMode=${r.recommendedMode} (${r.recommendedReason})`)
       for (const c of r.checks) console.log(`[hardware] ${c.status.toUpperCase().padEnd(7)} ${c.label}: ${c.detail}`)
       stopHeartbeat = startDeviceHeartbeat(r)

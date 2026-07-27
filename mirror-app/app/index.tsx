@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import qrcode from 'qrcode-generator'
@@ -30,6 +30,7 @@ import {
   getBootstrapCredential,
   getDeviceCredential,
 } from '../src/storage/deviceCredentials'
+import type { ReadinessVerdict } from '../src/lib/readiness'
 import { mirrorColors as palette, mirrorFonts as fonts } from '../src/theme/mirrorTheme'
 
 type BootCheck = { key: string; label: string; ok: boolean }
@@ -43,42 +44,59 @@ type PairingDetails = {
 
 const INSTALLER_SETUP_ENABLED = __DEV__ || process.env.EXPO_PUBLIC_ENABLE_INSTALLER_SETUP === 'true'
 
+// The one blocking verdict the boot flow can both detect and fix in place.
+const MICROPHONE_BLOCKED: ReadinessVerdict = {
+  blocked: true,
+  problem: 'microphone',
+  title: 'Aria cannot hear you yet',
+  body: 'The microphone is switched off for this app, so Aria would not hear your answers.',
+  actionLabel: 'Turn on the microphone',
+}
+
 export default function BootScreen() {
   const [booting, setBooting] = useState(true)
   const [checks, setChecks] = useState<BootCheck[]>([])
   const [pairing, setPairing] = useState<PairingDetails | null>(null)
   const [pairingError, setPairingError] = useState('')
   const [offlineHome, setOfflineHome] = useState(false)
+  const [blocked, setBlocked] = useState<ReadinessVerdict | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  useEffect(() => {
-    let mounted = true
-    async function boot() {
-      const result = await runBootChecks()
-      if (!mounted) return
-      setChecks(result.checks)
-      if (result.paired && !result.online) {
-        setOfflineHome(true)
+  // Hoisted out of the mount effect so the readiness screen can re-run it after the elder fixes the
+  // problem (permission granted -> straight into the conversation, no restart).
+  const boot = useCallback(async () => {
+    const result = await runBootChecks()
+    setChecks(result.checks)
+    if (result.paired && !result.online) {
+      setOfflineHome(true)
+      setBooting(false)
+      return
+    }
+    if (result.paired && result.online) {
+      // Readiness gate: never hand an elder a conversation that cannot work. A denied microphone used
+      // to sail through here and capture silence.
+      if (!result.microphoneGranted) {
+        setBlocked(MICROPHONE_BLOCKED)
         setBooting(false)
         return
       }
-      if (result.paired && result.online) {
-        try {
-          await refreshAndPersistDeviceProfile(result.deviceId)
-          router.replace('/conversation')
-          return
-        } catch { /* revoked credentials fall through to pairing */ }
-      }
-      await loadPairingCode(result.deviceId)
-      if (mounted) setBooting(false)
+      try {
+        await refreshAndPersistDeviceProfile(result.deviceId)
+        router.replace('/conversation')
+        return
+      } catch { /* revoked credentials fall through to pairing */ }
     }
-    void boot()
-    return () => {
-      mounted = false
-      if (pollRef.current) clearInterval(pollRef.current)
-    }
+    await loadPairingCode(result.deviceId)
+    setBooting(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    void boot()
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current)
+    }
+  }, [boot])
 
   async function loadPairingCode(knownDeviceId = '') {
     const details = await requestPairingCode()
@@ -118,6 +136,18 @@ export default function BootScreen() {
   }, [pairing?.pairingId])
 
   if (booting) return <BootLoadingScreen checks={checks} />
+  if (blocked) {
+    // The action re-requests the OS permission; either way we re-run boot so a fixed mirror proceeds
+    // straight into the conversation without the elder needing to restart anything.
+    const retryBoot = () => { setBlocked(null); setBooting(true); void boot() }
+    return (
+      <NotReadyScreen
+        verdict={blocked}
+        onAction={() => { void checkMicrophonePermission().then(retryBoot) }}
+        onRetry={retryBoot}
+      />
+    )
+  }
   if (offlineHome) return <OfflineHomeScreen onRetry={() => router.replace('/conversation')} />
   return <PairingScreen error={pairingError} onRetry={() => void loadPairingCode()} pairing={pairing} />
 }
@@ -140,6 +170,7 @@ async function runBootChecks() {
     deviceId,
     online: online && backendReachable,
     paired,
+    microphoneGranted,
     checks: [
       { key: 'device', label: 'Device provisioned', ok: Boolean(bootstrap?.token || credential) },
       { key: 'paired', label: 'Caregiver paired', ok: paired },
@@ -172,7 +203,20 @@ async function pingBackend() {
 }
 
 async function checkMicrophonePermission() {
-  if (Platform.OS !== 'web') return true
+  if (Platform.OS !== 'web') {
+    // This used to `return true` unconditionally on native, so the boot screen showed the elder
+    // "Microphone ready ✓" on a mirror whose mic permission was denied — the one check that most needed
+    // to be honest was the one that was hardcoded. Ask the OS, and request once if undetermined.
+    try {
+      const audio: any = await import('expo-audio')
+      const current = await audio.getRecordingPermissionsAsync?.()
+      if (current?.granted) return true
+      const requested = await audio.requestRecordingPermissionsAsync?.()
+      return Boolean(requested?.granted)
+    } catch {
+      return false
+    }
+  }
   if (!navigator.mediaDevices?.getUserMedia) return false
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
@@ -272,6 +316,34 @@ export function PairingScreen({ error, onRetry, pairing }: { error: string; onRe
               <Text style={styles.demoLinkText}>Open developer conversation</Text>
             </Pressable>
           ) : null}
+        </View>
+      </View>
+    </SafeAreaView>
+  )
+}
+
+/**
+ * Shown INSTEAD of starting a conversation when the self-check found a blocking problem. Previously a
+ * mirror with a denied microphone went straight into a check-in and silently recorded nothing; the elder
+ * saw a normal conversation that simply "did not work", and the caregiver saw a missed check-in rather
+ * than a one-tap fix. Same visual language as the offline screen: one large calm line, one supporting
+ * sentence, one action.
+ */
+function NotReadyScreen({ verdict, onAction, onRetry }: { verdict: ReadinessVerdict; onAction: () => void; onRetry: () => void }) {
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.stage}>
+        <View pointerEvents="none" style={styles.reflection} />
+        <View style={styles.offlineScene}>
+          <View style={styles.offlineIcon}>
+            <Ionicons name={verdict.problem === 'microphone' ? 'mic-off-outline' : 'construct-outline'} size={44} color={palette.linen} />
+          </View>
+          <Text style={styles.offlineTitle}>{verdict.title}</Text>
+          <Text style={styles.offlineText}>{verdict.body}</Text>
+          <Text style={styles.offlineNote}>Your caregiver can help with this.</Text>
+          <Pressable onPress={verdict.actionLabel ? onAction : onRetry} style={styles.retryButton}>
+            <Text style={styles.retryText}>{verdict.actionLabel ?? 'Check again'}</Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
