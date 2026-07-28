@@ -7,6 +7,7 @@ import {
   FlatList,
   Linking,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -257,7 +258,15 @@ export default function NotificationsScreen() {
   if (selectedTab === 'device') {
     return (
       <SafeAreaView style={styles.safe}>
-        <View style={styles.content}>
+        {/* Scrollable, and carrying the tab-bar clearance the alert list already has. The alerts tab is a
+            FlatList so it got both for free; this tab was a plain View, so its card sat under the tab bar
+            with no way to scroll it into view — and it is taller now that a registered phone is offered a
+            test as well as a re-register. At 320dp with the system font raised, that difference is the
+            whole card's last row. */}
+        <ScrollView
+          contentContainerStyle={[styles.content, { paddingBottom: bottomClearance }]}
+          showsVerticalScrollIndicator={false}
+        >
           {header}
           <View style={styles.testCard}>
             <View style={styles.testIcon}>
@@ -311,7 +320,7 @@ export default function NotificationsScreen() {
               <Text style={styles.testMessage}>{deviceMessage}</Text>
             ) : null}
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
