@@ -322,6 +322,26 @@ export async function registerNotificationDeviceV1(input: {
   return v1Post('/notification-devices', input);
 }
 
+export type V1PushTestResult = {
+  outcome: 'delivered' | 'undelivered' | 'accepted' | 'rejected' | 'no_registered_phone';
+  devices: number;
+  delivered: number;
+  /** Expo's error code when the push did not land (e.g. InvalidCredentials). Diagnostic, never shown raw. */
+  detail: string | null;
+};
+
+/**
+ * Asks the server to send one real push to this caregiver's registered phones and report the outcome.
+ *
+ * Registration only proves the phone can be addressed. This is the only way the app can tell a caregiver
+ * whether an alert would actually reach them — the failure it exists to catch (Expo accepts the message
+ * and then cannot deliver it) looks identical to success from the client. Takes a few seconds: the server
+ * waits for Expo's delivery receipt rather than reporting the send as if it were an arrival.
+ */
+export async function sendTestPushV1(): Promise<V1PushTestResult> {
+  return v1Post('/notification-devices/test', {});
+}
+
 // ── Support threads (the in-app "Support" conversation) ─────────────────────
 
 export type V1SupportThread = {

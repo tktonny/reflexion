@@ -26,6 +26,30 @@ type RegisterPushNotificationDeviceResult = {
 
 let notificationHandlerConfigured = false;
 
+/**
+ * Installs the foreground display handler and the Android channel, with NO dependency on being signed in
+ * or on a registration round-trip succeeding.
+ *
+ * This used to happen only as a side effect of getPushNotificationDeviceRegistration, which sits behind an
+ * early `hasV1Session()` return. Since v1 login is best-effort by design, a caregiver whose v1 token had
+ * not come up got no handler — and on Android a delivered push is only shown while the app is FOREGROUND
+ * if a handler asks for it. So the alert arrived, the phone stayed silent, and the caregiver saw it only
+ * after opening the Notifications tab: exactly the "push doesn't work" report, with nothing wrong in the
+ * delivery chain. Call this at app start, before anything can be received.
+ */
+export async function prepareNotificationDisplay(): Promise<void> {
+  if (Platform.OS === 'web') return;
+  const Notifications = await loadNotifications();
+  if (!Notifications) return;
+  try {
+    configureNotificationHandler(Notifications);
+    await configureAndroidChannel(Notifications);
+  } catch (error) {
+    // Display setup is best-effort like the rest of push: never let it break app start.
+    console.warn('[pushNotifications] display setup unavailable', error);
+  }
+}
+
 export async function registerPushNotificationDevice({
   nurseId,
 }: RegisterPushNotificationDeviceInput): Promise<RegisterPushNotificationDeviceResult> {
@@ -117,6 +141,41 @@ export function friendlyPushError(error: unknown): string {
     return 'Push is not set up in this build.';
   }
   return 'Push is unavailable on this device right now. Your alerts still appear in the Notifications tab.';
+}
+
+/**
+ * Calls `onOpen` when the caregiver taps an alert, including the cold-start case where the tap is what
+ * launched the app. Returns a teardown function.
+ *
+ * Without this a tapped alert just opened Home, so the one thing a caregiver does with a push — read the
+ * alert it is about — took three more taps.
+ */
+export function subscribeToNotificationTaps(onOpen: (data: Record<string, unknown>) => void): () => void {
+  if (Platform.OS === 'web') return () => {};
+  let subscription: { remove: () => void } | null = null;
+  let cancelled = false;
+
+  void (async () => {
+    const Notifications = await loadNotifications();
+    if (!Notifications || cancelled) return;
+    try {
+      // A tap that launched the app is already spent by the time we subscribe, so ask for it directly.
+      const initial = await Notifications.getLastNotificationResponseAsync();
+      if (initial && !cancelled) {
+        onOpen((initial.notification.request.content.data ?? {}) as Record<string, unknown>);
+      }
+      subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+        onOpen((response.notification.request.content.data ?? {}) as Record<string, unknown>);
+      });
+    } catch (error) {
+      console.warn('[pushNotifications] tap listener unavailable', error);
+    }
+  })();
+
+  return () => {
+    cancelled = true;
+    subscription?.remove();
+  };
 }
 
 async function loadNotifications() {

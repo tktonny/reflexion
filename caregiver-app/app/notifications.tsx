@@ -24,6 +24,7 @@ import { STATUS_META } from '../src/lib/v1Status';
 import {
   listNotificationsV1,
   markNotificationReadV1,
+  sendTestPushV1,
   type V1Notification,
 } from '../src/lib/v1Client';
 import { contentColumn, colors, spacing, radius, fontSize, fontFamily, scaleSize, MIN_TOUCH_TARGET } from '../src/theme';
@@ -75,6 +76,7 @@ export default function NotificationsScreen() {
   const canReadAlerts = hasV1Session();
   const [selectedTab, setSelectedTab] = useState<NotificationsTab>('alerts');
   const [deviceMessage, setDeviceMessage] = useState('');
+  const [isRegistered, setIsRegistered] = useState(false);
 
   const notificationsQuery = useInfiniteQuery({
     enabled: canReadAlerts,
@@ -139,8 +141,9 @@ export default function NotificationsScreen() {
     mutationFn: registerPushNotificationDevice,
     onMutate: () => setDeviceMessage('Registering this phone...'),
     onSuccess: (result) => {
+      setIsRegistered(result.ok);
       setDeviceMessage(result.ok
-        ? 'This phone is registered. Alerts will also appear in the list above.'
+        ? 'This phone is registered. Send yourself a test alert to confirm it arrives.'
         : result.reason || 'Could not register this phone for alerts.');
     },
     onError: (error) => {
@@ -150,6 +153,54 @@ export default function NotificationsScreen() {
       setDeviceMessage(friendlyPushError(error));
     },
   });
+
+  // Every outcome is phrased as something the caregiver can act on. The raw Expo error code is deliberately
+  // not shown: "InvalidCredentials" names a problem on OUR side of the chain, and reading it to a caregiver
+  // implies they broke something and can fix it. The code is recorded server-side on the notification row.
+  const testPushMutation = useMutation({
+    mutationFn: sendTestPushV1,
+    onMutate: () => setDeviceMessage('Sending a test alert...'),
+    onSuccess: (result) => {
+      if (result.outcome === 'delivered') {
+        setDeviceMessage('Test alert sent — it should appear on this phone now.');
+      } else if (result.outcome === 'accepted') {
+        setDeviceMessage('Test alert sent. If nothing appears in a moment, check that notifications are '
+          + 'allowed for Reflexion in your phone settings.');
+      } else if (result.outcome === 'no_registered_phone') {
+        setIsRegistered(false);
+        setDeviceMessage('This phone is not registered yet. Register it first.');
+      } else if (result.detail === 'DeviceNotRegistered') {
+        setIsRegistered(false);
+        setDeviceMessage('This phone needs registering again — tap Register this phone.');
+      } else {
+        setDeviceMessage('We could not reach this phone just now. Your alerts still appear in the list above.');
+      }
+    },
+    onError: () => {
+      setDeviceMessage('We could not send a test alert just now. Your alerts still appear in the list above.');
+    },
+  });
+
+  const isBusy = registerDeviceMutation.isPending || testPushMutation.isPending;
+
+  // Establish the real state on entering this tab, silently.
+  //
+  // `isRegistered` cannot start as `true` (a phone with notifications denied is not registered) and starting
+  // as `false` produced the contradiction this screen shipped with: the app registers at launch in
+  // _layout.tsx, so a caregiver who was already registered still saw "Register this phone" as the primary
+  // action with "This phone is registered" underneath it. Re-registering is a documented idempotent upsert
+  // keyed on the Expo token, so asking again costs nothing and is the only way this screen can know.
+  const probedRef = React.useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedTab !== 'device' || probedRef.current || !session?.userId) return;
+      probedRef.current = true;
+      void registerPushNotificationDevice({ nurseId: session.userId }).then((result) => {
+        // No message on this path — the caregiver did not ask for anything, so nothing should be announced.
+        setIsRegistered(result.ok);
+      });
+    }, [selectedTab, session?.userId]),
+  );
 
   async function refresh() {
     if (!canReadAlerts) return;
@@ -214,26 +265,48 @@ export default function NotificationsScreen() {
             </View>
             <Text style={styles.testTitle} maxFontSizeMultiplier={1.3}>Alerts on this phone</Text>
             <Text style={styles.testText}>
-              Register this phone so Reflexion can reach you here. Your alerts always appear in the list on
-              the Notifications tab, whether or not this phone is registered.
+              {isRegistered
+                ? 'This phone is set up to receive alerts. Send yourself a test to check it arrives — it takes a few seconds.'
+                : 'Register this phone so Reflexion can reach you here. Your alerts always appear in the list on the Notifications tab, whether or not this phone is registered.'}
             </Text>
+            {/* Once the phone is registered, registering again is not the useful next action — finding out
+                whether an alert actually ARRIVES is. Registration only proves the phone can be addressed;
+                a push can still be accepted and then silently dropped, which is indistinguishable from
+                success without a test. So the primary button becomes the test, and re-registering drops to
+                a quiet secondary for the case where the phone has genuinely lost its token. */}
             <TouchableOpacity
-              accessibilityLabel="Register this phone for alerts"
+              accessibilityLabel={isRegistered ? 'Send a test alert to this phone' : 'Register this phone for alerts'}
               accessibilityRole="button"
               activeOpacity={0.84}
-              disabled={registerDeviceMutation.isPending || !session?.userId}
-              onPress={() => registerDeviceMutation.mutate({ nurseId: session?.userId || '' })}
-              style={[styles.testButton, (registerDeviceMutation.isPending || !session?.userId) && styles.testButtonDisabled]}
+              disabled={isBusy || !session?.userId}
+              onPress={() => (isRegistered
+                ? testPushMutation.mutate()
+                : registerDeviceMutation.mutate({ nurseId: session?.userId || '' }))}
+              style={[styles.testButton, (isBusy || !session?.userId) && styles.testButtonDisabled]}
             >
-              {registerDeviceMutation.isPending ? (
+              {isBusy ? (
                 <ActivityIndicator color={colors.text.onAccent} />
               ) : (
                 <>
-                  <Feather name="smartphone" size={16} color={colors.text.onAccent} />
-                  <Text style={styles.testButtonText}>Register this phone</Text>
+                  <Feather name={isRegistered ? 'send' : 'smartphone'} size={16} color={colors.text.onAccent} />
+                  <Text style={styles.testButtonText}>
+                    {isRegistered ? 'Send a test alert' : 'Register this phone'}
+                  </Text>
                 </>
               )}
             </TouchableOpacity>
+            {isRegistered ? (
+              <TouchableOpacity
+                accessibilityLabel="Register this phone again"
+                accessibilityRole="button"
+                activeOpacity={0.84}
+                disabled={isBusy || !session?.userId}
+                onPress={() => registerDeviceMutation.mutate({ nurseId: session?.userId || '' })}
+                style={styles.testSecondaryButton}
+              >
+                <Text style={styles.testSecondaryText}>Register this phone again</Text>
+              </TouchableOpacity>
+            ) : null}
             {deviceMessage ? (
               <Text style={styles.testMessage}>{deviceMessage}</Text>
             ) : null}
@@ -599,6 +672,20 @@ const styles = StyleSheet.create({
   },
   testButtonDisabled: { opacity: 0.72 },
   testButtonText: { color: colors.text.onAccent, fontSize: fontSize.bodyLarge, fontWeight: '700' },
+  // Outlined, not filled: re-registering is the recovery path, not the thing to reach for. Same radius as
+  // the primary button so the pair reads as one control group.
+  testSecondaryButton: {
+    alignItems: 'center',
+    borderColor: colors.border.strong,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    justifyContent: 'center',
+    marginTop: spacing.sm,
+    minHeight: MIN_TOUCH_TARGET,
+    paddingHorizontal: 18,
+    width: '100%',
+  },
+  testSecondaryText: { color: colors.text.secondary, fontSize: fontSize.body, fontWeight: '600' },
   testMessage: { color: '#5E554E', fontSize: fontSize.body, lineHeight: scaleSize(19), marginTop: spacing.md, textAlign: 'center' },
   card: {
     backgroundColor: colors.surface.card,

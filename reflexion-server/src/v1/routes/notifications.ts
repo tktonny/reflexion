@@ -7,6 +7,7 @@ import { badRequest, forbidden, notFound } from '../platform/errors.js'
 import { sendData, sendPage } from '../platform/http.js'
 import { newId } from '../platform/ids.js'
 import { enumValue, objectBody, optionalString, pagination, requiredString } from '../platform/validation.js'
+import { ANDROID_CHANNEL_ID, EXPO_TOKEN_RE, fetchExpoReceipts, sendExpoPush } from '../notifications/push.js'
 
 export const notificationsRouter = Router()
 const requireHuman = requireActor('human')
@@ -106,6 +107,74 @@ notificationsRouter.post('/notification-devices', requireHuman, asyncHandler(asy
     state: device?.state,
     registeredAt: new Date(device?.createdAt || now).toISOString(),
   })
+}))
+
+/**
+ * Sends one real push to the caller's own registered phones and reports what actually happened to it.
+ *
+ * This exists because "is push working?" was unanswerable from the product. A caregiver could see the app
+ * say "This phone is registered" and still never get an alert, and the only way to find out why was to SSH
+ * into the server, read the Expo token out of Mongo and hand-poll Expo's receipts — which is how the
+ * InvalidCredentials class of failure (Expo accepts the message, then cannot reach Firebase for want of an
+ * FCM V1 key) stayed invisible. Registration proves the phone can be addressed; only a delivered push
+ * proves the chain works, so the app needs a way to ask for one.
+ *
+ * No Idempotency-Key, matching /notification-devices above: sending a duplicate test alert on a double-tap
+ * is harmless, and refusing the second one would be worse — a caregiver who tapped twice deserves an answer
+ * both times. It writes nothing to `notifications`, so a test never appears in the real alert feed.
+ */
+notificationsRouter.post('/notification-devices/test', requireHuman, asyncHandler(async (request, response) => {
+  const principal = getPrincipal(request)
+  if (principal.kind !== 'human') throw forbidden()
+  const db = await getDb()
+  const devices = await db.collection<any>(collections.notificationDevices)
+    .find({ tenantId: principal.tenantId, userId: principal.userId, state: 'active' }).toArray()
+  const tokens = devices.map((device) => String(device.expoPushToken)).filter((token) => EXPO_TOKEN_RE.test(token))
+  if (!tokens.length) {
+    sendData(response, { outcome: 'no_registered_phone', devices: 0, delivered: 0, detail: null })
+    return
+  }
+
+  const tickets = await sendExpoPush(tokens.map((to) => ({
+    to,
+    title: 'Reflexion test alert',
+    body: 'Push notifications are working on this phone.',
+    sound: 'default' as const,
+    data: { type: 'test' },
+    channelId: ANDROID_CHANNEL_ID,
+    priority: 'high' as const,
+  })))
+
+  const rejected = tickets.find((ticket) => ticket.status !== 'ok')
+  const ticketIds = tickets.filter((ticket) => ticket.status === 'ok' && ticket.id).map((ticket) => String(ticket.id))
+  if (!ticketIds.length) {
+    sendData(response, {
+      outcome: 'rejected', devices: tokens.length, delivered: 0,
+      detail: rejected?.details?.error || rejected?.message || 'expo_error',
+    })
+    return
+  }
+
+  // Expo needs a moment before a receipt exists. One short wait beats making the app poll: the caregiver is
+  // standing there watching their phone, and an answer that arrives after they walk away is not an answer.
+  await new Promise((resolve) => setTimeout(resolve, 3_000))
+  const receipts = await fetchExpoReceipts(ticketIds)
+  const resolved = ticketIds.map((id) => receipts[id]).filter(Boolean)
+  const failure = resolved.find((receipt) => receipt.status === 'error')
+
+  if (resolved.some((receipt) => receipt.status === 'ok')) {
+    sendData(response, { outcome: 'delivered', devices: tokens.length, delivered: 1, detail: null })
+    return
+  }
+  if (failure) {
+    sendData(response, {
+      outcome: 'undelivered', devices: tokens.length, delivered: 0,
+      detail: failure.details?.error || failure.message || 'receipt_error',
+    })
+    return
+  }
+  // Accepted by Expo but not yet confirmed. The worker's receipt pass will settle it either way.
+  sendData(response, { outcome: 'accepted', devices: tokens.length, delivered: 0, detail: null })
 }))
 
 function serializeNotification(item: Record<string, any>) {
