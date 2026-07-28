@@ -2,10 +2,16 @@ import { Platform } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { CONVERSATION_MODE, type ConversationMode } from '../config/conversationMode'
+import { getApiUrl } from '../config/apiUrl'
 import { DEFAULT_RELAY_PORT } from '../constants/realtime'
 import { isNativePcmAvailable } from '../native/pcmAudio'
+import { isWakeWordRuntimeAvailable, resolveWakeWordAssets } from '../native/wakeWord'
 import { probeSpeakerLoopback } from './speakerCheck'
 import { recommendMode } from './recommendMode'
+
+// Past this, the wake-bounded day boundary (and therefore "is this the first conversation today?") can
+// land on the wrong day. Generous enough that ordinary NTP jitter never trips it.
+const MAX_CLOCK_SKEW_MS = 5 * 60 * 1000
 
 // Startup hardware / capability self-check. Runs on every launch (see app/_layout + the
 // /hardware-check screen). Web-verifiable now; native hardware results appear once built to a
@@ -133,12 +139,89 @@ async function checkCamera(): Promise<HardwareCheck> {
   try {
     const cam: any = await import('expo-camera')
     const get = cam?.getCameraPermissionsAsync ?? cam?.Camera?.getCameraPermissionsAsync
+    const request = cam?.requestCameraPermissionsAsync ?? cam?.Camera?.requestCameraPermissionsAsync
     const perm = get ? await get() : null
     if (perm?.granted) return { key: 'camera', label, status: 'ok', detail: '已授权' }
     if (perm && perm.canAskAgain === false) return { key: 'camera', label, status: 'fail', detail: '已拒绝(系统设置里开启)' }
-    return { key: 'camera', label, status: 'warn', detail: '尚未授权(人脸预检时再申请)' }
+    // Actively request once at setup so the installer/caregiver grants it while they are standing there,
+    // instead of ambushing the elder later when the face pre-check ships. A refusal is NOT a failure of
+    // the mirror: the voice check-in needs no camera, so we degrade to audio-only (visionAvailable=false)
+    // and keep going — nothing about the daily conversation depends on this.
+    const requested = request ? await request() : null
+    if (requested?.granted) return { key: 'camera', label, status: 'ok', detail: '已授权' }
+    return { key: 'camera', label, status: 'warn', detail: '未授权 — 降级为纯音频(语音 check-in 不需要摄像头)' }
   } catch {
     return { key: 'camera', label, status: 'unknown', detail: '无法探测(需真机)' }
+  }
+}
+
+/** Wake word: onnxruntime bridge + the three bundled ONNX assets must both be present. A silent failure
+ *  here degrades the mirror to tap-to-start, so an elder who relies on "Hello Aria" thinks it is dead. */
+async function checkWakeWord(): Promise<HardwareCheck> {
+  const label = '唤醒词(Hello Aria)'
+  if (Platform.OS === 'web') return { key: 'wakeword', label, status: 'warn', detail: 'web 不支持,改用点击开始' }
+  if (!isWakeWordRuntimeAvailable()) {
+    return { key: 'wakeword', label, status: 'fail', detail: 'onnxruntime 未链接到此构建 — 只能点击开始' }
+  }
+  try {
+    await resolveWakeWordAssets()
+    return { key: 'wakeword', label, status: 'ok', detail: 'onnxruntime + 模型资源就绪' }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    return { key: 'wakeword', label, status: 'fail', detail: `模型资源不可用:${message.slice(0, 60)}` }
+  }
+}
+
+/** The REAL backend, unlike the `relay` probe which only ever hit the dev relay on localhost:8787.
+ *  Also measures clock skew from the server's own timestamp, and reports server-side readiness so the
+ *  mirror learns about a missing Qwen key / object store it cannot possibly check for itself. */
+async function checkApiBackend(): Promise<HardwareCheck[]> {
+  const label = '后端 API'
+  const clockLabel = '设备时钟'
+  try {
+    const started = Date.now()
+    const res = await fetch(getApiUrl('/health'), { method: 'GET' })
+    if (!res.ok) {
+      return [
+        { key: 'api', label, status: 'fail', detail: `HTTP ${res.status}` },
+        { key: 'clock', label: clockLabel, status: 'unknown', detail: '后端不可达,无法校时' },
+      ]
+    }
+    const body = await res.json().catch(() => null) as
+      | { serverTime?: string; readiness?: { objectStore?: boolean; database?: boolean; qwen?: Record<string, boolean | string> } }
+      | null
+
+    // Server-side readiness the device cannot see. Reported as a warn, never a block: the backend may be
+    // fine for conversations while a non-critical piece is unset, and only an operator can fix these.
+    const missing: string[] = []
+    if (body?.readiness) {
+      if (body.readiness.objectStore === false) missing.push('对象存储未配置(录音上传会失败)')
+      if (body.readiness.database === false) missing.push('数据库未配置')
+      const qwen = body.readiness.qwen
+      const region = typeof qwen?.defaultRegion === 'string' ? qwen.defaultRegion : 'cn'
+      if (qwen && qwen[region] === false) missing.push(`Qwen ${region} 区密钥缺失`)
+    }
+    const api: HardwareCheck = missing.length
+      ? { key: 'api', label, status: 'warn', detail: `可达,但${missing.join(';')}` }
+      : { key: 'api', label, status: 'ok', detail: `可达(${Date.now() - started}ms)` }
+
+    // Clock skew: the wake-bounded "first conversation of the day" rule and the check-in schedule both
+    // read the device clock, so drift silently breaks them. Compare against the server's timestamp.
+    let clock: HardwareCheck = { key: 'clock', label: clockLabel, status: 'unknown', detail: '后端未返回时间' }
+    const serverTime = body?.serverTime ? Date.parse(body.serverTime) : NaN
+    if (!Number.isNaN(serverTime)) {
+      const skewMs = Math.abs(Date.now() - serverTime)
+      const skewLabel = skewMs < 1000 ? `${skewMs}ms` : `${Math.round(skewMs / 1000)}s`
+      clock = skewMs > MAX_CLOCK_SKEW_MS
+        ? { key: 'clock', label: clockLabel, status: 'fail', detail: `与服务器相差 ${skewLabel} — 每日判定会出错` }
+        : { key: 'clock', label: clockLabel, status: 'ok', detail: `与服务器相差 ${skewLabel}` }
+    }
+    return [api, clock]
+  } catch {
+    return [
+      { key: 'api', label, status: 'fail', detail: '不可达(检查网络)' },
+      { key: 'clock', label: clockLabel, status: 'unknown', detail: '后端不可达,无法校时' },
+    ]
   }
 }
 
@@ -172,15 +255,22 @@ function checkNetwork(): HardwareCheck {
   return { key: 'network', label: '网络', status: online ? 'ok' : 'fail', detail: online ? '在线' : '离线' }
 }
 
-async function checkBackend(): Promise<HardwareCheck> {
-  const label = '后端 / 中继(relay)'
+/**
+ * Dev-relay probe (localhost:8787). This is NOT the backend — a production Android mirror talks straight
+ * to Qwen and never uses the relay, so this check was permanently `warn` while occupying the slot a real
+ * backend check should have had (that is now `api`, see checkApiBackend). Kept for web/Electron, where
+ * the relay genuinely carries the conversation; skipped entirely on native so it stops adding noise.
+ */
+async function checkRelay(): Promise<HardwareCheck | null> {
+  if (Platform.OS !== 'web' && CONVERSATION_MODE !== 'relay') return null
+  const label = '中继 relay(web/Electron 用)'
   const base = relayHttpBase()
   try {
     const res = await fetch(`${base}/health`, { method: 'GET' })
     if (res.ok) return { key: 'relay', label, status: 'ok', detail: base }
     return { key: 'relay', label, status: 'warn', detail: `HTTP ${res.status} @ ${base}` }
   } catch {
-    return { key: 'relay', label, status: 'warn', detail: `不可达 @ ${base}(v2/直连不需要)` }
+    return { key: 'relay', label, status: 'warn', detail: `不可达 @ ${base}` }
   }
 }
 
@@ -217,18 +307,22 @@ function recommend(platform: string, byKey: Record<string, HardwareCheck>): { mo
 
 export async function runHardwareChecks(): Promise<HardwareReport> {
   const platform = Platform.OS
-  const [mic, camera, backend, turn, speakerProbe] = await Promise.all([
+  const [mic, camera, apiAndClock, relay, turn, wakeword, speakerProbe] = await Promise.all([
     checkMicrophone(),
     checkCamera(),
-    checkBackend(),
+    checkApiBackend(),
+    checkRelay(),
     checkTurnAudio(),
+    checkWakeWord(),
     readSpeakerProbe(),
   ])
   const checks: HardwareCheck[] = [
+    ...apiAndClock, // api + clock (the real backend, and clock skew measured against it)
     checkNetwork(),
-    backend,
+    ...(relay ? [relay] : []),
     mic,
     checkSpeaker(speakerProbe),
+    wakeword,
     camera,
     turn,
     checkRealtimeAudio(),
