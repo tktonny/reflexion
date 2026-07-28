@@ -37,6 +37,12 @@ export interface ConversationApi {
   messages: ChatMessage[]
   startConversation: () => void | Promise<void>
   stopConversation: () => void | Promise<void>
+  /**
+   * Clear a latched error status back to idle. The screen's "Try again" could previously only reset the
+   * problems IT owned; an error raised inside the hook stayed latched, so for those failures the button
+   * did nothing at all. Optional — transports that never latch an error can omit it.
+   */
+  resetStatus?: () => void
   connecting: boolean
   sessionActive: boolean
   userSpeaking: boolean
