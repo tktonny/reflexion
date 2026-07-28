@@ -38,6 +38,7 @@
     "expo-router": "~56.2.15",
     "expo-secure-store": "~56.0.4",
     "expo-status-bar": "~56.0.4",
+    "expo-updates": "~56.0.23",
     "mongodb": "^7.3.0",
     "onnxruntime-react-native": "^1.24.3",
     "qrcode-generator": "^2.0.4",
@@ -60,16 +61,30 @@
   "build": {
     "appId": "com.reflexion.mirror",
     "productName": "Reflexion Mirror",
-    "extraMetadata": { "main": "electron/main.js" },
+    "extraMetadata": {
+      "main": "electron/main.js"
+    },
     "files": [
-      "electron/**/*", "dist/**/*", "server/**/*", "package.json", "!**/*.map",
-      "!node_modules/**", "node_modules/ws/**"
+      "electron/**/*",
+      "dist/**/*",
+      "server/**/*",
+      "package.json",
+      "!**/*.map",
+      "!node_modules/**",
+      "node_modules/ws/**"
     ],
-    "directories": { "output": "dist-linux" },
+    "directories": {
+      "output": "dist-linux"
+    },
     "npmRebuild": false,
-    "electronLanguages": ["en-US"],
+    "electronLanguages": [
+      "en-US"
+    ],
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "category": "Utility",
       "executableName": "reflexion-mirror"
     }
