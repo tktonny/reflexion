@@ -6,6 +6,8 @@ import { getApiUrl } from '../config/apiUrl'
 import { DEFAULT_RELAY_PORT } from '../constants/realtime'
 import { isNativePcmAvailable } from '../native/pcmAudio'
 import { isWakeWordRuntimeAvailable, resolveWakeWordAssets } from '../native/wakeWord'
+import { validateBootstrapCredential } from '../orchestration/deviceBootstrap'
+import { getBootstrapCredential, getDeviceCredential } from '../storage/deviceCredentials'
 import { probeSpeakerLoopback } from './speakerCheck'
 import { recommendMode } from './recommendMode'
 
@@ -152,6 +154,68 @@ async function checkCamera(): Promise<HardwareCheck> {
     return { key: 'camera', label, status: 'warn', detail: '未授权 — 降级为纯音频(语音 check-in 不需要摄像头)' }
   } catch {
     return { key: 'camera', label, status: 'unknown', detail: '无法探测(需真机)' }
+  }
+}
+
+/**
+ * Device identity: is this mirror provisioned with a credential that still works, and is that credential
+ * actually THIS device's? Two failure modes that were previously invisible:
+ *
+ *  1. **Expiry.** The bootstrap token is a short-lived JWT (30-day TTL). Nothing warned about it, so a
+ *     test fleet would simply stop being able to pair one day with no explanation.
+ *  2. **Identity collision.** A bootstrap token is bound to ONE device (`did` in its payload). Building
+ *     one APK with an embedded token and installing it on several devices makes them all claim the same
+ *     device record — the later one silently takes over the earlier one's identity, and both devices'
+ *     conversations land on the same patient. This is why the token must be per device; provision each
+ *     unit through the enrollment screen instead of baking one token into a shared build.
+ *
+ * Credential *liveness* is deliberately not probed here: the boot flow already calls the authenticated
+ * device-configuration endpoint and falls through to pairing when the credential has been revoked
+ * (app/index.tsx), which is the correct recovery. This check only reports what it can see locally.
+ */
+async function checkDeviceIdentity(): Promise<HardwareCheck> {
+  const label = '设备身份 / 凭证'
+  try {
+    const [bootstrap, credential] = await Promise.all([getBootstrapCredential(), getDeviceCredential()])
+    if (credential) {
+      // Paired. Flag a mismatch against the embedded token, if any — that is the collision above.
+      const embedded = process.env.EXPO_PUBLIC_DEVICE_BOOTSTRAP_TOKEN
+      if (embedded) {
+        try {
+          const claims = validateBootstrapCredential(embedded)
+          if (claims.deviceId && claims.deviceId !== credential.deviceId) {
+            return {
+              key: 'identity',
+              label,
+              status: 'fail',
+              detail: `构建内嵌的 token 属于另一台设备(…${claims.deviceId.slice(-6)}),与本机凭证(…${credential.deviceId.slice(-6)})不一致 — 多台设备共用同一 token 会互相顶号`,
+            }
+          }
+        } catch { /* an expired/invalid embedded token cannot cause a collision; ignore it here */ }
+      }
+      const refreshExpiry = Date.parse(credential.refreshCredentialExpiresAt || '')
+      if (!Number.isNaN(refreshExpiry)) {
+        const days = Math.floor((refreshExpiry - Date.now()) / 86_400_000)
+        if (days < 0) return { key: 'identity', label, status: 'fail', detail: '凭证已过期,需要重新配对' }
+        if (days <= 7) return { key: 'identity', label, status: 'warn', detail: `已配对,但凭证 ${days} 天后过期` }
+      }
+      return { key: 'identity', label, status: 'ok', detail: `已配对(设备 …${credential.deviceId.slice(-6)})` }
+    }
+    if (!bootstrap) {
+      return { key: 'identity', label, status: 'fail', detail: '未预配也未配对 — 需在设备录入 bootstrap 凭证' }
+    }
+    // Provisioned but not yet paired: surface how long the window still is.
+    try {
+      const claims = validateBootstrapCredential(bootstrap.token)
+      const days = Math.floor((claims.expiresAt * 1000 - Date.now()) / 86_400_000)
+      return days <= 7
+        ? { key: 'identity', label, status: 'warn', detail: `待配对,bootstrap 凭证 ${days} 天后过期` }
+        : { key: 'identity', label, status: 'ok', detail: `待配对(凭证还有 ${days} 天)` }
+    } catch {
+      return { key: 'identity', label, status: 'fail', detail: 'bootstrap 凭证已过期或无效 — 需重新录入' }
+    }
+  } catch {
+    return { key: 'identity', label, status: 'unknown', detail: '无法读取本机凭证' }
   }
 }
 
@@ -307,19 +371,21 @@ function recommend(platform: string, byKey: Record<string, HardwareCheck>): { mo
 
 export async function runHardwareChecks(): Promise<HardwareReport> {
   const platform = Platform.OS
-  const [mic, camera, apiAndClock, relay, turn, wakeword, speakerProbe] = await Promise.all([
+  const [mic, camera, apiAndClock, relay, turn, wakeword, identity, speakerProbe] = await Promise.all([
     checkMicrophone(),
     checkCamera(),
     checkApiBackend(),
     checkRelay(),
     checkTurnAudio(),
     checkWakeWord(),
+    checkDeviceIdentity(),
     readSpeakerProbe(),
   ])
   const checks: HardwareCheck[] = [
     ...apiAndClock, // api + clock (the real backend, and clock skew measured against it)
     checkNetwork(),
     ...(relay ? [relay] : []),
+    identity,
     mic,
     checkSpeaker(speakerProbe),
     wakeword,
