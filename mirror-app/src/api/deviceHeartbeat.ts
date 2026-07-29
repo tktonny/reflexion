@@ -46,7 +46,11 @@ export async function sendDeviceHeartbeat(report?: HardwareReport) {
         appVersion: Constants.expoConfig?.version || 'unknown',
         networkStatus: online ? 'online' : 'offline',
         micStatus: mic?.status === 'ok' ? 'ok' : mic?.status === 'fail' ? 'permission_denied' : 'unavailable',
-        speakerStatus: speaker?.status === 'fail' ? 'error' : 'ok',
+        // `ok` here must mean VERIFIED. This previously reported 'ok' for every status except 'fail' —
+        // including when there was no report at all — so a dead or muted speaker looked healthy to the
+        // caregiver. The backend enum has no 'unknown', so an unverified speaker maps to 'unavailable'
+        // (true: we cannot confirm it works); only a real loopback pass reports 'ok'. See speakerCheck.ts.
+        speakerStatus: speaker?.status === 'ok' ? 'ok' : speaker?.status === 'fail' ? 'error' : 'unavailable',
         backendReachable: lastBackendReachable,
         diagnostics: report ? {
           platform: report.platform,

@@ -25,12 +25,30 @@ export function createApp() {
 
   app.use(express.json({ limit: '1mb' }))
 
-  app.get('/health', (_request, response) => {
-    response.json({ ok: true })
+  // `ok` stays the top-level field every existing probe (nginx, pm2, smoke:deployment) reads.
+  // `readiness` is additive: it tells a mirror in ONE unauthenticated request whether the pieces its
+  // conversation depends on are actually configured server-side. The device cannot check these itself —
+  // it holds no provider key by design — and each of these has already broken a real check-in:
+  // an empty OBJECT_STORE_DRIVER made every artifact upload 503 ("Aria needs a moment"), and a missing
+  // regional Qwen key silently falls back to another region.
+  // SECURITY: booleans and region names only. Never a key, a URI, or any fragment of one.
+  const readiness = () => ({
+    qwen: {
+      cn: Boolean(process.env.QWEN_CN_API_KEY || process.env.QWEN_API_KEY),
+      sg: Boolean(process.env.QWEN_SG_API_KEY || process.env.QWEN_API_KEY_SINGAPORE),
+      jp: Boolean(process.env.QWEN_JP_API_KEY),
+      defaultRegion: process.env.QWEN_DEFAULT_REGION || 'cn',
+    },
+    objectStore: Boolean(process.env.OBJECT_STORE_DRIVER),
+    database: Boolean(process.env.MONGODB_URI),
   })
-  app.get('/healthcheck', (_request, response) => {
-    response.json({ ok: true })
-  })
+  const health = (_request: express.Request, response: express.Response) => {
+    // Date lets the device measure clock skew — the wake-bounded "first conversation of the day" rule
+    // silently breaks when the mirror's clock drifts, and express sets Date on every response anyway.
+    response.json({ ok: true, serverTime: new Date().toISOString(), readiness: readiness() })
+  }
+  app.get('/health', health)
+  app.get('/healthcheck', health)
 
   app.use('/api/v1/auth', rateLimit({ namespace: 'auth', maximum: Number(process.env.AUTH_RATE_LIMIT_PER_MINUTE || 20) }))
   app.use('/api/v1', rateLimit({ namespace: 'api', maximum: Number(process.env.API_RATE_LIMIT_PER_MINUTE || 300) }), auditAccess, v1Router)

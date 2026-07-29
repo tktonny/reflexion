@@ -11,7 +11,23 @@ const apiBase = origin.toString().replace(/\/$/, '')
 
 const health = await fetch(`${apiBase}/health`, { signal: AbortSignal.timeout(10_000) })
 assert.equal(health.status, 200, 'GET /health must return 200.')
-assert.deepEqual(await health.json(), { ok: true })
+// /health now carries additive readiness fields (see createApp) that let a mirror verify the whole
+// chain in one unauthenticated request. Assert the CONTRACT rather than an exact shape — and keep the
+// no-leak guarantee enforced right here, so a regression that puts key material in /health fails deploy.
+const healthBody = await health.json() as {
+  ok?: boolean
+  serverTime?: string
+  readiness?: { objectStore?: unknown; database?: unknown; qwen?: Record<string, unknown> }
+}
+assert.equal(healthBody.ok, true, 'GET /health must report ok:true.')
+assert.ok(healthBody.serverTime && !Number.isNaN(Date.parse(healthBody.serverTime)), '/health must report serverTime for clock-skew checks.')
+assert.equal(typeof healthBody.readiness?.objectStore, 'boolean', '/health must report objectStore readiness as a boolean.')
+assert.equal(typeof healthBody.readiness?.database, 'boolean', '/health must report database readiness as a boolean.')
+assert.ok(
+  Object.values(healthBody.readiness?.qwen ?? {}).every((value) => typeof value === 'boolean' || typeof value === 'string'),
+  '/health qwen readiness must expose booleans and region names only.',
+)
+assert.ok(!/sk-|mongodb(\+srv)?:\/\//.test(JSON.stringify(healthBody)), '/health must never leak a key or a connection URI.')
 assert.equal(health.headers.get('x-powered-by'), null, 'Express fingerprinting must be disabled.')
 assert.ok(health.headers.get('x-request-id'), 'Health response must include X-Request-Id.')
 assert.equal(health.headers.get('x-content-type-options'), 'nosniff')

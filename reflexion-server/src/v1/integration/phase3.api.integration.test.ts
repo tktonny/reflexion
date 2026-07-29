@@ -86,7 +86,10 @@ test('Phase 3 API works end-to-end across auth, pairing, session ingestion and t
 
     await t.test('health and v1 errors expose the frozen envelope and production headers', async () => {
       const health = await app.get('/health').expect(200)
-      assert.deepEqual(health.body, { ok: true })
+      // `ok` stays the frozen contract every probe reads; readiness is additive (see createApp).
+      assert.equal(health.body.ok, true)
+      assert.equal(typeof health.body.readiness?.objectStore, 'boolean')
+      assert.ok(!/sk-|mongodb(\+srv)?:\/\//.test(JSON.stringify(health.body)), '/health must not leak secrets')
       assert.equal(health.headers['x-powered-by'], undefined)
       assert.equal(health.headers['x-content-type-options'], 'nosniff')
 

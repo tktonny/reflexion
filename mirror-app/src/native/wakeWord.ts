@@ -78,6 +78,20 @@ async function assetPath(moduleId: number): Promise<string> {
   return (asset.localUri ?? asset.uri).replace('file://', '')
 }
 
+/**
+ * Resolve all three bundled models, for the startup self-check. Throws if any asset is missing, which is
+ * the failure that used to leave the mirror silently tap-only. Deliberately does NOT create the
+ * InferenceSessions: that costs ~3.7 MB of model init which the conversation screen does anyway, and the
+ * asset resolution is what actually differs between a healthy build and a broken one.
+ */
+export async function resolveWakeWordAssets(): Promise<void> {
+  await Promise.all([
+    assetPath(MODEL_MODULES.mel),
+    assetPath(MODEL_MODULES.emb),
+    assetPath(MODEL_MODULES.ww),
+  ])
+}
+
 export type WakeWordEngine = { feed: (pcm16: Int16Array) => Promise<void>; reset: () => void }
 
 /** Build the engine, or null if the runtime/models are unavailable (caller then uses tap-to-start). */
