@@ -327,7 +327,14 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   }, [])
 
   const reportUnavailable = useCallback((reason: string) => {
-    if (hadResponseRef.current || reportedUnavailableRef.current) return
+    // Gate on PATIENT TURNS, not on hadResponseRef. Falling back restarts the conversation on the
+    // turn-based engine, which is free while the elder has not answered anything yet and destructive
+    // afterwards (it would re-ask questions they already answered). hadResponseRef cannot express that:
+    // screening force-sets it at session.updated (it never receives a provider response, only ASR), so
+    // any screening failure looked "live" here and the fallback was silently skipped — the check-in died
+    // instead of degrading. `resume` at tryReconnect and the audio_start_failed path already use
+    // turnCount for exactly this decision.
+    if (turnCountRef.current > 0 || reportedUnavailableRef.current) return
     reportedUnavailableRef.current = true
     if (connectTimerRef.current) { clearTimeout(connectTimerRef.current); connectTimerRef.current = null }
     // Non-__DEV__ breadcrumb (like [session-telemetry]) so the reason for a v3→fallback is visible in a
@@ -893,10 +900,14 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         const detail = `${providerCode}${providerMessage ? `: ${providerMessage}` : ''}`
         dbg.log(`omni err ${detail}`.slice(0, 200))
         dbg.mic({ err: detail.slice(0, 260) })
-        if (!hadResponseRef.current) {
-          // Omni rejected the session before any response: hand off to the fallback AND tear this
-          // transport down (close -> onclose -> cleanup stops the PCM bridge). Do NOT un-mute, or the
-          // still-open v3 mic would capture concurrently with the v2 fallback.
+        if (turnCountRef.current === 0) {
+          // Omni rejected the session before the elder answered anything: hand off to the fallback AND
+          // tear this transport down (close -> onclose -> cleanup stops the PCM bridge). Do NOT un-mute,
+          // or the still-open v3 mic would capture concurrently with the v2 fallback.
+          //
+          // This used to test hadResponseRef, which screening force-sets — so the SAME provider error was
+          // invisible in free talk (silent fallback) but fatal in a check-in, the conversation that
+          // actually matters. Nothing is lost by restarting on the fallback before the first answer.
           reportUnavailable(`ws_error_frame ${providerCode}`)
           try { socketRef.current?.close() } catch {}
           return
@@ -1448,6 +1459,10 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         // Before any response: omni is unreachable -> let the supervisor fall back (onclose cleans up).
         if (!hadResponseRef.current) { reportUnavailable('ws_error'); cleanup(); return }
         if (tryReconnect('ws_error')) return
+        // Reconnects exhausted. While the elder has not answered anything yet there is nothing to
+        // preserve, so degrade to the turn-based engine rather than ending the conversation — dying here
+        // is what turned a transient link failure into "Aria needs a moment." on a check-in.
+        if (turnCountRef.current === 0) { reportUnavailable('ws_error_reconnects_exhausted'); cleanup(); return }
         failClosed('Realtime connection error.')
       }
       socket.onclose = () => {
