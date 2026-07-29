@@ -39,6 +39,10 @@ npm run test:turn-taking
 
 The checked-out `android/` project includes the local `expo-pcm-audio` native module and release-signing guard. See [`docs/ANDROID_BUILD.md`](./docs/ANDROID_BUILD.md) for configuration, signing and APK/AAB commands.
 
+## Provisioning a device
+
+Each unit needs its own bootstrap token — a token is bound to ONE device, so a shared build must NOT embed one. Test fleets use a universal APK plus on-device enrolment; see [`../docs/mirror-app/device-provisioning.md`](../docs/mirror-app/device-provisioning.md) (also covers renewal and the factory-TTL problem).
+
 ## Linux (Ubuntu) via Electron
 
 The same app also ships as a Linux desktop app — the web build (`react-native-web`) wrapped in Electron (`electron/`).
