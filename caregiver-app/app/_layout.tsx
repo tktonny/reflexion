@@ -6,7 +6,11 @@ import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { getStoredAuthSession, loadStoredAuthSession } from '../src/lib/authSession';
 import { loadV1Session } from '../src/lib/v1AuthSession';
-import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
+import {
+  prepareNotificationDisplay,
+  registerPushNotificationDevice,
+  subscribeToNotificationTaps,
+} from '../src/lib/pushNotifications';
 import { queryClient } from '../src/lib/queryClient';
 import { colors } from '../src/theme';
 
@@ -46,6 +50,23 @@ function AuthGate({ children }: { children: ReactNode }) {
   const { mutate: registerDevice } = useMutation({
     mutationFn: registerPushNotificationDevice,
   });
+
+  // Install the foreground display handler + Android channel FIRST, and unconditionally. This must not
+  // wait on session hydration or on registerDevice succeeding: a push that arrives while the app is open
+  // is only shown if a handler is already asking for it, and a caregiver whose v1 token has not come up
+  // still needs to see their alerts. Registration below is the separate, network-dependent half.
+  useEffect(() => {
+    void prepareNotificationDisplay();
+  }, []);
+
+  // A tapped alert goes to the alert list, not wherever the app happened to be.
+  useEffect(() => {
+    if (!isHydrated) return;
+    return subscribeToNotificationTaps(() => {
+      if (!getStoredAuthSession()?.userId) return;
+      router.push('/notifications');
+    });
+  }, [isHydrated, router]);
 
   // Hydrate the stored sessions ONCE on mount (legacy session gates routing; v1 token feeds
   // status reads). Critically, the navigator (<Stack>) is only withheld on this first boot —
