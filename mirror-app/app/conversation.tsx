@@ -36,6 +36,12 @@ import { isCheckinDoneToday, markCheckinDoneToday, wakeHourFrom } from '../src/s
 type ClosingStage = 'idle' | 'buffering' | 'goodbye' | 'saving'
 type LocalProblem = 'offline' | 'microphone' | 'service' | null
 
+// Show the raw failure reason on the error screen. Reuses the debug-overlay switch, so a test APK
+// (EXPO_PUBLIC_DEBUG_OVERLAY=on) is self-diagnosing while a production mirror shows an elder only the
+// warm copy. Set it independently with EXPO_PUBLIC_DEBUG_ERRORS=on if you want reasons without the HUD.
+const DEBUG_REASON_ON_SCREEN =
+  process.env.EXPO_PUBLIC_DEBUG_OVERLAY === 'on' || process.env.EXPO_PUBLIC_DEBUG_ERRORS === 'on'
+
 type SpeechRecognitionResultLike = {
   isFinal: boolean
   length: number
@@ -102,8 +108,13 @@ function latestMessage(messages: ChatMessage[], role: 'assistant' | 'user') {
   return messages.filter((message) => message.role === role).at(-1)?.text.trim() ?? ''
 }
 
+// Anything matching neither list falls through to 'service' — the "we could not tell what broke" bucket
+// the elder sees as "Aria needs a moment.". Two genuine connectivity failures used to land there on
+// wording alone: the reconnect watchdog says "timed out" (the old pattern only had "timeout"), and an
+// aborted fetch throws "Aborted" — so a slow link was reported as a service fault. Gateway codes
+// (api_502/503/504, 408, 429) are plainly connectivity too.
 function classifyError(message: string): Exclude<LocalProblem, null> {
-  if (/network|offline|connection|reach|socket|closed|timeout|fetch/i.test(message)) return 'offline'
+  if (/network|offline|connection|reach|socket|closed|timed?\s?out|timeout|fetch|abort|api_(408|429|50[234])/i.test(message)) return 'offline'
   if (/microphone|mic |audio start|permission|audiorecord/i.test(message)) return 'microphone'
   return 'service'
 }
@@ -125,6 +136,10 @@ export default function ConversationScreen() {
   const [wakeListening, setWakeListening] = useState(false)
   const [wakeError, setWakeError] = useState('')
   const [localProblem, setLocalProblem] = useState<LocalProblem>(null)
+  // The REASON behind localProblem. It used to be classified into a category and then thrown away, so
+  // the only record of why a check-in died was a logcat line — every field failure had to be guessed at.
+  // Kept here so a debug build can show it on screen (see DebugReason in MirrorExperience).
+  const [problemDetail, setProblemDetail] = useState<string | null>(null)
   const [weather, setWeather] = useState<CurrentWeather | null>(null)
   const [weatherLocation, setWeatherLocation] = useState<WeatherLocation | null>(null)
   const [usualWakeTime, setUsualWakeTime] = useState<string | null>(null)
@@ -136,6 +151,7 @@ export default function ConversationScreen() {
     messages,
     startConversation,
     stopConversation,
+    resetStatus,
     connecting,
     sessionActive,
     userSpeaking,
@@ -333,6 +349,7 @@ export default function ConversationScreen() {
       await startConversation()
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to reach the Reflexion service.'
+      setProblemDetail(`start: ${message}`)
       setLocalProblem(classifyError(message))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -454,7 +471,9 @@ export default function ConversationScreen() {
       endingRef.current = false
       setEndingConversation(false)
       setClosingStage('idle')
-      setLocalProblem(classifyError(error instanceof Error ? error.message : 'Unable to save the conversation.'))
+      const saveMessage = error instanceof Error ? error.message : 'Unable to save the conversation.'
+      setProblemDetail(`save: ${saveMessage}`)
+      setLocalProblem(classifyError(saveMessage))
     }
   }, [language, nurseName, persona, usualWakeTime, stopConversation])
 
@@ -489,15 +508,21 @@ export default function ConversationScreen() {
       return
     }
     if (!pairing.online) {
+      setProblemDetail('retry: device offline (pairing check)')
       setLocalProblem('offline')
       return
     }
     try {
       await sendDeviceHeartbeat()
-    } catch {
+    } catch (error) {
+      setProblemDetail(`retry: heartbeat failed — ${error instanceof Error ? error.message : 'unknown'}`)
       setLocalProblem('offline')
       return
     }
+    // Also un-latch an error the HOOK is holding. Without this, "Try again" only cleared the problems
+    // this screen owned, so on any realtime/TTS failure the button visibly did nothing.
+    resetStatus?.()
+    setProblemDetail(null)
     setLocalProblem(null)
   }
 
@@ -579,6 +604,7 @@ export default function ConversationScreen() {
         onEnd={() => void finalize()}
         onRetry={() => void retryProblem()}
         patientName={patientName}
+        problemDetail={DEBUG_REASON_ON_SCREEN ? (problemDetail || (statusKind === 'error' ? `realtime: ${statusText}` : undefined)) : undefined}
         progressText={progressText}
         state={visualState}
         time={formatTime(now, language)}

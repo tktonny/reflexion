@@ -44,6 +44,13 @@ type Props = {
   assistantText?: string
   userText?: string
   statusText?: string
+  /**
+   * Raw technical reason behind an error state, for FIELD DEBUGGING only. The elder-facing title and body
+   * above it are unchanged, so this adds diagnosability without changing what the mirror says to a person.
+   * Callers pass it only in debug builds. Until it existed, the screen read identically for a missing
+   * consent, a failed TTS call and a dead backend — every field failure had to be guessed from logcat.
+   */
+  problemDetail?: string
   progressText?: string
   /** Patient language (from the caregiver-app setting via device config) — localizes all UI chrome. */
   language?: string
@@ -257,6 +264,11 @@ function Problem(props: Props) {
         <Pressable accessibilityRole="button" onPress={props.onRetry} style={styles.retryButton}>
           <Text style={styles.retryText}>{offline ? t.retryOffline : t.retry}</Text>
         </Pressable>
+      ) : null}
+      {/* Debug builds only (the caller gates it) — the actual failure, so a tester does not have to
+          reach for logcat to tell a missing consent from a TTS failure. */}
+      {props.problemDetail ? (
+        <Text selectable style={styles.problemDetail}>{props.problemDetail}</Text>
       ) : null}
     </View>
   )
@@ -483,6 +495,9 @@ const styles = StyleSheet.create({
   problemIconError: { backgroundColor: 'rgba(201,120,110,0.10)', borderColor: 'rgba(201,120,110,0.22)' },
   problemTitle: { color: c.text, fontFamily: f.display, fontSize: 39, lineHeight: 49, marginTop: 28, maxWidth: 560, textAlign: 'center' },
   problemBody: { color: c.textSecondary, fontFamily: f.body, fontSize: 21, lineHeight: 31, marginTop: 18, maxWidth: 520, textAlign: 'center' },
+  // Diagnostic line: monospace and deliberately small/quiet so it reads as a technical code, never as
+  // something the elder is being asked to act on. Only rendered in debug builds.
+  problemDetail: { color: c.textSecondary, fontFamily: 'monospace', fontSize: 12, lineHeight: 17, marginTop: 28, maxWidth: 560, opacity: 0.75, textAlign: 'center' },
   offlineAssurance: { alignItems: 'center', backgroundColor: 'rgba(171,197,161,0.18)', borderRadius: 20, flexDirection: 'row', gap: 10, marginTop: 28, paddingHorizontal: 15, paddingVertical: 12 },
   offlineAssuranceText: { color: c.sageDeep, fontFamily: f.bodyMedium, fontSize: 15 },
   retryButton: { backgroundColor: c.text, borderRadius: 27, marginTop: 30, paddingHorizontal: 27, paddingVertical: 15 },

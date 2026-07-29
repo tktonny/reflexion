@@ -292,6 +292,12 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     setStatusText(text)
   }, [])
 
+  /** Un-latch a terminal error so the screen's "Try again" can bring the mirror back to ambient. */
+  const resetStatus = useCallback(() => {
+    setStatusKind('idle')
+    setStatusText('')
+  }, [])
+
   const transition = useCallback((event: TurnTakingEvent) => {
     const previousViolationCount = turnTakingRef.current.violations.length
     const next = reduceTurnTaking(turnTakingRef.current, event)
@@ -1560,6 +1566,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     messages,
     startConversation,
     stopConversation,
+    resetStatus,
     connecting,
     sessionActive,
     userSpeaking,
