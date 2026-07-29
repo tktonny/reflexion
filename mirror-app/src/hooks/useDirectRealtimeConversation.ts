@@ -4,6 +4,8 @@ import { Platform } from 'react-native'
 import { getBearer, getQwenRealtimeEndpoint, getQwenRealtimeModel } from '../api/qwenToken'
 import { qwenTTS } from '../api/qwenClient'
 import {
+  guidedOpeningDirective,
+  guidedStageDirective,
   looksLikeGoodbye,
   looksLikeUserGoodbye,
 } from '../orchestration/orchestrator'
@@ -23,7 +25,7 @@ import {
   takeYourTimeForLanguage,
 } from '../orchestration/deterministicSpeech'
 import { createSessionTelemetry } from '../orchestration/sessionTelemetry'
-import { createSessionCheckinFlow, type DailyCheckinFlow } from '../orchestration/dailyCheckinFlow'
+import { createSessionCheckinFlow, type CheckinStage, type DailyCheckinFlow } from '../orchestration/dailyCheckinFlow'
 import {
   acquireConversationRuntime,
   type ConversationRuntimeLease,
@@ -128,6 +130,16 @@ const DEBUG_MIC = process.env.EXPO_PUBLIC_DEBUG_OVERLAY === 'on'
 // Hidden user-role priming turn seeded before the companion opening response.create so SG accepts it
 // (see the seeding in session.updated). Input-only; never spoken, never in the recorded transcript.
 const COMPANION_OPENING_CUE = '(Please greet me warmly to begin our chat.)'
+
+// GUIDED check-in: qwen omni realtime speaks the check-in, steered per turn by the flow machine, instead
+// of reciting pre-written qwen-tts lines. Both conversations then run on one engine and one voice.
+// Set EXPO_PUBLIC_CHECKIN_SPEECH=scripted to fall back to the old deterministic script — a kill switch
+// worth keeping while the guided wording is still being judged on real hardware.
+const GUIDED_CHECKIN = (process.env.EXPO_PUBLIC_CHECKIN_SPEECH ?? 'guided') !== 'scripted'
+
+// How long to wait for the provider to acknowledge a queued session.update with an actual response
+// before treating it as a stall. Generous: it must not fire during a slow-but-working generation.
+const PROVIDER_RESPONSE_TIMEOUT_MS = 20_000
 const BARGE_IN_START_RMS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_START_RMS, 0.04)
 const BARGE_IN_MIN_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_MIN_MS, 300)
 const BARGE_IN_GRACE_MS = numberFromEnv(process.env.EXPO_PUBLIC_BARGEIN_GRACE_MS, 900)
@@ -395,6 +407,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const SILENCE_MS = 8000 // within the doc's 7–10s window
   const clearSilenceTimer = useCallback(() => {
     if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null }
+    if (providerWatchdogRef.current) { clearTimeout(providerWatchdogRef.current); providerWatchdogRef.current = null }
   }, [])
   const armSilenceTimer = useCallback(() => {
     clearSilenceTimer()
@@ -408,6 +421,14 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     if (s && s.readyState === WebSocket.OPEN) s.send(JSON.stringify(event))
   }, [])
 
+  // Watchdog for a queued provider response (see configureNextResponse). tryReconnect is referenced
+  // through a ref because it is declared later in this hook.
+  const providerWatchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const tryReconnectRef = useRef<((reason: string) => boolean) | null>(null)
+  const clearProviderWatchdog = useCallback(() => {
+    if (providerWatchdogRef.current) { clearTimeout(providerWatchdogRef.current); providerWatchdogRef.current = null }
+  }, [])
+
   const configureNextResponse = useCallback((
     sessionUpdate: Record<string, unknown>,
     intent: 'normal' | 'closing',
@@ -418,9 +439,28 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     }
     responseAfterSessionUpdateRef.current = intent
     if (__DEV__) console.info(`[turn-taking] queued ${intent} session update`)
+    // Watchdog on the whole session.update -> session.updated -> response.create -> response.created
+    // round trip. Nothing else covers it: the transcript timer was just cleared, the silence timer was
+    // cleared when the user turn finished, and waitForPlaybackDrain's timeout is only armed at
+    // response.done. A half-open socket (the documented cross-border failure this hook's whole reconnect
+    // ladder exists for) delivers no onclose/onerror, so without this the session sits in
+    // assistant_generating forever: `ended` is never set, finalize() never runs, and a fully answered
+    // check-in is silently never uploaded — the caregiver just sees a missed day. The scripted path had
+    // this covered for free, because every line went through qwenTTS's 45s fetch timeout into failClosed.
+    clearProviderWatchdog()
+    providerWatchdogRef.current = setTimeout(() => {
+      providerWatchdogRef.current = null
+      if (!runtimeLeaseRef.current?.isCurrent() || endedRef.current) return
+      if (!responseAfterSessionUpdateRef.current) return // already acknowledged
+      // A stalled CLOSING turn must fail closed, never reconnect: tryReconnect refuses while closing, and
+      // failing closed is what lets the `ended` effect still run finalize() and save the answers.
+      if (intent === 'closing' || !tryReconnectRef.current?.('provider_response_timeout')) {
+        failClosed('Aria stopped responding.')
+      }
+    }, PROVIDER_RESPONSE_TIMEOUT_MS)
     send(sessionUpdate)
     return true
-  }, [failClosed, send])
+  }, [clearProviderWatchdog, failClosed, send])
 
   const appendAssistantStreaming = useCallback((text: string) => {
     if (!streamIdRef.current) {
@@ -934,11 +974,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           }
         } else if (!openingRequestedRef.current) {
           openingRequestedRef.current = true
-          if (persona === 'screening') {
-            // Screening opens with the EXACT scripted warm-up: strict stage 1, no LLM drift, no
+          if (persona === 'screening' && !GUIDED_CHECKIN) {
+            // Scripted mode: the EXACT warm-up through local TTS — strict stage 1, no LLM drift, no
             // round-trip. Mark the session live (hadResponseRef) so a later WS drop reconnects/fails
-            // rather than silently restarting under turn-based — the screening path produces no realtime
-            // provider response (only ASR), so hadResponseRef would otherwise never flip.
+            // rather than silently restarting under turn-based — this path produces no realtime provider
+            // response (only ASR), so hadResponseRef would otherwise never flip.
             hadResponseRef.current = true
             void playDeterministicResponse(
               openingTextForLanguage(voiceRef.current.languageKey, dailyPlan.patientName),
@@ -1000,6 +1040,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         // honoured. A too-short answer consumes a gentle reprompt (re-asks the same question) before
         // advancing, and the flow can never wedge on a required question.
         let scriptedQuestion: string | null = null
+        let scriptedStage: CheckinStage | null = null
         if (persona === 'screening') {
           const flow = checkinFlowRef.current
           let answered = false
@@ -1007,16 +1048,17 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
             if (flow.recordAnswer(transcript) === 'insufficient') flow.recordRepromptOrTimeout()
             else answered = true
             const nextQuestion = flow.current()
+            scriptedStage = nextQuestion?.stage ?? null
             scriptedQuestion = nextQuestion
               ? screeningQuestionForTurn(voiceRef.current.languageKey, nextQuestion.order, dailyPlan)
               : null
           } else {
             scriptedQuestion = screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current, dailyPlan)
           }
-          // Warm the hand-off: prepend a brief neutral acknowledgement to the next scripted question so
-          // the check-in feels like a friend, not a questionnaire. Only after a satisfactory answer (not
-          // a reprompt), and never before the close (the dailyFlowComplete path owns the goodbye).
-          if (answered && scriptedQuestion) {
+          // Warm the hand-off. In GUIDED mode the model writes its own reaction to what was just said, so
+          // prepending a canned acknowledgement here would double it up — the rotating three-phrase glue
+          // is exactly the "questionnaire" feel we are removing. Scripted mode keeps it.
+          if (!GUIDED_CHECKIN && answered && scriptedQuestion) {
             scriptedQuestion = `${acknowledgementForLanguage(voiceRef.current.languageKey, turnCountRef.current)} ${scriptedQuestion}`
           }
         }
@@ -1033,16 +1075,43 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           closingRef.current = true
           wrappingUpRef.current = true
           transition({ type: 'close_requested' })
-          const goodbye = persona === 'companion'
-            ? companionClosingTextForLanguage(voiceRef.current.languageKey)
-            : closingTextForLanguage(voiceRef.current.languageKey)
-          void playDeterministicResponse(goodbye, true)
+          if (persona === 'screening' && GUIDED_CHECKIN) {
+            // Close on the same engine and voice as the rest of the guided check-in. The deterministic
+            // close speaks through qwen-tts, whose voice list differs from the realtime one (Cherry vs
+            // Serena), so keeping it would make Aria's voice audibly change at the goodbye. wrapUp still
+            // pins the exact final sentence — only the delivery moves, not the wording.
+            // No `response_requested` here: the user turn's response is still in flight, so the reducer
+            // would reject it ("a second response was requested before playback completed") and log a
+            // violation on every single close — poisoning the one turn-ownership ledger we have.
+            // `close_requested` above already set closingRequested, so the provider's response.created
+            // resolves phase 'closing' by itself. This mirrors the old scripted close, which emitted
+            // response_created alone.
+            responseRequestedRef.current = true
+            audioRef.current?.setCaptureMuted(true)
+            configureNextResponse(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, {
+              voice: voiceRef.current.voice,
+              languageKey: voiceRef.current.languageKey,
+              persona,
+              patientName: dailyPlan.patientName,
+              autoCreateResponse: false,
+              wrapUp: true,
+            }), 'closing')
+          } else {
+            const goodbye = persona === 'companion'
+              ? companionClosingTextForLanguage(voiceRef.current.languageKey)
+              : closingTextForLanguage(voiceRef.current.languageKey)
+            void playDeterministicResponse(goodbye, true)
+          }
           return
         }
 
-        if (scriptedQuestion) {
+        if (scriptedQuestion && !GUIDED_CHECKIN) {
           void playDeterministicResponse(scriptedQuestion, false)
         } else {
+          // Guided check-in shares the companion path: omni generates the audio. The only difference is
+          // the one-turn directive, which carries the canonical question the flow machine just chose —
+          // so Aria reacts to what was actually said and then asks it in her own words, instead of
+          // reciting a fixed line behind one of three rotating acknowledgements.
           configureNextResponse(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, {
             voice: voiceRef.current.voice,
             languageKey: voiceRef.current.languageKey,
@@ -1051,6 +1120,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
             autoCreateResponse: false,
             memory: memoryRef.current,
             weather: weatherRef.current,
+            turnDirective: scriptedQuestion
+              ? guidedStageDirective(scriptedQuestion, { isMedication: scriptedStage === 'medication_reminder' })
+              : undefined,
           }), 'normal')
         }
         return
@@ -1077,9 +1149,16 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         responseCompletedRef.current = false
         responseAudioReceivedRef.current = false
         currentResponseSourceRef.current = 'realtime'
+        clearProviderWatchdog() // provider acknowledged; the round trip is no longer stalled
         activeProviderResponseIdRef.current = createdResponseId
         currentResponseClosingRef.current = closingRef.current
-        goodbyeDetectedRef.current = false
+        // For a CLOSING response we already asked for the goodbye (wrapUp pins the exact sentence), so
+        // treat it as detected rather than re-deriving it from the generated wording. Otherwise the
+        // assertion in handlePlaybackComplete (closingResponse && !goodbyeDetected -> failClosed) becomes
+        // a bet on looksLikeGoodbye() matching a paraphrase — and losing a fully answered check-in at the
+        // final second is far worse than trusting the close we requested. The scripted path had this
+        // guarantee for free (playDeterministicResponse set the flag directly).
+        goodbyeDetectedRef.current = closingRef.current
         audioRef.current?.setCaptureMuted(true)
         transition({ type: 'response_created' })
         telemetryRef.current.onAriaResponseCreated(Date.now())
@@ -1227,6 +1306,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   // it restarts fresh; mid-conversation it RESUMES (see startConversation's `resume` path + the
   // resumingRef branch in session.updated). Refused once ended/closing/manually-closed or the per-gap
   // budget is spent. Returns true when a reconnect was scheduled (caller must then stop/return).
+  // Exposed through a ref so configureNextResponse's watchdog (declared earlier) can reach it.
   const tryReconnect = useCallback((reason: string): boolean => {
     if (endedRef.current || manualCloseRequestedRef.current || closingRef.current) return false
     if (reconnectAttemptsRef.current >= MAX_RECONNECTS_PER_GAP) return false
@@ -1248,6 +1328,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     void startConversationRef.current({ resume })
     return true
   }, [cleanup, updateStatus])
+  tryReconnectRef.current = tryReconnect
 
   const startConversation = useCallback(async (opts?: { resume?: boolean }) => {
     if (Platform.OS === 'web') {
@@ -1376,6 +1457,12 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           autoCreateResponse: false,
           memory: memoryRef.current,
           weather: weatherRef.current,
+          // Guided check-in: the opening is spoken by omni too, so pin THIS turn to stage one. The
+          // persona prompt also carries the opening sentence, but it says to recite it verbatim; the
+          // directive is appended after it and asks for the same meaning in Aria's own words.
+          turnDirective: persona === 'screening' && GUIDED_CHECKIN
+            ? guidedOpeningDirective(voiceRef.current.languageLabel, dailyPlan.patientName)
+            : undefined,
         }))
         // Start native PCM capture -> stream frames upstream.
         const audio = createPcmAudioBridge()

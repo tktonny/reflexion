@@ -33,6 +33,57 @@ export const BASE_DAILY_PATIENT_TURNS = FLOW.base_patient_turns
 const MAX_INJECTED_MEMORY_FACTS = 8
 export const HARD_MAX_TURN = FLOW.hard_max_patient_turns
 
+// --- Guided check-in: one-turn directives -------------------------------------------------------
+// The daily check-in used to speak ONLY pre-written strings through qwen-tts: six fixed questions plus
+// three rotating acknowledgements. It covered the stages reliably and sounded like a questionnaire —
+// the opposite of "a kind friend checking in every morning", which is the product. These directives move
+// the speaking to qwen omni realtime while the flow state machine keeps owning WHICH stage is due, so
+// coverage, ordering, the reprompt budget and per-turn protocolStage tagging are all unchanged.
+//
+// Deliberately still pinned: the *semantic target* of each turn. The model receives the canonical
+// question and conveys it rather than inventing its own agenda. Aria's phrasing and her reaction to what
+// was just said become natural; WHAT is asked does not drift day to day — which is what keeps the
+// patient-side features (word count, speech rate, response latency) comparable against the baseline.
+// Free-running wording would only widen the MAD and dull the signal the caregiver status rests on.
+
+/** Directive for the FIRST turn: greet, then open stage one. */
+export function guidedOpeningDirective(language: string, patientName?: string | null): string {
+  const opening = openingMessageForLanguage(language, patientName)
+  return [
+    'CURRENT TURN — this is your first line of the conversation.',
+    `Greet them warmly and ask what this opening conveys: "${opening}"`,
+    'Use your own natural words, keep it to one or two short sentences, then stop and wait.',
+  ].join(' ')
+}
+
+/**
+ * Directive for a mid-conversation turn: react to what was just said, then move to this stage.
+ *
+ * `canonicalQuestion` is the scripted text for the due stage — the model conveys its meaning rather than
+ * reciting it. `isMedication` locks the factual content down: a medication reminder comes from the
+ * caregiver's schedule, so the wording may be warmed but a drug name, dose or time must never be
+ * altered or invented.
+ */
+export function guidedStageDirective(canonicalQuestion: string, opts: { isMedication?: boolean } = {}): string {
+  const parts = [
+    'CURRENT TURN — do exactly this and nothing else.',
+    'First, respond to what they just said in one short, warm sentence: react to their actual words,',
+    'never presume a mood (they may have just shared something sad), and do not praise or evaluate them.',
+    `Then ask what this conveys: "${canonicalQuestion}"`,
+  ]
+  if (opts.isMedication) {
+    parts.push(
+      'This reminder comes from their caregiver\'s schedule: you may warm the wording, but do NOT change',
+      'or invent the medication name, the dose or the time, and do not give medical advice.',
+    )
+  }
+  parts.push(
+    'Ask ONE question only. Do not open another topic, do not ask them to repeat an earlier answer,',
+    'do not use "remember" framing, and do not say goodbye yet.',
+  )
+  return parts.join(' ')
+}
+
 
 /**
  * True when an assistant line reads as a closing goodbye — used by the realtime hooks (v1/v3) to

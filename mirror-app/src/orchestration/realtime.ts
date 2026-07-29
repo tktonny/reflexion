@@ -87,6 +87,13 @@ export function buildLiveSessionUpdate(
     persona?: 'screening' | 'companion'
     patientName?: string
     autoCreateResponse?: boolean
+    /**
+     * One-turn instruction APPENDED to the persona prompt — how the guided check-in tells Aria what to
+     * say next (see guidedStageDirective). An earlier `steer` option replaced the instructions wholesale,
+     * which also threw away the Singapore context, the clock and the patient memory; appending keeps all
+     * of that and still pins the turn, because the flow machine — not the prompt — owns the agenda.
+     */
+    turnDirective?: string
     memory?: string[]
     /** Today's local weather, one short human line (from the device's ambient widget), if available. */
     weather?: string
@@ -109,6 +116,8 @@ export function buildLiveSessionUpdate(
       persona: opts.persona, patientName: opts.patientName, memory: opts.memory,
       now: currentLocalTimeLine(language), weather: opts.weather,
     })
+    // Appended last so it outranks the prompt's own (hidden) agenda for this one turn.
+    if (opts.turnDirective) instructions += `\n\n${opts.turnDirective}`
   }
   // qwen3.5-omni-realtime has its own voice list (rejects the qwen-tts voices carried on the profile).
   // Pick the language-appropriate realtime voice: 粤语->Kiki, 闽南->Joseph Chen, else a multilingual voice.
