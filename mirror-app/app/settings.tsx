@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Ionicons } from '@expo/vector-icons'
 import Constants from 'expo-constants'
+
+import { applyDownloadedUpdate, checkAndDownload, currentUpdateLabel } from '../src/lib/otaUpdates'
 import { router } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -55,6 +57,7 @@ export default function SettingsScreen() {
   const [state, setState] = useState<AdminState>(EMPTY_STATE)
   const [language, setLanguage] = useState(DEFAULT_LANGUAGE)
   const [loading, setLoading] = useState(true)
+  const [checkingUpdate, setCheckingUpdate] = useState(false)
 
   const rows = useMemo(() => {
     const check = (key: string) => state.checks.find((item) => item.key === key)
@@ -70,6 +73,7 @@ export default function SettingsScreen() {
       ['Realtime PCM', check('rtaudio')?.detail || 'Unknown', check('rtaudio')?.status === 'ok'],
       ['Pending uploads', String(state.pendingUploads), state.pendingUploads === 0],
       ['App version', Constants.expoConfig?.version || 'Unknown', true],
+      ['Running bundle', currentUpdateLabel(), true],
       ['Android version', Platform.OS === 'android' ? `API ${String(Platform.Version)}` : `Development: ${Platform.OS}`, true],
       ['Volume', 'Managed by Android', true],
       ['Brightness', 'Managed by Android', true],
@@ -128,6 +132,26 @@ export default function SettingsScreen() {
     ])
   }
 
+  // Manual OTA, in two deliberate steps: download, then confirm before the reload. Applying an update
+  // restarts the JS runtime, so doing it automatically could cut an elder off mid-conversation.
+  async function checkForAppUpdate() {
+    if (checkingUpdate) return
+    setCheckingUpdate(true)
+    try {
+      const outcome = await checkAndDownload()
+      if (outcome.kind === 'downloaded') {
+        Alert.alert('Update ready', `${outcome.detail}\n\nRestart now? Only do this when nobody is mid-conversation.`, [
+          { text: 'Later', style: 'cancel' },
+          { text: 'Restart now', onPress: () => { void applyDownloadedUpdate() } },
+        ])
+      } else {
+        Alert.alert(outcome.kind === 'failed' ? 'Update check failed' : 'No update available', outcome.detail)
+      }
+    } finally {
+      setCheckingUpdate(false)
+    }
+  }
+
   async function uploadLogs() {
     const result = await flushPendingConversations()
     setState((current) => ({ ...current, pendingUploads: result.remaining }))
@@ -184,6 +208,7 @@ export default function SettingsScreen() {
           <AdminAction icon="refresh-outline" label="Run checks again" onPress={() => void loadAdminState()} />
           <AdminAction icon="cloud-upload-outline" label="Sync pending uploads" onPress={() => void uploadLogs()} />
           <AdminAction icon="pulse-outline" label="Open detailed hardware report" onPress={() => router.push('/hardware-check')} />
+          <AdminAction icon="cloud-download-outline" label={checkingUpdate ? 'Checking for update…' : 'Check for app update'} onPress={() => void checkForAppUpdate()} />
           <AdminAction icon="reload-outline" label="Restart mirror app" onPress={() => router.replace('/')} />
           <AdminAction danger icon="unlink-outline" label="Reset pairing" onPress={confirmResetPairing} />
         </View>
