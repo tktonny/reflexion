@@ -1,15 +1,15 @@
 {
   "expo": {
     "name": "Reflexion Mirror",
+    "owner": "reflexionsg",
     "slug": "reflexion-mobile-mirror-interface-app",
     "version": "1.0.2",
     "updates": {
-      "url": "https://u.expo.dev/REPLACE_WITH_EAS_PROJECT_ID",
-      "checkAutomatically": "NEVER",
-      "requestHeaders": { "expo-channel-name": "preview" },
+      "url": "https://u.expo.dev/f765e920-7d0f-4f73-bdd0-cf2990390bc0",
+      "checkAutomatically": "ON_LOAD",
       "fallbackToCacheTimeout": 0
     },
-    "runtimeVersion": { "policy": "fingerprint" },
+    "runtimeVersion": "1.0.2",
     "orientation": "portrait",
     "scheme": "reflexionmirror",
     "userInterfaceStyle": "light",
@@ -18,11 +18,6 @@
       "barStyle": "dark-content",
       "translucent": false
     },
-    "androidNavigationBar": {
-      "backgroundColor": "#FFF9F1",
-      "barStyle": "dark-content"
-    },
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -53,11 +48,15 @@
       "onnxruntime-react-native",
       "expo-asset",
       "@config-plugins/react-native-webrtc",
-      "./plugins/withKioskAndroid"
+      "./plugins/withKioskAndroid",
+      "expo-font"
     ],
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "projectId": "f765e920-7d0f-4f73-bdd0-cf2990390bc0"
       }
     }
   }

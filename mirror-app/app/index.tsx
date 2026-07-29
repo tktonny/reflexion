@@ -6,7 +6,7 @@ import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context'
 import qrcode from 'qrcode-generator'
 
-import { getApiUrl } from '../src/config/apiUrl'
+import { getApiUrl, hasConfiguredApiBase } from '../src/config/apiUrl'
 import {
   createDevicePairing,
   dataOrThrow,
@@ -43,6 +43,7 @@ type PairingDetails = {
 }
 
 const INSTALLER_SETUP_ENABLED = __DEV__ || process.env.EXPO_PUBLIC_ENABLE_INSTALLER_SETUP === 'true'
+const BACKEND_CONFIGURED = __DEV__ || hasConfiguredApiBase()
 
 // The one blocking verdict the boot flow can both detect and fix in place.
 const MICROPHONE_BLOCKED: ReadinessVerdict = {
@@ -92,6 +93,10 @@ export default function BootScreen() {
   }, [])
 
   useEffect(() => {
+    if (!BACKEND_CONFIGURED) {
+      setBooting(false)
+      return
+    }
     void boot()
     return () => {
       if (pollRef.current) clearInterval(pollRef.current)
@@ -135,6 +140,7 @@ export default function BootScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pairing?.pairingId])
 
+  if (!BACKEND_CONFIGURED) return <StagingBackendNotConfiguredScreen />
   if (booting) return <BootLoadingScreen checks={checks} />
   if (blocked) {
     // The action re-requests the OS permission; either way we re-run boot so a fixed mirror proceeds
@@ -150,6 +156,31 @@ export default function BootScreen() {
   }
   if (offlineHome) return <OfflineHomeScreen onRetry={() => router.replace('/conversation')} />
   return <PairingScreen error={pairingError} onRetry={() => void loadPairingCode()} pairing={pairing} />
+}
+
+function StagingBackendNotConfiguredScreen() {
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.stage}>
+        <View pointerEvents="none" style={styles.reflection} />
+        <View style={styles.pairScene}>
+          <Text style={styles.eyebrow}>MIRROR STAGING</Text>
+          <Text style={styles.pairTitle}>Staging backend not configured</Text>
+          <Text style={styles.pairBody}>
+            This staging build is ready for OTA validation. Pairing and conversations will remain unavailable until the staging API is configured.
+          </Text>
+          <View style={styles.offlineIcon}>
+            <Ionicons name="cloud-offline-outline" size={44} color={palette.linen} />
+          </View>
+          {INSTALLER_SETUP_ENABLED ? (
+            <Pressable onPress={() => router.push('/test-device')} style={styles.retryButton}>
+              <Text style={styles.retryText}>Installer setup</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      </View>
+    </SafeAreaView>
+  )
 }
 
 async function runBootChecks() {
