@@ -5,6 +5,12 @@ import { QWEN } from '../config/conversationMode'
 import { buildLiveInstructions, closingGoodbyeSentence } from './orchestrator'
 import { realtimeVoiceForLanguageKey, type LanguageKey } from './voice'
 
+// Who decides a patient turn has ended: the provider's semantic VAD (default) or the on-device energy
+// VAD. Shared by the session builder and the conversation hook, which must agree — if both commit the
+// input buffer the turn is committed twice. Set EXPO_PUBLIC_TURN_DETECTION=client to restore the
+// device-side behaviour.
+export const PROVIDER_TURN_DETECTION = (process.env.EXPO_PUBLIC_TURN_DETECTION ?? 'provider') !== 'client'
+
 export const REALTIME = {
   // max_tokens is a hard generation ceiling. 80 could truncate an otherwise healthy spoken reply;
   // prompts still keep answers concise, while 256 leaves enough room to finish the sentence.
@@ -133,18 +139,38 @@ export function buildLiveSessionUpdate(
       temperature: REALTIME.temperature,
       input_audio_format: 'pcm',
       output_audio_format: 'pcm',
-      // Direct WS uses manual turns so session.update can deterministically select normal/closing
-      // instructions before response.create. Qwen's semantic VAD auto-creates a response
-      // before that update can take effect. Relay/WebRTC callers retain provider VAD and MUST set
-      // create_response:true explicitly — without it they'd rely on the API default and could stop
-      // auto-responding (they don't send an explicit response.create like the manual WS path does).
-      turn_detection: opts.autoCreateResponse === false ? null : {
-        type: 'semantic_vad',
-        threshold: REALTIME.vadThreshold,
-        silence_duration_ms: REALTIME.vadSilenceDurationMs,
-        create_response: true,
-        interrupt_response: false,
-      },
+      // Turn detection. qwen3.5-omni was chosen FOR semantic_vad, which rejects the mirror's own speaker
+      // echo at the turn-detection layer — but the direct-WS path used to disable it entirely
+      // (turn_detection: null) and run a loudness-based energy VAD on device instead. That is the wrong
+      // layer for the job and is why the check-in saw double-digit false barge-ins per session.
+      //
+      // The original reason for disabling it was real: `create_response: true` makes the provider generate
+      // the moment the user stops, which is earlier than the app can push the next stage's directive.
+      // `create_response: false` resolves that — the provider still detects and commits the turn, while
+      // the app keeps deciding WHEN to generate. Verified accepted upstream (server/smoke-vad-video-probe.mjs).
+      // `interrupt_response: true` hands barge-in to the provider in principle, but it is INERT today:
+      // the native bridge stops emitting mic frames while Aria plays ("only emit when not muted —
+      // half-duplex"), so the provider never hears an interruption attempt. Making talk-over work means
+      // keeping capture open during playback and trusting the platform AEC to strip Aria's own voice —
+      // a change that must be judged on real speaker/mic hardware, since a weak AEC would recreate the
+      // false-interruption problem server-side. Left true so it takes effect the moment that lands.
+      turn_detection: opts.autoCreateResponse === false
+        ? (PROVIDER_TURN_DETECTION
+          ? {
+              type: 'semantic_vad',
+              threshold: REALTIME.vadThreshold,
+              silence_duration_ms: REALTIME.vadSilenceDurationMs,
+              create_response: false,
+              interrupt_response: true,
+            }
+          : null)
+        : {
+            type: 'semantic_vad',
+            threshold: REALTIME.vadThreshold,
+            silence_duration_ms: REALTIME.vadSilenceDurationMs,
+            create_response: true,
+            interrupt_response: false,
+          },
       input_audio_transcription: { model: REALTIME.transcriptionModel },
       // Companion (free chat) gets dynamic-knowledge tools; screening stays fully scripted.
       ...(opts.persona === 'companion' ? { tools: COMPANION_TOOLS } : {}),

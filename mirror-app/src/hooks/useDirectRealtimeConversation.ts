@@ -9,7 +9,7 @@ import {
   looksLikeGoodbye,
   looksLikeUserGoodbye,
 } from '../orchestration/orchestrator'
-import { buildLiveSessionUpdate, realtimeWsUrl, REALTIME_TOOL_BACKEND } from '../orchestration/realtime'
+import { buildLiveSessionUpdate, PROVIDER_TURN_DETECTION, realtimeWsUrl, REALTIME_TOOL_BACKEND } from '../orchestration/realtime'
 import { invokeSessionTool, getPatientMemory } from '../api/sessionSync'
 import { createEnergyVad, decodeBase64Pcm16, pcm16Rms } from '../orchestration/energyVad'
 import {
@@ -683,7 +683,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     resumeListening()
   }, [clearTranscriptWait, requestGoodbye, resumeListening, transition, updateStatus])
 
-  const finishUserTurn = useCallback(() => {
+  /**
+   * Run the turn-end sequence. `alreadyCommitted` is set when the PROVIDER's semantic VAD closed the turn
+   * and committed the input buffer itself — committing again would commit the same turn twice.
+   */
+  const finishUserTurn = useCallback((options: { alreadyCommitted?: boolean } = {}) => {
     if (turnTakingRef.current.captureMuted || responseRequestedRef.current || responseActiveRef.current) return
     clearSilenceTimer()
     vadSpeakingRef.current = false
@@ -698,9 +702,10 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     setRecording(false)
     updateStatus('processing', 'Thinking...')
     clearTranscriptWait()
-    // Manual Qwen mode: commit requests transcription but does not create a response. The
-    // transcript handler first chooses the response mode, waits for session.updated, then creates.
-    send({ type: 'input_audio_buffer.commit' })
+    // Commit requests transcription but does not create a response (create_response is false in both
+    // modes). The transcript handler then picks the response mode, waits for session.updated, and creates.
+    // Skip it when the provider already committed, or the turn is committed twice.
+    if (!options.alreadyCommitted) send({ type: 'input_audio_buffer.commit' })
     transcriptTimerRef.current = setTimeout(() => rejectPendingInput('timeout'), 6000)
   }, [clearSilenceTimer, clearTranscriptWait, rejectPendingInput, send, transition, updateStatus])
 
@@ -776,6 +781,15 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     }
     if (pushToTalk) {
       if (recordingRef.current) send({ type: 'input_audio_buffer.append', audio: base64Pcm16 })
+      return
+    }
+    // PROVIDER turn detection: stream the mic continuously and let semantic_vad decide where the turn
+    // ends. The device-side energy VAD must NOT also gate the upload here — the provider can only judge
+    // audio it actually receives, and a loudness gate would hide exactly the quiet trailing speech that
+    // semantic VAD exists to interpret. Barge-in is the provider's job too (interrupt_response: true), so
+    // none of the client talk-over machinery below runs in this mode.
+    if (PROVIDER_TURN_DETECTION) {
+      if (!turnTakingRef.current.captureMuted) send({ type: 'input_audio_buffer.append', audio: base64Pcm16 })
       return
     }
     if (bargeInActiveRef.current) {
@@ -956,6 +970,48 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
       if (type === 'session.created') return
+
+      // --- provider-driven turn detection (semantic_vad, create_response:false) --------------------
+      // These three events replace the on-device energy VAD. The provider decides the turn boundaries
+      // and commits the buffer itself; the app still owns WHEN to generate, which is what keeps the
+      // per-stage directive injection ordering intact.
+      if (type === 'input_audio_buffer.speech_started') {
+        if (!PROVIDER_TURN_DETECTION) return
+        dbg.log('vad: speech started (provider)')
+        // Aria is speaking and the provider is cancelling her (interrupt_response: true) — reflect the
+        // interruption locally: drop queued playback so the room goes quiet immediately, and mark the
+        // assistant turn as interrupted. Without this the speaker keeps draining an abandoned response.
+        if (turnTakingRef.current.responseInFlight || turnTakingRef.current.awaitingPlayback) {
+          clearDrain()
+          audioRef.current?.clearPlayback()
+          markAssistantInterrupted()
+          transition({ type: 'assistant_interrupted' })
+          telemetryRef.current.onInterrupt('provider_barge_in')
+          bargeCountRef.current += 1
+          dbg.mic({ barges: bargeCountRef.current })
+        }
+        clearSilenceTimer()
+        silenceNudgedRef.current = false
+        vadSpeakingRef.current = true
+        transition({ type: 'user_speech_started' })
+        telemetryRef.current.onUserSpeechStart(Date.now())
+        setUserSpeaking(true)
+        updateStatus('listening', 'Listening...')
+        return
+      }
+      if (type === 'input_audio_buffer.speech_stopped') {
+        if (!PROVIDER_TURN_DETECTION) return
+        dbg.log('vad: speech stopped (provider)')
+        return // the commit that follows is what closes the turn
+      }
+      if (type === 'input_audio_buffer.committed') {
+        if (!PROVIDER_TURN_DETECTION) return
+        // The provider closed and committed the turn. Run the same turn-end sequence the device VAD used
+        // to run, minus our own commit.
+        finishUserTurn({ alreadyCommitted: true })
+        return
+      }
+
       if (type === 'session.updated') {
         if (resumingRef.current) {
           resumingRef.current = false
@@ -1246,7 +1302,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         return
       }
     },
-    [appendAssistantStreaming, applyVoice, clearDrain, clearTranscriptWait, configureNextResponse, dailyPlan, failClosed, finalizeAssistant, handlePlaybackComplete, handleToolCall, patientId, persona, playDeterministicResponse, pushToTalk, rejectPendingInput, reportUnavailable, requestGoodbye, resumeListening, send, transition, updateStatus, waitForPlaybackDrain],
+    [appendAssistantStreaming, applyVoice, clearDrain, clearSilenceTimer, clearTranscriptWait, configureNextResponse, dailyPlan, failClosed, finalizeAssistant, finishUserTurn, handlePlaybackComplete, handleToolCall, markAssistantInterrupted, patientId, persona, playDeterministicResponse, pushToTalk, rejectPendingInput, reportUnavailable, requestGoodbye, resumeListening, send, transition, updateStatus, waitForPlaybackDrain],
   )
 
   const cleanup = useCallback(() => {
