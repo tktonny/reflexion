@@ -6,12 +6,13 @@
 // do, and the unit just sat on "unable to reach the Reflexion service" forever. Everything here is the
 // privileged half of that: the renderer asks over IPC, this module drives NetworkManager / BlueZ.
 //
-// SAFETY: every call goes through execFile with an ARGUMENT ARRAY — never a shell string — because SSIDs
-// and Wi-Fi passwords are attacker-adjacent free text typed on a touch keyboard (`"; rm -rf ~` is a
-// legal Wi-Fi password). No value below is ever interpolated into a shell.
+// SAFETY: every call goes through execFile with an ARGUMENT ARRAY — never a shell string — because an SSID
+// or Wi-Fi passphrase is attacker-adjacent free text supplied by whoever is setting the mirror up
+// (`"; rm -rf ~` is a legal Wi-Fi passphrase). No value below is ever interpolated into a shell.
 //
-// Secrets: Wi-Fi passwords are passed as argv to nmcli and never logged. `logArgs()` redacts them before
-// anything reaches stdout, because the Electron log on a mirror is not a secret store.
+// SECRETS: a live home Wi-Fi passphrase is handed to nmcli as argv, so `run()` never logs an argument list
+// at all — only a short caller-supplied label and stderr. See the comment on `run()` for why an allowlist of
+// "flags whose next argument is secret" was the wrong shape for this.
 
 const { execFile } = require('child_process')
 
@@ -21,25 +22,24 @@ const DEFAULT_TIMEOUT_MS = 20_000
 // Joining a network (DHCP + DNS) is genuinely slow on a weak home router; nmcli's own default wait is 90s.
 const CONNECT_TIMEOUT_MS = 75_000
 
-/** Arguments we must never print. Everything after these nmcli keywords is a secret. */
-const SECRET_AFTER = new Set(['password', 'wifi-sec.psk', '802-11-wireless-security.psk'])
-
-function logArgs(args) {
-  const out = []
-  let redactNext = false
-  for (const arg of args) {
-    if (redactNext) { out.push('***'); redactNext = false; continue }
-    out.push(arg)
-    if (SECRET_AFTER.has(arg)) redactNext = true
-  }
-  return out.join(' ')
-}
-
-function run(command, args, { timeout = DEFAULT_TIMEOUT_MS } = {}) {
+/**
+ * Run a network tool and never let its arguments reach a log.
+ *
+ * Wi-Fi passphrases are passed to nmcli as argv, so ANY code path that prints the argument list can leak a
+ * live home Wi-Fi password into the Electron log on an appliance sitting in someone's living room. This used
+ * to be handled with an allowlist of "keywords whose next argument is secret", which fails the moment a new
+ * secret-bearing flag is added and nobody updates the list — a fail-OPEN design.
+ *
+ * Instead, argv is never logged at all: callers pass a short human `label`, and only that label plus stderr
+ * is printed. Fail-closed — a new secret argument cannot leak because nothing is printed unless it was
+ * explicitly written out here.
+ */
+function run(command, args, { timeout = DEFAULT_TIMEOUT_MS, label = '' } = {}) {
   return new Promise((resolve) => {
     execFile(command, args, { timeout, maxBuffer: 4 * 1024 * 1024 }, (error, stdout, stderr) => {
       const failed = Boolean(error)
-      if (failed) console.warn(`[network] ${command} ${logArgs(args)} -> ${String(stderr || error.message).trim()}`)
+      // `label` falls back to the sub-command verb only (e.g. "device"), never a full argument list.
+      if (failed) console.warn(`[network] ${command} ${label || args[0] || ''} -> ${String(stderr || error.message).trim()}`)
       resolve({
         ok: !failed,
         stdout: String(stdout || ''),
@@ -203,15 +203,16 @@ async function wifiConnect({ ssid, password = '', hidden = false }) {
 
   // A previously saved network with a NEW password would silently reconnect with the stale secret and
   // fail, so an explicit password always wins: drop the saved profile and join fresh.
-  if (password) await run(NMCLI, ['connection', 'delete', 'id', ssid], { timeout: 10_000 })
+  if (password) await run(NMCLI, ['connection', 'delete', 'id', ssid], { timeout: 10_000, label: 'forget stale profile' })
 
   const args = ['device', 'wifi', 'connect', ssid]
   if (password) args.push('password', password)
   if (hidden) args.push('hidden', 'yes')
-  const result = await run(NMCLI, args, { timeout: CONNECT_TIMEOUT_MS })
+  // `label` matters most here: this is the one argv that carries a live home Wi-Fi passphrase.
+  const result = await run(NMCLI, args, { timeout: CONNECT_TIMEOUT_MS, label: 'wifi connect' })
   if (!result.ok) {
     // Don't leave a half-created profile behind that would auto-retry a wrong password on every boot.
-    if (password) await run(NMCLI, ['connection', 'delete', 'id', ssid], { timeout: 10_000 })
+    if (password) await run(NMCLI, ['connection', 'delete', 'id', ssid], { timeout: 10_000, label: 'rollback profile' })
     return { ok: false, error: friendlyError(result, `Could not join ${ssid}.`) }
   }
   return { ok: true, status: await status() }
@@ -243,45 +244,58 @@ async function wifiForget({ ssid }) {
 
 const HOTSPOT_CONNECTION = 'reflexion-mirror-hotspot'
 
+/**
+ * The passphrase of the hotspot THIS process started, held in memory only.
+ *
+ * The mirror's screen has to display this passphrase (that is the entire point — a caregiver reads it off
+ * the glass and types it into a phone), and `hotspotStart` is what generates it, so it is already known
+ * here. Reading it back out of NetworkManager instead would mean asking nmcli to print a live secret to
+ * stdout, which is a strictly worse thing to have in the process's output. Every `hotspotStart` deletes and
+ * recreates the profile with a fresh passphrase, so this value can never drift from what is broadcasting;
+ * a hotspot left over from a previous process reports an empty passphrase rather than a stale guess.
+ */
+let activeHotspotPassphrase = ''
+
 async function hotspotStatus() {
   const active = await run(NMCLI, ['-t', '-f', 'NAME,TYPE,DEVICE', 'connection', 'show', '--active'])
   if (!active.ok) return { active: false, ssid: '', password: '' }
   const row = lines(active.stdout).map(splitTerse).find(([name]) => name === HOTSPOT_CONNECTION)
   if (!row) return { active: false, ssid: '', password: '' }
-  const [ssid, psk] = await Promise.all([
-    run(NMCLI, ['-g', '802-11-wireless.ssid', 'connection', 'show', HOTSPOT_CONNECTION]),
-    // -s is required for nmcli to print secrets at all.
-    run(NMCLI, ['-s', '-g', '802-11-wireless-security.psk', 'connection', 'show', HOTSPOT_CONNECTION]),
-  ])
+  const ssid = await run(NMCLI, ['-g', '802-11-wireless.ssid', 'connection', 'show', HOTSPOT_CONNECTION])
   return {
     active: true,
     ssid: ssid.ok ? lines(ssid.stdout)[0] || '' : '',
-    password: psk.ok ? lines(psk.stdout)[0] || '' : '',
+    password: activeHotspotPassphrase,
     device: row[2] || '',
   }
 }
 
-async function hotspotStart({ ssid = '', password = '' } = {}) {
+async function hotspotStart({ ssid = '', passphrase = '' } = {}) {
   const caps = await capabilities()
   if (!caps.hotspot) return { ok: false, error: 'This mirror has no Wi-Fi adapter, so it cannot create a hotspot.' }
   const finalSsid = (ssid || 'Reflexion-Mirror').slice(0, 32)
-  // WPA2 requires >= 8 characters; a short password fails with an unhelpful nmcli error.
-  const finalPassword = password && password.length >= 8 ? password : randomPassphrase()
+  // WPA2 requires >= 8 characters; a shorter one fails with an unhelpful nmcli error.
+  const finalPassphrase = passphrase && passphrase.length >= 8 ? passphrase : randomPassphrase()
 
-  await run(NMCLI, ['connection', 'delete', 'id', HOTSPOT_CONNECTION], { timeout: 10_000 })
+  await run(NMCLI, ['connection', 'delete', 'id', HOTSPOT_CONNECTION], { timeout: 10_000, label: 'hotspot cleanup' })
   const created = await run(NMCLI, [
     'device', 'wifi', 'hotspot',
     'con-name', HOTSPOT_CONNECTION,
     'ssid', finalSsid,
-    'password', finalPassword,
-  ], { timeout: 40_000 })
-  if (!created.ok) return { ok: false, error: friendlyError(created, 'Could not start the hotspot. This mirror’s Wi-Fi adapter may not support it.') }
-  return { ok: true, hotspot: await hotspotStatus(), password: finalPassword, ssid: finalSsid }
+    'password', finalPassphrase,
+  ], { timeout: 40_000, label: 'hotspot start' })
+  if (!created.ok) {
+    activeHotspotPassphrase = ''
+    return { ok: false, error: friendlyError(created, 'Could not start the hotspot. This mirror’s Wi-Fi adapter may not support it.') }
+  }
+  activeHotspotPassphrase = finalPassphrase
+  return { ok: true, hotspot: await hotspotStatus(), passphrase: finalPassphrase, ssid: finalSsid }
 }
 
 async function hotspotStop() {
-  const down = await run(NMCLI, ['connection', 'down', 'id', HOTSPOT_CONNECTION], { timeout: 20_000 })
-  await run(NMCLI, ['connection', 'delete', 'id', HOTSPOT_CONNECTION], { timeout: 10_000 })
+  activeHotspotPassphrase = ''
+  const down = await run(NMCLI, ['connection', 'down', 'id', HOTSPOT_CONNECTION], { timeout: 20_000, label: 'hotspot stop' })
+  await run(NMCLI, ['connection', 'delete', 'id', HOTSPOT_CONNECTION], { timeout: 10_000, label: 'hotspot cleanup' })
   if (!down.ok && !down.stderr.toLowerCase().includes('not an active')) {
     return { ok: false, error: friendlyError(down, 'Could not stop the hotspot.') }
   }
@@ -289,6 +303,19 @@ async function hotspotStop() {
   // rather than waiting for its own retry timer.
   await run(NMCLI, ['device', 'connect', await firstWifiDevice()], { timeout: CONNECT_TIMEOUT_MS })
   return { ok: true, status: await status() }
+}
+
+/**
+ * The IPv4 address the mirror holds on its own hotspot — the address a phone must open to reach the setup
+ * portal. NetworkManager's shared mode usually hands out 10.42.0.1, but that is a default, not a promise,
+ * so it is read rather than assumed: printing the wrong address on the mirror's screen strands the setup.
+ */
+async function hotspotAddress() {
+  const device = await firstWifiDevice()
+  const result = await run(NMCLI, ['-g', 'IP4.ADDRESS', 'device', 'show', device])
+  if (!result.ok) return ''
+  const first = lines(result.stdout)[0] || ''
+  return first.split('/')[0] || ''
 }
 
 async function firstWifiDevice() {
@@ -451,6 +478,7 @@ module.exports = {
   hotspotStart,
   hotspotStop,
   hotspotStatus,
+  hotspotAddress,
   bluetoothStatus,
   bluetoothScan,
   bluetoothSetPower,

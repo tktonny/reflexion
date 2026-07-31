@@ -39,4 +39,23 @@ contextBridge.exposeInMainWorld('reflexionNetwork', {
   bluetoothPair: invoke('reflexion:bluetooth:pair'),
   bluetoothTether: invoke('reflexion:bluetooth:tether'),
   bluetoothDisconnect: invoke('reflexion:bluetooth:disconnect'),
+
+  // Setup mode. The mirror has no keyboard and no mouse, so when it cannot reach the network it broadcasts
+  // its own hotspot and serves a phone-facing setup page; the mirror's SCREEN has to display the hotspot
+  // name, passphrase, portal address and PIN, which is what the renderer reads through here.
+  setupState: invoke('reflexion:setup:state'),
+  setupStart: invoke('reflexion:setup:start'),
+  setupStop: invoke('reflexion:setup:stop'),
+  /**
+   * Subscribe to setup-state changes. Push rather than poll because the important transition — the join
+   * result — happens exactly when the phone's connection has died, so the screen is the only thing that can
+   * report it, and it must do so immediately. Returns an unsubscribe function.
+   */
+  onSetupState: (listener) => {
+    if (typeof listener !== 'function') return () => {}
+    // Only the payload crosses the bridge — never the raw IpcRendererEvent, which carries `sender`.
+    const handler = (_event, payload) => listener(payload)
+    ipcRenderer.on('reflexion:setup:state', handler)
+    return () => ipcRenderer.removeListener('reflexion:setup:state', handler)
+  },
 })

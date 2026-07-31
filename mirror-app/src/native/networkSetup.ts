@@ -75,6 +75,29 @@ export type BluetoothStatus = {
 
 export type NetworkResult<T = unknown> = { ok: boolean; error?: string } & Partial<T>
 
+/**
+ * Setup mode: the mirror is broadcasting its own hotspot and serving a phone-facing Wi-Fi setup page.
+ *
+ * This exists because the Ubuntu unit has no keyboard and no mouse — the family cannot type on it. When the
+ * mirror cannot reach the network it puts these details on its SCREEN, and the caregiver does the typing on
+ * their phone. The screen is also the only place the RESULT can be shown: applying a network takes the radio
+ * the hotspot runs on, so the phone's connection to the mirror dies at that exact moment.
+ */
+export type SetupModeState = {
+  active: boolean
+  /** Hotspot name to join. */
+  ssid: string
+  /** Hotspot passphrase, shown on the mirror so it can be typed into a phone. */
+  password: string
+  /** 6-digit code the portal requires — proves the person can actually see this mirror. */
+  pin: string
+  address: string
+  portalUrl: string
+  /** Outcome of the last apply, so a failed join can be reported after the hotspot returns. */
+  lastResult: { ok: boolean; ssid: string; error?: string } | null
+  reason: string
+}
+
 type NetworkBridge = {
   capabilities(): Promise<Omit<NetworkCapabilities, 'settingsOnly'>>
   status(): Promise<NetworkStatus>
@@ -83,7 +106,7 @@ type NetworkBridge = {
   wifiConnectSaved(options: { ssid: string }): Promise<NetworkResult<{ status: NetworkStatus }>>
   wifiForget(options: { ssid: string }): Promise<NetworkResult<{ status: NetworkStatus }>>
   wifiSetRadio(options: { enabled: boolean }): Promise<NetworkResult>
-  hotspotStart(options?: { ssid?: string; password?: string }): Promise<NetworkResult<{ hotspot: HotspotState; ssid: string; password: string }>>
+  hotspotStart(options?: { ssid?: string; passphrase?: string }): Promise<NetworkResult<{ hotspot: HotspotState; ssid: string; passphrase: string }>>
   hotspotStop(): Promise<NetworkResult<{ status: NetworkStatus }>>
   bluetoothStatus(): Promise<BluetoothStatus>
   bluetoothSetPower(options: { enabled: boolean }): Promise<NetworkResult>
@@ -91,6 +114,10 @@ type NetworkBridge = {
   bluetoothPair(options: { address: string }): Promise<NetworkResult<{ bluetooth: BluetoothStatus }>>
   bluetoothTether(options: { address: string }): Promise<NetworkResult<{ status: NetworkStatus }>>
   bluetoothDisconnect(options: { address: string }): Promise<NetworkResult<{ status: NetworkStatus }>>
+  setupState(): Promise<SetupModeState>
+  setupStart(): Promise<SetupModeState>
+  setupStop(): Promise<SetupModeState>
+  onSetupState(listener: (state: SetupModeState) => void): () => void
 }
 
 function bridge(): NetworkBridge | null {
@@ -179,7 +206,7 @@ export function setWifiRadio(enabled: boolean) {
   return call((api) => api.wifiSetRadio({ enabled }), NO_WIFI)
 }
 
-export function startHotspot(options: { ssid?: string; password?: string } = {}) {
+export function startHotspot(options: { ssid?: string; passphrase?: string } = {}) {
   return call((api) => api.hotspotStart(options), 'This mirror cannot create a hotspot.')
 }
 
@@ -216,6 +243,36 @@ export function tetherBluetooth(address: string) {
 
 export function disconnectBluetooth(address: string) {
   return call((api) => api.bluetoothDisconnect({ address }), NO_BLUETOOTH)
+}
+
+export async function getSetupModeState(): Promise<SetupModeState | null> {
+  const api = bridge()
+  if (!api?.setupState) return null
+  try {
+    return await api.setupState()
+  } catch {
+    return null
+  }
+}
+
+/** Bring up the setup hotspot + phone portal on demand (the watcher also does this automatically). */
+export function startSetupMode() {
+  return call((api) => api.setupStart().then((state) => ({ ok: true, state })), 'This mirror cannot start setup mode.')
+}
+
+export function stopSetupMode() {
+  return call((api) => api.setupStop().then((state) => ({ ok: true, state })), 'This mirror cannot start setup mode.')
+}
+
+/** Subscribe to setup-state pushes. Returns an unsubscribe function (a no-op off-Electron). */
+export function subscribeSetupMode(listener: (state: SetupModeState) => void) {
+  const api = bridge()
+  if (!api?.onSetupState) return () => {}
+  try {
+    return api.onSetupState(listener)
+  } catch {
+    return () => {}
+  }
 }
 
 export type SystemSettingsPanel = 'wifi' | 'hotspot' | 'bluetooth'

@@ -23,6 +23,7 @@ import {
   tetherBluetooth,
   type BluetoothDevice,
   type BluetoothStatus,
+  type HotspotState,
   type NetworkCapabilities,
   type NetworkStatus,
   type WifiNetwork,
@@ -503,7 +504,7 @@ function HotspotPanel({
   busy, hotspot, onStart, onStop, wifiIsUplink,
 }: {
   busy: string
-  hotspot: { active: boolean; ssid: string; password: string } | null
+  hotspot: HotspotState | null
   onStart: () => void
   onStop: () => void
   wifiIsUplink: boolean

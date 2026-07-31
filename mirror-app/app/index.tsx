@@ -31,7 +31,13 @@ import {
   getDeviceCredential,
 } from '../src/storage/deviceCredentials'
 import type { ReadinessVerdict } from '../src/lib/readiness'
-import { networkSetupAvailable } from '../src/native/networkSetup'
+import { PhoneSetupInstructions } from '../src/components/mirror/PhoneSetupInstructions'
+import {
+  getSetupModeState,
+  networkSetupAvailable,
+  subscribeSetupMode,
+  type SetupModeState,
+} from '../src/native/networkSetup'
 import { mirrorColors as palette, mirrorFonts as fonts } from '../src/theme/mirrorTheme'
 
 type BootCheck = { key: string; label: string; ok: boolean }
@@ -66,6 +72,9 @@ export default function BootScreen() {
   // wrong problem entirely. A mirror in a home with no Wi-Fi configured is the common case, so it gets
   // its own screen with the one action that actually fixes it.
   const [noConnection, setNoConnection] = useState<{ internetOk: boolean } | null>(null)
+  // Mirrored from the Electron shell. The unit has no keyboard or mouse, so when it cannot reach the network
+  // the shell raises its own hotspot + phone setup portal, and the SCREEN has to carry the instructions.
+  const [setupMode, setSetupMode] = useState<SetupModeState | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Hoisted out of the mount effect so the readiness screen can re-run it after the elder fixes the
@@ -110,6 +119,20 @@ export default function BootScreen() {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current)
     }
+  }, [boot])
+
+  // Track setup mode for the whole life of this screen. The shell pushes changes rather than the screen
+  // polling, because the transition that matters — the result of joining a network — happens exactly when
+  // the caregiver's phone has lost its connection to the mirror, so the glass is the only surface that can
+  // report it, and it has to do so immediately.
+  useEffect(() => {
+    void getSetupModeState().then((state) => { if (state) setSetupMode(state) })
+    return subscribeSetupMode((state) => {
+      setSetupMode(state)
+      // A successful join means the network appeared underneath us — re-run the checks so the mirror walks
+      // itself into pairing (or the conversation) without anyone touching it.
+      if (state.lastResult?.ok) { setBooting(true); void boot() }
+    })
   }, [boot])
 
   async function loadPairingCode(knownDeviceId = '') {
@@ -162,6 +185,9 @@ export default function BootScreen() {
       />
     )
   }
+  // Setup mode outranks every other offline screen: while the mirror is broadcasting its setup hotspot,
+  // these instructions are the ONLY way a keyboard-less unit can be connected, so nothing may cover them.
+  if (setupMode?.active) return <PhoneSetupScreen state={setupMode} />
   if (noConnection) return <NoConnectionScreen internetOk={noConnection.internetOk} onRetry={() => { setBooting(true); void boot() }} />
   if (offlineHome) return <OfflineHomeScreen onRetry={() => router.replace('/conversation')} />
   return <PairingScreen error={pairingError} onRetry={() => void loadPairingCode()} pairing={pairing} />
@@ -402,6 +428,26 @@ function OfflineHomeScreen({ onRetry }: { onRetry: () => void }) {
 }
 
 /**
+ * The mirror is broadcasting its own setup hotspot and serving a phone-facing Wi-Fi page.
+ *
+ * This is the screen that makes an Ubuntu unit recoverable at all: it has no keyboard and no mouse, so
+ * without this the only way onto a network was a technician with a USB keyboard. It renders full-bleed with
+ * no competing actions — there is nothing to tap here, by design. Everything happens on the phone.
+ */
+function PhoneSetupScreen({ state }: { state: SetupModeState }) {
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.stage}>
+        <View pointerEvents="none" style={styles.reflection} />
+        <View style={styles.setupScene}>
+          <PhoneSetupInstructions state={state} />
+        </View>
+      </View>
+    </SafeAreaView>
+  )
+}
+
+/**
  * Shown when an UNPAIRED mirror cannot reach the backend — the state a freshly installed unit lands in
  * when the home's Wi-Fi was never configured. This is the screen a colleague hit on an Ubuntu unit: the
  * app came up, could not talk to the server, and offered no way to connect the device to a network.
@@ -541,6 +587,7 @@ const styles = StyleSheet.create({
   demoLink: { borderBottomColor: palette.lineWarm, borderBottomWidth: 1, marginTop: 12, padding: 6 },
   demoLinkText: { color: palette.textSecondary, fontFamily: fonts.body, fontSize: 13 },
   offlineScene: { alignItems: 'center', flex: 1, justifyContent: 'center', paddingHorizontal: 38 },
+  setupScene: { alignItems: 'center', flex: 1, justifyContent: 'center', paddingHorizontal: 26, paddingVertical: 18 },
   offlineIcon: { alignItems: 'center', backgroundColor: 'rgba(231,207,166,0.24)', borderColor: palette.lineWarm, borderRadius: 46, borderWidth: 1, height: 92, justifyContent: 'center', width: 92 },
   offlineTitle: { color: palette.text, fontFamily: fonts.display, fontSize: 37, lineHeight: 48, marginTop: 30, textAlign: 'center' },
   offlineText: { color: palette.textSecondary, fontFamily: fonts.body, fontSize: 21, lineHeight: 31, marginTop: 20, maxWidth: 480, textAlign: 'center' },
