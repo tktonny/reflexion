@@ -17,15 +17,43 @@
 //      routing and relative asset URLs, so we serve it over http://127.0.0.1 instead;
 //   2. the Node relay (server/index.mjs) — keyless; it authenticates to Qwen with the renderer's ticket.
 
-const { app, BrowserWindow, session } = require('electron')
+const { app, BrowserWindow, ipcMain, session } = require('electron')
 const path = require('path')
 const http = require('http')
 const fs = require('fs')
 const { spawn } = require('child_process')
 
+const network = require('./network')
+const { DEFAULT_API_BASE, createBackendProxy, isBackendPath, normalizeBase } = require('./apiProxy')
+
 const WEB_DIR = path.join(__dirname, '..', 'dist')
 const WEB_PORT = Number(process.env.REFLEXION_MIRROR_WEB_PORT) || 8899
 const RELAY_PORT = Number(process.env.REFLEXION_RELAY_PORT) || 8787
+
+/**
+ * Backend origin, resolved at RUNTIME (not baked into the SPA bundle).
+ *
+ * Precedence: launch env -> device config file -> production default. Runtime resolution is what lets a
+ * unit be re-pointed at a different backend without re-exporting the web bundle, and it is what makes the
+ * /api proxy possible at all: the main process must know the target before the renderer runs.
+ */
+function resolveApiBase() {
+  const fromEnv = process.env.REFLEXION_API_BASE || process.env.EXPO_PUBLIC_API_BASE
+  if (fromEnv && fromEnv.trim()) return normalizeBase(fromEnv)
+  try {
+    const configPath = path.join(app.getPath('userData'), 'device-config.json')
+    if (fs.existsSync(configPath)) {
+      const parsed = JSON.parse(fs.readFileSync(configPath, 'utf8'))
+      if (typeof parsed?.apiBase === 'string' && parsed.apiBase.trim()) return normalizeBase(parsed.apiBase)
+    }
+  } catch (error) {
+    console.warn('[electron] could not read device-config.json', error)
+  }
+  return DEFAULT_API_BASE
+}
+
+let API_BASE = DEFAULT_API_BASE
+const proxyToBackend = createBackendProxy(() => API_BASE)
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript',
@@ -42,6 +70,7 @@ function startWebServer() {
   const server = http.createServer((req, res) => {
     let pathname = '/'
     try { pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname) } catch { /* keep / */ }
+    if (isBackendPath(pathname)) { proxyToBackend(req, res, pathname); return }
     // Prevent path traversal: resolve inside WEB_DIR only.
     let filePath = path.normalize(path.join(WEB_DIR, pathname))
     if (!filePath.startsWith(WEB_DIR)) filePath = path.join(WEB_DIR, 'index.html')
@@ -91,7 +120,50 @@ function createWindow() {
   return win
 }
 
+/**
+ * Expose the privileged network operations to the renderer over IPC.
+ *
+ * The renderer is sandboxed and context-isolated, so this is the only path by which the setup screen can
+ * join a Wi-Fi network, start the mirror's hotspot, or tether to a phone over Bluetooth. Each handler is
+ * an explicit, named operation — no "run this command" escape hatch — and every argument is validated
+ * inside network.js before it reaches NetworkManager or BlueZ.
+ */
+function registerNetworkIpc() {
+  const handlers = {
+    'reflexion:network:capabilities': () => network.capabilities(),
+    'reflexion:network:status': () => network.status(),
+    'reflexion:wifi:scan': (options) => network.wifiScan(options || {}),
+    'reflexion:wifi:connect': (options) => network.wifiConnect(options || {}),
+    'reflexion:wifi:connect-saved': (options) => network.wifiConnectSaved(options || {}),
+    'reflexion:wifi:forget': (options) => network.wifiForget(options || {}),
+    'reflexion:wifi:radio': (options) => network.wifiSetRadio(Boolean(options?.enabled)),
+    'reflexion:hotspot:start': (options) => network.hotspotStart(options || {}),
+    'reflexion:hotspot:stop': () => network.hotspotStop(),
+    'reflexion:bluetooth:status': () => network.bluetoothStatus(),
+    'reflexion:bluetooth:power': (options) => network.bluetoothSetPower(Boolean(options?.enabled)),
+    'reflexion:bluetooth:scan': (options) => network.bluetoothScan(options || {}),
+    'reflexion:bluetooth:pair': (options) => network.bluetoothPair(options || {}),
+    'reflexion:bluetooth:tether': (options) => network.bluetoothTether(options || {}),
+    'reflexion:bluetooth:disconnect': (options) => network.bluetoothDisconnect(options || {}),
+  }
+  for (const [channel, handler] of Object.entries(handlers)) {
+    ipcMain.handle(channel, async (_event, options) => {
+      try {
+        return await handler(options)
+      } catch (error) {
+        // A rejected invoke surfaces in the renderer as an opaque Error; a shaped failure keeps the setup
+        // screen able to show the installer something specific.
+        console.error(`[electron] ${channel} threw`, error)
+        return { ok: false, error: error instanceof Error ? error.message : 'Network operation failed.' }
+      }
+    })
+  }
+}
+
 app.whenReady().then(() => {
+  API_BASE = resolveApiBase()
+  console.log(`[electron] backend proxied at http://127.0.0.1:${WEB_PORT}/api -> ${API_BASE}`)
+  registerNetworkIpc()
   // The mirror is a controlled appliance and the daily check-in needs the microphone, so auto-grant
   // media capture rather than prompting an elder for permission.
   session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) => {

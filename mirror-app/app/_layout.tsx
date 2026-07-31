@@ -58,6 +58,7 @@ export default function RootLayout() {
         <Stack.Screen name="conversation" options={{ headerShown: false }} />
         <Stack.Screen name="conversation-closing" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
+        <Stack.Screen name="network-setup" options={{ headerShown: false }} />
         <Stack.Screen name="test-device" options={{ headerShown: false }} />
         <Stack.Screen name="realtime-test" options={{ headerShown: false }} />
         <Stack.Screen name="hardware-check" options={{ headerShown: false }} />
