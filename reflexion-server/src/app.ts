@@ -68,10 +68,26 @@ export function createApp() {
   return app
 }
 
-function corsOptions(): cors.CorsOptions {
+// The Linux (Electron) mirror is a Chromium renderer served from a LOOPBACK http server inside the
+// appliance itself, so every backend call it makes is cross-origin from `http://127.0.0.1:<web port>`.
+// A production `CORS_ALLOWED_ORIGINS` that lists only the admin SPA therefore blocks the whole mirror at
+// the browser's preflight — the device looks "unable to reach the server" while the API is perfectly
+// healthy, which is exactly how a shipped AppImage failed in the field. These origins are always allowed:
+// loopback is not a site an attacker can host from, and the device still has to present a real device
+// credential. Newer builds proxy through their own loopback origin and never rely on this, but AppImages
+// already installed on Ubuntu units do.
+export const MIRROR_LOOPBACK_ORIGINS = ['8899', '8081', '19006', '3000'].flatMap((port) => [
+  `http://127.0.0.1:${port}`,
+  `http://localhost:${port}`,
+])
+
+export function corsOptions(): cors.CorsOptions {
   const configured = process.env.CORS_ALLOWED_ORIGINS?.split(',').map((origin) => origin.trim()).filter(Boolean)
+  const allowed = configured?.length
+    ? [...new Set([...configured, ...MIRROR_LOOPBACK_ORIGINS])]
+    : process.env.NODE_ENV === 'production' ? MIRROR_LOOPBACK_ORIGINS : true
   return {
-    origin: configured?.length ? configured : process.env.NODE_ENV === 'production' ? false : true,
+    origin: allowed,
     credentials: true,
     allowedHeaders: ['Authorization', 'Content-Type', 'Idempotency-Key', 'If-Match', 'X-Request-Id', 'X-Device-Bootstrap'],
     exposedHeaders: ['X-Request-Id', 'Deprecation', 'Sunset'],

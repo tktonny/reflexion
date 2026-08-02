@@ -31,6 +31,13 @@ import {
   getDeviceCredential,
 } from '../src/storage/deviceCredentials'
 import type { ReadinessVerdict } from '../src/lib/readiness'
+import { PhoneSetupInstructions } from '../src/components/mirror/PhoneSetupInstructions'
+import {
+  getSetupModeState,
+  networkSetupAvailable,
+  subscribeSetupMode,
+  type SetupModeState,
+} from '../src/native/networkSetup'
 import { mirrorColors as palette, mirrorFonts as fonts } from '../src/theme/mirrorTheme'
 
 type BootCheck = { key: string; label: string; ok: boolean }
@@ -60,6 +67,14 @@ export default function BootScreen() {
   const [pairingError, setPairingError] = useState('')
   const [offlineHome, setOfflineHome] = useState(false)
   const [blocked, setBlocked] = useState<ReadinessVerdict | null>(null)
+  // Set when an UNPAIRED mirror cannot reach the backend. Previously this fell straight through to the
+  // pairing screen, which then failed and told the installer the device "has not been provisioned" — the
+  // wrong problem entirely. A mirror in a home with no Wi-Fi configured is the common case, so it gets
+  // its own screen with the one action that actually fixes it.
+  const [noConnection, setNoConnection] = useState<{ internetOk: boolean } | null>(null)
+  // Mirrored from the Electron shell. The unit has no keyboard or mouse, so when it cannot reach the network
+  // the shell raises its own hotspot + phone setup portal, and the SCREEN has to carry the instructions.
+  const [setupMode, setSetupMode] = useState<SetupModeState | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Hoisted out of the mount effect so the readiness screen can re-run it after the elder fixes the
@@ -67,8 +82,16 @@ export default function BootScreen() {
   const boot = useCallback(async () => {
     const result = await runBootChecks()
     setChecks(result.checks)
+    setNoConnection(null)
     if (result.paired && !result.online) {
       setOfflineHome(true)
+      setBooting(false)
+      return
+    }
+    // An unpaired mirror that cannot reach the backend cannot be paired either — pairing is a network
+    // call. Say THAT, and offer network setup, instead of failing later with a provisioning message.
+    if (!result.paired && !result.online) {
+      setNoConnection({ internetOk: result.internetOk })
       setBooting(false)
       return
     }
@@ -96,6 +119,20 @@ export default function BootScreen() {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current)
     }
+  }, [boot])
+
+  // Track setup mode for the whole life of this screen. The shell pushes changes rather than the screen
+  // polling, because the transition that matters — the result of joining a network — happens exactly when
+  // the caregiver's phone has lost its connection to the mirror, so the glass is the only surface that can
+  // report it, and it has to do so immediately.
+  useEffect(() => {
+    void getSetupModeState().then((state) => { if (state) setSetupMode(state) })
+    return subscribeSetupMode((state) => {
+      setSetupMode(state)
+      // A successful join means the network appeared underneath us — re-run the checks so the mirror walks
+      // itself into pairing (or the conversation) without anyone touching it.
+      if (state.lastResult?.ok) { setBooting(true); void boot() }
+    })
   }, [boot])
 
   async function loadPairingCode(knownDeviceId = '') {
@@ -148,6 +185,10 @@ export default function BootScreen() {
       />
     )
   }
+  // Setup mode outranks every other offline screen: while the mirror is broadcasting its setup hotspot,
+  // these instructions are the ONLY way a keyboard-less unit can be connected, so nothing may cover them.
+  if (setupMode?.active) return <PhoneSetupScreen state={setupMode} />
+  if (noConnection) return <NoConnectionScreen internetOk={noConnection.internetOk} onRetry={() => { setBooting(true); void boot() }} />
   if (offlineHome) return <OfflineHomeScreen onRetry={() => router.replace('/conversation')} />
   return <PairingScreen error={pairingError} onRetry={() => void loadPairingCode()} pairing={pairing} />
 }
@@ -161,20 +202,24 @@ async function runBootChecks() {
   const deviceId = credential?.deviceId || bootstrap?.deviceId || savedDeviceId || ''
   const paired = Boolean(credential && credential.deviceId === deviceId)
   if (!paired) await clearLegacyPairingState()
-  const online = typeof navigator === 'undefined' ? true : navigator.onLine !== false
-  const backendReachable = online ? await pingBackend() : false
+  // navigator.onLine only reports a LINK, not a route out: a mirror sitting on a captive-portal Wi-Fi or
+  // a hotspot with no data reports true and then fails every request. The backend ping is the real verdict,
+  // so it runs regardless — `internetOk` is kept separately only to word the failure correctly.
+  const internetOk = typeof navigator === 'undefined' ? true : navigator.onLine !== false
+  const backendReachable = await pingBackend()
   const microphoneGranted = await checkMicrophonePermission()
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   if (timezone) await AsyncStorage.setItem(MIRROR_TIMEZONE_STORAGE_KEY, timezone)
   return {
     deviceId,
-    online: online && backendReachable,
+    internetOk,
+    online: backendReachable,
     paired,
     microphoneGranted,
     checks: [
       { key: 'device', label: 'Device provisioned', ok: Boolean(bootstrap?.token || credential) },
       { key: 'paired', label: 'Caregiver paired', ok: paired },
-      { key: 'internet', label: 'Internet connected', ok: online },
+      { key: 'internet', label: 'Internet connected', ok: internetOk },
       { key: 'backend', label: 'Reflexion service reachable', ok: backendReachable },
       { key: 'microphone', label: 'Microphone ready', ok: microphoneGranted },
       { key: 'timezone', label: 'Time and timezone ready', ok: Boolean(timezone) },
@@ -306,6 +351,12 @@ export function PairingScreen({ error, onRetry, pairing }: { error: string; onRe
           )}
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
           {!pairing ? <Pressable onPress={onRetry} style={styles.retryButton}><Text style={styles.retryText}>Try again</Text></Pressable> : null}
+          {/* Pairing is itself a network call, so "pairing unavailable" is very often just "no network". */}
+          {!pairing && networkSetupAvailable() ? (
+            <Pressable onPress={() => router.push('/network-setup')} style={styles.demoLink}>
+              <Text style={styles.demoLinkText}>Set up the internet connection</Text>
+            </Pressable>
+          ) : null}
           {!pairing && INSTALLER_SETUP_ENABLED ? (
             <Pressable onPress={() => router.push('/test-device')} style={styles.demoLink}>
               <Text style={styles.demoLinkText}>Installer setup</Text>
@@ -363,6 +414,80 @@ function OfflineHomeScreen({ onRetry }: { onRetry: () => void }) {
           <Text style={styles.offlineText}>Saved check-ins will update your caregiver once the mirror is connected again.</Text>
           <Text style={styles.offlineNote}>Nothing already recorded will be lost.</Text>
           <Pressable onPress={onRetry} style={styles.retryButton}><Text style={styles.retryText}>Try connection again</Text></Pressable>
+          {/* Quiet, not prominent: a PAIRED mirror is the elder's, and the check-in still works offline.
+              The link is here so a visiting caregiver can fix the Wi-Fi without a factory reset. */}
+          {networkSetupAvailable() ? (
+            <Pressable onPress={() => router.push('/network-setup')} style={styles.demoLink}>
+              <Text style={styles.demoLinkText}>Set up the internet connection</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      </View>
+    </SafeAreaView>
+  )
+}
+
+/**
+ * The mirror is broadcasting its own setup hotspot and serving a phone-facing Wi-Fi page.
+ *
+ * This is the screen that makes an Ubuntu unit recoverable at all: it has no keyboard and no mouse, so
+ * without this the only way onto a network was a technician with a USB keyboard. It renders full-bleed with
+ * no competing actions — there is nothing to tap here, by design. Everything happens on the phone.
+ */
+function PhoneSetupScreen({ state }: { state: SetupModeState }) {
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.stage}>
+        <View pointerEvents="none" style={styles.reflection} />
+        <View style={styles.setupScene}>
+          <PhoneSetupInstructions state={state} />
+        </View>
+      </View>
+    </SafeAreaView>
+  )
+}
+
+/**
+ * Shown when an UNPAIRED mirror cannot reach the backend — the state a freshly installed unit lands in
+ * when the home's Wi-Fi was never configured. This is the screen a colleague hit on an Ubuntu unit: the
+ * app came up, could not talk to the server, and offered no way to connect the device to a network.
+ *
+ * Written for whoever is installing the mirror rather than for the elder, because nothing here is the
+ * elder's job, and the copy separates the two failures that look identical from the outside: no network at
+ * all, versus a network that cannot reach the Reflexion service.
+ */
+function NoConnectionScreen({ internetOk, onRetry }: { internetOk: boolean; onRetry: () => void }) {
+  const canSetUp = networkSetupAvailable()
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.stage}>
+        <View pointerEvents="none" style={styles.reflection} />
+        <View style={styles.offlineScene}>
+          <View style={styles.offlineIcon}>
+            <Ionicons name={internetOk ? 'cloud-offline-outline' : 'wifi-outline'} size={44} color={palette.linen} />
+          </View>
+          <Text style={styles.offlineTitle}>
+            {internetOk ? 'This mirror cannot reach Reflexion.' : 'This mirror needs an internet connection.'}
+          </Text>
+          <Text style={styles.offlineText}>
+            {internetOk
+              ? 'It is on a network, but that network is not letting it through to the Reflexion service.'
+              : 'Connect it to the home Wi-Fi, a phone’s hotspot, or a phone over Bluetooth to finish setting it up.'}
+          </Text>
+          <Text style={styles.offlineNote}>Setup can be finished at any time — nothing is lost.</Text>
+          {canSetUp ? (
+            <Pressable onPress={() => router.push('/network-setup')} style={styles.retryButton}>
+              <Text style={styles.retryText}>Set up the connection</Text>
+            </Pressable>
+          ) : null}
+          <Pressable onPress={onRetry} style={canSetUp ? styles.demoLink : styles.retryButton}>
+            <Text style={canSetUp ? styles.demoLinkText : styles.retryText}>Check again</Text>
+          </Pressable>
+          {INSTALLER_SETUP_ENABLED ? (
+            <Pressable onPress={() => router.push('/test-device')} style={styles.demoLink}>
+              <Text style={styles.demoLinkText}>Installer setup</Text>
+            </Pressable>
+          ) : null}
         </View>
       </View>
     </SafeAreaView>
@@ -462,6 +587,7 @@ const styles = StyleSheet.create({
   demoLink: { borderBottomColor: palette.lineWarm, borderBottomWidth: 1, marginTop: 12, padding: 6 },
   demoLinkText: { color: palette.textSecondary, fontFamily: fonts.body, fontSize: 13 },
   offlineScene: { alignItems: 'center', flex: 1, justifyContent: 'center', paddingHorizontal: 38 },
+  setupScene: { alignItems: 'center', flex: 1, justifyContent: 'center', paddingHorizontal: 26, paddingVertical: 18 },
   offlineIcon: { alignItems: 'center', backgroundColor: 'rgba(231,207,166,0.24)', borderColor: palette.lineWarm, borderRadius: 46, borderWidth: 1, height: 92, justifyContent: 'center', width: 92 },
   offlineTitle: { color: palette.text, fontFamily: fonts.display, fontSize: 37, lineHeight: 48, marginTop: 30, textAlign: 'center' },
   offlineText: { color: palette.textSecondary, fontFamily: fonts.body, fontSize: 21, lineHeight: 31, marginTop: 20, maxWidth: 480, textAlign: 'center' },
