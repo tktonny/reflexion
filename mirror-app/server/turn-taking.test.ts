@@ -189,7 +189,13 @@ test('daily flow prompt and closing update cannot compete', () => {
 
   assert.match(normal.session.instructions, /three-to-five-minute daily conversation/)
   assert.match(normal.session.instructions, /Never ask the patient to repeat an earlier answer/)
-  assert.equal(normal.session.turn_detection, null)
+  // The invariant this test protects is that the PROVIDER cannot generate a reply before the app has
+  // pushed the directive for that turn. It used to be enforced by disabling turn detection altogether
+  // (turn_detection: null), which also discarded semantic_vad's echo rejection. It is now enforced by
+  // create_response:false — the provider still detects and commits the turn, only the app creates the
+  // response. Assert the guarantee, not the old mechanism.
+  assert.equal(normal.session.turn_detection.type, 'semantic_vad')
+  assert.equal(normal.session.turn_detection.create_response, false)
   assert.doesNotMatch(closing.session.instructions, /HIDDEN objectives/)
   assert.match(closing.session.instructions, /end with exactly this sentence: "再见。"/)
   assert.match(closing.session.instructions, /Do not ask a question/)
