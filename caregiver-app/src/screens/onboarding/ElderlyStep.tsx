@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { PhoneField } from '../../components/Field';
 import { colors, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../../theme';
 import { fieldStyles, Label, MultiOptionGrid, OptionGrid } from './fields';
 import { PhotoInput } from './PhotoInput';
@@ -110,15 +111,12 @@ export function ElderlyStep({
         value={patient.name}
       />
 
-      <Label>Phone number</Label>
-      <TextInput
-        accessibilityLabel="Their phone number"
-        keyboardType="phone-pad"
-        onChangeText={(phoneNumber) => updatePatient(patientIndex, { phoneNumber })}
-        placeholder="+65 9123 4567"
-        placeholderTextColor={colors.placeholder}
-        style={fieldStyles.input}
-        value={patient.phoneNumber}
+      <PhoneField
+        countryCode={splitPhone(patient.phoneNumber).countryCode}
+        label="Phone number"
+        onCountryCodeChange={(countryCode) => updatePatient(patientIndex, { phoneNumber: `${countryCode}${splitPhone(patient.phoneNumber).phoneNumber}` })}
+        onPhoneNumberChange={(phoneNumber) => updatePatient(patientIndex, { phoneNumber: `${splitPhone(patient.phoneNumber).countryCode}${phoneNumber}` })}
+        phoneNumber={splitPhone(patient.phoneNumber).phoneNumber}
       />
 
       <View style={styles.twoCol}>
@@ -222,6 +220,11 @@ export function ElderlyStep({
       ) : null}
     </View>
   );
+}
+
+function splitPhone(value: string) {
+  const match = value.match(/^(\+\d{1,3})(.*)$/);
+  return { countryCode: match?.[1] || '+65', phoneNumber: (match?.[2] || value).replace(/[^0-9\s().-]/g, '') };
 }
 
 const styles = StyleSheet.create({

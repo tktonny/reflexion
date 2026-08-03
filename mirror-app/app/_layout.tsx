@@ -56,6 +56,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="conversation" options={{ headerShown: false }} />
+        <Stack.Screen name="consent" options={{ headerShown: false }} />
         <Stack.Screen name="conversation-closing" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
         <Stack.Screen name="network-setup" options={{ headerShown: false }} />

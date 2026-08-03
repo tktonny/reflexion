@@ -3,11 +3,12 @@ import { asyncHandler } from '../../lib/asyncHandler.js'
 import { getDb, inTransaction } from '../../lib/mongo.js'
 import { authorizePatient, getPrincipal, requireActor } from '../platform/auth.js'
 import { collections } from '../platform/collections.js'
-import { badRequest, conflict, notFound } from '../platform/errors.js'
+import { ApiError, badRequest, conflict, notFound } from '../platform/errors.js'
 import { sendData, sendPage } from '../platform/http.js'
 import { newId } from '../platform/ids.js'
 import { executeIdempotent } from '../platform/idempotency.js'
 import { CAREGIVER_RELATIONSHIP_SCOPES } from '../platform/scopes.js'
+import { DAILY_CHECKIN_CONSENT_PURPOSE, RESEARCH_CONSENT_PURPOSE } from '../platform/consent.js'
 import { enumValue, objectBody, optionalString, pagination, requiredString } from '../platform/validation.js'
 
 const PATIENT_STATUSES = ['active', 'inactive'] as const
@@ -17,7 +18,7 @@ const DEFAULT_RELATIONSHIP_SCOPES = [...CAREGIVER_RELATIONSHIP_SCOPES]
  * The consent purpose a daily check-in is gated on. Kept here next to the consent routes and imported by
  * the session route, so the gate and the thing that reports on the gate cannot drift apart.
  */
-export const DAILY_CHECKIN_CONSENT_PURPOSE = 'home_cognitive_monitoring'
+export { DAILY_CHECKIN_CONSENT_PURPOSE, RESEARCH_CONSENT_PURPOSE } from '../platform/consent.js'
 
 const GENDERS = ['male', 'female', 'other'] as const
 const SPEECH_SPEEDS = ['slow', 'normal', 'fast'] as const
@@ -189,19 +190,24 @@ patientsRouter.get('/patients/:patientId/care-relationships', requireHuman, asyn
  *
  * `requiredPurposes` is returned so a client does not have to hard-code which consent gates check-ins.
  */
-patientsRouter.get('/patients/:patientId/consents', requireHuman, asyncHandler(async (request, response) => {
+patientsRouter.get('/patients/:patientId/consents', requireActor('human', 'device'), asyncHandler(async (request, response) => {
   const patientId = request.params.patientId
-  await authorizePatient(request, patientId, 'patient:read')
   const principal = getPrincipal(request)
+  await authorizePatient(request, patientId, principal.kind === 'device' ? 'consent:read' : 'patient:read')
   const rows = await (await getDb()).collection<any>(collections.consents)
     .find({ tenantId: principal.tenantId, patientId })
-    .sort({ signedAt: -1, _id: -1 })
+    .sort({ createdAt: -1, _id: -1 })
     .limit(50)
     .toArray()
-  const granted = rows.filter((row) => row.status === 'granted' && !row.withdrawnAt)
+  // A device only needs the consent that gates its own patient. Do not expose caregiver research choices
+  // or another product's consent history to the Mirror credential.
+  const visibleRows = principal.kind === 'device'
+    ? rows.filter((row) => row.purpose === DAILY_CHECKIN_CONSENT_PURPOSE)
+    : rows
+  const granted = visibleRows.filter((row) => row.status === 'granted' && !row.withdrawnAt)
   sendData(response, {
     patientId,
-    consents: rows.map(serializeConsent),
+    consents: visibleRows.map(serializeConsent),
     /** Purposes a daily check-in requires. Missing any of these means check-ins cannot run. */
     requiredPurposes: [DAILY_CHECKIN_CONSENT_PURPOSE],
     missingPurposes: [DAILY_CHECKIN_CONSENT_PURPOSE].filter(
@@ -210,23 +216,41 @@ patientsRouter.get('/patients/:patientId/consents', requireHuman, asyncHandler(a
   })
 }))
 
-patientsRouter.post('/patients/:patientId/consents', requireHuman, asyncHandler(async (request, response) => {
+patientsRouter.post('/patients/:patientId/consents', requireActor('human', 'device'), asyncHandler(async (request, response) => {
   const result = await executeIdempotent(request, 'POST:/api/v1/patients/:patientId/consents', async () => {
     const patientId = request.params.patientId
-    await authorizePatient(request, patientId, 'patient:write')
     const principal = getPrincipal(request)
     const body = objectBody(request.body)
     const purpose = requiredString(body, 'purpose', 100)
     const documentVersion = requiredString(body, 'documentVersion', 80)
-    const status = enumValue(body.status, 'status', ['granted', 'withdrawn'] as const)
+    const status = enumValue(body.status, 'status', ['granted', 'declined', 'withdrawn'] as const)
+
+    if (principal.kind === 'device') {
+      await authorizePatient(request, patientId, 'consent:write')
+      if (purpose !== DAILY_CHECKIN_CONSENT_PURPOSE) {
+        throw new ApiError(403, 'DEVICE_CONSENT_SCOPE', 'The Mirror may only record the older adult consent for home conversations.')
+      }
+    } else {
+      await authorizePatient(request, patientId, 'patient:write')
+      // Product consent is the older adult's choice. A caregiver can see it and withdraw it, but cannot
+      // manufacture an acceptance on the loved one's behalf. Optional research remains a separate
+      // caregiver preference and is the only consent a human client may grant here.
+      if (purpose === DAILY_CHECKIN_CONSENT_PURPOSE && status !== 'withdrawn') {
+        throw new ApiError(403, 'OLDER_ADULT_CONSENT_REQUIRED', 'The older adult must review this consent on the Mirror or with the care team.')
+      }
+      if (purpose !== DAILY_CHECKIN_CONSENT_PURPOSE && purpose !== RESEARCH_CONSENT_PURPOSE) {
+        throw new ApiError(403, 'CONSENT_PURPOSE_NOT_ALLOWED', 'This consent purpose is not available to the caregiver app.')
+      }
+    }
     const now = new Date()
     const consent = {
       _id: newId('con'), tenantId: principal.tenantId, patientId, purpose, documentVersion, status,
       signedAt: status === 'granted' ? now : null, withdrawnAt: status === 'withdrawn' ? now : null,
-      actorId: principal.kind === 'human' ? principal.userId : principal.deviceId, createdAt: now,
+      actorId: principal.kind === 'human' ? principal.userId : principal.deviceId,
+      actorType: principal.kind, createdAt: now,
     }
     const db = await getDb()
-    if (status === 'withdrawn') {
+    if (status !== 'granted') {
       await db.collection<any>(collections.consents).updateMany({
         tenantId: principal.tenantId, patientId, purpose, status: 'granted',
       }, { $set: { status: 'withdrawn', withdrawnAt: now } })

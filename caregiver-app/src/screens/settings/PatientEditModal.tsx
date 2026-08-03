@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
@@ -15,6 +16,7 @@ import {
   View,
 } from 'react-native';
 import { colors, fontFamily, fontSize, radius, spacing, scaleSize, MIN_TOUCH_TARGET } from '../../theme';
+import { PhoneField } from '../../components/Field';
 import { isTopicSelected, normalizeKeyTopics } from './helpers';
 import { PILL_HIT_SLOP, pillStyles } from './optionPills';
 import type { Gender, KeyTopic, Language, PatientForm } from './types';
@@ -53,6 +55,7 @@ export function PatientEditModal({
   if (!patient) return null;
 
   const selectedTopics = normalizeKeyTopics(patient.keyTopics);
+  const phone = splitPhone(patient.phoneNumber);
   const showOtherTopicText = selectedTopics.includes('others') || Boolean(patient.keyTopicsOtherText?.trim());
   const update = (values: Partial<PatientForm>) => onChange({ ...patient, ...values });
   const toggleTopic = (topic: KeyTopic) => {
@@ -68,9 +71,9 @@ export function PatientEditModal({
     <Modal animationType="slide" transparent visible onRequestClose={onClose}>
       <View style={styles.modalBackdrop}>
         {/* Keeps a screen reader inside the sheet instead of wandering into the settings list behind it. */}
-        <View accessibilityViewIsModal style={styles.modalSheet}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalSheet}>
           <View style={styles.modalHeader}>
-            <Text accessibilityRole="header" maxFontSizeMultiplier={1.3} style={styles.modalTitle}>Edit loved one</Text>
+            <Text accessibilityRole="header" style={styles.modalTitle}>Edit loved one</Text>
             <TouchableOpacity
               accessibilityLabel="Close without saving"
               accessibilityRole="button"
@@ -84,7 +87,7 @@ export function PatientEditModal({
           </View>
           <ScrollView contentContainerStyle={styles.modalContent}>
             <ModalInput label="Name" value={patient.name} onChangeText={(name) => update({ name })} />
-            <ModalInput label="Phone number" value={patient.phoneNumber} onChangeText={(phoneNumber) => update({ phoneNumber })} keyboardType="phone-pad" />
+            <PhoneField countryCode={phone.countryCode} label="Phone number" onCountryCodeChange={(countryCode) => update({ phoneNumber: `${countryCode}${phone.phoneNumber}` })} onPhoneNumberChange={(phoneNumber) => update({ phoneNumber: `${phone.countryCode}${phoneNumber}` })} phoneNumber={phone.phoneNumber} />
             <ModalInput label="Age" value={patient.age} onChangeText={(age) => update({ age })} keyboardType="numeric" />
             <ModalInput label="Usual wake time" value={patient.usualWakeTime} onChangeText={(usualWakeTime) => update({ usualWakeTime })} />
             <ModalPicker label="Gender" options={GENDER_OPTIONS} selected={patient.gender} onSelect={(gender) => update({ gender })} />
@@ -137,7 +140,7 @@ export function PatientEditModal({
               {isSaving ? <ActivityIndicator color={colors.text.onAccent} /> : <Text style={styles.saveBtnText}>Save profile</Text>}
             </TouchableOpacity>
           </ScrollView>
-        </View>
+        </KeyboardAvoidingView>
       </View>
     </Modal>
   );
@@ -254,6 +257,11 @@ function ModalInput({
       />
     </View>
   );
+}
+
+function splitPhone(value: string) {
+  const match = value.match(/^(\+\d{1,3})(.*)$/);
+  return { countryCode: match?.[1] || '+65', phoneNumber: (match?.[2] || value).replace(/[^0-9\s().-]/g, '') };
 }
 
 function ModalPicker<T extends string>({

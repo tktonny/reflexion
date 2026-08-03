@@ -14,6 +14,8 @@ export type AccountForm = {
   name: string;
   email: string;
   password: string;
+  /** Stored separately from the national number so every phone field has the same contract. */
+  countryCode: string;
   phoneNumber: string;
   relationshipToElderly: Relationship;
 };

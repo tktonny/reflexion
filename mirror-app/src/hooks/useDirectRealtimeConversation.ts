@@ -10,7 +10,7 @@ import {
   looksLikeUserGoodbye,
 } from '../orchestration/orchestrator'
 import { buildLiveSessionUpdate, PROVIDER_TURN_DETECTION, realtimeWsUrl, REALTIME_TOOL_BACKEND } from '../orchestration/realtime'
-import { invokeSessionTool, getPatientMemory } from '../api/sessionSync'
+import { invokeSessionTool, getPatientMemory, respondToReminderOccurrence } from '../api/sessionSync'
 import { createEnergyVad, decodeBase64Pcm16, pcm16Rms } from '../orchestration/energyVad'
 import {
   acknowledgementForLanguage,
@@ -18,6 +18,7 @@ import {
   closingTextForLanguage,
   companionClosingTextForLanguage,
   createDailyConversationPlan,
+  classifyReminderResponse,
   dailyConversationMetadataForPatientTurn,
   openingTextForLanguage,
   qwenWavToPcm24kChunks,
@@ -1101,6 +1102,21 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           const flow = checkinFlowRef.current
           let answered = false
           if (flow) {
+            const currentQuestion = flow.current()
+            const reminder = currentQuestion?.stage === 'medication_reminder'
+              ? dailyPlan.medicationReminder
+              : currentQuestion?.stage === 'routine_reminder'
+                ? dailyPlan.routineReminder
+                : undefined
+            if (reminder) {
+              const responseKind = currentQuestion?.stage === 'routine_reminder' ? 'routine' : 'medication'
+              const responseStatus = classifyReminderResponse(transcript, responseKind)
+              if (responseStatus !== 'unknown') {
+                void respondToReminderOccurrence(reminder.occurrenceId, responseStatus).catch((error) => {
+                  dbg.log(`reminder response failed: ${error instanceof Error ? error.message : 'unknown'}`)
+                })
+              }
+            }
             if (flow.recordAnswer(transcript) === 'insufficient') flow.recordRepromptOrTimeout()
             else answered = true
             const nextQuestion = flow.current()
@@ -1177,7 +1193,10 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
             memory: memoryRef.current,
             weather: weatherRef.current,
             turnDirective: scriptedQuestion
-              ? guidedStageDirective(scriptedQuestion, { isMedication: scriptedStage === 'medication_reminder' })
+              ? guidedStageDirective(scriptedQuestion, {
+                isMedication: scriptedStage === 'medication_reminder',
+                isRoutine: scriptedStage === 'routine_reminder',
+              })
               : undefined,
           }), 'normal')
         }

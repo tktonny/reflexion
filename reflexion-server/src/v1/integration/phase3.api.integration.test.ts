@@ -46,6 +46,9 @@ test('Phase 3 API works end-to-end across auth, pairing, session ingestion and t
   process.env.CREDENTIAL_ENCRYPTION_KEY = 'phase3-encryption-key-with-at-least-32-characters'
   process.env.AUTH_RATE_LIMIT_PER_MINUTE = '1000'
   process.env.API_RATE_LIMIT_PER_MINUTE = '5000'
+  process.env.EMAIL_PROVIDER = 'postmark'
+  process.env.POSTMARK_SERVER_TOKEN = 'test-postmark-token'
+  process.env.EMAIL_FROM = 'Reflexion <test@example.com>'
   process.env.QWEN_API_KEY = 'server-only-qwen-integration-key'
   process.env.QWEN_BASE = 'https://qwen.integration.invalid'
   process.env.QWEN_REALTIME_ENDPOINT = 'wss://qwen.integration.invalid/api-ws/v1/realtime'
@@ -199,8 +202,9 @@ test('Phase 3 API works end-to-end across auth, pairing, session ingestion and t
       assert.equal(paired.body.data.state, 'paired')
       assert.ok(paired.body.data.exchangeTicket)
 
+      const exchangeKey = idempotencyKey('exchange-device')
       const exchange = await app.post('/api/v1/device-credentials/exchange')
-        .set(bootstrapHeader)
+        .set({ ...bootstrapHeader, 'Idempotency-Key': exchangeKey })
         .send({ pairingId, exchangeTicket: paired.body.data.exchangeTicket })
         .expect(200)
       deviceAccessToken = exchange.body.data.accessToken
@@ -208,8 +212,13 @@ test('Phase 3 API works end-to-end across auth, pairing, session ingestion and t
       deviceCredentialId = exchange.body.data.credentialId
       assert.equal(exchange.body.data.patientId, PATIENT_ID)
 
+      const replayedExchange = await app.post('/api/v1/device-credentials/exchange')
+        .set({ ...bootstrapHeader, 'Idempotency-Key': exchangeKey })
+        .send({ pairingId, exchangeTicket: paired.body.data.exchangeTicket })
+        .expect(200)
+      assert.equal(replayedExchange.body.data.refreshCredential, deviceRefreshCredential)
       const consumed = await app.post('/api/v1/device-credentials/exchange')
-        .set(bootstrapHeader)
+        .set({ ...bootstrapHeader, 'Idempotency-Key': idempotencyKey('exchange-device-different-key') })
         .send({ pairingId, exchangeTicket: paired.body.data.exchangeTicket })
         .expect(400)
       assert.equal(consumed.body.error.code, 'EXCHANGE_TICKET_INVALID')
@@ -540,8 +549,12 @@ test('Phase 3 API works end-to-end across auth, pairing, session ingestion and t
       const resetEvent = await db.collection(collections.outboxEvents).findOne({
         eventType: 'password_reset.requested', aggregateId: USER_ID,
       }, { sort: { occurredAt: -1 } })
-      assert.ok(resetEvent?.payload?.sealedToken)
-      const resetToken = openSecret(String(resetEvent?.payload?.sealedToken))
+      assert.ok(resetEvent?.payload?.sealedCode)
+      const resetCode = openSecret(String(resetEvent?.payload?.sealedCode))
+      const verification = await app.post('/api/v1/auth/password-reset-verifications')
+        .send({ email: 'caregiver@example.com', code: resetCode })
+        .expect(200)
+      const resetToken = verification.body.data.resetToken
       await app.post('/api/v1/auth/password-resets')
         .send({ token: resetToken, newPassword: NEXT_PASSWORD })
         .expect(200)

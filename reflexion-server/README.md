@@ -17,6 +17,10 @@ The live Mirror never receives account-level Qwen, search, database, object-stor
 
 ## Runtime topology
 
+Supported runtime: **Node.js 24.x** (the repository pin is `24.18.0`; the exact `geoip-lite@2.0.3` dependency requires Node 24 or newer). Deployments must use the same runtime because no older Node fallback is safe.
+The local and CI test replica set uses MongoDB **7.0.14**. Production should use a MongoDB Atlas replica set on
+the MongoDB 7.0 series until a later server version has passed the full integration suite.
+
 Run these as separate processes from the same build artifact:
 
 1. `npm start` — HTTP API.
@@ -90,6 +94,12 @@ Optional integrations:
 - `EMBEDDING_*` for versioned semantic embeddings. If omitted, robust scalar monitoring remains active.
 - `BRAVE_SEARCH_API_KEY` for `web.search`; weather uses Open-Meteo without a key.
 - `EMAIL_PROVIDER=postmark` plus Postmark variables for password reset email.
+- `SMS_PROVIDER=twilio` plus `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` and `TWILIO_FROM_NUMBER` for phone verification and SMS invitations.
+
+The repository does not contain staging credentials or provider deployment configuration. Without Postmark,
+Twilio or an S3-compatible object store, the corresponding outbox events remain retryable/visible and the API
+returns an explicit provider-not-configured error; it never reports an undelivered email/SMS or deleted media as
+successful.
 
 In production, configure HTTPS at the reverse proxy/load balancer, allow only the caregiver web origin in `CORS_ALLOWED_ORIGINS`, keep secrets in the server's secret manager, and run `db:indexes` during controlled rollout.
 
@@ -101,5 +111,3 @@ In production, configure HTTPS at the reverse proxy/load balancer, allow only th
 - Longitudinal monitoring design: [`../docs/architecture/longitudinal-vector-anomaly-design.md`](../docs/architecture/longitudinal-vector-anomaly-design.md)
 
 All `/api/v1` success responses use `{ data, meta: { requestId } }`. Errors use `{ error: { code, message, retryable, details }, meta }`. Mutating creation/command routes accept `Idempotency-Key`; versioned resources use `If-Match` where required.
-
-

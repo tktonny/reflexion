@@ -1,12 +1,13 @@
 import type { Db } from 'mongodb'
 import { MongoServerError } from 'mongodb'
 import { getDb } from '../../lib/mongo.js'
-import { materializeMedicationReminders } from '../care/reminderScheduler.js'
+import { materializeMedicationReminders, materializeRoutineReminders } from '../care/reminderScheduler.js'
 import { processCompletedSession, verifyArtifact } from '../monitoring/pipeline.js'
 import { collections } from '../platform/collections.js'
 import { openSecret } from '../platform/crypto.js'
-import { sendPasswordResetEmail } from '../notifications/email.js'
+import { sendAccountVerificationEmail, sendCareCircleInvitationEmail, sendEmailChangeEmail, sendPasswordResetCodeEmail, sendPasswordResetEmail, sendPhoneChangeCode } from '../notifications/email.js'
 import { materializeReviewCaseNotifications, materializeSessionCompletionNotifications } from '../notifications/service.js'
+import { processDataDeletionRequest } from '../privacy/dataDeletion.js'
 
 const CONSUMER_NAME = 'platform-v1-worker'
 const MAX_ATTEMPTS = 8
@@ -88,8 +89,28 @@ async function handleEvent(db: Db, event: Record<string, any>) {
     case 'medication_plan.changed':
       await materializeMedicationReminders(db, String(event.aggregateId))
       break
+    case 'routine.changed':
+      await materializeRoutineReminders(db, String(event.aggregateId))
+      break
+    case 'data.deletion.requested':
+      await processDataDeletionRequest(db, String(event.aggregateId))
+      break
     case 'password_reset.requested':
-      await sendPasswordResetEmail({ email: String(event.payload.email), name: String(event.payload.name || ''), token: openSecret(String(event.payload.sealedToken)) })
+      await sendPasswordResetEmail({ email: String(event.payload.email), name: String(event.payload.name || ''), code: openSecret(String(event.payload.sealedCode)) })
+      break
+    case 'account_verification.requested':
+      await sendAccountVerificationEmail({ email: String(event.payload.email), name: String(event.payload.name || ''), code: openSecret(String(event.payload.sealedCode)) })
+      break
+    case 'email_change.requested':
+      await sendEmailChangeEmail({ email: String(event.payload.email), name: String(event.payload.name || ''), code: openSecret(String(event.payload.sealedCode)) })
+      break
+    case 'care_circle.invitation.requested':
+      if (String(event.payload.invitee).includes('@') && event.payload.sealedToken) {
+        await sendCareCircleInvitationEmail({ email: String(event.payload.invitee), token: openSecret(String(event.payload.sealedToken)) })
+      }
+      break
+    case 'phone_change.requested':
+      await sendPhoneChangeCode({ phoneNumber: String(event.payload.phoneNumber), code: openSecret(String(event.payload.sealedCode)) })
       break
     case 'review_case.created':
       await materializeReviewCaseNotifications(db, String(event.aggregateId))

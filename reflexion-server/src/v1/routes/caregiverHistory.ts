@@ -16,7 +16,7 @@ import {
 import { getOpenAIApiKey } from '../../lib/env.js'
 import { authorizePatient, getPrincipal, requireActor } from '../platform/auth.js'
 import { collections } from '../platform/collections.js'
-import { ApiError, badRequest } from '../platform/errors.js'
+import { ApiError, badRequest, notFound } from '../platform/errors.js'
 import { sendData } from '../platform/http.js'
 import { objectBody } from '../platform/validation.js'
 import { executeIdempotent } from '../platform/idempotency.js'
@@ -40,6 +40,9 @@ const requireHuman = requireActor('human')
 const MONTH_PATTERN = /^\d{4}-\d{2}$/
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 const TREND_RANGES = [7, 30] as const
+
+const SESSION_LIST_LIMIT_DEFAULT = 20
+const SESSION_LIST_LIMIT_MAX = 50
 
 /** Per-day session counts for one calendar month, in the patient's local calendar. */
 caregiverHistoryRouter.get('/patients/:patientId/session-days', requireHuman, asyncHandler(async (request, response) => {
@@ -109,6 +112,72 @@ caregiverHistoryRouter.get('/patients/:patientId/session-days/:date', requireHum
       String(patient.preferredLanguage || ''),
     )),
   })
+}))
+
+/**
+ * Recent conversation sessions for the Sessions screen.
+ *
+ * The calendar endpoint remains useful for month navigation, but making the mobile client fan out one
+ * request per day is both slow and race-prone.  This read model returns the same transcript-backed shape
+ * as the day endpoint, with an optional cursor for older sessions.  It is intentionally limited to the two
+ * caregiver-visible conversation types; device self-tests never appear in a loved-one history.
+ */
+caregiverHistoryRouter.get('/patients/:patientId/sessions', requireHuman, asyncHandler(async (request, response) => {
+  const patientId = request.params.patientId
+  const patient = await authorizePatient(request, patientId, 'session:read')
+  const limit = parseSessionLimit(request.query.limit)
+  const before = parseBeforeCursor(request.query.before)
+  const db = await getDb()
+  const filter: Record<string, unknown> = {
+    patientId,
+    type: { $in: ['daily_checkin', 'companion'] },
+  }
+  if (before) filter.createdAt = { $lt: before }
+  const sessions = await db.collection<any>(collections.sessions)
+    .find(filter)
+    .sort({ createdAt: -1, _id: -1 })
+    .limit(limit + 1)
+    .toArray()
+  const hasMore = sessions.length > limit
+  const page = hasMore ? sessions.slice(0, limit) : sessions
+  const turnsBySession = await getV1TurnsBySession(db, page.map((session) => session._id))
+  const patientName = String(patient.displayName || '')
+  const serialized = page.map((session) => serializeV1Session(
+    session,
+    turnsBySession.get(session._id) || [],
+    patientId,
+    patientName,
+    String(patient.preferredLanguage || ''),
+  ))
+  const lastCreatedAt = page.at(-1)?.createdAt
+  sendData(response, {
+    patientId,
+    patientName,
+    sessions: serialized,
+    nextBefore: hasMore && lastCreatedAt ? lastCreatedAt.toISOString() : null,
+  })
+}))
+
+/** A direct transcript read for a session detail route. */
+caregiverHistoryRouter.get('/patients/:patientId/sessions/:sessionId', requireHuman, asyncHandler(async (request, response) => {
+  const patientId = request.params.patientId
+  const sessionId = request.params.sessionId
+  const patient = await authorizePatient(request, patientId, 'session:read')
+  const db = await getDb()
+  const session = await db.collection<any>(collections.sessions).findOne({
+    _id: sessionId,
+    patientId,
+    type: { $in: ['daily_checkin', 'companion'] },
+  })
+  if (!session) throw notFound('Conversation session')
+  const turnsBySession = await getV1TurnsBySession(db, [sessionId])
+  sendData(response, serializeV1Session(
+    session,
+    turnsBySession.get(sessionId) || [],
+    patientId,
+    String(patient.displayName || ''),
+    String(patient.preferredLanguage || ''),
+  ))
 }))
 
 /**
@@ -260,4 +329,25 @@ async function summarizeTranscript(
     throw new ApiError(502, 'SUMMARY_UNAVAILABLE', 'The summary could not be generated just now.', true)
   }
   return payload?.choices?.[0]?.message?.content?.trim() || 'No summary generated.'
+}
+
+function parseSessionLimit(value: unknown): number {
+  if (value === undefined) return SESSION_LIST_LIMIT_DEFAULT
+  const parsed = Number(typeof value === 'string' ? value : '')
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > SESSION_LIST_LIMIT_MAX) {
+    throw badRequest('VALIDATION_FAILED', `limit must be an integer between 1 and ${SESSION_LIST_LIMIT_MAX}.`)
+  }
+  return parsed
+}
+
+function parseBeforeCursor(value: unknown): Date | null {
+  if (value === undefined) return null
+  if (typeof value !== 'string' || !value.trim()) {
+    throw badRequest('VALIDATION_FAILED', 'before must be an ISO-8601 timestamp.')
+  }
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    throw badRequest('VALIDATION_FAILED', 'before must be an ISO-8601 timestamp.')
+  }
+  return parsed
 }

@@ -18,6 +18,8 @@ export type PreparedObject = {
 export interface ObjectStore {
   prepareUpload(input: PreparedObject): Promise<UploadPlan>
   verify(input: { objectKey: string; hash: string; sizeBytes: number }): Promise<boolean>
+  /** Deletes an object during an explicitly confirmed data-deletion request. */
+  deleteObject(objectKey: string): Promise<boolean>
 }
 
 export function getObjectStore(): ObjectStore {
@@ -32,6 +34,9 @@ class UnconfiguredObjectStore implements ObjectStore {
     throw new ApiError(503, 'OBJECT_STORE_NOT_CONFIGURED', 'Artifact storage is not configured on this server.', true)
   }
   async verify(): Promise<boolean> {
+    return false
+  }
+  async deleteObject(): Promise<boolean> {
     return false
   }
 }
@@ -68,7 +73,14 @@ class S3CompatibleObjectStore implements ObjectStore {
       && response.headers.get('x-amz-meta-sha256') === input.hash
   }
 
-  private presign(method: 'PUT' | 'HEAD', objectKey: string, expires: number, headers: Record<string, string>) {
+  async deleteObject(objectKey: string) {
+    const response = await fetch(this.presign('DELETE', objectKey, 60, {}), { method: 'DELETE', signal: AbortSignal.timeout(10_000) })
+    // S3-compatible providers return 204 for a successful delete and 404 when the object is already gone.
+    // Both are safe outcomes for an idempotent deletion request.
+    return response.ok || response.status === 404
+  }
+
+  private presign(method: 'PUT' | 'HEAD' | 'DELETE', objectKey: string, expires: number, headers: Record<string, string>) {
     const now = new Date()
     const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, '')
     const date = amzDate.slice(0, 8)

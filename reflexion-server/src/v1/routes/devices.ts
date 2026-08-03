@@ -13,12 +13,13 @@ import { appendOutbox } from '../platform/outbox.js'
 import { issueAccessToken, verifyAccessToken } from '../platform/tokens.js'
 import { enumValue, isoDate, objectBody, optionalString, requiredString } from '../platform/validation.js'
 import { getClientIp, resolveDeviceRegion } from '../platform/region.js'
+import { DAILY_CHECKIN_CONSENT_PURPOSE, publicConsentStatus } from '../platform/consent.js'
 
 const PAIRING_TTL_MS = 10 * 60 * 1000
 const EXCHANGE_TTL_MS = 5 * 60 * 1000
 const ACCESS_TTL_SECONDS = 15 * 60
 const REFRESH_TTL_MS = 90 * 24 * 60 * 60 * 1000
-const DEVICE_SCOPES = ['session:write', 'session:read', 'care_plan:read', 'reminder:respond', 'device:heartbeat']
+const DEVICE_SCOPES = ['session:write', 'session:read', 'care_plan:read', 'reminder:respond', 'device:heartbeat', 'consent:read', 'consent:write']
 
 export const devicesRouter = Router()
 
@@ -186,12 +187,15 @@ devicesRouter.post('/device-pairing-claims', requireActor('human'), asyncHandler
 
 devicesRouter.post('/device-credentials/exchange', asyncHandler(async (request, response) => {
   const bootstrap = await bootstrapClaims(request)
-  const body = objectBody(request.body)
-  const pairingId = requiredString(body, 'pairingId', 100)
-  const exchangeTicket = requiredString(body, 'exchangeTicket', 500)
-  const credential = await createCredentialFromExchange(bootstrap.did!, pairingId, exchangeTicket)
+  const result = await executeIdempotent(request, 'POST:/api/v1/device-credentials/exchange', async () => {
+    const body = objectBody(request.body)
+    const pairingId = requiredString(body, 'pairingId', 100)
+    const exchangeTicket = requiredString(body, 'exchangeTicket', 500)
+    const credential = await createCredentialFromExchange(bootstrap.did!, pairingId, exchangeTicket)
+    return { status: 200, data: credential }
+  }, `bootstrap:${bootstrap.did}`, credentialResponseCodec())
   response.setHeader('Cache-Control', 'no-store')
-  sendData(response, credential)
+  sendData(response, result.data, result.status)
 }))
 
 /**
@@ -237,7 +241,7 @@ devicesRouter.get('/device-assignments', requireActor('human'), asyncHandler(asy
   const deviceIds = [...new Set(assignments.map((assignment) => String(assignment.deviceId)))]
   const devices = deviceIds.length
     ? await db.collection<any>(collections.devices).find({ _id: { $in: deviceIds } })
-      .project({ serial: 1, softwareVersion: 1, lastHeartbeatAt: 1, status: 1 }).toArray()
+      .project({ serial: 1, softwareVersion: 1, lastHeartbeatAt: 1, lastSeenAt: 1, technicalState: 1, status: 1 }).toArray()
     : []
   const byDevice = new Map(devices.map((device) => [String(device._id), device]))
 
@@ -260,11 +264,91 @@ devicesRouter.get('/device-assignments', requireActor('human'), asyncHandler(asy
           serial: device.serial || null,
           softwareVersion: device.softwareVersion || null,
           status: device.status || null,
-          lastHeartbeatAt: device.lastHeartbeatAt ? new Date(device.lastHeartbeatAt).toISOString() : null,
+          technicalState: device.technicalState || 'unknown',
+          lastHeartbeatAt: device.lastHeartbeatAt
+            ? new Date(device.lastHeartbeatAt).toISOString()
+            : device.lastSeenAt ? new Date(device.lastSeenAt).toISOString() : null,
         } : null,
       }
     }),
   })
+}))
+
+/**
+ * A caregiver-to-mirror message is deliberately a one-way delivery, not a chat transcript. The mirror
+ * receives a quiet notification, and only reveals the content when the older adult chooses to open it.
+ * Keeping the message alongside the patient assignment makes it impossible for a newly paired device to
+ * receive another person's family messages.
+ */
+devicesRouter.post('/patients/:patientId/family-messages', requireActor('human'), asyncHandler(async (request, response) => {
+  const result = await executeIdempotent(request, 'POST:/api/v1/patients/:patientId/family-messages', async () => {
+    const patientId = request.params.patientId
+    await authorizePatient(request, patientId, 'patient:read')
+    const principal = getPrincipal(request)
+    if (principal.kind !== 'human') throw forbidden()
+    const body = objectBody(request.body)
+    const text = requiredString(body, 'body', 2_000)
+    const scheduledForRaw = optionalString(body, 'scheduledFor', 80)
+    const scheduledFor = scheduledForRaw ? new Date(scheduledForRaw) : new Date()
+    if (Number.isNaN(scheduledFor.getTime())) {
+      throw badRequest('VALIDATION_FAILED', 'scheduledFor must be an ISO-8601 date.')
+    }
+    const now = new Date()
+    const state = scheduledFor.getTime() > now.getTime() ? 'scheduled' : 'queued'
+    const message = {
+      _id: newId('fmsg'), tenantId: principal.tenantId, patientId, senderUserId: principal.userId,
+      body: text, type: 'text', state, scheduledFor, createdAt: now, updatedAt: now,
+      deliveredAt: null, openedAt: null,
+    }
+    await (await getDb()).collection<any>(collections.familyMessages).insertOne(message)
+    return { status: 201, data: serializeFamilyMessage(message) }
+  })
+  sendData(response, result.data, result.status)
+}))
+
+/** The caregiver sees only messages they are authorised to send to that loved one. */
+devicesRouter.get('/patients/:patientId/family-messages', requireActor('human'), asyncHandler(async (request, response) => {
+  const patientId = request.params.patientId
+  await authorizePatient(request, patientId, 'patient:read')
+  const principal = getPrincipal(request)
+  const rows = await (await getDb()).collection<any>(collections.familyMessages)
+    .find({ tenantId: principal.tenantId, patientId }).sort({ createdAt: -1 }).limit(100).toArray()
+  sendData(response, { messages: rows.map(serializeFamilyMessage) })
+}))
+
+/** The paired Mirror polls this small feed while it is awake. Fetching marks a due message delivered. */
+devicesRouter.get('/devices/:deviceId/family-messages', requireActor('device'), asyncHandler(async (request, response) => {
+  const { assignment } = await authorizedDevice(request, request.params.deviceId)
+  const principal = getPrincipal(request)
+  if (principal.kind !== 'device') throw forbidden()
+  const db = await getDb()
+  const now = new Date()
+  await db.collection<any>(collections.familyMessages).updateMany({
+    tenantId: principal.tenantId, patientId: assignment.patientId, state: 'scheduled', scheduledFor: { $lte: now },
+  }, { $set: { state: 'queued', updatedAt: now } })
+  const rows = await db.collection<any>(collections.familyMessages).find({
+    tenantId: principal.tenantId, patientId: assignment.patientId, state: { $in: ['queued', 'delivered'] }, scheduledFor: { $lte: now },
+  }).sort({ scheduledFor: 1, createdAt: 1 }).limit(20).toArray()
+  const queuedIds = rows.filter((row) => row.state === 'queued').map((row) => row._id)
+  if (queuedIds.length) {
+    await db.collection<any>(collections.familyMessages).updateMany({ _id: { $in: queuedIds }, state: 'queued' }, {
+      $set: { state: 'delivered', deliveredAt: now, updatedAt: now },
+    })
+  }
+  sendData(response, { messages: rows.map((row) => serializeFamilyMessage({ ...row, state: row.state === 'queued' ? 'delivered' : row.state, deliveredAt: row.deliveredAt || now })) })
+}))
+
+/** Opening is an explicit action on the Mirror; merely polling the notification does not mark it read. */
+devicesRouter.post('/devices/:deviceId/family-messages/:messageId/opened', requireActor('device'), asyncHandler(async (request, response) => {
+  const { assignment } = await authorizedDevice(request, request.params.deviceId)
+  const principal = getPrincipal(request)
+  if (principal.kind !== 'device') throw forbidden()
+  const now = new Date()
+  const message = await (await getDb()).collection<any>(collections.familyMessages).findOneAndUpdate({
+    _id: request.params.messageId, tenantId: principal.tenantId, patientId: assignment.patientId, state: { $in: ['queued', 'delivered'] },
+  }, { $set: { state: 'opened', openedAt: now, updatedAt: now }, $setOnInsert: { deliveredAt: now } }, { returnDocument: 'after' })
+  if (!message) throw notFound('Family message')
+  sendData(response, serializeFamilyMessage(message))
 }))
 
 devicesRouter.get('/devices/:deviceId', requireActor('human', 'device'), asyncHandler(async (request, response) => {
@@ -320,13 +404,15 @@ devicesRouter.post('/devices/:deviceId/revocations', requireActor('human'), asyn
 devicesRouter.get('/devices/:deviceId/configuration', requireActor('human', 'device'), asyncHandler(async (request, response) => {
   const { device, assignment } = await authorizedDevice(request, request.params.deviceId)
   const db = await getDb()
-  const [configuration, patient, carePlan] = await Promise.all([
+  const [configuration, patient, carePlan, consent] = await Promise.all([
     db.collection<any>(collections.deviceConfigurations).findOne({ deviceId: device._id }, { sort: { configVersion: -1 } }),
     db.collection<any>(collections.patients).findOne({ _id: assignment.patientId, tenantId: assignment.tenantId }, { projection: { displayName: 1, preferredLanguage: 1, timezone: 1, version: 1 } }),
     db.collection<any>(collections.carePlans).findOne({ tenantId: assignment.tenantId, patientId: assignment.patientId, status: 'active' }, { sort: { version: -1 }, projection: { version: 1, communicationPreferences: 1, dailyRoutine: 1 } }),
+    db.collection<any>(collections.consents).find({ tenantId: assignment.tenantId, patientId: assignment.patientId, purpose: DAILY_CHECKIN_CONSENT_PURPOSE }).sort({ createdAt: -1, _id: -1 }).limit(1).next(),
   ])
   const patientConfiguration = patient ? { patientId: patient._id, displayName: patient.displayName,
     preferredLanguage: patient.preferredLanguage, timezone: patient.timezone, version: patient.version,
+    consent: { purpose: DAILY_CHECKIN_CONSENT_PURPOSE, status: publicConsentStatus(consent) },
     carePlan: carePlan ? { version: carePlan.version, communicationPreferences: carePlan.communicationPreferences, dailyRoutine: carePlan.dailyRoutine } : null } : null
   sendData(response, configuration ? {
     deviceId: device._id, configVersion: configuration.configVersion, desired: configuration.desired,
@@ -334,6 +420,35 @@ devicesRouter.get('/devices/:deviceId/configuration', requireActor('human', 'dev
   } : {
     deviceId: device._id, configVersion: 1, desired: defaultDeviceConfiguration(), effectiveAt: new Date(0).toISOString(), patient: patientConfiguration,
   })
+}))
+
+/** The paired Mirror records the older adult's product-consent choice; caregivers cannot grant it. */
+devicesRouter.post('/devices/:deviceId/consent', requireActor('device'), asyncHandler(async (request, response) => {
+  const result = await executeIdempotent(request, 'POST:/api/v1/devices/:deviceId/consent', async () => {
+    const { assignment } = await authorizedDevice(request, request.params.deviceId, 'consent:write')
+    const principal = getPrincipal(request)
+    if (principal.kind !== 'device' || !principal.scopes.includes('consent:write')) throw forbidden()
+    const body = objectBody(request.body)
+    const status = enumValue(body.status, 'status', ['granted', 'declined', 'withdrawn'] as const)
+    const documentVersion = requiredString(body, 'documentVersion', 80)
+    const now = new Date()
+    const consent = {
+      _id: newId('con'), tenantId: principal.tenantId, patientId: assignment.patientId,
+      purpose: DAILY_CHECKIN_CONSENT_PURPOSE, documentVersion, status,
+      signedAt: status === 'granted' ? now : null, withdrawnAt: status === 'withdrawn' ? now : null,
+      actorId: principal.deviceId, actorType: 'device', createdAt: now,
+    }
+    const db = await getDb()
+    if (status !== 'granted') {
+      await db.collection<any>(collections.consents).updateMany({
+        tenantId: principal.tenantId, patientId: assignment.patientId,
+        purpose: DAILY_CHECKIN_CONSENT_PURPOSE, status: 'granted',
+      }, { $set: { status: 'withdrawn', withdrawnAt: now } })
+    }
+    await db.collection<any>(collections.consents).insertOne(consent)
+    return { status: 201, data: { consentId: consent._id, purpose: consent.purpose, documentVersion: consent.documentVersion, status: consent.status, signedAt: consent.signedAt, withdrawnAt: consent.withdrawnAt } }
+  })
+  sendData(response, result.data, result.status)
 }))
 
 devicesRouter.post('/devices/:deviceId/heartbeats', requireActor('device'), asyncHandler(async (request, response) => {
@@ -459,6 +574,17 @@ function deviceCredentialResponse(deviceId: string, tenantId: string, patientId:
   }
 }
 
+// Exchange responses contain the device refresh credential. Idempotency records are durable by design, so
+// never persist that secret as plain JSON: seal it in the same application-encrypted envelope used for
+// pairing tickets and reset links. A retry with the same pairing key can safely replay the exact credential
+// after a network timeout without creating a second active credential.
+function credentialResponseCodec() {
+  return {
+    encode: (value: Record<string, unknown>) => sealSecret(JSON.stringify(value)),
+    decode: (value: unknown) => JSON.parse(openSecret(String(value))) as Record<string, unknown>,
+  }
+}
+
 async function authorizedDevice(request: Request, deviceId: string, scope = 'patient:read') {
   const principal = getPrincipal(request)
   const db = await getDb()
@@ -484,7 +610,7 @@ async function authorizedDevice(request: Request, deviceId: string, scope = 'pat
 function serializeDevice(device: Record<string, unknown>, assignment: Record<string, unknown>) {
   return {
     deviceId: device._id, displayName: device.displayName || 'Reflexion Mirror', hardwareRevision: device.hardwareRevision,
-    softwareVersion: device.softwareVersion, status: device.status, lastSeenAt: device.lastSeenAt || null,
+    softwareVersion: device.softwareVersion, status: device.status, technicalState: device.technicalState || 'unknown', lastSeenAt: device.lastSeenAt || null,
     assignment: { assignmentId: assignment._id, patientId: assignment.patientId, status: assignment.status, assignedAt: assignment.assignedAt },
   }
 }
@@ -515,5 +641,15 @@ function defaultDeviceConfiguration() {
     heartbeatIntervalSeconds: 60, pairingPollSeconds: 2, sessionUploadBatchSize: 50,
     capture: { microphoneRequired: true, cameraRequiredForAssessment: false },
     realtime: { provider: 'qwen', credentialMode: 'session_ticket' },
+  }
+}
+
+function serializeFamilyMessage(message: Record<string, any>) {
+  return {
+    messageId: String(message._id), patientId: String(message.patientId), body: String(message.body), type: 'text',
+    state: String(message.state), scheduledFor: new Date(message.scheduledFor).toISOString(),
+    createdAt: new Date(message.createdAt).toISOString(),
+    deliveredAt: message.deliveredAt ? new Date(message.deliveredAt).toISOString() : null,
+    openedAt: message.openedAt ? new Date(message.openedAt).toISOString() : null,
   }
 }

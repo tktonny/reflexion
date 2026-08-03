@@ -1,57 +1,37 @@
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { SettingsPlaceholder } from '../../src/screens/settings/SettingsPlaceholder';
-import { InputRow, SectionHeader, SettingRow, SettingsGroup } from '../../src/screens/settings/SettingsRows';
-import { SettingsSubPage } from '../../src/screens/settings/SettingsSubPage';
-import { resolveSettingsState } from '../../src/screens/settings/helpers';
-import { useCaregiverSettings, useSaveCaregiverProfile } from '../../src/screens/settings/useCaregiverSettings';
-import { getStoredAuthSession } from '../../src/lib/authSession';
+import React from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
-export default function AccountSettingsScreen() {
+import { AppHeader, ScreenLayout, SettingsRow, TertiaryButton } from '../../src/components/AppUI';
+import { v1Logout } from '../../src/lib/v1Client';
+import { colors, fontFamily, fontSize, radius, spacing } from '../../src/theme';
+
+export default function AccountScreen() {
   const router = useRouter();
-  const session = getStoredAuthSession();
-  const settings = useCaregiverSettings();
-  const [name, setName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-
-  useEffect(() => {
-    if (!settings.data) return;
-    setName(settings.data.caregiverName);
-    setPhoneNumber(settings.data.phoneNumber);
-  }, [settings.data]);
-
-  const save = useSaveCaregiverProfile(() => router.back());
-  const state = resolveSettingsState({
-    hasNurseId: Boolean(session?.userId),
-    hasFailed: Boolean(settings.error),
-    hasSettings: Boolean(settings.data),
-    isLoading: settings.isLoading,
-  });
-
-  if (state !== 'ready' && state !== 'empty') {
-    return (
-      <SettingsSubPage title="Your account">
-        <SettingsPlaceholder onRetry={() => void settings.refetch()} state={state} />
-      </SettingsSubPage>
-    );
-  }
-
+  const signOut = () => Alert.alert('Sign out?', 'You will need your email and password to sign in again.', [
+    { text: 'Cancel', style: 'cancel' },
+    { text: 'Sign out', style: 'destructive', onPress: () => void v1Logout().finally(() => router.replace('/sign-in')) },
+  ]);
   return (
-    <SettingsSubPage
-      isSaving={save.isPending}
-      onSave={() => save.mutate({ name: name.trim(), phoneNumber: phoneNumber.trim() })}
-      subtitle="This is you — the person we contact about your loved ones."
-      title="Your account"
-    >
-      <SectionHeader title="Account" />
-      <SettingsGroup>
-        <InputRow label="Name" onChangeText={setName} value={name} />
-      {/* Read-only: the email is the account's login identity, and v1 deliberately refuses to change it here
-          because moving it needs a verified flow — email uniqueness is only enforced per tenant, so an
-          unverified change could create the duplicate-account state that used to break sign-in. */}
-      <SettingRow label="Email" value={settings.data?.email || ''} />
-        <InputRow keyboardType="phone-pad" label="Phone" onChangeText={setPhoneNumber} value={phoneNumber} />
-      </SettingsGroup>
-    </SettingsSubPage>
+    <ScreenLayout contentContainerStyle={styles.content}>
+      <AppHeader title="Account" onBack={() => router.back()} />
+      <Text accessibilityRole="header" style={styles.title}>Account</Text>
+      <Text style={styles.subtitle}>Manage your personal information and sign-in security.</Text>
+      <View style={styles.group}>
+        <SettingsRow icon="user" label="Edit personal information" value="Name and relationship" onPress={() => router.push('/settings/account/personal')} />
+        <SettingsRow icon="mail" label="Change email" value="Verified by email link" onPress={() => router.push('/settings/account/email')} />
+        <SettingsRow icon="smartphone" label="Change phone number" value="Verification code by SMS" onPress={() => router.push('/settings/account/phone')} />
+        <SettingsRow icon="key" label="Change password" value="Use your current password" onPress={() => router.push('/settings/account/password')} />
+        <SettingsRow icon="shield" label="Sign-in methods" value="Email and password" onPress={() => router.push('/settings/account/sign-in-methods')} />
+      </View>
+      <TertiaryButton label="Sign out" onPress={signOut} />
+    </ScreenLayout>
   );
 }
+
+const styles = StyleSheet.create({
+  content: { gap: spacing.lg },
+  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, lineHeight: 36, marginTop: spacing.lg },
+  subtitle: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: 22 },
+  group: { backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
+});

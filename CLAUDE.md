@@ -10,7 +10,7 @@ REFLEXION is a daily reassurance companion for Singaporean elderly: a smart-mirr
 
 ## Repo layout
 
-Plain multi-package repo — **no root package.json, no workspaces, no Makefile**. Run every command from inside the specific package directory.
+Plain multi-package repo — **no root package.json, no workspaces, no Makefile**. Run every command from inside the specific package directory. The supported server Node.js runtime is Node 24.x; `.nvmrc` pins local/CI development to `24.18.0` because the server's exact `geoip-lite@2.0.3` dependency requires Node 24 or newer. Deployments must select the same Node line; no provider-specific deployment configuration is checked into this repository.
 
 - `reflexion-server/` — Express + TypeScript ESM + raw MongoDB driver (no ODM). The single backend for all clients. One `tsc` build serves multiple processes: HTTP API, outbox worker, scheduled jobs.
 - `mirror-app/` — Expo SDK 56 / RN Android smart-mirror app (`com.reflexion.mirror`), plus a Node relay under `server/` (web-dev diagnostic only) and a local Python wake-word training pipeline under `wakeword-training/`.

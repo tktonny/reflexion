@@ -41,8 +41,16 @@ export async function materializeNotifications(db: Db, input: {
   push?: boolean
 }): Promise<number> {
   const now = new Date()
+  const preferenceRows = await db.collection<any>(collections.users).find({ _id: { $in: input.recipientUserIds }, tenantId: input.tenantId }).project({ notificationPreferences: 1 }).toArray().catch(() => [])
+  const preferences = new Map(preferenceRows.map((row: any) => [String(row._id), row.notificationPreferences || {}]))
+  const trigger = notificationTriggerForType(input.type)
   let created = 0
   for (const recipientUserId of input.recipientUserIds) {
+    const preference = preferences.get(recipientUserId) || {}
+    const triggers = preference.triggers && typeof preference.triggers === 'object' ? preference.triggers as Record<string, unknown> : {}
+    const pushAllowed = input.push === true && preference.pushNotificationsEnabled !== false
+      && (!trigger || triggers[trigger] !== false)
+      && (!(trigger === 'conversation-session-summary') || preference.summaryFrequency !== 'off')
     const result = await db.collection<any>(collections.notifications).updateOne({
       tenantId: input.tenantId,
       recipientUserId,
@@ -59,7 +67,7 @@ export async function materializeNotifications(db: Db, input: {
       dedupeKey: input.dedupeKey,
       source: input.source,
       // pushState gates the dispatcher: 'pending' → deliver once to the phone, 'none' → in-app only.
-      pushState: input.push ? 'pending' : 'none',
+      pushState: pushAllowed ? 'pending' : 'none',
       ...(input.extra || {}),
       createdAt: now,
       updatedAt: now,
@@ -67,6 +75,21 @@ export async function materializeNotifications(db: Db, input: {
     created += result.upsertedCount
   }
   return created
+}
+
+function notificationTriggerForType(type: string): string | undefined {
+  switch (type) {
+    case 'completion':
+    case 'late_completion': return 'conversation-session-summary'
+    case 'missed_7pm': return 'no-interaction-yet-today'
+    case 'red_missed_streak': return 'repeated-missed-interactions'
+    case 'technical_issue': return 'device-may-be-offline'
+    case 'worth_checking': return 'reminder-not-completed-or-unclear'
+    case 'needs_attention': return 'reminder-not-completed-or-unclear'
+    case 'new_chat_reply': return 'new-chat-reply'
+    case 'weekly_summary': return 'weekly-summary'
+    default: return undefined
+  }
 }
 
 export type DailyCheckNotificationType =

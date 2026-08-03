@@ -53,6 +53,9 @@ test('a patient without consent cannot run a check-in, and the backfill unblocks
   await db.collection<any>(collections.credentials).insertOne({
     _id: CREDENTIAL_ID, deviceId: DEVICE_ID, status: 'active', refreshExpiresAt: new Date(Date.now() + 86_400_000),
   })
+  await db.collection<any>(collections.devices).insertOne({
+    _id: DEVICE_ID, tenantId: TENANT_ID, status: 'active', displayName: 'Consent Mirror', createdAt: now,
+  })
   await db.collection<any>(collections.assignments).insertOne({
     _id: 'asg_consent', tenantId: TENANT_ID, deviceId: DEVICE_ID, patientId: PATIENT_ID, status: 'active',
   })
@@ -63,7 +66,7 @@ test('a patient without consent cannot run a check-in, and the backfill unblocks
   }, 3600)}` }
   const mirror = { Authorization: `Bearer ${issueAccessToken({
     sub: DEVICE_ID, kind: 'device', tid: TENANT_ID, did: DEVICE_ID, pid: PATIENT_ID, cid: CREDENTIAL_ID,
-    roles: ['device'], scopes: ['session:write', 'session:read'],
+    roles: ['device'], scopes: ['session:write', 'session:read', 'consent:read', 'consent:write'],
   }, 3600)}` }
 
   t.after(async () => {
@@ -91,6 +94,24 @@ test('a patient without consent cannot run a check-in, and the backfill unblocks
     assert.equal(companion.body.data.type, 'companion')
   })
 
+  await t.test('the caregiver cannot grant product consent, while the Mirror can record a decline', async () => {
+    const caregiverGrant = await app.post(`/api/v1/patients/${PATIENT_ID}/consents`)
+      .set({ ...caregiver, 'Idempotency-Key': 'consent_caregiver_grant_denied_1' })
+      .send({ purpose: 'home_cognitive_monitoring', documentVersion: 'v1', status: 'granted' })
+      .expect(403)
+    assert.equal(caregiverGrant.body.error.code, 'OLDER_ADULT_CONSENT_REQUIRED')
+
+    const declined = await app.post(`/api/v1/patients/${PATIENT_ID}/consents`)
+      .set({ ...mirror, 'Idempotency-Key': 'consent_mirror_declined_1' })
+      .send({ purpose: 'home_cognitive_monitoring', documentVersion: 'v1', status: 'declined' })
+      .expect(201)
+    assert.equal(declined.body.data.status, 'declined')
+    const mirrorState = await app.get(`/api/v1/patients/${PATIENT_ID}/consents`).set(mirror).expect(200)
+    assert.deepEqual(mirrorState.body.data.missingPurposes, ['home_cognitive_monitoring'])
+    const configuration = await app.get(`/api/v1/devices/${DEVICE_ID}/configuration`).set(mirror).expect(200)
+    assert.equal(configuration.body.data.patient.consent.status, 'declined')
+  })
+
   await t.test('the backfill grants it, marked so it can never pass for a real consent', async () => {
     const { BACKFILL_CONSENT_DOCUMENT_VERSION, ensureCheckInConsent } = await import('../../lib/legacyV1Bridge.js')
     assert.equal(await ensureCheckInConsent(db, { tenantId: TENANT_ID, patientId: PATIENT_ID, actorId: USER_ID }), 'created')
@@ -98,10 +119,11 @@ test('a patient without consent cannot run a check-in, and the backfill unblocks
     assert.equal(await ensureCheckInConsent(db, { tenantId: TENANT_ID, patientId: PATIENT_ID, actorId: USER_ID }), 'present')
 
     const rows = await db.collection<any>(collections.consents).find({ patientId: PATIENT_ID }).toArray()
-    assert.equal(rows.length, 1)
-    assert.equal(rows[0].documentVersion, BACKFILL_CONSENT_DOCUMENT_VERSION)
-    assert.equal(rows[0].source, 'legacy_onboarding_backfill', 'provenance must be queryable')
-    assert.equal(rows[0].actorId, USER_ID)
+    assert.equal(rows.length, 2)
+    const backfill = rows.find((row: any) => row.documentVersion === BACKFILL_CONSENT_DOCUMENT_VERSION)
+    assert.ok(backfill)
+    assert.equal(backfill.source, 'legacy_onboarding_backfill', 'provenance must be queryable')
+    assert.equal(backfill.actorId, USER_ID)
   })
 
   await t.test('the same check-in now succeeds and carries the consent reference', async () => {
@@ -113,6 +135,16 @@ test('a patient without consent cannot run a check-in, and the backfill unblocks
     const session = await db.collection<any>(collections.sessions).findOne({ _id: created.body.data.sessionId })
     assert.ok(session?.consentRef?.consentId, 'without consentRef the pipeline excludes the session')
     assert.equal(session.consentRef.purpose, 'home_cognitive_monitoring')
+
+    await app.post(`/api/v1/devices/${DEVICE_ID}/consent`)
+      .set({ ...mirror, 'Idempotency-Key': 'consent_mirror_declined_2' })
+      .send({ documentVersion: 'v1', status: 'declined' }).expect(201)
+    const blockedAgain = await app.post('/api/v1/sessions').set({ ...mirror, 'Idempotency-Key': 'consent_checkin_declined_again' })
+      .send({ type: 'daily_checkin', requestedLanguage: 'mandarin' }).expect(403)
+    assert.equal(blockedAgain.body.error.code, 'CONSENT_REQUIRED')
+    await app.post(`/api/v1/devices/${DEVICE_ID}/consent`)
+      .set({ ...mirror, 'Idempotency-Key': 'consent_mirror_granted_2' })
+      .send({ documentVersion: 'v1', status: 'granted' }).expect(201)
 
     const state = await app.get(`/api/v1/patients/${PATIENT_ID}/consents`).set(caregiver).expect(200)
     assert.deepEqual(state.body.data.missingPurposes, [])

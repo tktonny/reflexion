@@ -104,8 +104,8 @@ export default function BootScreen() {
         return
       }
       try {
-        await refreshAndPersistDeviceProfile(result.deviceId)
-        router.replace('/conversation')
+        const configuration = await refreshAndPersistDeviceProfile(result.deviceId)
+        router.replace(configuration.patient?.consent?.status === 'accepted' ? '/conversation' : '/consent')
         return
       } catch { /* revoked credentials fall through to pairing */ }
     }
@@ -161,9 +161,9 @@ export default function BootScreen() {
         }
         if (status.state !== 'paired' || !status.exchangeTicket) return
         await exchangeDeviceCredential(status)
-        await refreshAndPersistDeviceProfile(activePairing.deviceId)
+        const configuration = await refreshAndPersistDeviceProfile(activePairing.deviceId)
         if (pollRef.current) clearInterval(pollRef.current)
-        router.replace('/conversation')
+        router.replace(configuration.patient?.consent?.status === 'accepted' ? '/conversation' : '/consent')
       } catch { /* polling resumes when connectivity returns */ }
     }
     void pollStatus()
@@ -293,7 +293,7 @@ async function requestPairingCode(): Promise<PairingDetails | null> {
   }
 }
 
-async function refreshAndPersistDeviceProfile(deviceId: string) {
+async function refreshAndPersistDeviceProfile(deviceId: string): Promise<DeviceConfiguration> {
   const response = await deviceFetch(`/api/v1/devices/${encodeURIComponent(deviceId)}/configuration`)
   const configuration = await dataOrThrow<DeviceConfiguration>(response)
   if (!configuration.patient) throw new Error('paired_patient_configuration_missing')
@@ -305,6 +305,7 @@ async function refreshAndPersistDeviceProfile(deviceId: string) {
     [MIRROR_LANGUAGE_STORAGE_KEY, configuration.patient.preferredLanguage || DEFAULT_LANGUAGE],
     [MIRROR_TIMEZONE_STORAGE_KEY, configuration.patient.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone],
   ])
+  return configuration
 }
 
 export function BootLoadingScreen({ checks }: { checks: BootCheck[] }) {
