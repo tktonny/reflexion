@@ -10,17 +10,13 @@ import { hashPassword } from '../../lib/password.js'
 import { collections } from '../../v1/platform/collections.js'
 import { hashSecret, sha256, verifySecret } from '../../v1/platform/crypto.js'
 import { newId, randomPairingCode, randomSecret } from '../../v1/platform/ids.js'
-import { emailDeliveryConfigured, sendPasswordResetEmail } from '../../v1/notifications/email.js'
+import { sendPasswordResetEmail } from '../../v1/notifications/email.js'
 
 const TOKEN_TTL_MS = 30 * 60 * 1000
 
 // POST /auth/password-reset-requests { email } -> 202 always (no account enumeration).
 export const passwordResetRequestRouter = Router()
 passwordResetRequestRouter.post('/', asyncHandler(async (request, response) => {
-  if (!emailDeliveryConfigured()) {
-    response.status(503).json({ error: { code: 'EMAIL_NOT_CONFIGURED', message: 'Password reset email is unavailable during this pilot. Contact support for help resetting your password.' } })
-    return
-  }
   const email = String((request.body as { email?: string } | null)?.email || '').trim().toLowerCase()
   if (email) {
     const db = await getDb()
