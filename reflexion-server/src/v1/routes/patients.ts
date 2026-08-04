@@ -19,6 +19,17 @@ const DEFAULT_RELATIONSHIP_SCOPES = [...CAREGIVER_RELATIONSHIP_SCOPES]
  */
 export const DAILY_CHECKIN_CONSENT_PURPOSE = 'home_cognitive_monitoring'
 
+/**
+ * Consent for the mirror to use its CAMERA during a conversation, streaming live frames to the model so
+ * Aria can see the person she is talking with.
+ *
+ * Deliberately separate from the check-in consent and never implied by it: agreeing to a spoken daily
+ * check-in is not agreeing to live video of your living room. It is also independent of the OS camera
+ * permission — that is the device asking, this is the person deciding. Absent or withdrawn, every paired
+ * mirror runs audio-only from its next configuration read, so withdrawal is the off switch.
+ */
+export const VIDEO_COMPANION_CONSENT_PURPOSE = 'home_video_companion'
+
 const GENDERS = ['male', 'female', 'other'] as const
 const SPEECH_SPEEDS = ['slow', 'normal', 'fast'] as const
 
