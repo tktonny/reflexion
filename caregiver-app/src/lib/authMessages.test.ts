@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { LegacyApiError } from './apiClient';
-import { passwordResetMessage, passwordResetRequestMessage, signInMessage } from './authMessages';
+import { emailChangeMessage, passwordResetMessage, passwordResetRequestMessage, phoneChangeMessage, registrationMessage, signInMessage, verificationResendMessage } from './authMessages';
 
 // Regression guard for a real leak. Sign-in built its visible error straight from err.message, and
 // apiClient composes those from the wire, so the app's front door could display — and, once the box became
@@ -77,4 +77,14 @@ test('the raw error is still logged for whoever has to debug it', () => {
 
   assert.equal(logged.length, 1);
   assert.match(JSON.stringify(logged[0]), /502/, 'the detail must survive somewhere');
+});
+
+test('stable authentication states retain actionable distinctions', () => {
+  assert.match(signInMessage({ status: 401, code: 'ACCOUNT_NOT_FOUND' }), /could not find.*create an account/i);
+  assert.match(signInMessage({ status: 403, code: 'EMAIL_NOT_VERIFIED' }), /not been verified.*resend/i);
+  assert.match(registrationMessage({ status: 409, code: 'EMAIL_VERIFICATION_PENDING' }), /waiting for verification/i);
+  assert.match(registrationMessage({ status: 409, code: 'EMAIL_IN_USE' }), /already exists.*sign in|reset/i);
+  assert.match(verificationResendMessage({ status: 503, code: 'EMAIL_NOT_CONFIGURED' }), /email delivery is unavailable.*try again later/i);
+  assert.match(emailChangeMessage({ status: 409, code: 'EMAIL_IN_USE' }), /already exists/i);
+  assert.match(phoneChangeMessage({ status: 503, code: 'SMS_NOT_CONFIGURED' }), /SMS delivery is unavailable/i);
 });

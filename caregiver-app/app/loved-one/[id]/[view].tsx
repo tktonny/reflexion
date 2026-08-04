@@ -1,0 +1,14 @@
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { AppHeader, PrimaryButton, ProvenanceSection, ScreenLayout } from '../../../src/components/AppUI';
+import { colors, fontFamily, fontSize, radius, spacing } from '../../../src/theme';
+const COPY: Record<string, { title: string; subtitle: string; body: string; action: string }> = {
+  sessions: { title: 'Sessions', subtitle: 'A chronological record of available conversations.', body: 'Today · 9:18 AM · 18 minutes\nConversation summary is available where permission allows.', action: 'View session detail' },
+  'weekly-summary': { title: 'Weekly summary', subtitle: 'A factual view of interactions, routines, messages and notable events.', body: 'Sessions and conversation time are shown separately from what Mum shared.', action: 'Share weekly summary' },
+  trends: { title: 'Trends', subtitle: 'Review 7 days, 30 days or 3 months.', body: 'Building Mum’s usual pattern. Reflexion needs two valid sessions in the recent 14-day window before showing comparisons.', action: 'View 30 days' },
+  history: { title: 'History', subtitle: 'Calendar and chronological views for Mum.', body: 'Choose a day to review its available sessions and activity.', action: 'Choose a date' },
+  export: { title: 'Export summaries', subtitle: 'Export available summaries from Mum’s dashboard.', body: 'Only information available under current permissions can be included.', action: 'Prepare export' },
+};
+export default function LovedOneViewScreen() { const router = useRouter(); const { id, view } = useLocalSearchParams<{ id: string; view: string }>(); const detail = COPY[view] || COPY.sessions; const destination = view === 'sessions' ? `/loved-one/${id}/sessions` : view === 'history' ? `/loved-one/${id}/history` : view === 'trends' ? `/loved-one/${id}/trends` : undefined; return <ScreenLayout><AppHeader title="Mum" onBack={() => router.back()} /><Text accessibilityRole="header" style={styles.title}>{detail.title}</Text><Text style={styles.subtitle}>{detail.subtitle}</Text><View style={styles.card}><ProvenanceSection label="Available information">{detail.body}</ProvenanceSection><ProvenanceSection label="Limitations">Reflexion shows only recorded, reported or technically observed information.</ProvenanceSection></View>{destination ? <PrimaryButton label={detail.action} onPress={() => router.push(destination)} /> : null}</ScreenLayout>; }
+const styles = StyleSheet.create({ title: { color: colors.text.primary, flexShrink: 1, fontFamily: fontFamily.display, fontSize: fontSize.title, fontWeight: '500', marginTop: spacing.xl }, subtitle: { color: colors.text.secondary, flexShrink: 1, fontSize: fontSize.body, lineHeight: 22 }, card: { backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden', paddingHorizontal: spacing.lg } });

@@ -2,6 +2,9 @@
   "name": "reflexion-mobile-mirror-interface-app",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",

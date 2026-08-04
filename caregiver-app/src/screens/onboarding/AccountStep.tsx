@@ -1,6 +1,7 @@
 import React from 'react';
 import { MIN_PASSWORD_LENGTH } from '../../lib/authMessages';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { PhoneField } from '../../components/Field';
 import { colors, fontSize, MIN_TOUCH_TARGET } from '../../theme';
 import { fieldStyles, Label, OptionGrid } from './fields';
 import type { AccountForm, Relationship } from './types';
@@ -61,15 +62,12 @@ export function AccountStep({
         value={account.password}
       />
 
-      <Label>Phone number</Label>
-      <TextInput
-        accessibilityLabel="Your phone number"
-        keyboardType="phone-pad"
-        onChangeText={(phoneNumber) => setAccount((current) => ({ ...current, phoneNumber }))}
-        placeholder="+65 9123 4567"
-        placeholderTextColor={colors.placeholder}
-        style={fieldStyles.input}
-        value={account.phoneNumber}
+      <PhoneField
+        countryCode={account.countryCode || '+65'}
+        label="Phone number"
+        onCountryCodeChange={(countryCode) => setAccount((current) => ({ ...current, countryCode }))}
+        onPhoneNumberChange={(phoneNumber) => setAccount((current) => ({ ...current, phoneNumber }))}
+        phoneNumber={account.phoneNumber}
       />
 
       <Label>I am caring for...</Label>

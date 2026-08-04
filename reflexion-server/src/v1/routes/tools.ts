@@ -62,7 +62,7 @@ toolsRouter.get('/assistant/memory', requireDevice, asyncHandler(async (request,
   const principal = getPrincipal(request)
   if (principal.kind !== 'device') throw forbidden()
   const db = await getDb()
-  const doc = await db.collection<any>(collections.patientMemory).findOne({ _id: principal.patientId })
+  const doc = await db.collection<any>(collections.patientMemory).findOne({ _id: principal.patientId, tenantId: principal.tenantId })
   response.setHeader('Cache-Control', 'no-store')
   sendData(response, { facts: Array.isArray(doc?.facts) ? doc.facts : [], updatedAt: doc?.updatedAt ?? null })
 }))
@@ -75,7 +75,7 @@ toolsRouter.put('/assistant/memory', requireDevice, asyncHandler(async (request,
   const facts = raw.map((f) => String(f ?? '').trim()).filter(Boolean).slice(0, 8).map((f) => f.slice(0, 200))
   const db = await getDb()
   await db.collection<any>(collections.patientMemory).updateOne(
-    { _id: principal.patientId },
+    { _id: principal.patientId, tenantId: principal.tenantId },
     { $set: { tenantId: principal.tenantId, patientId: principal.patientId, facts, updatedAt: new Date() } },
     { upsert: true },
   )
@@ -105,10 +105,10 @@ async function invokeTool(db: Awaited<ReturnType<typeof getDb>>, tenantId: strin
     // Confirm a medication/reminder occurrence from the conversation. The occurrence MUST belong to
     // this device's patient; the agent can only mark an existing scheduled occurrence, never invent one.
     const occurrenceId = requiredString(args, 'occurrenceId', 100)
-    const status = enumValue(args.status, 'status', ['taken', 'skipped', 'snoozed', 'unknown'] as const)
     const note = optionalString(args, 'note', 500)
     const occurrence = await db.collection<any>(collections.reminderOccurrences).findOne({ _id: occurrenceId, tenantId, patientId })
     if (!occurrence) throw notFound('Reminder occurrence')
+    const status = occurrenceTypeStatus(args.status, occurrence.type)
     const changed = await db.collection<any>(collections.reminderOccurrences).findOneAndUpdate(
       { _id: occurrence._id, status: { $nin: ['cancelled'] } },
       { $set: { status, respondedAt: new Date(), response: { note, actorType: 'device', channel: 'conversational' }, updatedAt: new Date() } },
@@ -138,6 +138,11 @@ function numberArgument(value: unknown, field: string) {
   if (value === undefined || value === null) return undefined
   if (typeof value !== 'number' || !Number.isFinite(value)) throw badRequest('VALIDATION_FAILED', `${field} must be a finite number.`)
   return value
+}
+function occurrenceTypeStatus(value: unknown, type: unknown) {
+  return type === 'routine'
+    ? enumValue(value, 'status', ['reported-complete', 'deferred', 'declined', 'no-response', 'unknown'] as const)
+    : enumValue(value, 'status', ['taken', 'skipped', 'snoozed', 'unknown'] as const)
 }
 function redactArguments(tool: string, args: Record<string, unknown>) {
   if (tool === 'web.search') return { queryHashOnly: true, freshness: args.freshness }

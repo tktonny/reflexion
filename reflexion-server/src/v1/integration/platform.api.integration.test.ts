@@ -8,6 +8,7 @@ import { closeMongo, getDb } from '../../lib/mongo.js'
 import { collections } from '../platform/collections.js'
 import { ensureV1Indexes } from '../platform/indexes.js'
 import { issueAccessToken } from '../platform/tokens.js'
+import { materializeRoutineReminders } from '../care/reminderScheduler.js'
 
 const TENANT_ID = 'ten_api_integration'
 const USER_ID = 'usr_api_admin'
@@ -34,7 +35,7 @@ const deviceToken = () => issueAccessToken({
   pid: PATIENT_ID,
   cid: DEVICE_CREDENTIAL_ID,
   roles: ['device'],
-  scopes: ['session:write', 'session:read', 'care_plan:read', 'reminder:respond', 'device:heartbeat'],
+  scopes: ['session:write', 'session:read', 'care_plan:read', 'reminder:respond', 'device:heartbeat', 'consent:read', 'consent:write'],
 }, 3600)
 
 const bearer = (token: string) => ({ Authorization: `Bearer ${token}` })
@@ -120,8 +121,13 @@ test('all unified v1 business routes work through HTTP with real Mongo authoriza
       const consent = await app.post(`/api/v1/patients/${createdPatientId}/consents`)
         .set({ ...bearer(human), 'Idempotency-Key': idempotencyKey('patient-consent') })
         .send({ purpose: 'home_cognitive_monitoring', documentVersion: '2026-07', status: 'granted' })
-        .expect(201)
-      assert.equal(consent.body.data.status, 'granted')
+        .expect(403)
+      assert.equal(consent.body.error.code, 'OLDER_ADULT_CONSENT_REQUIRED')
+      await db.collection(collections.consents).insertOne({
+        _id: 'con_api_created_patient', tenantId: TENANT_ID, patientId: createdPatientId,
+        purpose: 'home_cognitive_monitoring', documentVersion: '2026-07', status: 'granted',
+        signedAt: new Date(), withdrawnAt: null, actorType: 'device', actorId: DEVICE_ID, createdAt: new Date(),
+      })
 
       await db.collection(collections.programEnrollments).insertOne({
         _id: 'enr_api_current', tenantId: TENANT_ID, patientId: createdPatientId,
@@ -132,6 +138,7 @@ test('all unified v1 business routes work through HTTP with real Mongo authoriza
     })
 
     let medicationPlanId = ''
+    let routineId = ''
     const occurrenceId = 'rem_api_taken'
     await t.test('care plan, medication, reminder and caregiver task routes', async () => {
       const planBody = {
@@ -165,6 +172,61 @@ test('all unified v1 business routes work through HTTP with real Mongo authoriza
         .send({ displayName: 'Afternoon heart tablet', status: 'active' })
         .expect(200)
       assert.equal(patched.body.data.version, 2)
+
+      const routine = await app.post(`/api/v1/patients/${PATIENT_ID}/routines`)
+        .set({ ...bearer(human), 'Idempotency-Key': idempotencyKey('create-routine') })
+        .send({
+          name: 'Morning walk', category: 'exercise',
+          schedule: { timezone: 'Asia/Shanghai', times: ['09:00'], recurrence: 'daily' },
+          notificationPolicy: 'after-one-missed-or-unclear-response', notes: 'A short walk if the weather is comfortable.',
+        })
+        .expect(201)
+      routineId = routine.body.data.routineId
+      assert.equal(routine.body.data.status, 'active')
+      const routines = await app.get(`/api/v1/patients/${PATIENT_ID}/routines`).set(bearer(human)).expect(200)
+      assert.equal(routines.body.data.length, 1)
+      const paused = await app.patch(`/api/v1/routines/${routineId}`)
+        .set({ ...bearer(human), 'If-Match': '1' })
+        .send({ status: 'paused' })
+        .expect(200)
+      assert.equal(paused.body.data.status, 'paused')
+      const resumed = await app.patch(`/api/v1/routines/${routineId}`)
+        .set({ ...bearer(human), 'If-Match': '2' })
+        .send({ status: 'active' })
+        .expect(200)
+      assert.equal(resumed.body.data.version, 3)
+      const materialized = await materializeRoutineReminders(db, routineId, new Date('2026-07-20T00:00:00.000Z'))
+      assert.ok(materialized > 0)
+      const routineOccurrence = await db.collection(collections.reminderOccurrences).findOne({ sourceId: routineId })
+      assert.ok(routineOccurrence)
+      const routineResponse = await app.post(`/api/v1/reminder-occurrences/${routineOccurrence._id}/responses`)
+        .set({ ...bearer(device), 'Idempotency-Key': idempotencyKey('routine-response') })
+        .send({ status: 'reported-complete', respondedAt: new Date().toISOString() })
+        .expect(200)
+      assert.equal(routineResponse.body.data.status, 'reported-complete')
+      const ended = await app.delete(`/api/v1/routines/${routineId}`)
+        .set({ ...bearer(human), 'Idempotency-Key': idempotencyKey('end-routine') })
+        .expect(202)
+      assert.equal(ended.body.data.state, 'ended')
+
+      const familyMessage = await app.post(`/api/v1/patients/${PATIENT_ID}/family-messages`)
+        .set({ ...bearer(human), 'Idempotency-Key': idempotencyKey('family-message-now') })
+        .send({ body: 'Good morning — thinking of you.' })
+        .expect(201)
+      assert.equal(familyMessage.body.data.state, 'queued')
+      const futureMessage = await app.post(`/api/v1/patients/${PATIENT_ID}/family-messages`)
+        .set({ ...bearer(human), 'Idempotency-Key': idempotencyKey('family-message-future') })
+        .send({ body: 'I will call this afternoon.', scheduledFor: new Date(Date.now() + 60 * 60_000).toISOString() })
+        .expect(201)
+      assert.equal(futureMessage.body.data.state, 'scheduled')
+      const deviceInbox = await app.get(`/api/v1/devices/${DEVICE_ID}/family-messages`).set(bearer(device)).expect(200)
+      assert.equal(deviceInbox.body.data.messages.length, 1)
+      assert.equal(deviceInbox.body.data.messages[0].state, 'delivered')
+      const opened = await app.post(`/api/v1/devices/${DEVICE_ID}/family-messages/${familyMessage.body.data.messageId}/opened`)
+        .set(bearer(device)).expect(200)
+      assert.equal(opened.body.data.state, 'opened')
+      const caregiverInbox = await app.get(`/api/v1/patients/${PATIENT_ID}/family-messages`).set(bearer(human)).expect(200)
+      assert.equal(caregiverInbox.body.data.messages.find((item: any) => item.messageId === familyMessage.body.data.messageId).state, 'opened')
       await app.post(`/api/v1/patients/${PATIENT_ID}/medication-plans`)
         .set({ ...bearer(device), 'Idempotency-Key': idempotencyKey('device-medication-write') })
         .send({ displayName: 'Unsafe', source: 'caregiver', schedule: { timezone: 'Asia/Shanghai', times: ['10:00'] } })

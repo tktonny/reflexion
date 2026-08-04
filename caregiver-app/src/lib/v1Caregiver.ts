@@ -1,6 +1,7 @@
 import { getV1Url } from './apiUrl';
 import { generateIdempotencyKey, v1FetchWithHeaders, v1Get, v1Post } from './v1Client';
 import type { V1PatientStatus } from './v1Status';
+import type { SetupCategory, SetupStatus } from '../architecture/models';
 
 // The caregiver data layer, on v1 only.
 //
@@ -19,11 +20,23 @@ import type { V1PatientStatus } from './v1Status';
 
 export type V1AlertSensitivity = 'notify_me_about_everything' | 'only_important_changes' | 'only_urgent_alerts';
 export type V1SummaryTime = '09:00' | '19:00';
+export type V1NotificationTrigger =
+  | 'conversation-session-summary'
+  | 'no-interaction-yet-today'
+  | 'repeated-missed-interactions'
+  | 'recent-interaction-shorter-than-usual'
+  | 'device-may-be-offline'
+  | 'reminder-not-completed-or-unclear'
+  | 'new-chat-reply'
+  | 'weekly-summary';
+export type V1SummaryFrequency = 'immediately-after-each-session' | 'daily-summary' | 'weekly-summary' | 'off';
 
 export type V1NotificationPreferences = {
   pushNotificationsEnabled: boolean;
   alertSensitivity: V1AlertSensitivity;
   preferredDailySummaryTime: V1SummaryTime;
+  summaryFrequency: V1SummaryFrequency;
+  triggers: Record<V1NotificationTrigger, boolean>;
 };
 
 export type V1CaregiverProfile = {
@@ -34,6 +47,7 @@ export type V1CaregiverProfile = {
   roles: string[];
   phoneNumber: string;
   relationshipToElderly: string | null;
+  appLanguage: 'en' | 'zh';
   notificationPreferences: V1NotificationPreferences;
   /** Privacy, not notifications: whether a session's summary text is kept at all. */
   storeSessionSummaries: boolean;
@@ -48,10 +62,31 @@ export async function updateCaregiverProfileV1(input: {
   name?: string;
   phoneNumber?: string;
   relationshipToElderly?: string | null;
+  appLanguage?: 'en' | 'zh';
   notificationPreferences?: Partial<V1NotificationPreferences>;
   storeSessionSummaries?: boolean;
 }): Promise<V1CaregiverProfile> {
   return v1Patch<V1CaregiverProfile>('/me', input);
+}
+
+export function requestEmailChangeV1(email: string): Promise<{ state: 'accepted' }> {
+  return v1Post('/me/email-change-requests', { email: email.trim().toLowerCase() });
+}
+
+export function confirmEmailChangeV1(code: string): Promise<V1CaregiverProfile> {
+  return v1Post('/me/email-changes', { code });
+}
+
+export function requestPhoneChangeV1(phoneNumber: string): Promise<{ state: 'accepted'; phoneNumber: string }> {
+  return v1Post('/me/phone-change-requests', { phoneNumber: phoneNumber.trim() });
+}
+
+export function confirmPhoneChangeV1(phoneNumber: string, code: string): Promise<V1CaregiverProfile> {
+  return v1Post('/me/phone-changes', { phoneNumber: phoneNumber.trim(), code: code.trim() });
+}
+
+export function changePasswordV1(currentPassword: string, newPassword: string): Promise<{ state: 'completed' }> {
+  return v1Post('/me/password-changes', { currentPassword, newPassword });
 }
 
 // ── Loved ones (replaces the patients array of /nurse-patient-config/latest, create and add-patients)
@@ -142,6 +177,40 @@ export function putCarePlanV1(patientId: string, version: number, input: {
   });
 }
 
+export type V1Routine = {
+  routineId: string;
+  patientId: string;
+  name: string;
+  category: 'medication' | 'meals' | 'hydration' | 'medical-appointments' | 'exercise' | 'family-events' | 'custom-other';
+  schedule: { timezone: string; times: string[]; recurrence: string };
+  notificationPolicy: 'do-not-notify' | 'after-one-missed-or-unclear-response' | 'daily-summary';
+  notes: string | null;
+  status: 'active' | 'paused' | 'ended';
+  version: number;
+};
+
+export function listRoutinesV1(patientId: string): Promise<V1Routine[]> {
+  return v1Get(`/patients/${encodeURIComponent(patientId)}/routines`);
+}
+
+export function createRoutineV1(patientId: string, input: {
+  name: string;
+  category: V1Routine['category'];
+  schedule: V1Routine['schedule'];
+  notificationPolicy: V1Routine['notificationPolicy'];
+  notes?: string;
+}): Promise<V1Routine> {
+  return v1Post(`/patients/${encodeURIComponent(patientId)}/routines`, input, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export function updateRoutineV1(routine: V1Routine, input: Partial<Pick<V1Routine, 'name' | 'category' | 'schedule' | 'notificationPolicy' | 'notes' | 'status'>>): Promise<V1Routine> {
+  return v1Patch(`/routines/${encodeURIComponent(routine.routineId)}`, input, { ifMatch: String(routine.version) });
+}
+
+export function endRoutineV1(routineId: string): Promise<{ routineId: string; state: 'ended' }> {
+  return v1Delete(`/routines/${encodeURIComponent(routineId)}`, { idempotencyKey: generateIdempotencyKey() });
+}
+
 // ── Consent (a HARD gate: without it POST /sessions refuses a daily check-in, so no check-in can run)
 
 export type V1ConsentState = {
@@ -162,12 +231,59 @@ export const CHECKIN_CONSENT_PURPOSE = 'home_cognitive_monitoring';
 /** The document version the onboarding consent screen presents. Bump when that wording changes. */
 export const CHECKIN_CONSENT_DOCUMENT_VERSION = 'checkin-consent-2026-07';
 
-export function grantCheckInConsentV1(patientId: string, purpose: string): Promise<unknown> {
+export function withdrawCheckInConsentV1(patientId: string, purpose = CHECKIN_CONSENT_PURPOSE): Promise<unknown> {
   return v1Post(`/patients/${encodeURIComponent(patientId)}/consents`, {
     purpose,
     documentVersion: CHECKIN_CONSENT_DOCUMENT_VERSION,
-    status: 'granted',
+    status: 'withdrawn',
   }, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export const RESEARCH_CONSENT_PURPOSE = 'optional_research_participation';
+export const RESEARCH_CONSENT_DOCUMENT_VERSION = 'research-consent-2026-07';
+
+export function grantResearchParticipationV1(patientId: string): Promise<unknown> {
+  return v1Post(`/patients/${encodeURIComponent(patientId)}/consents`, { purpose: RESEARCH_CONSENT_PURPOSE, documentVersion: RESEARCH_CONSENT_DOCUMENT_VERSION, status: 'granted' }, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export function withdrawResearchParticipationV1(patientId: string): Promise<unknown> {
+  return v1Post(`/patients/${encodeURIComponent(patientId)}/consents`, { purpose: RESEARCH_CONSENT_PURPOSE, documentVersion: RESEARCH_CONSENT_DOCUMENT_VERSION, status: 'withdrawn' }, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export type V1PrivacyState = {
+  patientId: string;
+  consent: { status: 'pending' | 'accepted' | 'declined' | 'withdrawn'; requiredPurpose: string; history: { consentId: string; purpose: string; documentVersion: string; status: string; signedAt: string | null; withdrawnAt: string | null }[] };
+  research: { status: 'separate'; message: string };
+  retention: { structuredData: string; sessionMedia: string; operationalLogs: string; configuredByServer: boolean };
+  deletionCategories: { category: 'sessions' | 'messages' | 'routine-responses' | 'device-events'; label: string }[];
+  deletionRequests: { requestId: string; categories: string[]; state: string; createdAt: string; updatedAt: string; remainingObjectKeys: string[]; error: string | null }[];
+};
+
+export function getPrivacyStateV1(patientId: string): Promise<V1PrivacyState> {
+  return v1Get(`/patients/${encodeURIComponent(patientId)}/privacy`);
+}
+
+export function requestDataDeletionV1(patientId: string, categories: V1PrivacyState['deletionCategories'][number]['category'][]): Promise<V1PrivacyState['deletionRequests'][number]> {
+  return v1Post(`/patients/${encodeURIComponent(patientId)}/data-deletion-requests`, { confirm: true, categories }, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export type V1CareCircleMember = { memberId: string; kind: 'member' | 'invitation'; userId?: string; name?: string; email?: string | null; phoneNumber?: string | null; invitee?: string; role: 'full-access' | 'standard-access' | 'view-only' | 'custom-access'; permissions: string[]; state: string; version: number; createdAt?: string };
+export type V1CareCircle = { patientId: string; members: V1CareCircleMember[]; invitations: V1CareCircleMember[] };
+
+export function getCareCircleV1(patientId: string): Promise<V1CareCircle> {
+  return v1Get(`/patients/${encodeURIComponent(patientId)}/care-circle`);
+}
+
+export function inviteCaregiverV1(patientId: string, input: { emailOrPhone: string; role: V1CareCircleMember['role']; permissions?: string[] }): Promise<V1CareCircleMember> {
+  return v1Post(`/patients/${encodeURIComponent(patientId)}/care-circle/invitations`, input, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export function updateCareCircleMemberV1(patientId: string, member: V1CareCircleMember, input: { role: V1CareCircleMember['role']; permissions?: string[] }): Promise<V1CareCircleMember> {
+  return v1Write('PATCH', `/patients/${encodeURIComponent(patientId)}/care-circle/${encodeURIComponent(member.memberId)}`, input, { ifMatch: String(member.version) });
+}
+
+export function revokeCareCircleMemberV1(patientId: string, memberId: string): Promise<{ memberId: string; state: 'revoked' }> {
+  return v1Delete(`/patients/${encodeURIComponent(patientId)}/care-circle/${encodeURIComponent(memberId)}`, { idempotencyKey: generateIdempotencyKey() });
 }
 
 // ── Mirrors (replaces /nurse-patient-config/mirrors and mirrors/connect)
@@ -181,7 +297,7 @@ export type V1DeviceAssignment = {
   deviceId: string | null;
   mirrorName: string | null;
   assignedAt: string | null;
-  device: { serial: string | null; softwareVersion: string | null; status: string | null; lastHeartbeatAt: string | null } | null;
+  device: { serial: string | null; softwareVersion: string | null; status: string | null; technicalState: 'ok' | 'possible_issue' | 'unknown'; lastHeartbeatAt: string | null } | null;
 };
 
 export async function listDeviceAssignmentsV1(): Promise<V1DeviceAssignment[]> {
@@ -200,6 +316,32 @@ export function revokeDeviceV1(deviceId: string, reason: string): Promise<unknow
   });
 }
 
+// ── Family messages (caregiver → paired Mirror, one-way)
+
+export type V1FamilyMessage = {
+  messageId: string;
+  patientId: string;
+  body: string;
+  type: 'text';
+  state: 'scheduled' | 'queued' | 'delivered' | 'opened';
+  scheduledFor: string;
+  createdAt: string;
+  deliveredAt: string | null;
+  openedAt: string | null;
+};
+
+export function sendFamilyMessageV1(input: { patientId: string; body: string; scheduledFor?: string }): Promise<V1FamilyMessage> {
+  return v1Post<V1FamilyMessage>(`/patients/${encodeURIComponent(input.patientId)}/family-messages`, {
+    body: input.body,
+    ...(input.scheduledFor ? { scheduledFor: input.scheduledFor } : {}),
+  }, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export async function listFamilyMessagesV1(patientId: string): Promise<V1FamilyMessage[]> {
+  const body = await v1Get<{ messages: V1FamilyMessage[] }>(`/patients/${encodeURIComponent(patientId)}/family-messages`);
+  return Array.isArray(body?.messages) ? body.messages : [];
+}
+
 // ── Session history (replaces /conversation-session-counts, -by-day, /patient-trend, /patient-summary)
 
 export type V1SessionDay = { date: string; day: number; count: number; completedCount: number; hasCompletedSession: boolean };
@@ -216,6 +358,8 @@ export type V1SessionDetail = {
   id: string;
   patientId: string;
   patientName: string;
+  type: 'daily_checkin' | 'companion' | string | null;
+  state: string | null;
   duration: number;
   words: number;
   exchanges: number;
@@ -227,6 +371,41 @@ export type V1SessionDetail = {
 
 export function getSessionDayV1(patientId: string, date: string): Promise<{ patientId: string; date: string; patientName: string; sessions: V1SessionDetail[] }> {
   return v1Get(`/patients/${encodeURIComponent(patientId)}/session-days/${encodeURIComponent(date)}`);
+}
+
+export type V1SessionFeed = {
+  patientId: string;
+  patientName: string;
+  sessions: V1SessionDetail[];
+  nextBefore: string | null;
+};
+
+/** Recent, transcript-backed sessions for the caregiver Sessions screen. */
+export function listSessionsV1(patientId: string, options?: { limit?: number; before?: string }): Promise<V1SessionFeed> {
+  const params = new URLSearchParams();
+  if (options?.limit !== undefined) params.set('limit', String(options.limit));
+  if (options?.before) params.set('before', options.before);
+  const query = params.toString();
+  return v1Get(`/patients/${encodeURIComponent(patientId)}/sessions${query ? `?${query}` : ''}`);
+}
+
+/** One session and its materialized transcript, authorized by the server for this caregiver. */
+export function getSessionV1(patientId: string, sessionId: string): Promise<V1SessionDetail> {
+  return v1Get(`/patients/${encodeURIComponent(patientId)}/sessions/${encodeURIComponent(sessionId)}`);
+}
+
+export type V1SessionProcessingStatus = {
+  sessionId: string;
+  operationId: string | null;
+  state: 'accepted' | 'queued' | 'processing' | 'completed' | 'failed';
+  stage: string;
+  retryable: boolean;
+  result: Record<string, unknown> | null;
+  updatedAt: string;
+};
+
+export function getSessionProcessingStatusV1(sessionId: string): Promise<V1SessionProcessingStatus> {
+  return v1Get(`/sessions/${encodeURIComponent(sessionId)}/processing-status`);
 }
 
 export type V1TrendDay = { date: string; duration: number; sessionCount: number; status: 'green' | 'amber' | 'red' | null; missed: boolean };
@@ -277,12 +456,24 @@ export async function loadCaregiverSettings(): Promise<CaregiverSettings> {
 // ── Onboarding (replaces /nurse-patient-config/create and add-patients)
 
 export type V1Registration = {
+  state: 'verification_pending' | 'authenticated';
+  email: string;
+  emailVerified?: boolean;
+  accessToken?: string;
+  refreshToken?: string;
+  accessTokenExpiresAt?: string;
+  refreshTokenExpiresAt?: string;
+  actor?: V1VerifiedAccount['actor'];
+};
+
+export type V1VerifiedAccount = {
+  state: 'verified';
   actor: { userId: string; tenantId: string; name?: string; email?: string; roles?: string[] };
   accessToken: string;
   refreshToken: string;
 };
 
-/** Creates the caregiver, their private tenant, and a usable session in one call. */
+/** Creates the caregiver; the server decides whether this enters verification or an authenticated setup. */
 export function registerCaregiverV1(input: {
   name: string;
   email: string;
@@ -291,6 +482,50 @@ export function registerCaregiverV1(input: {
   relationshipToElderly?: string | null;
 }): Promise<V1Registration> {
   return v1Post<V1Registration>('/auth/registrations', input);
+}
+
+export function resendAccountVerificationV1(email: string): Promise<{ state: 'accepted' }> {
+  return v1Post('/auth/account-verification-requests', { email: email.trim().toLowerCase() });
+}
+
+export function verifyAccountV1(email: string, code: string): Promise<V1VerifiedAccount> {
+  return v1Post<V1VerifiedAccount>('/auth/account-verifications', { email: email.trim().toLowerCase(), code });
+}
+
+export function requestPasswordResetV1(email: string): Promise<{ state: 'accepted' }> {
+  return v1Post('/auth/password-reset-requests', { email: email.trim().toLowerCase() });
+}
+
+export function verifyPasswordResetCodeV1(email: string, code: string): Promise<{ resetToken: string }> {
+  return v1Post('/auth/password-reset-verifications', { email: email.trim().toLowerCase(), code });
+}
+
+export function resetPasswordV1(token: string, newPassword: string): Promise<{ state: 'completed' }> {
+  return v1Post('/auth/password-resets', { token, newPassword });
+}
+
+// ── Persisted setup progress (the review screen is a completion stage, not a ninth category)
+
+export type V1SetupProgress = {
+  setupProgressId: string;
+  userId: string;
+  categories: Record<SetupCategory, SetupStatus>;
+  completeCount: number;
+  total: number;
+  state: 'in-progress' | 'complete';
+  version: number;
+  completedAt: string | null;
+};
+
+export function getSetupProgressV1(): Promise<V1SetupProgress> {
+  return v1Get<V1SetupProgress>('/setup-progress');
+}
+
+export function updateSetupProgressV1(category: SetupCategory, status: SetupStatus, version: number): Promise<V1SetupProgress> {
+  return v1Patch<V1SetupProgress>('/setup-progress', { category, status }, {
+    ifMatch: String(version),
+    idempotencyKey: generateIdempotencyKey(),
+  });
 }
 
 export type NewLovedOne = {
@@ -309,10 +544,9 @@ export type NewLovedOne = {
  * Adding a loved one is three writes, and the third is the one that was never made.
  *
  * A daily check-in is refused with 403 CONSENT_REQUIRED unless a granted home_cognitive_monitoring consent
- * exists, and the monitoring pipeline drops any session without a consentRef. No creation path in this app
- * has ever written one — not legacy onboarding, not the operator console — so the product's core function
- * could not start for anybody, and the mirror surfaced only a generic error. Consent is granted here, as
- * part of adding a loved one, because that is the moment the caregiver is actually being asked.
+ * exists, and the monitoring pipeline drops any session without a consentRef. Adding a loved one creates the
+ * patient and care plan only; the older adult must make the product-consent choice on the Mirror (or with the
+ * care team). The caregiver can view the state and withdraw an existing grant, but cannot accept it for them.
  *
  * The care plan carries everything that changes how Aria talks, which is what the mirror reads from its
  * device configuration; those fields previously sat unread in the legacy patient document.
@@ -336,7 +570,6 @@ export async function createLovedOneV1(input: NewLovedOne): Promise<V1PatientRec
     },
   });
 
-  await grantCheckInConsentV1(patient.patientId, CHECKIN_CONSENT_PURPOSE);
   return patient;
 }
 
@@ -414,6 +647,13 @@ async function v1Patch<T>(path: string, body: unknown, options?: WriteOptions): 
 
 async function v1Put<T>(path: string, body: unknown, options?: WriteOptions): Promise<T> {
   return v1Write<T>('PUT', path, body, options);
+}
+
+async function v1Delete<T>(path: string, options?: { idempotencyKey?: string }): Promise<T> {
+  const headers: Record<string, string> = {};
+  if (options?.idempotencyKey) headers['Idempotency-Key'] = options.idempotencyKey;
+  const envelope = await v1FetchWithHeaders<T>(path, { method: 'DELETE', headers });
+  return envelope.data;
 }
 
 /**

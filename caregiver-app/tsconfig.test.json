@@ -14,5 +14,5 @@
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.test.ts", "src/lib/apiUrl.ts", "src/lib/v1Status.ts", "src/lib/authMessages.ts", "src/lib/apiClient.ts", "src/screens/**/helpers.ts"]
+  "include": ["src/**/*.test.ts", "src/lib/apiUrl.ts", "src/lib/v1Status.ts", "src/lib/authMessages.ts", "src/lib/apiClient.ts", "src/screens/**/helpers.ts", "src/architecture/interactionContract.ts"]
 }

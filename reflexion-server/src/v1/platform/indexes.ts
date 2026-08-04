@@ -11,10 +11,18 @@ const indexes: IndexSet[] = [
   ]],
   [c.authSessions, [{ key: { refreshExpiresAt: 1 }, expireAfterSeconds: 0 }, { key: { tenantId: 1, userId: 1, status: 1 } }]],
   [c.passwordResetTokens, [{ key: { tokenDigest: 1 }, unique: true }, { key: { expiresAt: 1 }, expireAfterSeconds: 0 }]],
+  [c.emailChangeTokens, [{ key: { tokenDigest: 1 }, unique: true }, { key: { expiresAt: 1 }, expireAfterSeconds: 0 }]],
+  [c.phoneChangeTokens, [{ key: { tokenDigest: 1 }, unique: true }, { key: { expiresAt: 1 }, expireAfterSeconds: 0 }, { key: { tenantId: 1, userId: 1, state: 1 } }]],
+  [c.emailVerificationTokens, [{ key: { tokenDigest: 1 }, unique: true }, { key: { expiresAt: 1 }, expireAfterSeconds: 0 }, { key: { tenantId: 1, userId: 1, state: 1 } }]],
+  [c.setupProgress, [{ key: { tenantId: 1, userId: 1 }, unique: true }, { key: { updatedAt: -1 } }]],
   [c.patients, [{ key: { tenantId: 1, _id: 1 }, unique: true }, { key: { tenantId: 1, status: 1 } }]],
   [c.careRelationships, [
     { key: { tenantId: 1, userId: 1, status: 1 } },
     { key: { tenantId: 1, patientId: 1, userId: 1, status: 1 }, unique: true, partialFilterExpression: { status: 'active' } },
+  ]],
+  [c.careCircleInvitations, [
+    { key: { tenantId: 1, patientId: 1, state: 1, createdAt: -1 } },
+    { key: { tenantId: 1, patientId: 1, inviteeNormalized: 1, state: 1 }, unique: true, partialFilterExpression: { state: 'pending' } },
   ]],
   [c.consents, [{ key: { tenantId: 1, patientId: 1, purpose: 1, status: 1 } }]],
   [c.programEnrollments, [{ key: { tenantId: 1, patientId: 1, status: 1, enrolledAt: -1 } }]],
@@ -35,6 +43,7 @@ const indexes: IndexSet[] = [
   ]],
   [c.carePlans, [{ key: { tenantId: 1, patientId: 1, status: 1 } }]],
   [c.medicationPlans, [{ key: { tenantId: 1, patientId: 1, status: 1 } }]],
+  [c.reminderRules, [{ key: { tenantId: 1, patientId: 1, status: 1, updatedAt: -1 } }]],
   [c.reminderOccurrences, [
     { key: { tenantId: 1, sourceId: 1, scheduledAt: 1 }, unique: true },
     { key: { tenantId: 1, patientId: 1, scheduledAt: 1 } },
@@ -94,12 +103,22 @@ const indexes: IndexSet[] = [
     { key: { tenantId: 1, expoPushToken: 1 }, unique: true },
     { key: { tenantId: 1, userId: 1, state: 1 } },
   ]],
+  [c.familyMessages, [
+    { key: { tenantId: 1, patientId: 1, createdAt: -1 } },
+    // The mirror only polls messages addressed to its paired person. This index also makes scheduled
+    // messages inexpensive to pick up when their delivery time arrives.
+    { key: { tenantId: 1, patientId: 1, state: 1, scheduledFor: 1, createdAt: 1 } },
+  ]],
   [c.outboxEvents, [{ key: { state: 1, nextAttemptAt: 1 } }, { key: { aggregateType: 1, aggregateId: 1, occurredAt: 1 } }]],
   [c.eventConsumptions, [{ key: { eventId: 1, consumerName: 1 }, unique: true }]],
   [c.auditEvents, [{ key: { tenantId: 1, occurredAt: -1 } }]],
   [c.idempotencyRecords, [
     { key: { actorKey: 1, routeKey: 1, key: 1 }, unique: true },
     { key: { expiresAt: 1 }, expireAfterSeconds: 0 },
+  ]],
+  [c.dataDeletionRequests, [
+    { key: { tenantId: 1, patientId: 1, createdAt: -1 } },
+    { key: { tenantId: 1, requestKey: 1 }, unique: true },
   ]],
   [c.toolInvocations, [{ key: { tenantId: 1, patientId: 1, sessionId: 1, createdAt: -1 } }, { key: { state: 1, createdAt: 1 } }]],
   [c.protocolRegistry, [{ key: { sessionType: 1, status: 1, activatedAt: -1 } }]],

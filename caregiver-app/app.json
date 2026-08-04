@@ -28,7 +28,6 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.reflexion.caregiver",
-      "googleServicesFile": "./google-services.json",
       "versionCode": 4
     },
     "web": {

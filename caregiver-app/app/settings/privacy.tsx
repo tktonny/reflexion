@@ -1,61 +1,27 @@
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
-import { getStoredAuthSession } from '../../src/lib/authSession';
-import { SettingsPlaceholder } from '../../src/screens/settings/SettingsPlaceholder';
-import { ActionRow, SectionHeader, SettingsGroup, SwitchRow } from '../../src/screens/settings/SettingsRows';
-import { SettingsSubPage } from '../../src/screens/settings/SettingsSubPage';
-import { resolveSettingsState } from '../../src/screens/settings/helpers';
-import { useCaregiverSettings, useSaveCaregiverProfile } from '../../src/screens/settings/useCaregiverSettings';
+import { ActivityIndicator, Alert, Linking, StyleSheet, Switch, Text, View } from 'react-native';
 
-export default function PrivacySettingsScreen() {
+import { AppHeader, PrimaryButton, ScreenLayout, SecondaryButton } from '../../src/components/AppUI';
+import { getPrivacyStateV1, listPatientRecordsV1, requestDataDeletionV1, type V1PatientRecord, type V1PrivacyState } from '../../src/lib/v1Caregiver';
+import { colors, fontFamily, fontSize, radius, spacing } from '../../src/theme';
+
+export default function PrivacySettings() {
   const router = useRouter();
-  const session = getStoredAuthSession();
-  const settings = useCaregiverSettings();
-  const [storeSummaries, setStoreSummaries] = useState(true);
-
-  useEffect(() => {
-    if (!settings.data) return;
-    setStoreSummaries(settings.data.storeSessionSummaries);
-  }, [settings.data]);
-
-  const save = useSaveCaregiverProfile(() => router.back());
-  const state = resolveSettingsState({
-    hasNurseId: Boolean(session?.userId),
-    hasFailed: Boolean(settings.error),
-    hasSettings: Boolean(settings.data),
-    isLoading: settings.isLoading,
-  });
-
-  if (state !== 'ready' && state !== 'empty') {
-    return (
-      <SettingsSubPage title="Privacy & data">
-        <SettingsPlaceholder onRetry={() => void settings.refetch()} state={state} />
-      </SettingsSubPage>
-    );
-  }
-
-  return (
-    <SettingsSubPage
-      isSaving={save.isPending}
-      onSave={() => save.mutate({ storeSessionSummaries: storeSummaries })}
-      title="Privacy & data"
-    >
-      <SectionHeader title="Conversations" />
-      <SettingsGroup>
-        <SwitchRow label="Keep written summaries" onChange={setStoreSummaries} value={storeSummaries} />
-      </SettingsGroup>
-      {/* Says what turning it off costs, since the honest trade-off is not obvious from the label: the
-          check-ins still happen and the status still works, you just lose the readable record afterwards. */}
-      <SectionHeader title="Turning this off means daily check-ins still run and the status still updates — you just will not be able to read back what was said." />
-
-      <SectionHeader title="Your data" />
-      <SettingsGroup>
-        <ActionRow
-          label="Export my data"
-          onPress={() => Alert.alert('Export', 'Data export is coming in a later version.')}
-        />
-      </SettingsGroup>
-    </SettingsSubPage>
-  );
+  const [patient, setPatient] = useState<V1PatientRecord | null>(null);
+  const [privacy, setPrivacy] = useState<V1PrivacyState | null>(null);
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  useEffect(() => { void listPatientRecordsV1().then((people) => { const first = people[0] || null; setPatient(first); return first ? getPrivacyStateV1(first.patientId) : null; }).then((next) => { if (next) setPrivacy(next); }).catch(() => setError('We could not load privacy details. Check your connection and try again.')); }, []);
+  const requestDeletion = () => {
+    if (!patient || !privacy) return;
+    const categories = privacy.deletionCategories.filter((item) => selected[item.category]).map((item) => item.category);
+    if (!categories.length) { setError('Select at least one category before requesting deletion.'); return; }
+    Alert.alert('Delete selected data?', 'This cannot be undone. The request will be queued and its status will be recorded.', [{ text: 'Cancel', style: 'cancel' }, { text: 'Request deletion', style: 'destructive', onPress: () => void (async () => { setBusy(true); setError(''); try { await requestDataDeletionV1(patient.patientId, categories); setPrivacy(await getPrivacyStateV1(patient.patientId)); setError('Your deletion request was accepted and is being processed.'); } catch { setError('We could not request deletion. Check your connection and try again.'); } finally { setBusy(false); } })() }]);
+  };
+  const contactForAccountDeletion = () => { void Linking.openURL('mailto:support@reflexion.care?subject=Reflexion%20account%20deletion%20request').catch(() => setError('Your mail app is unavailable. Email support@reflexion.care to request account deletion.')); };
+  return <ScreenLayout contentContainerStyle={styles.content}><AppHeader title="Privacy & data" onBack={() => router.back()} /><Text accessibilityRole="header" style={styles.title}>Privacy & data</Text><Text style={styles.copy}>You choose what is kept and when selected records are removed. Consent and optional research participation remain separate.</Text>{error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}{!patient || !privacy ? <ActivityIndicator color={colors.accent} /> : <><View style={styles.card}><Text style={styles.label}>View consent</Text><Text style={styles.help}>Product consent: {privacy.consent.status}</Text><Text style={styles.help}>Required purpose: {privacy.consent.requiredPurpose}</Text><Text style={styles.help}>Research participation is separate and optional.</Text></View><View style={styles.card}><Text style={styles.label}>Consent history</Text>{privacy.consent.history.length ? privacy.consent.history.map((item) => <Text key={item.consentId} style={styles.help}>{item.purpose} · {item.status} · {item.documentVersion}</Text>) : <Text style={styles.help}>No consent record has been added yet.</Text>}</View><View style={styles.card}><Text style={styles.label}>Data retention</Text><Text style={styles.help}>{privacy.retention.structuredData}</Text><Text style={styles.help}>{privacy.retention.sessionMedia}</Text><Text style={styles.help}>{privacy.retention.operationalLogs}</Text></View><View style={styles.card}><Text style={styles.label}>Delete selected data for {patient.displayName}</Text>{privacy.deletionCategories.map((item) => <View key={item.category} style={styles.row}><Text style={styles.help}>{item.label}</Text><Switch accessibilityLabel={item.label} value={selected[item.category] === true} onValueChange={(value) => setSelected((current) => ({ ...current, [item.category]: value }))} trackColor={{ false: '#D5D9DB', true: colors.accent }} /></View>)}{busy ? <ActivityIndicator color={colors.accent} /> : <PrimaryButton label="Request deletion" onPress={requestDeletion} />}</View><View style={styles.card}><Text style={styles.label}>Recent requests</Text>{privacy.deletionRequests.length ? privacy.deletionRequests.map((item) => <Text key={item.requestId} style={styles.help}>{item.categories.join(', ')} · {item.state}</Text>) : <Text style={styles.help}>No deletion requests yet.</Text>}</View><View style={styles.card}><Text style={styles.label}>Vendor & cross-border disclosure</Text><Text style={styles.help}>Reflexion may use configured email, SMS, object-storage and conversation-processing providers. The exact vendors and processing regions are set by the deployment and may vary. See the current Privacy Policy or contact support for the configured list.</Text><Text style={styles.label}>Delete account</Text><Text style={styles.help}>Account deletion is support-managed in this pilot so identity, shared loved-one records and retention obligations can be reviewed before irreversible removal.</Text><SecondaryButton label="Contact support to request deletion" onPress={contactForAccountDeletion} /></View></>}</ScreenLayout>;
 }
+
+const styles = StyleSheet.create({ content: { gap: spacing.lg }, title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, lineHeight: 36, marginTop: spacing.lg }, copy: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: 22 }, error: { color: colors.error.text, fontSize: fontSize.body, lineHeight: 22 }, card: { backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.lg, borderWidth: 1, gap: spacing.md, padding: spacing.lg }, row: { alignItems: 'center', borderBottomColor: colors.border.subtle, borderBottomWidth: 1, flexDirection: 'row', gap: spacing.md, justifyContent: 'space-between', paddingVertical: spacing.md }, label: { color: colors.text.primary, flexShrink: 1, fontSize: fontSize.bodyLarge, fontWeight: '700', lineHeight: 22 }, help: { color: colors.text.secondary, flex: 1, flexShrink: 1, fontSize: fontSize.body, lineHeight: 21 } });

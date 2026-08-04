@@ -11,7 +11,7 @@ import {
 } from './deterministicSpeech'
 import type { LanguageKey } from './voice'
 
-export type CheckinStage = 'warm_up' | 'yesterday_recall' | 'present_planning' | 'medication_reminder' | 'reminiscence'
+export type CheckinStage = 'warm_up' | 'yesterday_recall' | 'present_planning' | 'medication_reminder' | 'routine_reminder' | 'reminiscence'
 export type QuestionState = 'pending' | 'asked' | 'answered' | 'skipped'
 
 export type CheckinQuestion = {
@@ -36,6 +36,7 @@ const STAGE_SIGNALS: Record<CheckinStage, string[]> = {
   yesterday_recall: ['episodic_memory', 'temporal_orientation', 'narrative_coherence'],
   present_planning: ['executive_function', 'prospective_memory', 'social_connectedness'],
   medication_reminder: ['memory', 'caregiver_adjunct'],
+  routine_reminder: ['routine_follow_through', 'caregiver_adjunct'],
   reminiscence: ['semantic_memory', 'language_richness', 'lexical_diversity', 'speech_fluency'],
 }
 
@@ -72,13 +73,19 @@ export function buildDailyCheckinScript(language: LanguageKey, plan: DailyConver
       })
       continue
     }
-    // Optional tail: medication (if scheduled) is always the first optional slot, then reminiscence.
+    // Optional tail: medication (if scheduled), then a generic routine (if scheduled), then reminiscence.
     const isMedication = plan.medicationReminder && optionalSeen === 0
+    const isRoutine = plan.routineReminder && optionalSeen === Number(Boolean(plan.medicationReminder))
     optionalSeen += 1
     if (isMedication) {
       script.push({
         questionId: 'medication', order: turn, stage: 'medication_reminder', cognitiveSignals: STAGE_SIGNALS.medication_reminder,
         // Medication is the top-WTP question — it should get an answer; allow one extra reprompt and no skip.
+        prompt, required: true, maxReprompts: 2, timeoutMs: 12_000, skippable: false, minWordsToAnswer: 1,
+      })
+    } else if (isRoutine) {
+      script.push({
+        questionId: 'routine_reminder', order: turn, stage: 'routine_reminder', cognitiveSignals: STAGE_SIGNALS.routine_reminder,
         prompt, required: true, maxReprompts: 2, timeoutMs: 12_000, skippable: false, minWordsToAnswer: 1,
       })
     } else {

@@ -1,123 +1,60 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useMemo, useState } from 'react';
+import { Alert, StyleSheet, Text } from 'react-native';
 
-import { v1Post } from '../src/lib/v1Client';
+import { AppHeader, PrimaryButton, ScreenLayout, TertiaryButton } from '../src/components/AppUI';
+import { BrandLockup } from '../src/components/BrandLockup';
+import { Field } from '../src/components/Field';
+import { validatePasswordPair } from '../src/lib/authValidation';
 import { MIN_PASSWORD_LENGTH, passwordResetMessage } from '../src/lib/authMessages';
-import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
+import { resetPasswordV1 } from '../src/lib/v1Caregiver';
+import { colors, fontFamily, fontSize, spacing } from '../src/theme';
 
-// Reset-completion screen. Reached from the emailed link caregiver-app://reset-password?token=... (or
-// the CAREGIVER_APP_URL/reset-password?token=... web link). Sets a new password via the reserved endpoint.
 export default function ResetPasswordScreen() {
   const router = useRouter();
-  const { token } = useLocalSearchParams<{ token?: string }>();
+  const params = useLocalSearchParams<{ token?: string }>();
+  const token = useMemo(() => Array.isArray(params.token) ? params.token[0] : params.token || '', [params.token]);
   const [password, setPassword] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [repeat, setRepeat] = useState('');
+  const [errors, setErrors] = useState<{ password?: string; repeatPassword?: string }>({});
+  const [requestError, setRequestError] = useState('');
+  const [working, setWorking] = useState(false);
 
-  async function submit() {
-    if (submitting) return;
-    if (!token) { setError('This reset link is missing its token. Open the link from your email again.'); return; }
-    if (password.length < MIN_PASSWORD_LENGTH) { setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`); return; }
-    setSubmitting(true);
-    setError('');
+  const reset = async () => {
+    const nextErrors = validatePasswordPair(password, repeat);
+    setErrors(nextErrors);
+    setRequestError('');
+    if (!token) { setRequestError('This reset link is missing. Request a new reset code and try again.'); return; }
+    if (Object.keys(nextErrors).length) return;
+    setWorking(true);
     try {
-      await v1Post('/auth/password-resets', { token, newPassword: password });
-      Alert.alert('Password updated', 'You can now sign in with your new password.');
-      router.replace('/sign-in');
-    } catch (err) {
-      // Never the server's own text — this box is a live region, so a raw 502 HTML preview would be read
-      // aloud. See src/lib/authMessages.ts.
-      setError(passwordResetMessage(err));
+      await resetPasswordV1(token, password);
+      Alert.alert('Password updated', 'Sign in with your new password.', [{ text: 'Sign in', onPress: () => router.replace('/sign-in') }]);
+    } catch (cause) {
+      setRequestError(passwordResetMessage(cause));
     } finally {
-      setSubmitting(false);
+      setWorking(false);
     }
-  }
+  };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboard}>
-        <View style={styles.card}>
-          <Text maxFontSizeMultiplier={1.3} style={styles.title}>New password</Text>
-          <Text style={styles.subtitle}>Choose a new password for your caregiver account.</Text>
-          <Text style={styles.label}>New password</Text>
-          <TextInput
-            accessibilityLabel="New password"
-            autoCapitalize="none"
-            // new-password/newPassword is what makes the keychain offer to generate and then SAVE the
-            // password; with plain "password" it tries to fill the old one instead.
-            autoComplete="new-password"
-            onChangeText={setPassword}
-            placeholder="At least 8 characters"
-            placeholderTextColor={colors.placeholder}
-            secureTextEntry
-            style={styles.input}
-            textContentType="newPassword"
-            value={password}
-          />
-          {/* Announced on Android — the two local checks (missing token, too short) never move the screen,
-              so silence is the only other feedback. */}
-          {error ? <Text accessibilityLiveRegion="polite" style={styles.error}>{error}</Text> : null}
-          <TouchableOpacity
-            // Named explicitly because the spinner takes the visible text away while submitting.
-            accessibilityLabel="Set new password"
-            accessibilityRole="button"
-            accessibilityState={{ busy: submitting, disabled: submitting }}
-            disabled={submitting}
-            onPress={submit}
-            style={styles.primaryBtn}
-          >
-            {submitting ? <ActivityIndicator color={colors.text.onAccent} /> : <Text style={styles.primaryText}>Set new password</Text>}
-          </TouchableOpacity>
-          <TouchableOpacity
-            accessibilityRole="button"
-            onPress={() => router.replace('/sign-in')}
-            style={styles.linkBtn}
-          >
-            <Text style={styles.linkText}>Back to sign in</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+    <ScreenLayout contentContainerStyle={styles.content}>
+      <AppHeader onBack={() => router.back()} />
+      <BrandLockup compact />
+      <Text accessibilityRole="header" style={styles.title}>Create new password</Text>
+      <Text style={styles.subtitle}>New passwords must be at least {MIN_PASSWORD_LENGTH} characters. Active sessions will be signed out after the change.</Text>
+      <Field error={errors.password} helperText={`At least ${MIN_PASSWORD_LENGTH} characters.`} label="New password" onChangeText={(value) => { setPassword(value); setErrors((current) => ({ ...current, password: undefined })); }} placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`} secure value={password} />
+      <Field error={errors.repeatPassword} label="Repeat password" onChangeText={(value) => { setRepeat(value); setErrors((current) => ({ ...current, repeatPassword: undefined })); }} placeholder="Enter it again" secure value={repeat} />
+      {requestError ? <Text accessibilityRole="alert" style={styles.requestError}>{requestError}</Text> : null}
+      <PrimaryButton disabled={working} label={working ? 'Updating…' : 'Reset password'} onPress={() => void reset()} />
+      <TertiaryButton label="Back to sign in" onPress={() => router.replace('/sign-in')} />
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.surface.page },
-  keyboard: { flex: 1, justifyContent: 'center', padding: scaleSize(24) },
-  card: {
-    backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: 18,
-    borderWidth: 1, padding: scaleSize(24),
-  },
-  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(34), fontWeight: '500' },
-  subtitle: { color: colors.text.secondary, fontSize: scaleSize(16), lineHeight: scaleSize(23), marginBottom: scaleSize(24), marginTop: spacing.sm },
-  label: {
-    color: colors.text.secondary, fontSize: fontSize.bodyLarge, fontWeight: '700',
-    marginBottom: spacing.sm, marginTop: scaleSize(14),
-  },
-  input: {
-    backgroundColor: colors.surface.input, borderColor: colors.border.default, borderRadius: 12, borderWidth: 1,
-    color: colors.text.primary, fontSize: scaleSize(16), paddingHorizontal: scaleSize(14), paddingVertical: spacing.md,
-  },
-  // Form-rejection red — not a status colour (src/lib/v1Status.ts owns those) and not in the theme.
-  error: { color: colors.error.text, fontSize: fontSize.bodyLarge, lineHeight: scaleSize(20), marginTop: spacing.md },
-  primaryBtn: {
-    alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.lg, justifyContent: 'center',
-    marginTop: scaleSize(24), minHeight: scaleSize(50),
-  },
-  primaryText: { color: colors.text.onAccent, fontSize: scaleSize(16), fontWeight: '700' },
-  // 44pt: the text link is only ~20pt tall on its own, which is an easy miss one-handed.
-  linkBtn: { alignItems: 'center', justifyContent: 'center', marginTop: scaleSize(18), minHeight: MIN_TOUCH_TARGET },
-  linkText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
+  content: { gap: spacing.lg },
+  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, fontWeight: '500', lineHeight: 36, marginTop: spacing.xl },
+  subtitle: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: 22 },
+  requestError: { color: colors.error.text, fontSize: fontSize.body, lineHeight: 22 },
 });

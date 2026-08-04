@@ -7,12 +7,14 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "node": "24.18.0",
       "env": {
         "EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL": "https://reflexion.production.tktonny.top"
       }
     },
     "preview": {
       "distribution": "internal",
+      "node": "24.18.0",
       "android": {
         "buildType": "apk"
       },
@@ -22,6 +24,7 @@
     },
     "release-apk": {
       "distribution": "internal",
+      "node": "24.18.0",
       "android": {
         "buildType": "apk"
       },
@@ -31,6 +34,7 @@
     },
     "production": {
       "autoIncrement": true,
+      "node": "24.18.0",
       "env": {
         "EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL": "https://reflexion.production.tktonny.top"
       }

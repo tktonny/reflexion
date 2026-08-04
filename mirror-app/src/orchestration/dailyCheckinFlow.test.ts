@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createDailyConversationPlan } from './deterministicSpeech'
+import { classifyReminderResponse, createDailyConversationPlan } from './deterministicSpeech'
 import { buildDailyCheckinScript, createDailyCheckinFlow, createSessionCheckinFlow } from './dailyCheckinFlow'
 
 const withMedAndReminiscence = createDailyConversationPlan({
@@ -34,10 +34,10 @@ test('answers in fixed order and completes only after the last question', () => 
   assert.equal(flow.current(), null)
 })
 
-test('a too-short answer is insufficient and does not advance', () => {
+test('an empty answer is insufficient and does not advance', () => {
   const flow = createSessionCheckinFlow('english', createDailyConversationPlan({ reminiscenceWeekdays: [] }))
   const first = flow.current()!
-  assert.equal(flow.recordAnswer('ok'), 'insufficient') // < 3 words
+  assert.equal(flow.recordAnswer(''), 'insufficient')
   assert.equal(flow.current()!.questionId, first.questionId, 'stays on the same question')
   assert.equal(flow.recordAnswer('yes I had fish and rice'), 'answered')
   assert.notEqual(flow.current()!.questionId, first.questionId, 'advances after a real answer')
@@ -73,4 +73,18 @@ test('a required non-skippable question cannot wedge the flow', () => {
 test('CJK answers count characters, not whitespace tokens', () => {
   const flow = createSessionCheckinFlow('mandarin', createDailyConversationPlan({ reminiscenceWeekdays: [] }))
   assert.equal(flow.recordAnswer('我昨天吃了鱼'), 'answered') // 6 CJK chars >= 3
+})
+
+test('generic routine reminders share the scripted tail and response states', () => {
+  const plan = createDailyConversationPlan({
+    routineReminder: { occurrenceId: 'routine_occ_1', displayText: 'Morning walk', scheduledAt: '2026-07-23T01:00:00Z', category: 'exercise' },
+    reminiscenceWeekdays: [],
+  })
+  const script = buildDailyCheckinScript('english', plan)
+  assert.equal(script.at(-1)?.questionId, 'routine_reminder')
+  assert.equal(script.at(-1)?.stage, 'routine_reminder')
+  assert.equal(classifyReminderResponse('Yes, I finished it', 'routine'), 'reported-complete')
+  assert.equal(classifyReminderResponse('I will do it later', 'routine'), 'deferred')
+  assert.equal(classifyReminderResponse('No, not today', 'routine'), 'declined')
+  assert.equal(classifyReminderResponse('I am not sure', 'routine'), 'unknown')
 })

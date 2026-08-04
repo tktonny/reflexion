@@ -18,11 +18,11 @@ import { enumValue, isoDate, objectBody, optionalString, positiveInteger, requir
 const SESSION_TYPES = ['companion', 'daily_checkin', 'clinic_assessment', 'device_test'] as const
 const EVENT_KINDS = ['transcript_turn', 'tool_call', 'tool_result', 'capture_metric', 'lifecycle', 'user_correction'] as const
 const ARTIFACT_KINDS = ['audio', 'video', 'transcript', 'image', 'sidecar'] as const
-const DAILY_PROTOCOL_STAGES = new Set(['warm_up', 'yesterday_recall', 'present_planning', 'medication_reminder', 'reminiscence'])
+const DAILY_PROTOCOL_STAGES = new Set(['warm_up', 'yesterday_recall', 'present_planning', 'medication_reminder', 'routine_reminder', 'reminiscence'])
 const DAILY_COGNITIVE_SIGNALS = new Set([
   'mood', 'speech_initiation', 'response_latency', 'episodic_memory', 'temporal_orientation',
   'narrative_coherence', 'executive_function', 'prospective_memory', 'social_connectedness',
-  'memory', 'caregiver_adjunct', 'semantic_memory', 'language_richness', 'lexical_diversity', 'speech_fluency',
+  'memory', 'caregiver_adjunct', 'routine_follow_through', 'semantic_memory', 'language_richness', 'lexical_diversity', 'speech_fluency',
 ])
 
 export const sessionsRouter = Router()

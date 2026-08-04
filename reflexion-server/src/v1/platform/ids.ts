@@ -4,10 +4,10 @@ export type IdPrefix =
   | 'ten' | 'usr' | 'pat' | 'rel' | 'con' | 'enr'
   | 'dev' | 'pair' | 'asg' | 'cred' | 'cfg'
   | 'ses' | 'evt' | 'art' | 'op' | 'run'
-  | 'plan' | 'rem' | 'task' | 'away' | 'flag'
+  | 'plan' | 'rule' | 'rem' | 'task' | 'away' | 'flag'
   | 'base' | 'score' | 'win' | 'case' | 'disp'
   | 'auth' | 'idem' | 'audit' | 'notif' | 'ndev' | 'day' | 'thr' | 'msg'
-  | 'fbk' | 'dsum'
+  | 'fbk' | 'dsum' | 'fmsg' | 'setp' | 'inv' | 'del'
 
 export function newId(prefix: IdPrefix) {
   return `${prefix}_${randomUUID().replaceAll('-', '')}`

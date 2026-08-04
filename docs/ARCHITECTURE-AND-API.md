@@ -99,7 +99,7 @@ verified and kept current.
 
 _Repo: `/Users/macbookair/Documents/Cloud/REFLEXION`. Facts cited as `file:line` are read directly from source._
 
-The platform has one backend (`reflexion-server`, Express + MongoDB, `/api/v1` surface) and three client apps: **mirror-app** (the smart-mirror device UI), **caregiver-app** (family/caregiver mobile app), and **admin-web** (operator/onboarding web SPA). Backend routers are mounted in `reflexion-server/src/v1/router.ts:14-22` (identity, patients, devices, sessions, tools, carePlan, monitoring, notifications, admin), all under `/api/v1` (`reflexion-server/src/app.ts:36`).
+The platform has one backend (`reflexion-server`, Express + MongoDB, `/api/v1` surface) and three client apps: **mirror-app** (the smart-mirror device UI), **caregiver-app** (family/caregiver mobile app), and **admin-web** (operator/onboarding web SPA). Backend routers are mounted in `reflexion-server/src/v1/router.ts` (identity, setup progress, patients/consent, devices, sessions, tools, carePlan, monitoring, notifications, Care Circle and privacy/deletion, plus admin), all under `/api/v1` (`reflexion-server/src/app.ts`).
 
 ---
 
@@ -263,9 +263,11 @@ Sources: `admin-web/src/*`.
 - `reflexion-worker` → `node dist/jobs/outboxWorker.js` (`npm run start:worker`), the long-running outbox worker (`src/jobs/outboxWorker.ts` → `processNextOutboxEvent`; must NOT run in a request/serverless process — deployment runbook `docs/operations/phase3-server-deployment.md:5-11`). Runs the monitoring pipeline, notifications, etc.
 - (Additional scheduled workloads exist as scripts but are not the two core pm2 processes: `npm run start:finalize-day` = `RUN_FINALIZE_JOB=1 node dist/jobs/finalizeDay.js` for the 7pm/finalize jobs, `npm run reminders:materialize`, `npm run start:daily-summary-cron`.)
 
-**Build** — `npm run build` = `tsc` → `dist/` (`package.json` `"build":"tsc"`). Node.js 22 runtime (`phase3-server-deployment.md:15`). Release order in the runbook: `npm ci` → typecheck → test → coverage → `npm run build` → `npm run db:indexes`; then bootstrap admin + provision devices via CLI (`phase3-server-deployment.md:26-45`).
+**Build** — `npm run build` = `tsc` → `dist/` (`package.json` `"build":"tsc"`). Node.js 24.x runtime, pinned locally and in CI by the repository `.nvmrc` (`24.18.0`); `geoip-lite@2` requires Node 24 or newer. Local/CI tests use MongoDB `7.0.14`; production uses a MongoDB 7.0-series Atlas replica set until a later version passes the full suite. Release order in the runbook: `npm ci` → typecheck → test → coverage → `npm run build` → `npm run db:indexes`; then bootstrap admin + provision devices via CLI (`phase3-server-deployment.md:26-45`).
 
 **Config** — comes from `reflexion-server/.env` via `dotenv` (`import 'dotenv/config'` at `src/index.ts:1`). `.env` is present locally but **not committed** (only `.env.example` is the variable inventory, `phase3-server-deployment.md:23`). Notable vars: `PORT`/`HOST`, `MONGODB_*`, `JWT_SECRET`, `PAIRING_PEPPER`, `CREDENTIAL_ENCRYPTION_KEY`, `CORS_ALLOWED_ORIGINS`, `AUTH_RATE_LIMIT_PER_MINUTE`, `API_RATE_LIMIT_PER_MINUTE`, `ENABLE_LEGACY_API`, Qwen keys, object-store config.
+
+The exact server dependency `geoip-lite@2.0.3` requires Node 24 or newer; the repository pins `24.18.0` in `.nvmrc` and in CI. Provider-specific deployment configuration is external and must pin Node `24.18.0` and MongoDB Atlas 7.0.x.
 
 **Reverse proxy / hosting (Aliyun + BT-Panel)**:
 - nginx on an Aliyun server managed by BT-Panel.
@@ -393,11 +395,17 @@ Seen scope strings used with `authorizePatient`: `patient:read`, `patient:write`
 | Method & path | Auth | Purpose | Key request body | Key response data | Headers | Main errors |
 |---|---|---|---|---|---|---|
 | POST `/api/v1/auth/sessions` | public | Login; create human session | `email`, `password` | `accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, actor{userId,tenantId,name,email,roles}` (201) | — | 401 `INVALID_CREDENTIALS`; 400 `VALIDATION_FAILED`/`ACCOUNT_INVALID`; 429 `RATE_LIMITED` (auth) |
+| POST `/api/v1/auth/registrations` | public | Create a pending caregiver account and send verification | `name`, `email`, `password` (≥12), `phoneNumber?` | `{ state: "verification_pending", email }` (202) | — | 400 validation; 409 `EMAIL_IN_USE`/`EMAIL_VERIFICATION_PENDING` |
+| POST `/api/v1/auth/account-verification-requests` | public | Resend verification (same response for unknown email) | `email` | `{ state: "accepted" }` (202) | — | 400 validation |
+| POST `/api/v1/auth/account-verifications` | public | Consume the one-time verification link and issue a session | `token` | session + `actor`, `state:"verified"` (201) | — | 400 `ACCOUNT_VERIFICATION_INVALID` |
 | POST `/api/v1/auth/session-refreshes` | public | Rotate refresh → new access+refresh | `refreshToken` | `accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt` (201) | — | 401 `UNAUTHORIZED` (invalid/rotated/expired) |
 | POST `/api/v1/auth/password-reset-requests` | public | Begin password reset (always 202, no user enumeration) | `email` | `{ state: "accepted" }` (202) | — | 400 `VALIDATION_FAILED` |
+| POST `/api/v1/auth/password-reset-verifications` | public | Verify the six-digit email code and mint a reset token | `email`, `code` | `{ resetToken }` (200) | — | 400 `PASSWORD_RESET_CODE_INVALID` |
 | POST `/api/v1/auth/password-resets` | public | Complete reset; revokes active sessions | `token`, `newPassword` (≥12 chars) | `{ state: "completed" }` | — | 400 `PASSWORD_TOO_SHORT`, `PASSWORD_RESET_INVALID` |
 | DELETE `/api/v1/auth/sessions/current` | human | Logout current session | — | 204 No Content | — | 401 `UNAUTHORIZED` |
 | GET `/api/v1/me` | human | Current actor profile | — | `{ userId, tenantId, name, email, roles }` | — | 401 `UNAUTHORIZED` |
+| GET `/api/v1/setup-progress` | human | Read the eight v4 setup categories | — | `{ categories, completeCount, total:8, state, version }` | — | 401 `UNAUTHORIZED` |
+| PATCH `/api/v1/setup-progress` | human | Persist one setup category | `category`, `status` | updated progress (200) | **If-Match**, **Idempotency-Key** | 400 validation/`IF_MATCH_REQUIRED`; 409 `VERSION_CONFLICT` |
 
 #### 3.2 Identity — Patients & consent (patients) — `src/v1/routes/patients.ts`
 
@@ -418,6 +426,7 @@ Seen scope strings used with `authorizePatient`: `patient:read`, `patient:write`
 | POST `/api/v1/device-pairings` | **bootstrap** | Mirror starts pairing; issues 6-digit code | `hardwareRevision`, `softwareVersion`, `timezone`, `deviceNonce?` | `{pairingId, displayCode, state:"pending", expiresAt, pollAfterSeconds:2}` (201) | **X-Device-Bootstrap**, Idempotency-Key | 401 `UNAUTHORIZED` (revoked/missing bootstrap), 400 `INVALID_TIMEZONE`, 503 `PAIRING_CODE_UNAVAILABLE` |
 | GET `/api/v1/device-pairings/:pairingId` | **bootstrap** | Mirror polls pairing; on `paired` returns exchange ticket (re-issues if expired but unconsumed) | — | `{pairingId, state, expiresAt}`; when paired adds `patientDisplayName, exchangeTicket?, exchangeTicketExpiresAt?` | **X-Device-Bootstrap** | 401, 404 `NOT_FOUND` |
 | POST `/api/v1/device-pairing-claims` | human (`device:assign`) | Caregiver claims a pairing code → assigns device to patient | `pairingCode` (6 digits), `patientId`, `mirrorName?` | `{assignmentId, deviceId, patientId, mirrorName, status:"active", assignedAt}` | Idempotency-Key | 400 `INVALID_PAIRING_CODE`/`PAIRING_CODE_INVALID`; 409 `PAIRING_ALREADY_CLAIMED`; 429 `PAIRING_ATTEMPTS_EXCEEDED`; 403 |
+| POST `/api/v1/device-credentials/exchange` | bootstrap | Mirror exchanges the caregiver claim ticket for a device credential | `pairingId`, `exchangeTicket` | device access + refresh credential (200) | **X-Device-Bootstrap**, **Idempotency-Key** | 400 `EXCHANGE_TICKET_INVALID`/`EXCHANGE_TICKET_USED`; 409 `REQUEST_IN_PROGRESS` |
 | POST `/api/v1/device-credentials/exchange` | **bootstrap** | Redeem exchange ticket → device credential + first access token | `pairingId`, `exchangeTicket` | `{deviceId, credentialId, patientId, accessToken, accessTokenExpiresAt, refreshCredential, refreshCredentialExpiresAt}` | **X-Device-Bootstrap** | 400 `EXCHANGE_TICKET_INVALID`; 409 `EXCHANGE_TICKET_USED`/`ASSIGNMENT_NOT_ACTIVE` |
 | GET `/api/v1/devices/:deviceId` | human+device | Device summary + active assignment | — | `{deviceId, displayName, hardwareRevision, softwareVersion, status, lastSeenAt, assignment{...}}` | — | 404, 403 |
 | POST `/api/v1/devices/:deviceId/credential-rotations` | **public** (proves possession of refresh credential in body) | Rotate device refresh credential → new tokens | `credentialId`, `refreshCredential` | same shape as exchange response (201) | Idempotency-Key | 401 `UNAUTHORIZED` (invalid credential/assignment); 409 `CREDENTIAL_ALREADY_ROTATED` |
@@ -463,8 +472,12 @@ Tools (`tools.ts:17`): read — `weather.get`, `web.search`, `medication.list`, 
 | GET `/api/v1/patients/:patientId/medication-plans` | human+device (`care_plan:read`) | Active/paused medication plans | — | `[{planId,patientId,displayName,instructions,schedule,source,status,version}]` | — | 403 |
 | POST `/api/v1/patients/:patientId/medication-plans` | **human only** (`care_plan:write`) | Create medication plan | `displayName`, `schedule{timezone,times[HH:mm],recurrence?}`, `source(caregiver|provider)`, `instructions?` | medication plan (201) | Idempotency-Key | 403 (device / provider-source w/o provider role); 400 `VALIDATION_FAILED` |
 | PATCH `/api/v1/medication-plans/:planId` | **human only** (`care_plan:write`) | Update medication plan | any of `displayName, instructions, schedule, status(active|paused|ended)` | medication plan | **If-Match** (version) | 403 (device); 404; 409 `VERSION_CONFLICT` |
+| GET `/api/v1/patients/:patientId/routines` | human+device (`care_plan:read`) | Active/paused v4 routines | — | `[{routineId,patientId,name,category,schedule,notificationPolicy,notes,status,version}]` | — | 403 |
+| POST `/api/v1/patients/:patientId/routines` | **human only** (`care_plan:write`) | Create a caregiver routine | `name`, `category(medication|meals|hydration|medical-appointments|exercise|family-events|custom-other)`, `schedule`, `notificationPolicy(do-not-notify|after-one-missed-or-unclear-response|daily-summary)`, `notes?` | routine (201) | Idempotency-Key | 403; 400 `VALIDATION_FAILED` |
+| PATCH `/api/v1/routines/:routineId` | **human only** (`care_plan:write`) | Edit or pause/resume a routine | routine fields or `status(active|paused|ended)` | routine | **If-Match** (version) | 404; 409 `VERSION_CONFLICT` |
+| DELETE `/api/v1/routines/:routineId` | **human only** (`care_plan:write`) | End a routine and cancel future occurrences | — | `{routineId,state:"ended"}` (202) | Idempotency-Key | 404; 403 |
 | GET `/api/v1/patients/:patientId/reminder-occurrences` | human+device (`care_plan:read`) | Reminder occurrences in a window (≤32 days) | query `from`, `to` (ISO) | `[{occurrenceId,patientId,scheduledAt,type,displayText,status,respondedAt}]` | — | 400 `INVALID_TIME_WINDOW`, 403 |
-| POST `/api/v1/reminder-occurrences/:occurrenceId/responses` | human+device (device `reminder:respond`, human `care_plan:read`) | Mark reminder taken/skipped/etc. | `status(taken|skipped|snoozed|unknown)`, `respondedAt`, `note?` | reminder occurrence (200) | Idempotency-Key | 404; 409 `REMINDER_NOT_RESPONDABLE` |
+| POST `/api/v1/reminder-occurrences/:occurrenceId/responses` | human+device (device `reminder:respond`, human `care_plan:read`) | Record a response without inferring health | medication `status(taken|skipped|snoozed|unknown)`; routine `status(reported-complete|deferred|declined|no-response|unknown)`; `respondedAt`, `note?` | reminder occurrence (200) | Idempotency-Key | 404; 409 `REMINDER_NOT_RESPONDABLE` |
 | POST `/api/v1/patients/:patientId/caregiver-tasks` | human+device (device `session:write`, human `care_plan:write`) | Create a caregiver task | `category`, `priority`, `title`, `details?`, `sourceRef?`, `dueAt?` | `{taskId, ...task}` (201) | Idempotency-Key | 403; 400 `VALIDATION_FAILED` |
 
 #### 3.7 Monitoring / Status (monitoring) — `src/v1/routes/monitoring.ts`
@@ -480,6 +493,12 @@ Tools (`tools.ts:17`): read — `weather.get`, `web.search`, `medication.list`, 
 | GET `/api/v1/review-cases` | **human + role** (`provider|reviewer|tenant_admin`) | List clinical review cases (scoped by `review:read`) | query `limit,cursor,state?,patientId?` | paged `[{caseId,patientId,reason,priority,state,sourceRefs,createdAt}]` | — | 403 |
 | GET `/api/v1/review-cases/:caseId` | **human + role** | Review case + dispositions | — | review case + `dispositions[]` | — | 404, 403 |
 | POST `/api/v1/review-cases/:caseId/dispositions` | **human + role** (`review:write` unless tenant_admin) | Record a disposition; optionally close case | `outcome(enum)`, `notes?`, `closeCase?` | `{dispositionId,caseId,reviewerId,outcome,createdAt}` (201) | Idempotency-Key | 404, 403, 400 |
+
+Caregiver transcript history is exposed through the v1 history read model (all routes require an active
+care relationship with `session:read`):
+
+| GET `/api/v1/patients/:patientId/sessions` | human (`session:read`) | Bounded recent feed for Sessions | `limit=1..50`, `before=ISO timestamp?` | `{patientId,patientName,sessions[],nextBefore}` | — | 400 invalid cursor/limit; 403 |
+| GET `/api/v1/patients/:patientId/sessions/:sessionId` | human (`session:read`) | Direct transcript-backed session detail | — | serialized session with `logs[]` | — | 404, 403 |
 
 `disposition.outcome` enum (`monitoring.ts:194-195`): `confirmed_meaningful_change, no_meaningful_change, acute_or_reversible_context, poor_quality, wrong_identity, protocol_issue, follow_up_ordered, insufficient_information`.
 
@@ -713,6 +732,8 @@ All names below are the physical Mongo collection strings (line references into 
 | `users` (:2) | `users` | Human accounts (caregivers/admins) | `_id` (`usr_…`/hex), tenantId, emailNormalized, passwordHash (pbkdf2), roles[], scopes[], status, notificationPreferences (`legacyV1Bridge.ts:55-72`, `identity.ts:25`) |
 | `authSessions` (:2) | `auth_sessions` | Human refresh sessions | `_id` (`auth_…`), userId, tenantId, refreshDigest=sha256, refreshHash=hashSecret, status, version, refreshExpiresAt (`identity.ts:145-155`, `auth.ts:17-24`) |
 | `passwordResetTokens` (:2) | `password_reset_tokens` | One-time reset tokens | `_id` (`auth_…`), userId, tokenDigest=sha256, tokenHash=hashSecret, state, expiresAt (`identity.ts:73`) |
+| `emailVerificationTokens` (:2) | `email_verification_tokens` | One-time account verification links | `_id` (`auth_…`), userId, tokenDigest=sha256, tokenHash=hashSecret, state, expiresAt |
+| `setupProgress` (:2) | `setup_progress` | Authoritative v4 setup state per caregiver | `_id` (`setp_<userId>`), tenantId, userId, categories, version, completedAt |
 | `patients` (:2) | `patients` | Care recipients | `_id` (`pat_…`/legacy hex), tenantId, displayName, preferredLanguage, timezone, ageBand, status, version (`legacyV1Bridge.ts:80-90`) |
 | `careRelationships` (:3) | `care_relationships` | User↔patient authorization edges | `_id` (`rel_…`/`rel_<patientId>`), tenantId, patientId, userId, relationshipType, scopes[], status, validFrom/validTo (`legacyV1Bridge.ts:92-102`, `auth.ts:85-93`) |
 | `programEnrollments` (:3) | `program_enrollments` | Patient program enrollment | read in `patients.ts:148` |
@@ -725,7 +746,7 @@ All names below are the physical Mongo collection strings (line references into 
 | `deviceTelemetry` (:5) | `device_telemetry` | Heartbeats (timeseries-style) | meta.{tenantId,deviceId,kind}, measurements.{heartbeatId,appVersion,networkStatus,micStatus,speakerStatus,backendReachable,diagnostics}, recordedAt (`devices.ts:265-271`) |
 | `carePlans` (:6) | `care_plans` | Per-patient care plan | `_id` (`plan_…`), tenantId, patientId, version, status:'active', communicationPreferences, dailyRoutine (`devices.ts:238`, `carePlan.ts`) |
 | `medicationPlans` (:6) | `medication_plans` | Medication schedules | `_id` (`plan_…`), tenantId, patientId, displayName, instructions, schedule, source, version, status (active/paused/ended) (`carePlan.ts:62-96`, `reminderScheduler.ts:8-40`) |
-| `reminderRules` (:6) | `reminder_rules` | **Declared, not referenced** in `src/` | — |
+| `reminderRules` (:6) | `reminder_rules` | Caregiver-authored v4 routines; materialized by the reminder scheduler | `_id` (`rule_…`), tenantId, patientId, category, schedule, notificationPolicy, status, version (`carePlan.ts`, `reminderScheduler.ts`) |
 | `reminderOccurrences` (:7) | `reminder_occurrences` | Materialized reminder instances | `_id` (`rem_…`), tenantId, patientId, scheduledAt, status (scheduled/delivered/snoozed/…) (`reminderScheduler.ts:11-26`, `tools.ts:83-106`) |
 | `caregiverTasks` (:7) | `caregiver_tasks` | Follow-up tasks for caregivers | `_id` (`task_…`) (`tools.ts:102`, `carePlan.ts:166`) |
 | `sessions` (:8) | `sessions` | Conversation/check-in sessions (core) | `_id` (`ses_…`), tenantId, patientId, deviceId, clientSessionId, type (companion/daily_checkin/clinic_assessment/device_test), state (created/active/ingesting/processing/completed/excluded/review_pending/abandoned/processing_failed), stateVersion, protocolContext, consentRef, acquisition{language,timezone,durationMs,patientSpeechMs,patientTurns,…}, artifactIds, latestProcessingRevision, localCompletedAt, processingSummary (`sessions.ts:44-53`, `pipeline.ts`) |
@@ -807,7 +828,9 @@ JWTs are HS256, HMAC-signed with `JWT_SECRET` (`tokens.ts:31-47`); fixed `iss:'r
 | Human refresh token | (secret, not JWT) | **30 days** | `REFRESH_TTL_MS = 30*24*60*60*1000` (`identity.ts:16`) | request body |
 | Pairing code | (6-digit) | **10 min** | `PAIRING_TTL_MS = 10*60*1000` (`devices.ts:16`) | display code |
 | Exchange ticket | (secret) | **5 min** | `EXCHANGE_TTL_MS = 5*60*1000` (`devices.ts:17`; also `legacyV1Bridge.ts:14`) | pairing poll / claim |
-| Password reset token | (secret) | **30 min** | `identity.ts:72` / legacy `TOKEN_TTL_MS` (`auth/password-reset.ts:13`) | email link |
+| Password reset token | (secret) | **30 min** | `identity.ts` | email code verification then reset request |
+| Password reset code | (secret) | **30 min / 5 attempts** | `identity.ts` | email code |
+| Account verification token | (secret) | **24 hours** | `identity.ts` | email link |
 | Qwen realtime ticket | (upstream DashScope) | 60s..3600s (default 900/1800s) | `qwen.ts:9`, `qwen-token.ts:16` | session ticket |
 
 Device scopes granted on credential issue: `['session:write','session:read','care_plan:read','reminder:respond','device:heartbeat']`
@@ -942,4 +965,4 @@ Device scopes granted on credential issue: `['session:write','session:read','car
 - **The backend logs only non-`ApiError` exceptions** (`src/v1/platform/http.ts`); 4xx business errors (e.g. `EXCHANGE_TICKET_INVALID`) are returned but not logged, so operational debugging often needs a direct DB query. Consider structured request/error audit logging.
 - **The backend `.env` is not committed** and lives only on the server (loaded via dotenv). It was lost once during the server rename and restored from a local copy — keep a secure backup or move to a secrets manager.
 - **Legacy `/api/*` is gated by `ENABLE_LEGACY_API=true`** (Sunset). The caregiver app still relies on legacy sign-in + `/api/nurse-patient-config/*`; migrate it fully onto v1 before disabling legacy.
-- **Five declared-but-unused collections** (`reminder_rules`, `session_observations`, `notification_suppressions`, `feature_registry`, `model_registry`) are reserved and not yet written.
+- **Four declared-but-unused collections** (`session_observations`, `notification_suppressions`, `feature_registry`, `model_registry`) are reserved and not yet written; `reminder_rules` is now the v4 routine source collection.

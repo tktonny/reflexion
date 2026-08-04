@@ -64,7 +64,7 @@ export function guidedOpeningDirective(language: string, patientName?: string | 
  * caregiver's schedule, so the wording may be warmed but a drug name, dose or time must never be
  * altered or invented.
  */
-export function guidedStageDirective(canonicalQuestion: string, opts: { isMedication?: boolean } = {}): string {
+export function guidedStageDirective(canonicalQuestion: string, opts: { isMedication?: boolean; isRoutine?: boolean } = {}): string {
   const parts = [
     'CURRENT TURN — do exactly this and nothing else.',
     'First, respond to what they just said in one short, warm sentence: react to their actual words,',
@@ -75,6 +75,11 @@ export function guidedStageDirective(canonicalQuestion: string, opts: { isMedica
     parts.push(
       'This reminder comes from their caregiver\'s schedule: you may warm the wording, but do NOT change',
       'or invent the medication name, the dose or the time, and do not give medical advice.',
+    )
+  }
+  if (opts.isRoutine) {
+    parts.push(
+      'This reminder comes from the caregiver schedule: keep the routine name and timing factual, and do not claim it was completed unless the patient says so.',
     )
   }
   parts.push(
