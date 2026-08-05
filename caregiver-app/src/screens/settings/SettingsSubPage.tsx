@@ -1,8 +1,8 @@
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScreenLayout } from '../../components/AppUI';
 import { colors, contentColumn, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../../theme';
 
 /**
@@ -35,8 +35,28 @@ export function SettingsSubPage({
 }) {
   const router = useRouter();
 
+  const footer = onSave ? (
+    <View style={styles.footerBar}>
+      <View style={styles.footer}>
+        <TouchableOpacity
+          // Spelled out because the spinner replaces the visible text while saving.
+          accessibilityLabel={isSaving ? 'Saving' : saveLabel}
+          accessibilityRole="button"
+          accessibilityState={{ busy: isSaving, disabled: isSaving }}
+          disabled={isSaving}
+          onPress={onSave}
+          style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+        >
+          {isSaving
+            ? <ActivityIndicator color={colors.text.onAccent} />
+            : <Text style={styles.saveButtonText}>{saveLabel}</Text>}
+        </TouchableOpacity>
+      </View>
+    </View>
+  ) : undefined;
+
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+    <ScreenLayout contentContainerStyle={styles.content} footer={footer}>
       <View style={styles.header}>
         <TouchableOpacity
           accessibilityLabel="Back"
@@ -48,44 +68,20 @@ export function SettingsSubPage({
           <Feather color={colors.text.primary} name="chevron-left" size={24} />
         </TouchableOpacity>
         {/* The title is the page's accessible heading, so it must not be a decorative sibling of the back arrow. */}
-        <Text accessibilityRole="header" maxFontSizeMultiplier={1.3} style={styles.title}>{title}</Text>
+        <Text accessibilityRole="header" style={styles.title}>{title}</Text>
       </View>
-
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-        {children}
-      </ScrollView>
-
-      {onSave ? (
-        <View style={styles.footerBar}>
-          <View style={styles.footer}>
-          <TouchableOpacity
-            // Spelled out because the spinner replaces the visible text while saving.
-            accessibilityLabel={isSaving ? 'Saving' : saveLabel}
-            accessibilityRole="button"
-            accessibilityState={{ busy: isSaving, disabled: isSaving }}
-            disabled={isSaving}
-            onPress={onSave}
-            style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
-          >
-            {isSaving
-              ? <ActivityIndicator color={colors.text.onAccent} />
-              : <Text style={styles.saveButtonText}>{saveLabel}</Text>}
-            </TouchableOpacity>
-          </View>
-        </View>
-      ) : null}
-    </SafeAreaView>
+      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      {children}
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { backgroundColor: colors.surface.page, flex: 1 },
   header: {
     alignItems: 'center',
     flexDirection: 'row',
     gap: spacing.xs,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: 0,
     paddingVertical: spacing.md,
   },
   backButton: {
@@ -106,14 +102,14 @@ const styles = StyleSheet.create({
     fontSize: fontSize.body,
     lineHeight: scaleSize(21),
     paddingBottom: spacing.md,
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: 0,
   },
   // The button sits outside the ScrollView so it cannot be scrolled away from — on a short screen the old
   // in-flow button could be below the fold with nothing indicating it was there.
   footerBar: { backgroundColor: colors.surface.page, borderTopColor: colors.border.default, borderTopWidth: 1 },
   footer: {
     ...contentColumn,
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing.screen,
     paddingVertical: spacing.md,
   },
   saveButton: {

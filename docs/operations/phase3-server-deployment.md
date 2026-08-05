@@ -12,13 +12,16 @@ The API and worker must use the same environment, MongoDB database and object-st
 
 ## Infrastructure prerequisites
 
-- Node.js 22 runtime behind HTTPS/TLS.
-- MongoDB replica set with backups and restore testing.
+- Node.js 24.x runtime behind HTTPS/TLS (use the repository `.nvmrc`, currently `24.18.0`; the exact `geoip-lite@2.0.3` dependency requires Node 24 or newer). The repository does not contain provider-specific deployment settings, so set this explicitly in the staging/production service.
+- MongoDB Atlas replica set on the MongoDB 7.0 series with backups and restore testing. Local/CI tests pin
+  `mongodb-memory-server` to MongoDB `7.0.14`; do not promote MongoDB 8.x without rerunning the full suite.
 - S3-compatible encrypted object storage for consented image/audio/video artifacts.
 - Qwen API key and endpoint from the same enabled region.
 - DNS for the final unified API origin.
 - Independent 32+ character `JWT_SECRET`, `PAIRING_PEPPER` and `CREDENTIAL_ENCRYPTION_KEY` values in a secret manager.
 - Process supervision and alerts for API failures, worker lag, retry/dead-letter events and provider failures.
+- Transactional email: Postmark (`EMAIL_PROVIDER=postmark`) for account verification, reset and Care Circle invites.
+- SMS: Twilio (`SMS_PROVIDER=twilio`) for phone verification and SMS invites, if phone flows are enabled in the pilot.
 
 Use `reflexion-server/.env.example` as the variable inventory. Never copy real secrets into source control, an APK or a browser bundle.
 
@@ -60,6 +63,11 @@ It verifies:
 - unknown v1 routes return the stable `ROUTE_NOT_FOUND` envelope.
 
 Then use a staging patient/device to run the authenticated acceptance sequence: provision → Pairing v2 → credential exchange → heartbeat → session create → Qwen ticket → event batch → artifact upload/commit → complete → worker processing → processing-status completed.
+
+Staging access, Postmark credentials, Twilio credentials and a physical Mirror are external deployment inputs;
+they are not present in this checkout. Local tests use deterministic provider stubs and verify that missing
+providers fail closed with a retryable, user-visible state. Do not mark a staging release ready until the
+authenticated sequence and provider delivery checks have been run with real credentials.
 
 ## Client cutover
 

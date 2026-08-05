@@ -279,6 +279,18 @@ paths:
         default: { $ref: "#/components/responses/Error" }
 
   /api/v1/patients/{patientId}/consents:
+    get:
+      tags: [Patients]
+      summary: Get Patient Consent State
+      operationId: getPatientConsentState
+      security:
+        - bearerAuth: []
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/PatientId"
+      responses:
+        "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       tags: [Patients]
       summary: Record Patient Consent
@@ -298,7 +310,7 @@ paths:
               properties:
                 purpose: { type: string }
                 documentVersion: { type: string }
-                status: { type: string, enum: [granted, withdrawn] }
+                status: { type: string, enum: [granted, declined, withdrawn] }
       responses:
         "201": { $ref: "#/components/responses/DataResponse" }
         default: { $ref: "#/components/responses/Error" }
@@ -524,6 +536,31 @@ paths:
         - $ref: "#/components/parameters/DeviceId"
       responses:
         "200": { $ref: "#/components/responses/DataResponse" }
+        default: { $ref: "#/components/responses/Error" }
+
+  /api/v1/devices/{deviceId}/consent:
+    post:
+      tags: [Devices]
+      summary: Record Older-Adult Consent
+      operationId: recordMirrorConsent
+      description: The paired Mirror records the older adult's choice for home conversations. Caregiver tokens are refused.
+      security:
+        - deviceBearer: []
+      parameters:
+        - $ref: "#/components/parameters/DeviceId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [documentVersion, status]
+              properties:
+                documentVersion: { type: string }
+                status: { type: string, enum: [granted, declined, withdrawn] }
+      responses:
+        "201": { $ref: "#/components/responses/DataResponse" }
         default: { $ref: "#/components/responses/Error" }
 
   /api/v1/devices/{deviceId}/heartbeats:

@@ -1,114 +1,84 @@
-import { Dimensions, PixelRatio } from 'react-native';
+import { Dimensions, PixelRatio, Platform } from 'react-native';
 
-// The single source of truth for colour in the caregiver app.
-//
-// Before this module there were ~570 hard-coded hex literals across 19 separate StyleSheet.create blocks,
-// so `#87566A` alone appeared 80 times. Two consequences worth naming, because they both actually
-// happened: a palette change was a 19-file sweep, and when the WCAG audit found that the muted text colour
-// only reached 2.70:1 on white, fixing it meant a scripted find-and-replace across a dozen screens rather
-// than editing one line.
-//
-// Every value below is the value already shipping — this is an extraction, not a redesign.
-//
-// CONTRAST: the `text` tokens all clear WCAG AA 4.5:1 against every surface in `surface`. `textDecorative`
-// clears 3:1 only and is for glyphs that duplicate an affordance (a chevron next to a tappable row), never
-// for words a caregiver has to read. If you add a token, check it — scripts/checkContrast.mjs does it.
+/**
+ * Reflexion Caregiver App — Design System
+ *
+ * Based on the 2026-08-02 architecture spec and design direction.
+ * Warm white background, deep teal accent, soft states that never feel clinical.
+ */
 
 export const colors = {
-  /**
-   * Backgrounds text sits on. Every `text` token below is checked against every entry here, so a surface
-   * that never carries text does not belong in this group — put it in `border` instead.
-   */
   surface: {
-    page: '#F8F3EC',
-    card: '#FFFFFF',
-    input: '#FBF8F4',
-    muted: '#F4F0EA',
+    page: '#FBF8F2',
+    card: '#FFFDFC',
+    input: '#FFFDFC',
+    muted: '#F6F1E8',
   },
 
-  /** Text. All AA-compliant on every `surface` value. */
   text: {
-    primary: '#2B2522',
-    secondary: '#756C64',
-    /** De-emphasised meta lines (dates, counts, sub-labels). */
-    tertiary: '#766C61',
+    primary: '#16324A',
+    secondary: '#606D77',
+    tertiary: '#626E75',
     onAccent: '#FFFFFF',
   },
 
-  /** 3:1 only — decorative glyphs that repeat an affordance. Never body copy. */
-  textDecorative: '#94897F',
+  /** Brand accent — Reflexion teal. Buttons, links, active tabs. */
+  accent: '#0C746D',
+  accentPressed: '#075D58',
 
-  /** Brand accent: primary buttons, links, active tabs, spinners. */
-  accent: '#87566A',
-  accentPressed: '#6E2F48',
+  /** Low-saturation accents used by factual alerts; never imply a health judgement. */
+  alertAccent: {
+    laterThanUsual: '#A66A22',
+    connection: '#718078',
+  },
+
+  /** Status colors — named for what they mean, per architecture §2.4 */
+  status: {
+    /** Interaction recorded today */
+    green: '#347A3B',
+    greenBg: '#EAF4E7',
+    /** No interaction yet / shorter than usual */
+    amber: '#A86200',
+    amberBg: '#FFF2DD',
+    /** Device may be offline / technical uncertainty */
+    grey: '#68727B',
+    greyBg: '#F0F2F3',
+    /** Needs your attention */
+    red: '#B42318',
+    redBg: '#FDEBE8',
+  },
 
   border: {
-    default: '#E7DED2',
-    strong: '#D8CFC3',
-    /** Hairline between rows inside a card. Only ever a border — never a text background. */
-    subtle: '#F3EDE6',
+    default: '#E9E1D6',
+    strong: '#D9D3CA',
+    subtle: '#ECE5DC',
   },
 
-  /**
-   * The inline "that didn't work" box on the auth screens. Previously hard-coded per screen, which is how
-   * its border ended up at 1.53:1 against the card — invisible as a boundary. Reserved for a message the
-   * caregiver must read and act on; it is never used for anything about their loved one's wellbeing, which
-   * has its own non-alarming vocabulary in v1Status.ts.
-   */
   error: {
-    surface: '#FDECEC',
-    border: '#AA7F7F',
-    text: '#8A2E2E',
+    surface: '#FEE2E2',
+    border: '#AD5555',
+    text: '#991B1B',
   },
 
-  /**
-   * Accents for the two alert types that are NOT a caregiver status.
-   *
-   * Every other alert type reads its colour from STATUS_META in v1Status.ts, which is the authoritative
-   * palette. These two have nothing to read: "later than usual" and "connection issue" describe an event and
-   * a device, not how somebody is — so borrowing a status colour would say the wrong thing, and inventing one
-   * per component is how a second status vocabulary starts. They live here instead, named for what they mean.
-   *
-   * Used for an icon and a card's left stripe only, never for words, so 3:1 is the bar they have to clear.
-   */
-  alertAccent: {
-    laterThanUsual: '#8B6A92',
-    connection: '#6F7F92',
-  },
+  tabInactive: '#596568',
 
-  /** Unselected tab-bar label. Was #8D8278 (3.75:1 on white) — text, so it has to clear AA. */
-  tabInactive: '#776C62',
+  /** Decorative icons and chevrons; deliberately quieter than readable secondary text. */
+  textDecorative: '#728C6F',
 
-  /** Form-field hint text. 3:1 by design: legible, but not mistakable for entered text. */
-  placeholder: '#93887D',
+  placeholder: '#737E86',
 
   shadow: '#000000',
 } as const;
 
-/**
- * Status colour belongs to src/lib/v1Status.ts (STATUS_META), not here.
- *
- * It is the app's one authoritative status vocabulary — the muted "Option-1" palette fixed by the product
- * doc (§2.9) and keyed on the four server states including `establishing`. Re-declaring status colours in a
- * theme file is how a second, drifting vocabulary gets started, which is exactly the bug that let a patient
- * still learning their routine be painted red.
- */
-
-// --- Responsive scaling -------------------------------------------------------------------------
-// Android ships on a huge range of screen sizes; fixed-pixel type + spacing look cramped on a 360dp phone
-// and lost on a 430dp+ phone or a tablet. Scale both to the device's SHORTER side against a 390dp design
-// baseline, MODERATED (factor 0.5 — type moves half as much as raw width) and CLAMPED so a small phone
-// never drops the type below the readability floor and a tablet never balloons. Computed once at module
-// load: fine for phones, which don't resize; a split-screen tablet keeps the launch size until relaunch.
+// --- Responsive scaling ---
 const BASELINE_WIDTH = 390;
 const shortestSide = Math.min(Dimensions.get('window').width, Dimensions.get('window').height);
 const widthScale = Math.min(1.3, Math.max(0.9, shortestSide / BASELINE_WIDTH));
 
-/** Moderate, clamped, pixel-snapped scale of a base size. factor 0 = no scaling, 1 = full width scaling. */
 export function scaleSize(size: number, factor = 0.5): number {
   return PixelRatio.roundToNearestPixel(size + (size * widthScale - size) * factor);
 }
-/** Type scale — same as scaleSize but never below the 12px readability floor (see fontSize note). */
+
 function fontScale(size: number): number {
   return Math.max(12, scaleSize(size));
 }
@@ -119,99 +89,84 @@ export const spacing = {
   md: scaleSize(12),
   lg: scaleSize(16),
   xl: scaleSize(20),
-  xxl: scaleSize(28),
+  xxl: scaleSize(32),
+  editorial: scaleSize(40),
+  welcome: scaleSize(48),
+  /** The single horizontal boundary used by every screen and sheet. */
+  screen: scaleSize(24, 0.35),
 } as const;
 
 export const radius = {
   sm: 8,
-  md: 10,
+  md: 12,
   lg: 14,
-  xl: 16,
+  xl: 18,
   pill: 999,
 } as const;
 
-
-/**
- * 12 is the floor. Anything smaller is unreadable for the caregivers this app is for — often middle-aged
- * to older, checking the app one-handed — and clips first when the system font size is raised.
- */
 export const fontSize = {
   caption: fontScale(12),
-  body: fontScale(13),
-  bodyLarge: fontScale(14),
-  subheading: fontScale(15),
-  heading: fontScale(17),
-  title: fontScale(20),
-  display: fontScale(26),
+  body: fontScale(14),
+  bodyLarge: fontScale(16),
+  subheading: fontScale(17),
+  heading: fontScale(20),
+  title: fontScale(28),
+  display: fontScale(34),
 } as const;
 
-/** Serif display face used for names, greetings and card titles. */
-export const fontFamily = { display: 'Georgia' } as const;
+/** System font stack — clean, readable, available everywhere. */
+export const fontFamily = {
+  /** Editorial display face for warm, human headings; body copy remains the platform font. */
+  display: Platform.select({ android: 'serif', ios: 'Georgia', default: 'Georgia' }) || 'serif',
+  regular: 'System',
+  medium: 'System',
+  semibold: 'System',
+  bold: 'System',
+} as const;
 
-/** The smallest reliably tappable target. Below this, use hitSlop rather than shrinking. */
+export const fontWeight = {
+  regular: '400' as const,
+  medium: '500' as const,
+  semibold: '600' as const,
+  bold: '700' as const,
+};
+
 export const MIN_TOUCH_TARGET = 44;
 
-/** The soft elevation every card in the app shares. */
 export const cardShadow = {
-  shadowColor: colors.shadow,
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.035,
-  shadowRadius: 10,
+  shadowColor: '#16324A',
+  shadowOffset: { width: 0, height: 5 },
+  shadowOpacity: 0.055,
+  shadowRadius: 20,
   elevation: 2,
 } as const;
 
-/** The tab icon, sized from the label it sits above so the two scale together. */
 export function tabIconSize(): number {
-  return Math.round(fontSize.caption * 1.75 * PixelRatio.getFontScale());
+  return Math.round(fontSize.body * 1.5 * PixelRatio.getFontScale());
 }
 
-/**
- * How tall the tab bar has to be to hold its own content.
- *
- * Leaving the height unset does NOT make the bar adaptive: react-navigation falls back to a fixed 49px,
- * which fits a 12px label on a 360dp phone and clips the same label on a 744dp tablet — where scaleSize
- * takes the caption to 14 and the icon with it. So this follows the tokens the content is built from and the
- * reader's font scale, which is what actually tracks.
- */
 export function tabBarContentHeight(): number {
   const labelHeight = fontSize.caption * 1.45 * PixelRatio.getFontScale();
-  // The last term is the navigator's own gap between icon and label, which it does not expose. Measured at
-  // 10px against a 38px content box that needed 48 — so it is allowed for rather than assumed away, and it
-  // scales with the type like everything else here. Without it the button box is short and the label spills
-  // past the bar into the last row of the screen.
-  const navigatorInternalGap = spacing.md;
-  return Math.round(tabIconSize() + labelHeight + spacing.sm + spacing.md + navigatorInternalGap);
+  const navigatorInternalGap = spacing.xs;
+  return Math.round(tabIconSize() + labelHeight + spacing.sm + spacing.xs + navigatorInternalGap);
 }
 
-/**
- * Fallback clearance for a scrolling screen that cannot ask the navigator how tall the bar is.
- *
- * Three screens used to type their own number here — 48, 60 and 104 against a bar of 72+ — and two were
- * short, which is how content ended up permanently under the bar. This is the same derivation the bar uses,
- * so the two cannot disagree.
- */
 export function tabBarClearanceFallback(): number {
   return Math.round(tabBarContentHeight() * 1.12);
 }
 
-/**
- * How wide the content column is allowed to get, so a card does not stretch across an unfolded foldable.
- *
- * Every screen filled the full viewport width, which is right on a phone and wrong the moment there is more
- * of it: on a Pixel Fold or an unfolded Z Fold a loved-one card ran 700px with the text hugging the left
- * edge and nothing on the right. Wide layouts here cap the column and centre it, which is what Gmail and
- * Notion do on a tablet — a dashboard of one to three cards has nothing to put in a second column.
- *
- * Derived from typography rather than picked: a comfortable line is roughly 65 characters, and at this body
- * size a character averages a little over half its em. So the cap follows the type — it moves if the type
- * does, instead of freezing at whatever looked right on one device. Below the cap nothing changes, so phones
- * are untouched.
- */
-export const maxContentWidth = Math.round(fontSize.body * 0.58 * 65 + spacing.xl * 2);
+export const maxContentWidth = Math.round(fontSize.body * 0.6 * 65 + spacing.xl * 2);
 
-/** Centres a content column and caps it, while still filling a narrow screen edge to edge. */
 export const contentColumn = {
   alignSelf: 'center' as const,
   maxWidth: maxContentWidth,
   width: '100%' as const,
 };
+
+/** Shared page geometry for safe-area, keyboard-aware screens. */
+export const layout = {
+  horizontalPadding: spacing.screen,
+  verticalPadding: spacing.lg,
+  bottomPadding: spacing.welcome,
+  keyboardOffset: 0,
+} as const;

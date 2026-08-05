@@ -55,6 +55,8 @@ export type LegacyConversation = {
   id: string
   patientId: string
   patientName: string
+  type: string | null
+  state: string | null
   duration: number
   words: number
   exchanges: number
@@ -163,6 +165,8 @@ export function serializeV1Session(
     id: session._id,
     patientId,
     patientName,
+    type: session.type || null,
+    state: session.state || null,
     duration: durationSec,
     words,
     exchanges,

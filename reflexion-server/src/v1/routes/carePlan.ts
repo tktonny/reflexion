@@ -37,6 +37,10 @@ export const CARE_PLAN_KEYS = {
 
 export const carePlanRouter = Router()
 const requireCarePlanActor = requireActor('human', 'device')
+const ROUTINE_CATEGORIES = ['medication', 'meals', 'hydration', 'medical-appointments', 'exercise', 'family-events', 'custom-other'] as const
+const ROUTINE_NOTIFICATION_POLICIES = ['do-not-notify', 'after-one-missed-or-unclear-response', 'daily-summary'] as const
+const MEDICATION_RESPONSE_STATUSES = ['taken', 'skipped', 'snoozed', 'unknown'] as const
+const ROUTINE_RESPONSE_STATUSES = ['reported-complete', 'deferred', 'declined', 'no-response', 'unknown'] as const
 
 carePlanRouter.get('/patients/:patientId/care-plan', requireCarePlanActor, asyncHandler(async (request, response) => {
   const patientId = request.params.patientId
@@ -139,6 +143,93 @@ carePlanRouter.patch('/medication-plans/:planId', requireCarePlanActor, asyncHan
   sendData(response, serializeMedicationPlan(changed))
 }))
 
+/** Generic caregiver routines. Medication plans keep their provider/caregiver source model; these rules
+ * cover the other v4 routine categories and share the same materialized occurrence/response state machine. */
+carePlanRouter.get('/patients/:patientId/routines', requireCarePlanActor, asyncHandler(async (request, response) => {
+  const patientId = request.params.patientId
+  await authorizePatient(request, patientId, 'care_plan:read')
+  const principal = getPrincipal(request)
+  const rows = await (await getDb()).collection<any>(collections.reminderRules).find({
+    tenantId: principal.tenantId, patientId, status: { $in: ['active', 'paused'] },
+  }).sort({ createdAt: -1 }).toArray()
+  sendData(response, rows.map(serializeRoutine))
+}))
+
+carePlanRouter.post('/patients/:patientId/routines', requireCarePlanActor, asyncHandler(async (request, response) => {
+  const result = await executeIdempotent(request, 'POST:/api/v1/patients/:patientId/routines', async () => {
+    const principal = getPrincipal(request)
+    if (principal.kind !== 'human') throw forbidden('Only a caregiver can create a routine.')
+    const patientId = request.params.patientId
+    await authorizePatient(request, patientId, 'care_plan:write')
+    const body = objectBody(request.body)
+    const routine = {
+      _id: newId('rule'), tenantId: principal.tenantId, patientId,
+      name: requiredString(body, 'name', 160),
+      category: enumValue(body.category, 'category', ROUTINE_CATEGORIES),
+      schedule: validateSchedule(body.schedule),
+      notificationPolicy: enumValue(body.notificationPolicy, 'notificationPolicy', ROUTINE_NOTIFICATION_POLICIES),
+      notes: optionalString(body, 'notes', 1000),
+      status: 'active', version: 1, createdBy: principal.userId, createdAt: new Date(), updatedAt: new Date(),
+    }
+    const db = await getDb()
+    await db.collection<any>(collections.reminderRules).insertOne(routine)
+    await appendOutbox(db, { eventType: 'routine.changed', tenantId: principal.tenantId, patientId,
+      aggregateType: 'routine', aggregateId: routine._id, correlationId: request.requestId, payload: { change: 'created' } })
+    return { status: 201, data: serializeRoutine(routine) }
+  })
+  sendData(response, result.data, result.status)
+}))
+
+carePlanRouter.patch('/routines/:routineId', requireCarePlanActor, asyncHandler(async (request, response) => {
+  const principal = getPrincipal(request)
+  if (principal.kind !== 'human') throw forbidden('Only a caregiver can change a routine.')
+  const db = await getDb()
+  const routine = await db.collection<any>(collections.reminderRules).findOne({ _id: request.params.routineId, tenantId: principal.tenantId })
+  if (!routine) throw notFound('Routine')
+  await authorizePatient(request, String(routine.patientId), 'care_plan:write')
+  const expected = parseIfMatch(request.header('If-Match'))
+  if (Number(routine.version) !== expected) throw conflict('VERSION_CONFLICT', 'The routine changed. Refresh and retry.')
+  const body = objectBody(request.body)
+  const update: Record<string, unknown> = { updatedAt: new Date() }
+  if ('name' in body) update.name = requiredString(body, 'name', 160)
+  if ('category' in body) update.category = enumValue(body.category, 'category', ROUTINE_CATEGORIES)
+  if ('schedule' in body) update.schedule = validateSchedule(body.schedule)
+  if ('notificationPolicy' in body) update.notificationPolicy = enumValue(body.notificationPolicy, 'notificationPolicy', ROUTINE_NOTIFICATION_POLICIES)
+  if ('notes' in body) update.notes = optionalString(body, 'notes', 1000)
+  if ('status' in body) update.status = enumValue(body.status, 'status', ['active', 'paused', 'ended'] as const)
+  if (Object.keys(update).length === 1) throw badRequest('VALIDATION_FAILED', 'At least one supported field is required.')
+  const changed = await db.collection<any>(collections.reminderRules).findOneAndUpdate({ _id: routine._id, version: expected }, {
+    $set: update, $inc: { version: 1 },
+  }, { returnDocument: 'after' })
+  if (!changed) throw conflict('VERSION_CONFLICT', 'The routine changed. Refresh and retry.')
+  await appendOutbox(db, { eventType: 'routine.changed', tenantId: principal.tenantId, patientId: String(routine.patientId),
+    aggregateType: 'routine', aggregateId: routine._id, correlationId: request.requestId, payload: { change: update.status === 'ended' ? 'ended' : 'updated' } })
+  sendData(response, serializeRoutine(changed))
+}))
+
+/** Ending a routine preserves its history while cancelling future occurrences. */
+carePlanRouter.delete('/routines/:routineId', requireCarePlanActor, asyncHandler(async (request, response) => {
+  const result = await executeIdempotent(request, 'DELETE:/api/v1/routines/:routineId', async () => {
+    const principal = getPrincipal(request)
+    if (principal.kind !== 'human') throw forbidden('Only a caregiver can end a routine.')
+    const db = await getDb()
+    const routine = await db.collection<any>(collections.reminderRules).findOne({ _id: request.params.routineId, tenantId: principal.tenantId })
+    if (!routine) throw notFound('Routine')
+    await authorizePatient(request, String(routine.patientId), 'care_plan:write')
+    const now = new Date()
+    await db.collection<any>(collections.reminderRules).updateOne({ _id: routine._id, status: { $ne: 'ended' } }, {
+      $set: { status: 'ended', updatedAt: now }, $inc: { version: 1 },
+    })
+    await db.collection<any>(collections.reminderOccurrences).updateMany({ sourceId: routine._id, status: 'scheduled', scheduledAt: { $gt: now } }, {
+      $set: { status: 'cancelled', updatedAt: now },
+    })
+    await appendOutbox(db, { eventType: 'routine.changed', tenantId: principal.tenantId, patientId: String(routine.patientId),
+      aggregateType: 'routine', aggregateId: routine._id, correlationId: request.requestId, payload: { change: 'ended' } })
+    return { status: 202, data: { routineId: routine._id, state: 'ended' } }
+  })
+  sendData(response, result.data, result.status)
+}))
+
 carePlanRouter.get('/patients/:patientId/reminder-occurrences', requireCarePlanActor, asyncHandler(async (request, response) => {
   const patientId = request.params.patientId
   await authorizePatient(request, patientId, 'care_plan:read')
@@ -161,7 +252,9 @@ carePlanRouter.post('/reminder-occurrences/:occurrenceId/responses', requireCare
     if (!occurrence) throw notFound('Reminder occurrence')
     await authorizePatient(request, String(occurrence.patientId), principal.kind === 'device' ? 'reminder:respond' : 'care_plan:read')
     const body = objectBody(request.body)
-    const status = enumValue(body.status, 'status', ['taken', 'skipped', 'snoozed', 'unknown'] as const)
+    const status = occurrence.type === 'routine'
+      ? enumValue(body.status, 'status', ROUTINE_RESPONSE_STATUSES)
+      : enumValue(body.status, 'status', MEDICATION_RESPONSE_STATUSES)
     const respondedAt = isoDate(body.respondedAt, 'respondedAt')
     const note = optionalString(body, 'note', 500)
     const changed = await db.collection<any>(collections.reminderOccurrences).findOneAndUpdate({
@@ -205,9 +298,15 @@ function serializeMedicationPlan(plan: Record<string, unknown>) {
     schedule: plan.schedule, source: plan.source, status: plan.status, version: plan.version }
 }
 
+function serializeRoutine(routine: Record<string, unknown>) {
+  return { routineId: routine._id, patientId: routine.patientId, name: routine.name, category: routine.category,
+    schedule: routine.schedule, notificationPolicy: routine.notificationPolicy, notes: routine.notes || null,
+    status: routine.status, version: routine.version }
+}
+
 function serializeOccurrence(item: Record<string, unknown>) {
   return { occurrenceId: item._id, patientId: item.patientId, scheduledAt: item.scheduledAt, type: item.type,
-    displayText: item.displayText, status: item.status, respondedAt: item.respondedAt || null }
+    category: item.category || null, displayText: item.displayText, status: item.status, respondedAt: item.respondedAt || null }
 }
 
 function validateSchedule(value: unknown) {

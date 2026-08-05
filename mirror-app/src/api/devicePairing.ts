@@ -19,6 +19,10 @@ export type DeviceConfiguration = {
     preferredLanguage: string
     timezone: string
     version: number
+    consent?: {
+      purpose: 'home_cognitive_monitoring'
+      status: 'accepted' | 'declined' | 'withdrawn' | 'pending'
+    }
     carePlan?: {
       version?: number
       communicationPreferences?: Record<string, unknown>
@@ -98,7 +102,7 @@ export async function exchangeDeviceCredential(pairing: V1PairingStatus) {
   const bootstrap = await getBootstrapCredential()
   if (!bootstrap) throw new Error('device_not_provisioned')
   const response = await fetch(getApiUrl('/api/v1/device-credentials/exchange'), {
-    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Device-Bootstrap': bootstrap.token },
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Device-Bootstrap': bootstrap.token, 'Idempotency-Key': `mirror_exchange_${pairing.pairingId}` },
     body: JSON.stringify({ pairingId: pairing.pairingId, exchangeTicket: pairing.exchangeTicket }),
   })
   const credential = await dataOrThrow<StoredDeviceCredential>(response)

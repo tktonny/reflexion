@@ -1,10 +1,13 @@
 import { Redirect } from 'expo-router';
-import { getStoredAuthSession } from '../src/lib/authSession';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import { loadV1Session } from '../src/lib/v1AuthSession';
+import { loadPendingVerification } from '../src/lib/pendingVerification';
+import { colors } from '../src/theme';
 
-// Auth-aware entry redirect. The session is already hydrated before this renders — AuthGate
-// (app/_layout.tsx) withholds <Stack> until loadStoredAuthSession() has run — so this synchronous
-// read is safe and decides the first screen without a flash of Home for signed-out users.
 export default function Index() {
-  const session = getStoredAuthSession();
-  return <Redirect href={session ? '/(tabs)' : '/sign-in'} />;
+  const [ready, setReady] = useState(false); const [signedIn, setSignedIn] = useState(false); const [pendingVerification, setPendingVerification] = useState(false);
+  useEffect(() => { void Promise.all([loadV1Session(), loadPendingVerification()]).then(([session, pending]) => { setSignedIn(Boolean(session)); setPendingVerification(!session && Boolean(pending)); setReady(true); }); }, []);
+  if (!ready) return <View style={{ alignItems: 'center', backgroundColor: colors.surface.page, flex: 1, justifyContent: 'center' }}><ActivityIndicator color={colors.accent} /></View>;
+  return <Redirect href={signedIn ? '/(tabs)' : pendingVerification ? '/account-verification' : '/sign-in'} />;
 }

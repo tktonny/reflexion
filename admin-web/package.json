@@ -2,6 +2,9 @@
   "name": "reflexion-admin-web",
   "private": true,
   "version": "0.1.0",
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
   "type": "module",
   "description": "Reflexion Admin / Onboarding web portal (doc 1.1 third component) — manage users + loved ones, reply to caregiver support conversations. Talks to reflexion-server /api/v1/admin.",
   "scripts": {

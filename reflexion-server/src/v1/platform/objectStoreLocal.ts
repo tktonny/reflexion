@@ -1,5 +1,5 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, stat, unlink, writeFile } from 'node:fs/promises'
 import { dirname, resolve, sep } from 'node:path'
 import express, { type Express } from 'express'
 import { ApiError } from './errors.js'
@@ -61,6 +61,17 @@ export class LocalObjectStore implements ObjectStore {
       return createHash('sha256').update(bytes).digest('hex') === input.hash
     } catch {
       return false
+    }
+  }
+
+  async deleteObject(objectKey: string) {
+    const { dir } = config()
+    try {
+      await unlink(objectPath(dir, objectKey))
+      return true
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') return true
+      throw error
     }
   }
 }

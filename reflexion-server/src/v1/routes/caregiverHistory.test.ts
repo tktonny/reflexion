@@ -113,6 +113,26 @@ test('the caregiver history read models work over v1 and enforce the care relati
     await app.get(`/api/v1/patients/${PATIENT_ID}/session-days/20-07-2026`).set(caregiver).expect(400)
   })
 
+  await t.test('the sessions screen has a bounded cursor feed and direct detail read', async () => {
+    const first = await app.get(`/api/v1/patients/${PATIENT_ID}/sessions?limit=1`).set(caregiver).expect(200)
+    assert.equal(first.body.data.sessions.length, 1)
+    assert.equal(first.body.data.sessions[0].id, 'ses_history_open')
+    assert.ok(first.body.data.nextBefore)
+
+    const second = await app.get(`/api/v1/patients/${PATIENT_ID}/sessions?limit=1&before=${encodeURIComponent(first.body.data.nextBefore)}`)
+      .set(caregiver).expect(200)
+    assert.equal(second.body.data.sessions.length, 1)
+    assert.equal(second.body.data.sessions[0].id, 'ses_history_done')
+    assert.equal(second.body.data.nextBefore, null)
+
+    const detail = await app.get(`/api/v1/patients/${PATIENT_ID}/sessions/ses_history_done`).set(caregiver).expect(200)
+    assert.equal(detail.body.data.id, 'ses_history_done')
+    assert.equal(detail.body.data.logs.length, 2)
+    await app.get(`/api/v1/patients/${PATIENT_ID}/sessions/ses_missing`).set(caregiver).expect(404)
+    await app.get(`/api/v1/patients/${PATIENT_ID}/sessions?limit=51`).set(caregiver).expect(400)
+    await app.get(`/api/v1/patients/${PATIENT_ID}/sessions?before=not-a-date`).set(caregiver).expect(400)
+  })
+
   await t.test('the trend covers the requested window, oldest first', async () => {
     const trend = await app.get(`/api/v1/patients/${PATIENT_ID}/session-trend?days=30`).set(caregiver).expect(200)
     assert.equal(trend.body.data.trend.length, 30)

@@ -43,6 +43,47 @@ export async function materializeAllMedicationReminders(db: Db) {
   return created
 }
 
+/** Materialize a non-medication v4 routine into the same occurrence stream the Mirror consumes. */
+export async function materializeRoutineReminders(db: Db, routineId: string, now = new Date()) {
+  const routine = await db.collection<any>(collections.reminderRules).findOne({ _id: routineId })
+  if (!routine) return 0
+  if (routine.status !== 'active') {
+    await db.collection<any>(collections.reminderOccurrences).updateMany({
+      tenantId: routine.tenantId, sourceId: routineId, scheduledAt: { $gt: now }, status: 'scheduled',
+    }, { $set: { status: 'cancelled', updatedAt: now } })
+    return 0
+  }
+  const schedule = routine.schedule as { timezone?: string; times?: string[]; recurrence?: string } | undefined
+  if (!schedule?.timezone || !Array.isArray(schedule.times) || schedule.recurrence !== 'daily') return 0
+  const today = localDateParts(now, schedule.timezone)
+  let created = 0
+  for (let dayOffset = 0; dayOffset < HORIZON_DAYS; dayOffset++) {
+    const date = new Date(Date.UTC(today.year, today.month - 1, today.day + dayOffset))
+    for (const time of schedule.times) {
+      const [hour, minute] = time.split(':').map(Number)
+      const scheduledAt = zonedDateTimeToUtc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), hour, minute, schedule.timezone)
+      if (scheduledAt < now) continue
+      const result = await db.collection<any>(collections.reminderOccurrences).updateOne({
+        tenantId: routine.tenantId, sourceId: routineId, scheduledAt,
+      }, { $setOnInsert: {
+        _id: newId('rem'), tenantId: routine.tenantId, patientId: routine.patientId, sourceId: routineId,
+        routineId, scheduledAt, timezone: schedule.timezone, type: 'routine', category: routine.category,
+        displayText: routine.name, notificationPolicy: routine.notificationPolicy, status: 'scheduled', createdAt: now,
+      } }, { upsert: true })
+      created += result.upsertedCount
+    }
+  }
+  return created
+}
+
+export async function materializeAllReminders(db: Db) {
+  const medication = await materializeAllMedicationReminders(db)
+  const routines = await db.collection<any>(collections.reminderRules).find({ status: { $in: ['active', 'paused', 'ended'] } }).project({ _id: 1 }).toArray()
+  let generic = 0
+  for (const routine of routines) generic += await materializeRoutineReminders(db, String(routine._id))
+  return medication + generic
+}
+
 export function zonedDateTimeToUtc(year: number, month: number, day: number, hour: number, minute: number, timezone: string) {
   const wallClockAsUtc = Date.UTC(year, month - 1, day, hour, minute)
   let guess = wallClockAsUtc

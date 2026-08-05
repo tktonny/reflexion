@@ -1,294 +1,89 @@
-import React, { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { apiSend } from '../src/lib/apiClient';
+import React, { useState } from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+
+import { BrandLockup } from '../src/components/BrandLockup';
+import { PrimaryButton, ScreenLayout, SecondaryButton, TertiaryButton } from '../src/components/AppUI';
+import { Field } from '../src/components/Field';
+import { validateSignIn } from '../src/lib/authValidation';
 import { signInMessage } from '../src/lib/authMessages';
-import { clearStoredAuthSession, setStoredAuthSession } from '../src/lib/authSession';
-import { registerPushNotificationDevice } from '../src/lib/pushNotifications';
 import { v1Login } from '../src/lib/v1Client';
-import { clearV1Session } from '../src/lib/v1AuthSession';
-import { clearCaregiverCache } from '../src/lib/queryKeys';
-import { colors, contentColumn, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
+import { V1ApiError } from '../src/lib/v1Client';
+import { savePendingVerification } from '../src/lib/pendingVerification';
+import { colors, fontFamily, fontSize, spacing } from '../src/theme';
 
-type SignInResponse = {
-  nurseId: string;
-  name?: string;
-  email?: string;
-};
-
-type SignInResult = { userId: string; name: string; email: string };
-
-/**
- * Only a rejected credential may fall through to the legacy surface. A 500, a timeout or an offline
- * device must not be retried there: the second attempt would fail for its own reason and the user would be
- * told their password was wrong.
- */
-function isCredentialRejection(error: unknown): boolean {
-  const status = (error as { status?: number } | null)?.status;
-  return status === 401 || status === 404;
-}
+type DeferredMethod = 'Phone' | 'Google' | 'Apple';
 
 export default function SignInScreen() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const signInMutation = useMutation({
-    mutationFn: async (): Promise<SignInResult> => {
-      // v1 is primary now: every screen reads v1, so a session without a v1 token is not a usable session.
-      //
-      // The legacy fallback stays for one case only — an account that exists in NursePatientConfig but has
-      // no v1 user yet, which the sign-in bridge repairs on the way through. It is deliberately BOUNDED:
-      // only a credential rejection (401/404) falls through. A 500 or a network failure must surface as
-      // itself rather than being retried against a second surface and reported as a wrong password.
-      try {
-        const session = await v1Login(email, password);
-        return { userId: session.actor.userId, name: session.actor.name || '', email: session.actor.email || email.trim().toLowerCase() };
-      } catch (v1Error) {
-        if (!isCredentialRejection(v1Error)) throw v1Error;
-        // Legacy sign-in bridges the account into v1; the retry then succeeds and we hold a v1 token.
-        const legacy = await apiSend<SignInResponse>('/api/auth/sign-in', {
-          method: 'POST',
-          body: JSON.stringify({ email, password }),
-        });
-        const bridged = await v1Login(email, password).catch(() => null);
-        return {
-          userId: bridged?.actor.userId || legacy.nurseId,
-          name: bridged?.actor.name || legacy.name || '',
-          email: bridged?.actor.email || legacy.email || email.trim().toLowerCase(),
-        };
-      }
-    },
-    onSuccess: async (body) => {
-      await setStoredAuthSession({
-        userId: body.userId,
-        name: body.name,
-        email: body.email,
-      });
-      // Defensive: the previous session may have ended without a clean sign-out (app killed, or the
-      // sign-up path), which would otherwise leave that caregiver's data cached under gcTime: Infinity.
-      clearCaregiverCache(queryClient);
-      const registration = await registerPushNotificationDevice({ nurseId: body.userId });
-      if (!registration.ok) {
-        console.warn('[SignInScreen] push registration failed', registration.reason);
-      }
+  const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
+  const [requestError, setRequestError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const showDeferredMethod = (method: DeferredMethod) => {
+    const copy = method === 'Phone'
+      ? 'Phone sign-in is not available during the current pilot. Please sign in using your email.'
+      : method === 'Google'
+        ? 'Google sign-in is not available during the current pilot. Please sign in using your email.'
+        : 'Apple sign-in is not available during the current pilot. Please sign in using your email.';
+    Alert.alert(`${method} sign-in unavailable`, copy, [{ text: 'Continue with email', onPress: () => { setErrors({}); setRequestError(''); } }]);
+  };
+
+  const signIn = async () => {
+    const nextErrors = validateSignIn(email, password, 'email');
+    setErrors(nextErrors);
+    setRequestError('');
+    if (Object.keys(nextErrors).length) return;
+    setSubmitting(true);
+    try {
+      await v1Login(email.trim(), password);
       router.replace('/(tabs)');
-    },
-    onError: (err) => {
-      // Never the server's own text: see src/lib/authMessages.ts.
-      setError(signInMessage(err));
-    },
-  });
-
-  async function signIn() {
-    if (signInMutation.isPending) {
-      return;
+    } catch (cause) {
+      if (cause instanceof V1ApiError && cause.code === 'EMAIL_NOT_VERIFIED') {
+        await savePendingVerification(email.trim().toLowerCase());
+        router.replace({ pathname: '/account-verification', params: { email: email.trim().toLowerCase() } });
+        return;
+      }
+      setRequestError(signInMessage(cause));
+    } finally {
+      setSubmitting(false);
     }
-
-    setError('');
-    if (!email.trim() || !password) {
-      setError('Enter your email and password.');
-      return;
-    }
-
-    signInMutation.mutate();
-  }
-
-  async function goToSignUp() {
-    setError('');
-    await Promise.all([clearStoredAuthSession(), clearV1Session()]);
-    router.replace('/onboarding');
-  }
+  };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.keyboard}
-      >
-        <View style={styles.card}>
-          <Text maxFontSizeMultiplier={1.3} style={styles.title}>Sign in</Text>
-          <Text style={styles.subtitle}>Use your caregiver account to continue.</Text>
-
-          {error ? (
-            // Announced on Android: the button returns to its idle state on failure, so without a live
-            // region a screen-reader user is left with no signal that the sign-in was rejected at all.
-            <View accessibilityLiveRegion="polite" style={styles.errorBox}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          ) : null}
-
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            accessibilityLabel="Email"
-            autoCapitalize="none"
-            autoComplete="email"
-            keyboardType="email-address"
-            onChangeText={setEmail}
-            placeholder="you@email.com"
-            style={styles.input}
-            // textContentType lets iOS Keychain / Android autofill fill these two fields, which is the
-            // difference between one tap and typing an address on a phone keyboard.
-            textContentType="emailAddress"
-            value={email}
-          />
-
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            accessibilityLabel="Password"
-            autoCapitalize="none"
-            autoComplete="password"
-            onChangeText={setPassword}
-            onSubmitEditing={signIn}
-            placeholder="Password"
-            secureTextEntry
-            style={styles.input}
-            textContentType="password"
-            value={password}
-          />
-
-          <TouchableOpacity
-            // The label is spelled out because the spinner replaces the visible text while signing in —
-            // otherwise the button loses its name at exactly the moment someone is waiting on it.
-            accessibilityLabel="Sign in"
-            accessibilityRole="button"
-            accessibilityState={{ busy: signInMutation.isPending, disabled: signInMutation.isPending }}
-            disabled={signInMutation.isPending}
-            onPress={signIn}
-            style={styles.signInBtn}
-          >
-            {signInMutation.isPending ? (
-              <ActivityIndicator color={colors.text.onAccent} />
-            ) : (
-              <Text style={styles.signInText}>Sign in</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            accessibilityRole="button"
-            onPress={() => router.push('/forgot-password')}
-            style={styles.signUpBtn}
-          >
-            <Text style={styles.signUpText}>Forgot password?</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            accessibilityRole="button"
-            onPress={() => void goToSignUp()}
-            style={styles.signUpBtn}
-          >
-            <Text style={styles.signUpText}>If you don't have an account, sign up!</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+    <ScreenLayout contentContainerStyle={styles.content}>
+      <BrandLockup />
+      <Text accessibilityRole="header" style={styles.title}>Welcome back</Text>
+      <Text style={styles.subtitle}>Sign in to continue caring with confidence.</Text>
+      <Field error={errors.identifier} label="Email" keyboardType="email-address" autoComplete="email" onChangeText={(value) => { setEmail(value); setErrors((current) => ({ ...current, identifier: undefined })); }} placeholder="you@email.com" value={email} />
+      <Field error={errors.password} label="Password" autoComplete="current-password" onChangeText={(value) => { setPassword(value); setErrors((current) => ({ ...current, password: undefined })); }} placeholder="Enter your password" secure value={password} />
+      {requestError ? <Text accessibilityRole="alert" style={styles.requestError}>{requestError}</Text> : null}
+      <PrimaryButton disabled={submitting} label={submitting ? 'Signing in…' : 'Sign in'} onPress={() => void signIn()} />
+      <TertiaryButton label="Forgot password?" onPress={() => router.push('/forgot-password')} />
+      <View style={styles.divider}><View style={styles.rule} /><Text style={styles.or}>or continue with</Text><View style={styles.rule} /></View>
+      <View style={styles.deferredRow}>
+        <SecondaryButton accessibilityLabel="Phone sign-in, unavailable during the pilot" label="Phone" onPress={() => showDeferredMethod('Phone')} />
+        <SecondaryButton accessibilityLabel="Google sign-in, unavailable during the pilot" label="Google" onPress={() => showDeferredMethod('Google')} />
+        <SecondaryButton accessibilityLabel="Apple sign-in, unavailable during the pilot" label="Apple" onPress={() => showDeferredMethod('Apple')} />
+      </View>
+      <View style={styles.create}><Text style={styles.createText}>Don’t have an account?</Text><TertiaryButton label="Create account" onPress={() => router.push('/create-account')} /></View>
+      <Text style={styles.legal}>By continuing, you agree to the Terms of Service and Privacy Policy.</Text>
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.surface.page,
-  },
-  keyboard: {
-    flex: 1,
-    // Anchored near the top rather than geometrically centred. On a tall narrow screen — a Fold5 cover panel
-    // or an unfolded Flip5 — centring left roughly 400px empty above the card and 600px below it, which
-    // reads as a loading state rather than a form. 'center' still applies on a short screen, where the card
-    // fills most of the height anyway, because the padding only takes effect once there is slack.
-    justifyContent: 'flex-start',
-    paddingHorizontal: scaleSize(24),
-    paddingTop: '12%',
-  },
-  card: {
-    ...contentColumn,
-    backgroundColor: colors.surface.card,
-    borderColor: colors.border.default,
-    // The shared token rather than a literal 18, so the panel matches every other card in the app.
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    padding: scaleSize(24),
-  },
-  title: {
-    color: colors.text.primary,
-    fontFamily: fontFamily.display,
-    fontSize: scaleSize(34),
-    fontWeight: '500',
-  },
-  subtitle: {
-    color: colors.text.secondary,
-    fontSize: scaleSize(16),
-    marginBottom: scaleSize(24),
-    marginTop: spacing.sm,
-  },
-  errorBox: {
-    // Form-rejection red. Not a status colour (those live in src/lib/v1Status.ts) and not in the theme,
-    // so it stays literal here.
-    backgroundColor: colors.error.surface,
-    borderColor: colors.error.border,
-    borderRadius: 12,
-    borderWidth: 1,
-    marginBottom: scaleSize(18),
-    padding: spacing.md,
-  },
-  errorText: {
-    color: colors.error.text,
-    fontSize: fontSize.bodyLarge,
-    lineHeight: scaleSize(20),
-  },
-  label: {
-    color: colors.text.secondary,
-    fontSize: fontSize.bodyLarge,
-    fontWeight: '700',
-    marginBottom: spacing.sm,
-    marginTop: scaleSize(14),
-  },
-  input: {
-    backgroundColor: colors.surface.input,
-    borderColor: colors.border.default,
-    borderRadius: 12,
-    borderWidth: 1,
-    color: colors.text.primary,
-    fontSize: scaleSize(16),
-    paddingHorizontal: scaleSize(14),
-    paddingVertical: spacing.md,
-  },
-  signInBtn: {
-    alignItems: 'center',
-    backgroundColor: colors.accent,
-    borderRadius: radius.lg,
-    justifyContent: 'center',
-    marginTop: scaleSize(24),
-    minHeight: scaleSize(50),
-  },
-  signInText: {
-    color: colors.text.onAccent,
-    fontSize: scaleSize(16),
-    fontWeight: '700',
-  },
-  signUpBtn: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: scaleSize(18),
-    // These two are plain text links about 20pt tall; 44pt keeps them tappable one-handed without
-    // changing how they look.
-    minHeight: MIN_TOUCH_TARGET,
-  },
-  signUpText: {
-    color: colors.accent,
-    fontSize: fontSize.subheading,
-    fontWeight: '700',
-  },
+  content: { gap: spacing.lg, paddingTop: spacing.welcome },
+  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, fontWeight: '500', lineHeight: 36, marginTop: spacing.xl },
+  subtitle: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 25 },
+  requestError: { color: colors.error.text, fontSize: fontSize.body, lineHeight: 22 },
+  divider: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm, marginVertical: spacing.xs },
+  rule: { backgroundColor: colors.border.default, flex: 1, height: 1 },
+  or: { color: colors.text.secondary, fontSize: fontSize.caption },
+  deferredRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  create: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: spacing.sm },
+  createText: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: 20 },
+  legal: { color: colors.text.secondary, fontSize: fontSize.caption, lineHeight: 18, textAlign: 'center' },
 });

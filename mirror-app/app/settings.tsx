@@ -20,6 +20,7 @@ import {
   NURSE_PATIENT_CONFIG_STORAGE_KEY,
 } from '../src/constants/nursePatientConfig'
 import { runHardwareChecks, type HardwareCheck } from '../src/lib/hardwareCheck'
+import { networkSetupAvailable } from '../src/native/networkSetup'
 import { clearPendingConversations, flushPendingConversations, loadPendingConversations } from '../src/storage/conversationQueue'
 import { clearDeviceCredential, getDeviceCredential } from '../src/storage/deviceCredentials'
 import { loadJson } from '../src/storage/mirrorStorage'
@@ -208,6 +209,9 @@ export default function SettingsScreen() {
           <AdminAction icon="refresh-outline" label="Run checks again" onPress={() => void loadAdminState()} />
           <AdminAction icon="cloud-upload-outline" label="Sync pending uploads" onPress={() => void uploadLogs()} />
           <AdminAction icon="pulse-outline" label="Open detailed hardware report" onPress={() => router.push('/hardware-check')} />
+          {networkSetupAvailable() ? (
+            <AdminAction icon="wifi-outline" label="Set up the internet connection" onPress={() => router.push('/network-setup')} />
+          ) : null}
           <AdminAction icon="cloud-download-outline" label={checkingUpdate ? 'Checking for update…' : 'Check for app update'} onPress={() => void checkForAppUpdate()} />
           <AdminAction icon="reload-outline" label="Restart mirror app" onPress={() => router.replace('/')} />
           <AdminAction danger icon="unlink-outline" label="Reset pairing" onPress={confirmResetPairing} />

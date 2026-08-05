@@ -178,6 +178,7 @@ export async function beginMirrorSession(type: MirrorSessionType, language: stri
           protocolVersion: dailyPlan.protocolVersion,
           reminiscenceEnabled: dailyPlan.includeReminiscence,
           medicationOccurrenceId: dailyPlan.medicationReminder?.occurrenceId ?? null,
+          routineOccurrenceId: dailyPlan.routineReminder?.occurrenceId ?? null,
         } : {}),
       } }),
   })
@@ -246,16 +247,32 @@ export async function getActiveQwenTicket() {
 /** Execute a backend tool for the active session (POST /sessions/:id/tool-invocations) and return its
  *  output — used by the realtime hook when Qwen requests a function call. The backend holds the provider
  *  keys and audits every invocation; the device only forwards the tool name + arguments. */
-export async function invokeSessionTool(tool: string, args: Record<string, unknown>): Promise<unknown> {
+export async function invokeSessionTool(tool: string, args: Record<string, unknown>, idempotencyKey?: string): Promise<unknown> {
   const session = await getActiveMirrorSession()
   if (!session) throw new Error('no_active_session')
   const response = await deviceFetch(`/api/v1/sessions/${encodeURIComponent(session.sessionId)}/tool-invocations`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Idempotency-Key': randomIdempotencyKey() },
+    headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey || randomIdempotencyKey() },
     body: JSON.stringify({ tool, arguments: args }),
   })
   const data = await dataOrThrow<{ output: unknown }>(response)
   return data.output
+}
+
+export type ReminderResponseStatus = 'taken' | 'skipped' | 'snoozed' | 'unknown' | 'reported-complete' | 'deferred' | 'declined' | 'no-response'
+
+/** Record a spoken medication/routine response while the Mirror session is still active. The stable
+ * key makes transcript retries and provider reconnects harmless; the backend remains the authority. */
+export async function respondToReminderOccurrence(
+  occurrenceId: string,
+  status: ReminderResponseStatus,
+  note?: string,
+): Promise<unknown> {
+  return invokeSessionTool(
+    'reminder.respond',
+    { occurrenceId, status, ...(note ? { note: note.slice(0, 500) } : {}) },
+    `reminder_response_${occurrenceId}`,
+  )
 }
 
 /** Per-patient soft-continuity memory (backend). Fetched at session start to inject into Aria's

@@ -1,128 +1,57 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState } from 'react';
+import { StyleSheet, Text } from 'react-native';
 
-import { v1Post } from '../src/lib/v1Client';
-import { colors, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../src/theme';
+import { AppHeader, PrimaryButton, ScreenLayout, TertiaryButton } from '../src/components/AppUI';
+import { BrandLockup } from '../src/components/BrandLockup';
+import { Field } from '../src/components/Field';
+import { validateEmail } from '../src/lib/authValidation';
+import { passwordResetRequestMessage } from '../src/lib/authMessages';
+import { requestPasswordResetV1 } from '../src/lib/v1Caregiver';
+import { colors, fontFamily, fontSize, spacing } from '../src/theme';
 
-// Reserved forgot-password request screen. The backend always accepts (no account enumeration); the
-// reset email itself is dormant until Postmark is configured on the server (launch-time).
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
+  const [requestError, setRequestError] = useState('');
+  const [working, setWorking] = useState(false);
 
-  async function submit() {
-    if (submitting || !email.trim()) return;
-    setSubmitting(true);
+  const sendCode = async () => {
+    const validation = validateEmail(email);
+    setError(validation || '');
+    setRequestError('');
+    if (validation) return;
+    setWorking(true);
     try {
-      await v1Post('/auth/password-reset-requests', { email: email.trim() });
-    } catch {
-      // The request is designed to always succeed; ignore transient errors so we don't reveal accounts.
+      await requestPasswordResetV1(email);
+      router.push({ pathname: '/reset-verification', params: { email: email.trim().toLowerCase() } });
+    } catch (cause) {
+      setRequestError(passwordResetRequestMessage(cause));
     } finally {
-      setSubmitting(false);
-      setSent(true);
+      setWorking(false);
     }
-  }
+  };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboard}>
-        <View style={styles.card}>
-          <Text maxFontSizeMultiplier={1.3} style={styles.title}>Reset password</Text>
-          {sent ? (
-            <>
-              {/* The confirmation replaces the form in place, so it is announced rather than left silent. */}
-              <Text accessibilityLiveRegion="polite" style={styles.subtitle}>
-                If an account exists for that email, we’ve sent reset instructions. Open the link in the
-                email to set a new password.
-              </Text>
-              <TouchableOpacity
-                accessibilityRole="button"
-                onPress={() => router.replace('/sign-in')}
-                style={styles.primaryBtn}
-              >
-                <Text style={styles.primaryText}>Back to sign in</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <Text style={styles.subtitle}>Enter your caregiver email and we’ll send a link to reset your password.</Text>
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                accessibilityLabel="Email"
-                autoCapitalize="none"
-                autoComplete="email"
-                keyboardType="email-address"
-                onChangeText={setEmail}
-                placeholder="you@email.com"
-                placeholderTextColor={colors.placeholder}
-                style={styles.input}
-                // Autofill matters here: this screen is reached by someone who has already forgotten
-                // something, on a phone keyboard.
-                textContentType="emailAddress"
-                value={email}
-              />
-              <TouchableOpacity
-                // Named explicitly because the spinner takes the visible text away while submitting.
-                accessibilityLabel="Send reset link"
-                accessibilityRole="button"
-                accessibilityState={{ busy: submitting, disabled: submitting }}
-                disabled={submitting}
-                onPress={submit}
-                style={styles.primaryBtn}
-              >
-                {submitting ? <ActivityIndicator color={colors.text.onAccent} /> : <Text style={styles.primaryText}>Send reset link</Text>}
-              </TouchableOpacity>
-              <TouchableOpacity
-                accessibilityRole="button"
-                onPress={() => router.replace('/sign-in')}
-                style={styles.linkBtn}
-              >
-                <Text style={styles.linkText}>Back to sign in</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+    <ScreenLayout contentContainerStyle={styles.content}>
+      <AppHeader onBack={() => router.back()} />
+      <BrandLockup compact />
+      <Text accessibilityRole="header" style={styles.title}>Forgot password?</Text>
+      <Text style={styles.subtitle}>Enter your email and we’ll request a six-digit reset code.</Text>
+      <Field error={error} label="Email" keyboardType="email-address" autoComplete="email" onChangeText={(value) => { setEmail(value); setError(''); }} placeholder="you@email.com" value={email} />
+      <Text style={styles.note}>For your security, the same response is shown whether an account exists.</Text>
+      {requestError ? <Text accessibilityRole="alert" style={styles.requestError}>{requestError}</Text> : null}
+      <PrimaryButton disabled={working} label={working ? 'Requesting…' : 'Send code'} onPress={() => void sendCode()} />
+      <TertiaryButton label="Back to sign in" onPress={() => router.replace('/sign-in')} />
+    </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.surface.page },
-  keyboard: { flex: 1, justifyContent: 'center', padding: scaleSize(24) },
-  card: {
-    backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: 18,
-    borderWidth: 1, padding: scaleSize(24),
-  },
-  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(34), fontWeight: '500' },
-  subtitle: { color: colors.text.secondary, fontSize: scaleSize(16), lineHeight: scaleSize(23), marginBottom: scaleSize(24), marginTop: spacing.sm },
-  label: {
-    color: colors.text.secondary, fontSize: fontSize.bodyLarge, fontWeight: '700',
-    marginBottom: spacing.sm, marginTop: scaleSize(14),
-  },
-  input: {
-    backgroundColor: colors.surface.input, borderColor: colors.border.default, borderRadius: 12, borderWidth: 1,
-    color: colors.text.primary, fontSize: scaleSize(16), paddingHorizontal: scaleSize(14), paddingVertical: spacing.md,
-  },
-  primaryBtn: {
-    alignItems: 'center', backgroundColor: colors.accent, borderRadius: radius.lg, justifyContent: 'center',
-    marginTop: scaleSize(24), minHeight: scaleSize(50),
-  },
-  primaryText: { color: colors.text.onAccent, fontSize: scaleSize(16), fontWeight: '700' },
-  // 44pt: the text link is only ~20pt tall on its own, which is an easy miss one-handed.
-  linkBtn: { alignItems: 'center', justifyContent: 'center', marginTop: scaleSize(18), minHeight: MIN_TOUCH_TARGET },
-  linkText: { color: colors.accent, fontSize: fontSize.subheading, fontWeight: '700' },
+  content: { gap: spacing.lg },
+  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, fontWeight: '500', lineHeight: 36, marginTop: spacing.xl },
+  subtitle: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: 22 },
+  note: { color: colors.text.secondary, fontSize: fontSize.caption, lineHeight: 18 },
+  requestError: { color: colors.error.text, fontSize: fontSize.body, lineHeight: 22 },
 });

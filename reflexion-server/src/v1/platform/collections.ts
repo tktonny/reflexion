@@ -1,6 +1,6 @@
 export const collections = {
-  tenants: 'tenants', users: 'users', authSessions: 'auth_sessions', passwordResetTokens: 'password_reset_tokens', patients: 'patients',
-  careRelationships: 'care_relationships', programEnrollments: 'program_enrollments', consents: 'consents',
+  tenants: 'tenants', users: 'users', authSessions: 'auth_sessions', passwordResetTokens: 'password_reset_tokens', emailChangeTokens: 'email_change_tokens', phoneChangeTokens: 'phone_change_tokens', emailVerificationTokens: 'email_verification_tokens', setupProgress: 'setup_progress', patients: 'patients',
+  careRelationships: 'care_relationships', careCircleInvitations: 'care_circle_invitations', programEnrollments: 'program_enrollments', consents: 'consents',
   devices: 'devices', pairings: 'device_pairings', assignments: 'device_assignments', credentials: 'device_credentials',
   deviceConfigurations: 'device_configurations', deviceTelemetry: 'device_telemetry',
   carePlans: 'care_plans', medicationPlans: 'medication_plans', reminderRules: 'reminder_rules',
@@ -18,6 +18,7 @@ export const collections = {
   auditEvents: 'audit_events', idempotencyRecords: 'idempotency_records',
   toolInvocations: 'tool_invocations',
   patientMemory: 'patient_memory',
+  familyMessages: 'family_messages',
   supportThreads: 'support_threads', supportMessages: 'support_messages',
-  dailySummaries: 'daily_summaries', feedback: 'feedback',
+  dailySummaries: 'daily_summaries', feedback: 'feedback', dataDeletionRequests: 'data_deletion_requests',
 } as const

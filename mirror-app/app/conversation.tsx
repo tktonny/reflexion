@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 
 import { dataOrThrow, type DeviceConfiguration } from '../src/api/devicePairing'
+import { fetchFamilyMessages, markFamilyMessageOpened, type FamilyMessage } from '../src/api/familyMessages'
 import { loadDailyConversationPlan } from '../src/api/dailyConversationContext'
 import { sendDeviceHeartbeat, subscribeDeviceHeartbeat } from '../src/api/deviceHeartbeat'
 import { resolveOwnerIds, saveCheckin } from '../src/api/saveCheckin'
@@ -143,6 +144,8 @@ export default function ConversationScreen() {
   const [weather, setWeather] = useState<CurrentWeather | null>(null)
   const [weatherLocation, setWeatherLocation] = useState<WeatherLocation | null>(null)
   const [usualWakeTime, setUsualWakeTime] = useState<string | null>(null)
+  const [familyMessages, setFamilyMessages] = useState<FamilyMessage[]>([])
+  const [openFamilyMessageId, setOpenFamilyMessageId] = useState<string | null>(null)
   const lastAutoStartDateRef = useRef<string>('')
 
   const {
@@ -220,6 +223,27 @@ export default function ConversationScreen() {
     const timerId = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(timerId)
   }, [])
+
+  // Family messages are a separate, one-way notification channel. Polling retrieves only messages for
+  // this paired device's patient; it never generates a reply or adds anything to conversation data.
+  useEffect(() => {
+    if (checkingPairing) return
+    let mounted = true
+    const load = async () => {
+      try {
+        const credential = await getDeviceCredential()
+        if (!credential) return
+        const messages = await fetchFamilyMessages(credential.deviceId)
+        if (mounted) setFamilyMessages(messages)
+      } catch {
+        // A message refresh must never interrupt the older adult's conversation or turn an offline
+        // notification poll into a scary error screen.
+      }
+    }
+    void load()
+    const timerId = setInterval(load, 30_000)
+    return () => { mounted = false; clearInterval(timerId) }
+  }, [checkingPairing])
 
   useEffect(() => {
     let mounted = true
@@ -589,6 +613,19 @@ export default function ConversationScreen() {
     setWakeListening(false)
   }
 
+  const newestFamilyMessage = familyMessages.at(0)
+  async function openFamilyMessage(message: FamilyMessage) {
+    setOpenFamilyMessageId(message.messageId)
+    try {
+      const credential = await getDeviceCredential()
+      if (!credential) return
+      const opened = await markFamilyMessageOpened(credential.deviceId, message.messageId)
+      setFamilyMessages((current) => current.map((item) => item.messageId === opened.messageId ? opened : item))
+    } catch {
+      // The content is already on screen after an explicit tap. A later poll can reconcile delivery state.
+    }
+  }
+
   return (
     <View style={styles.root}>
       <MirrorExperience
@@ -612,6 +649,26 @@ export default function ConversationScreen() {
         wakeError={wakeError}
         wakeListening={wakeListening}
       />
+
+      {visualState === 'ambient' && newestFamilyMessage ? (
+        <Pressable
+          accessibilityLabel={openFamilyMessageId === newestFamilyMessage.messageId ? 'Close family message' : 'Open family message'}
+          accessibilityRole="button"
+          onPress={() => openFamilyMessageId === newestFamilyMessage.messageId
+            ? setOpenFamilyMessageId(null)
+            : void openFamilyMessage(newestFamilyMessage)}
+          style={styles.familyMessageNotice}
+        >
+          <Ionicons name="heart-outline" size={25} color={c.sageDeep} />
+          <View style={styles.familyMessageCopy}>
+            <Text style={styles.familyMessageTitle}>A message from your family</Text>
+            {openFamilyMessageId === newestFamilyMessage.messageId
+              ? <Text style={styles.familyMessageBody}>{newestFamilyMessage.body}</Text>
+              : <Text style={styles.familyMessageHint}>Tap to open when you’re ready.</Text>}
+          </View>
+          <Ionicons name={openFamilyMessageId === newestFamilyMessage.messageId ? 'chevron-down' : 'chevron-forward'} size={22} color={c.sageDeep} />
+        </Pressable>
+      ) : null}
 
       {beginPushToTalk && endPushToTalk && busy && !endingConversation && visualState !== 'service_error' ? (
         <Pressable
@@ -680,6 +737,11 @@ async function clearStoredMirrorConnection() {
 
 const styles = StyleSheet.create({
   root: { backgroundColor: c.cream, flex: 1 },
+  familyMessageNotice: { alignItems: 'center', backgroundColor: 'rgba(255,252,244,0.97)', borderColor: c.line, borderRadius: 18, borderWidth: 1, bottom: 30, flexDirection: 'row', gap: 12, left: 38, maxWidth: 460, padding: 16, position: 'absolute', right: 38 },
+  familyMessageCopy: { flex: 1 },
+  familyMessageTitle: { color: c.ink, fontFamily: f.bodyMedium, fontSize: 17 },
+  familyMessageHint: { color: c.sageDeep, fontFamily: f.body, fontSize: 14, marginTop: 3 },
+  familyMessageBody: { color: c.ink, fontFamily: f.body, fontSize: 16, lineHeight: 22, marginTop: 5 },
   pushToTalk: { alignItems: 'center', backgroundColor: c.inkLift, borderColor: c.line, borderRadius: 28, borderWidth: 1, bottom: 28, flexDirection: 'row', gap: 9, left: 38, paddingHorizontal: 20, paddingVertical: 14, position: 'absolute' },
   pushToTalkActive: { backgroundColor: c.linen, borderColor: c.linen },
   pushToTalkPressed: { transform: [{ scale: 0.98 }] },

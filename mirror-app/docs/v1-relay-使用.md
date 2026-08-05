@@ -12,7 +12,7 @@
 
 ## 一、准备（一次性）
 
-1. 安装 Node.js（18+）。
+1. 安装仓库支持的 Node.js 24.x（本地版本由根目录 `.nvmrc` 固定为 `24.18.0`）。
 2. 进项目：
    ```bash
    cd /Users/macbookair/Documents/Cloud/REFLEXION/mirror-app

@@ -5,6 +5,7 @@ export type DailyConversationStage =
   | 'yesterday_recall'
   | 'present_planning'
   | 'medication_reminder'
+  | 'routine_reminder'
   | 'reminiscence'
   | 'close'
 
@@ -17,6 +18,12 @@ export type DailyConversationPlan = {
     occurrenceId: string
     displayText: string
     scheduledAt: string
+  }
+  routineReminder?: {
+    occurrenceId: string
+    displayText: string
+    scheduledAt: string
+    category?: string
   }
 }
 
@@ -33,6 +40,7 @@ export function createDailyConversationPlan(options: {
   patientName?: string | null
   now?: Date
   medicationReminder?: DailyConversationPlan['medicationReminder']
+  routineReminder?: DailyConversationPlan['routineReminder']
   reminiscenceWeekdays?: readonly number[]
 } = {}): DailyConversationPlan {
   const now = options.now ?? new Date()
@@ -43,11 +51,12 @@ export function createDailyConversationPlan(options: {
     includeReminiscence: weekdays.includes(now.getDay()),
     reminiscencePrompt: now.getDay() === weekdays.at(-1) ? 'childhood_food' : 'holiday',
     ...(options.medicationReminder ? { medicationReminder: options.medicationReminder } : {}),
+    ...(options.routineReminder ? { routineReminder: options.routineReminder } : {}),
   }
 }
 
 export function dailyConversationPatientTurns(plan: DailyConversationPlan): number {
-  return BASE_DAILY_PATIENT_TURNS + Number(Boolean(plan.medicationReminder)) + Number(plan.includeReminiscence)
+  return BASE_DAILY_PATIENT_TURNS + Number(Boolean(plan.medicationReminder)) + Number(Boolean(plan.routineReminder)) + Number(plan.includeReminiscence)
 }
 
 const BASE_QUESTIONS: Partial<Record<LanguageKey, string[]>> = {
@@ -98,6 +107,20 @@ function medicationQuestion(language: LanguageKey, plan: DailyConversationPlan):
   }
 }
 
+function routineQuestion(language: LanguageKey, plan: DailyConversationPlan): string | null {
+  if (!plan.routineReminder) return null
+  const routine = cleanMedicationName(plan.routineReminder.displayText)
+  const name = cleanName(plan.patientName)
+  switch (language) {
+    case 'mandarin': return `${name}，提醒一下照护者为你安排的${routine}。你完成了吗？`
+    case 'cantonese': return `${name}，提提你照顧者安排咗嘅${routine}。你完成咗未呀？`
+    case 'minnan': return `${name}，提醒你照顧者安排的${routine}。你完成了無？`
+    case 'malay': return `${name}, peringatan ringkas tentang ${routine} yang dijadualkan oleh penjaga anda. Sudahkah anda menyelesaikannya?`
+    case 'tamil': return `${name}, உங்கள் பராமரிப்பாளர் திட்டமிட்ட ${routine} பற்றிய ஒரு நினைவூட்டல். அதை முடித்துவிட்டீர்களா?`
+    default: return `Good afternoon ${name} — a quick reminder about ${routine}, which your caregiver has scheduled. Have you completed it yet?`
+  }
+}
+
 function reminiscenceQuestion(language: LanguageKey, prompt: DailyConversationPlan['reminiscencePrompt']): string {
   const holiday = prompt === 'holiday'
   switch (language) {
@@ -125,6 +148,10 @@ export function screeningQuestionForTurn(
     if (optionalIndex === 0) return medicationQuestion(language, plan)
     optionalIndex -= 1
   }
+  if (plan.routineReminder) {
+    if (optionalIndex === 0) return routineQuestion(language, plan)
+    optionalIndex -= 1
+  }
   if (plan.includeReminiscence && optionalIndex === 0) return reminiscenceQuestion(language, plan.reminiscencePrompt)
   return null
 }
@@ -138,6 +165,8 @@ export function dailyConversationMetadataForPatientTurn(
   if (patientTurn <= 5) return { protocolStage: 'present_planning', cognitiveSignals: ['executive_function', 'prospective_memory', 'social_connectedness'] }
   const medicationTurn = plan.medicationReminder ? 6 : -1
   if (patientTurn === medicationTurn) return { protocolStage: 'medication_reminder', cognitiveSignals: ['memory', 'caregiver_adjunct'] }
+  const routineTurn = BASE_DAILY_PATIENT_TURNS + Number(Boolean(plan.medicationReminder)) + 1
+  if (plan.routineReminder && patientTurn === routineTurn) return { protocolStage: 'routine_reminder', cognitiveSignals: ['routine_follow_through', 'caregiver_adjunct'] }
   return { protocolStage: 'reminiscence', cognitiveSignals: ['semantic_memory', 'language_richness', 'lexical_diversity', 'speech_fluency'] }
 }
 
@@ -182,6 +211,21 @@ const ACKNOWLEDGEMENTS: Partial<Record<LanguageKey, string[]>> = {
 export function acknowledgementForLanguage(language: LanguageKey, turn: number): string {
   const list = ACKNOWLEDGEMENTS[language] ?? ACKNOWLEDGEMENTS.english!
   return list[Math.abs(Math.trunc(turn)) % list.length]
+}
+
+/** Map an explicit spoken answer to the shared reminder state machine. Ambiguous speech is left as
+ * unknown so the caregiver sees that the Mirror could not determine completion rather than a guess. */
+export function classifyReminderResponse(text: string, kind: 'medication' | 'routine'): 'taken' | 'skipped' | 'snoozed' | 'reported-complete' | 'deferred' | 'declined' | 'unknown' {
+  const value = String(text || '').trim().toLowerCase()
+  if (!value) return 'unknown'
+  if (/\b(not sure|unsure|unclear|maybe|perhaps|don't know|do not know)\b|唔知|不知道|不确定|唔肯定/.test(value)) return 'unknown'
+  const later = /\b(later|not yet|after|tomorrow)\b|迟一点|遲啲|等一下|晚點|晚啲|之后|之後|稍后|稍後/.test(value)
+  if (later) return kind === 'routine' ? 'deferred' : 'snoozed'
+  const affirmative = /\b(yes|yeah|yep|did|done|finished|completed|taken|took|have|already|sure)\b|吃了|食咗|食左|服用了|服咗|完成了|完成咗|做了|做咗|喝了|飲咗|飲左|去了|去咗/.test(value)
+  if (affirmative) return kind === 'routine' ? 'reported-complete' : 'taken'
+  const negative = /\b(no|nope|not|haven't|didn't|unable|refuse|refused|skip|skipped)\b|没|未|未有|唔得|唔想|不想|没有|冇/.test(value)
+  if (negative) return kind === 'routine' ? 'declined' : 'skipped'
+  return 'unknown'
 }
 
 export function companionClosingTextForLanguage(language: LanguageKey): string {

@@ -105,7 +105,11 @@ export async function ensureDeviceAccessToken() {
 export async function deviceFetch(path: string, init: RequestInit = {}) {
   let token = await ensureDeviceAccessToken()
   let response = await fetch(getApiUrl(path), { ...init, headers: { ...headersObject(init.headers), Authorization: `Bearer ${token}` } })
-  if (response.status === 401) {
+  // Consent write/read scopes were added after the first paired-device credentials were issued. A 403 on
+  // those endpoints can therefore be a stale token rather than a real authorization failure; rotate once
+  // so an already-paired Mirror picks up the server's current scope set without a factory reset.
+  const scopeRefresh = response.status === 403 && /\/consent(?:$|\/)/.test(path)
+  if (response.status === 401 || scopeRefresh) {
     const credential = await getDeviceCredential()
     if (!credential) return response
     token = await rotateDeviceCredential(credential)

@@ -20,13 +20,45 @@ import type { V1PatientStatus } from './v1Status';
 export class V1ApiError extends Error {
   status: number;
   code?: string;
+  /** Diagnostic wire text for logging only; never render this value in a caregiver screen. */
+  readonly wireMessage: string;
 
   constructor(message: string, status: number, code?: string) {
-    super(message);
+    super(caregiverFacingApiMessage(status, code));
     this.name = 'V1ApiError';
     this.status = status;
     this.code = code;
+    this.wireMessage = message;
   }
+}
+
+function caregiverFacingApiMessage(status: number, code?: string): string {
+  switch (code) {
+    case 'EMAIL_INVALID': return 'Enter a valid email address.';
+    case 'EMAIL_IN_USE': return 'An account already exists for this email. Choose another address or sign in.';
+    case 'EMAIL_VERIFICATION_PENDING': return 'Your account is waiting for email verification. Resend the verification email and try again.';
+    case 'PASSWORD_TOO_SHORT': return 'Your password must be at least 12 characters.';
+    case 'CURRENT_PASSWORD_INVALID': return 'Your current password is incorrect. Check it and try again.';
+    case 'PHONE_INVALID': return 'Enter a valid phone number, including the country code.';
+    case 'PHONE_CHANGE_CODE_INVALID': return 'That verification code is invalid or expired. Request a new code and try again.';
+    case 'SMS_NOT_CONFIGURED':
+    case 'SMS_DELIVERY_FAILED': return 'The verification code could not be sent because SMS delivery is unavailable. Try again later.';
+    case 'EMAIL_NOT_CONFIGURED':
+    case 'EMAIL_DELIVERY_FAILED': return 'The email could not be sent because email delivery is unavailable. Try again later.';
+    case 'ACCOUNT_NOT_FOUND': return 'We could not find an account with those details. Check your email or create an account.';
+    case 'EMAIL_NOT_VERIFIED': return 'Your email has not been verified. Resend the verification email and try again.';
+    case 'CONSENT_REQUIRED': return 'Consent is required before this action can continue.';
+    case 'FORBIDDEN': return 'You do not have permission to make this change.';
+    case 'CONFLICT': return 'This changed elsewhere. Refresh and try again.';
+  }
+  if (status === 401) return 'Your session has expired. Sign in again.';
+  if (status === 403) return 'You do not have permission to make this change.';
+  if (status === 404) return 'We could not find that item. Refresh and try again.';
+  if (status === 409) return 'This changed elsewhere. Refresh and try again.';
+  if (status === 429) return 'Too many requests just now. Wait a moment and try again.';
+  if (status >= 500) return 'We could not connect to Reflexion. Check your connection and try again.';
+  if (status === 400) return 'Check the details and try again.';
+  return 'Something went wrong. Check your connection and try again.';
 }
 
 type Envelope<T> = { data: T; meta?: { requestId?: string; nextCursor?: string | null } };
@@ -188,12 +220,12 @@ type LoginResponse = {
   actor: V1Actor;
 };
 
-export async function v1Login(email: string, password: string): Promise<V1Session> {
+export async function v1Login(identifier: string, password: string): Promise<V1Session> {
   const envelope = await parseEnvelope<LoginResponse>(
     await fetch(getV1Url('/auth/sessions'), {
       method: 'POST',
       headers: { 'content-type': 'application/json', accept: 'application/json' },
-      body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+      body: JSON.stringify({ identifier: identifier.trim(), password }),
     }),
     '/auth/sessions',
   );
@@ -207,7 +239,7 @@ export async function v1Login(email: string, password: string): Promise<V1Sessio
       userId: data.actor?.userId || '',
       tenantId: data.actor?.tenantId || '',
       name: data.actor?.name || '',
-      email: data.actor?.email || email.trim().toLowerCase(),
+      email: data.actor?.email || (identifier.includes('@') ? identifier.trim().toLowerCase() : ''),
       roles: Array.isArray(data.actor?.roles) ? data.actor.roles : [],
     },
   };
