@@ -18,7 +18,8 @@ const DEFAULT_RELATIONSHIP_SCOPES = [...CAREGIVER_RELATIONSHIP_SCOPES]
  * The consent purpose a daily check-in is gated on. Kept here next to the consent routes and imported by
  * the session route, so the gate and the thing that reports on the gate cannot drift apart.
  */
-export { DAILY_CHECKIN_CONSENT_PURPOSE, RESEARCH_CONSENT_PURPOSE } from '../platform/consent.js'
+export { DAILY_CHECKIN_CONSENT_PURPOSE, RESEARCH_CONSENT_PURPOSE, VIDEO_COMPANION_CONSENT_PURPOSE } from '../platform/consent.js'
+
 
 const GENDERS = ['male', 'female', 'other'] as const
 const SPEECH_SPEEDS = ['slow', 'normal', 'fast'] as const
