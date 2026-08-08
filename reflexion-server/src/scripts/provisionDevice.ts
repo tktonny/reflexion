@@ -21,6 +21,9 @@ const serial = (argument('serial') || process.env.PROVISION_DEVICE_SERIAL || '')
 const serialHashArgument = (argument('serial-hash') || '').trim().toLowerCase()
 const deviceIdArgument = (argument('device-id') || '').trim()
 const hardwareRevision = (argument('hardware') || 'unknown').trim()
+// Without this every unit reads as "Reflexion Mirror" in the caregiver app (serializeDevice's fallback),
+// which is wrong the moment a fleet contains something that is not a mirror.
+const displayName = (argument('display-name') || '').trim()
 const softwareVersion = (argument('software') || 'uninstalled').trim()
 // 30 days is right for a unit shipping straight to a home. A test fleet that is provisioned once and
 // re-flashed for weeks needs longer, otherwise pairing silently starts failing mid-pilot.
@@ -42,13 +45,14 @@ try {
   const candidateId = deviceIdArgument || newId('dev')
   const device = await db.collection<any>(collections.devices).findOneAndUpdate(filter, { $set: {
     hardwareRevision, softwareVersion, status: 'provisioned', serialHash, updatedAt: new Date(),
+    ...(displayName ? { displayName } : {}),
   }, $setOnInsert: { _id: candidateId, createdAt: new Date() } }, { upsert: true, returnDocument: 'after' })
   if (!device) throw new Error('Unable to provision device.')
   const bootstrapToken = issueAccessToken({
     sub: String(device._id), kind: 'bootstrap', did: String(device._id), serialHash,
     roles: ['device_bootstrap'], scopes: ['device:pair'],
   }, ttlDays * 24 * 60 * 60)
-  console.log(JSON.stringify({ deviceId: device._id, serialHash, bootstrapToken, expiresInDays: ttlDays }, null, 2))
+  console.log(JSON.stringify({ deviceId: device._id, serialHash, displayName: device.displayName || null, bootstrapToken, expiresInDays: ttlDays }, null, 2))
 } finally {
   await closeMongo()
 }
