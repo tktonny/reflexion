@@ -10,6 +10,9 @@ import {
 } from './v1AuthSession';
 import { getV1Url } from './apiUrl';
 import type { V1PatientStatus } from './v1Status';
+import { isDemoMode } from '../demo/demoMode';
+import { ensureDemoSessions, getDemoV1Session } from '../demo/demoSession';
+import { requestDemo } from '../demo/demoRepository';
 
 // Client for the authoritative v1 API (reflexion-implementation-baseline.md §4/§5). All v1 responses are
 // enveloped as { data, meta }; errors as { error: { code, message }, meta }.
@@ -34,10 +37,12 @@ export class V1ApiError extends Error {
 
 function caregiverFacingApiMessage(status: number, code?: string): string {
   switch (code) {
+    case 'NETWORK_UNAVAILABLE': return 'We could not connect to Reflexion right now. Check your connection and try again.';
     case 'EMAIL_INVALID': return 'Enter a valid email address.';
     case 'EMAIL_IN_USE': return 'An account already exists for this email. Choose another address or sign in.';
     case 'EMAIL_VERIFICATION_PENDING': return 'Your account is waiting for email verification. Resend the verification email and try again.';
     case 'PASSWORD_TOO_SHORT': return 'Your password must be at least 12 characters.';
+    case 'PASSWORD_POLICY': return 'Choose a password that meets all of the requirements shown.';
     case 'CURRENT_PASSWORD_INVALID': return 'Your current password is incorrect. Check it and try again.';
     case 'PHONE_INVALID': return 'Enter a valid phone number, including the country code.';
     case 'PHONE_CHANGE_CODE_INVALID': return 'That verification code is invalid or expired. Request a new code and try again.';
@@ -96,6 +101,9 @@ export function generateIdempotencyKey(): string {
 let refreshInFlight: Promise<string | null> | null = null;
 
 async function doRefresh(refreshToken: string): Promise<string | null> {
+  if (isDemoMode()) {
+    return getV1Session()?.accessToken || null;
+  }
   try {
     const response = await fetch(getV1Url('/auth/session-refreshes'), {
       method: 'POST',
@@ -167,7 +175,7 @@ async function v1Fetch<T>(
     baseInit.body = JSON.stringify(init.body);
   }
 
-  const response = await fetch(getV1Url(path), baseInit);
+  const response = await fetchForApi(path, getV1Url(path), baseInit);
   if (response.status === 401 && getV1Session()?.refreshToken) {
     const nextToken = await refreshAccessToken();
     if (nextToken) {
@@ -178,7 +186,7 @@ async function v1Fetch<T>(
       if (init.body !== undefined) {
         retryInit.body = JSON.stringify(init.body);
       }
-      const retry = await fetch(getV1Url(path), retryInit);
+      const retry = await fetchForApi(path, getV1Url(path), retryInit);
       return parseEnvelope<T>(retry, path);
     }
   }
@@ -221,8 +229,15 @@ type LoginResponse = {
 };
 
 export async function v1Login(identifier: string, password: string): Promise<V1Session> {
+  if (isDemoMode()) {
+    ensureDemoSessions();
+    const demoSession = getDemoV1Session();
+    if (!demoSession) throw new V1ApiError('Demo session unavailable.', 0, 'NETWORK_UNAVAILABLE');
+    await setV1Session(demoSession);
+    return demoSession;
+  }
   const envelope = await parseEnvelope<LoginResponse>(
-    await fetch(getV1Url('/auth/sessions'), {
+    await fetchForApi('/auth/sessions', getV1Url('/auth/sessions'), {
       method: 'POST',
       headers: { 'content-type': 'application/json', accept: 'application/json' },
       body: JSON.stringify({ identifier: identifier.trim(), password }),
@@ -245,6 +260,19 @@ export async function v1Login(identifier: string, password: string): Promise<V1S
   };
   await setV1Session(session);
   return session;
+}
+
+async function fetchForApi(path: string, url: string, init: RequestInit): Promise<Response> {
+  if (isDemoMode()) {
+    return requestDemo(path, init);
+  }
+  try {
+    return await fetch(url, init);
+  } catch (cause) {
+    const wireMessage = cause instanceof Error ? cause.message : String(cause);
+    console.warn(`[v1] ${path} request failed`, wireMessage);
+    throw new V1ApiError(wireMessage, 0, 'NETWORK_UNAVAILABLE');
+  }
 }
 
 export async function v1Logout(): Promise<void> {

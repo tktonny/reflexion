@@ -1,5 +1,7 @@
 // Form shapes shared by the onboarding route and its step components.
 
+import type { V1SummaryFrequency } from '../../lib/v1Caregiver';
+
 export type Relationship = 'parent' | 'sibling' | 'spouse' | 'inlaw' | 'grandpa' | 'grandma' | 'other';
 export type Gender = 'male' | 'female' | 'other';
 export type PreferredLanguage = 'english' | 'mandarin' | 'other';
@@ -9,6 +11,7 @@ export type AlertSensitivity =
   | 'only_important_changes'
   | 'only_urgent_alerts';
 export type SummaryTime = '09:00' | '19:00';
+export type SummaryFrequency = V1SummaryFrequency;
 
 export type AccountForm = {
   name: string;
@@ -40,4 +43,5 @@ export type NotificationForm = {
   pushNotificationsEnabled: boolean;
   alertSensitivity: AlertSensitivity;
   preferredDailySummaryTime: SummaryTime;
+  summaryFrequency: SummaryFrequency;
 };

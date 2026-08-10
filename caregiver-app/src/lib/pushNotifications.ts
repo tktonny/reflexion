@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { registerNotificationDeviceV1 } from './v1Client';
 import { hasV1Session } from './v1AuthSession';
+import { isDemoMode } from '../demo/demoMode';
 
 type NotificationsModule = typeof import('expo-notifications');
 
@@ -53,6 +54,9 @@ export async function prepareNotificationDisplay(): Promise<void> {
 export async function registerPushNotificationDevice({
   nurseId,
 }: RegisterPushNotificationDeviceInput): Promise<RegisterPushNotificationDeviceResult> {
+  if (isDemoMode()) {
+    return { ok: true, reason: 'Demo only — not synced.' };
+  }
   if (!nurseId) {
     return { ok: false, reason: 'Missing nurse id.' };
   }

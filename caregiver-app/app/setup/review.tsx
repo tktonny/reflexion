@@ -10,6 +10,15 @@ import { colors, contentColumn, fontFamily, fontSize, spacing } from '../../src/
 export default function SetupReviewScreen() {
   const router = useRouter(); const { setup, loadSetupProgress } = useCaregiver();
   React.useEffect(() => { void loadSetupProgress(); }, [loadSetupProgress]);
-  return <ScreenLayout contentContainerStyle={styles.content}><AppHeader title="Setup" onBack={() => router.back()} /><Text accessibilityRole="header" style={styles.title}>Review setup</Text><Text style={styles.subtitle}>You can finish now and return to any category whenever you need to.</Text><View style={styles.cards}>{SETUP_CATEGORIES.map((category) => <SetupProgressCard key={category.id} description="Edit this category" status={setup[category.id]} title={category.title} onPress={() => router.push(`/setup/${category.id}`)} />)}</View><PrimaryButton label="Finish setup" onPress={() => router.replace('/setup/complete')} /><TertiaryButton label="Set up later" onPress={() => router.replace('/(tabs)')} /></ScreenLayout>;
+  const destinations: Record<(typeof SETUP_CATEGORIES)[number]['id'], string> = {
+    household: '/setup/household',
+    'pair-device': '/device/select',
+    'language-accessibility': '/settings/language',
+    routines: '/settings/routines',
+    notifications: '/settings/notifications',
+    'consent-control': '/settings/consent',
+    'research-participation': '/research/overview',
+  };
+  return <ScreenLayout contentContainerStyle={styles.content}><AppHeader title="Setup" onBack={() => router.back()} /><Text accessibilityRole="header" style={styles.title}>Review setup</Text><Text style={styles.subtitle}>You can finish now and return to any category whenever you need to.</Text><View style={styles.cards}>{SETUP_CATEGORIES.map((category) => <SetupProgressCard key={category.id} description="Edit this category" status={setup[category.id]} title={category.title} onPress={() => router.push(destinations[category.id])} />)}</View><PrimaryButton label="Finish setup" onPress={() => router.replace('/setup/complete')} /><TertiaryButton label="Set up later" onPress={() => router.replace('/(tabs)')} /></ScreenLayout>;
 }
 const styles = StyleSheet.create({ content: { gap: spacing.lg }, title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, fontWeight: '500', marginTop: spacing.xl }, subtitle: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 25 }, cards: { gap: spacing.md, marginBottom: spacing.lg, marginTop: spacing.md } });

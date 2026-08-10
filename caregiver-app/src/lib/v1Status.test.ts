@@ -90,7 +90,7 @@ test('a device problem is attributed to the mirror, not to the person', () => {
   const unreachable = getTechnicalNote('unreachable');
   assert.ok(unreachable);
   assert.match(unreachable, /mirror/i);
-  assert.match(unreachable, /not a change in how they are doing/i);
+  assert.match(unreachable, /not information about your loved one/i);
 
   assert.ok(getTechnicalNote('possible_issue'));
   // A healthy device says nothing at all — silence is the reassuring state.

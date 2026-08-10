@@ -60,6 +60,7 @@ export function passwordResetMessage(error: unknown): string {
   logFailure('password reset', error);
   const status = statusOf(error);
   if (codeOf(error) === 'PASSWORD_TOO_SHORT') return `Your password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
+  if (codeOf(error) === 'PASSWORD_POLICY') return 'Choose a password that meets all of the password requirements shown.';
   if (codeOf(error) === 'CURRENT_PASSWORD_INVALID') return 'Your current password is incorrect. Check it and try again.';
   if (status === 400) return 'That reset link has expired or has already been used. Please request a new one.';
   if (status === 404) return 'That reset link is no longer valid. Please request a new one.';
@@ -73,6 +74,7 @@ export function registrationMessage(error: unknown): string {
   if (code === 'EMAIL_IN_USE') return 'An account already exists for this email. Sign in or reset your password.';
   if (code === 'EMAIL_INVALID') return 'Enter a valid email address.';
   if (code === 'PASSWORD_TOO_SHORT') return `Your password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
+  if (code === 'PASSWORD_POLICY') return 'Choose a password that meets all of the password requirements shown.';
   if (statusOf(error) === 409) return 'An account already exists for this email. Sign in or reset your password.';
   return 'We could not create your account. Check your details and try again.';
 }

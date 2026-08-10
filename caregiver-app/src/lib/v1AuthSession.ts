@@ -1,5 +1,7 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { getWebStorage, migrateLegacyPlaintextFile, secureDelete, secureGet, secureSet } from './secureStorage';
+import { isDemoMode } from '../demo/demoMode';
+import { clearDemoSessions, getDemoV1Session, setDemoV1Session } from '../demo/demoSession';
 
 // v1 human JWT session (see reflexion-implementation-baseline.md §5). Stored ALONGSIDE the legacy
 // AuthSession — this holds the tokens the /api/v1 status/flag/away/notification routes require. Storage
@@ -59,6 +61,9 @@ function parseSession(raw: string | null | undefined): V1Session | null {
 }
 
 export function getV1Session(): V1Session | null {
+  if (isDemoMode()) {
+    return getDemoV1Session();
+  }
   if (memorySession) {
     return memorySession;
   }
@@ -76,6 +81,9 @@ export function hasV1Session(): boolean {
 
 // Native cold-start hydration (mirrors loadStoredAuthSession). Call once on app boot before any v1 read.
 export async function loadV1Session(): Promise<V1Session | null> {
+  if (isDemoMode()) {
+    return getDemoV1Session();
+  }
   const existing = getV1Session();
   if (existing) {
     return existing;
@@ -89,6 +97,10 @@ export async function loadV1Session(): Promise<V1Session | null> {
 }
 
 export async function setV1Session(session: V1Session): Promise<void> {
+  if (isDemoMode()) {
+    setDemoV1Session(session);
+    return;
+  }
   memorySession = session;
   await secureSet(V1_SESSION_KEY, JSON.stringify(session));
 }
@@ -108,6 +120,10 @@ export async function updateV1Tokens(tokens: {
 }
 
 export async function clearV1Session(): Promise<void> {
+  if (isDemoMode()) {
+    clearDemoSessions();
+    return;
+  }
   memorySession = null;
   await secureDelete(V1_SESSION_KEY);
 }

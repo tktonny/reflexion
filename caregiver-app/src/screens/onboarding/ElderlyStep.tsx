@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { PhoneField } from '../../components/Field';
+import { MotionPressable } from '../../components/Motion';
 import { colors, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../../theme';
 import { fieldStyles, Label, MultiOptionGrid, OptionGrid } from './fields';
 import { PhotoInput } from './PhotoInput';
@@ -56,19 +57,21 @@ export function ElderlyStep({
           const isSelected = selectedPatientIndex === index;
           return (
             <View key={index} style={[styles.patientTab, isSelected && styles.patientTabActive]}>
-              <TouchableOpacity
+              <MotionPressable
                 accessibilityLabel={tabName}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: isSelected }}
                 onPress={() => setSelectedPatientIndex(index)}
                 style={styles.patientTabLabel}
+                feedback="card"
+                haptic="selection"
               >
                 <Text style={[styles.patientTabText, isSelected && styles.patientTabTextActive]}>
                   {tabName}
                 </Text>
-              </TouchableOpacity>
+              </MotionPressable>
               {patients.length > 1 ? (
-                <TouchableOpacity
+                <MotionPressable
                   accessibilityLabel={`Remove ${tabName}`}
                   accessibilityRole="button"
                   // Deliberately not grown to 44 wide: it sits inside the tab strip, so it gets reach
@@ -76,29 +79,32 @@ export function ElderlyStep({
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   onPress={() => removePatient(index)}
                   style={[styles.patientTabRemove, isSelected && styles.patientTabRemoveActive]}
+                  feedback="button"
+                  haptic="selection"
                 >
                   <Text
                     accessibilityElementsHidden
                     importantForAccessibility="no"
                     // Tightly boxed glyph inside a 34pt cell; the label above carries the meaning.
-                    maxFontSizeMultiplier={1.6}
                     style={[styles.patientTabRemoveText, isSelected && styles.patientTabRemoveTextActive]}
                   >
                     ×
                   </Text>
-                </TouchableOpacity>
+                </MotionPressable>
               ) : null}
             </View>
           );
         })}
-        <TouchableOpacity
+        <MotionPressable
           accessibilityLabel="Add another elderly profile"
           accessibilityRole="button"
           onPress={addPatient}
           style={styles.addTab}
+          feedback="button"
+          haptic="selection"
         >
           <Text style={styles.addTabText}>+ Add</Text>
-        </TouchableOpacity>
+        </MotionPressable>
       </View>
 
       <Label>Name they like to be called</Label>
@@ -209,14 +215,16 @@ export function ElderlyStep({
       ) : null}
 
       {patients.length > 1 ? (
-        <TouchableOpacity
+        <MotionPressable
           accessibilityLabel={`Remove ${patient.name.trim() || `Person ${patientNumberOffset + patientIndex + 1}`} from this setup`}
           accessibilityRole="button"
           onPress={() => removePatient(patientIndex)}
           style={styles.removeBtn}
+          feedback="button"
+          haptic="selection"
         >
           <Text style={styles.removeBtnText}>Remove this profile</Text>
-        </TouchableOpacity>
+        </MotionPressable>
       ) : null}
     </View>
   );

@@ -1,8 +1,9 @@
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { ScreenLayout } from '../../components/AppUI';
+import { MotionPressable } from '../../components/Motion';
 import { colors, contentColumn, fontFamily, fontSize, MIN_TOUCH_TARGET, radius, scaleSize, spacing } from '../../theme';
 
 /**
@@ -38,7 +39,7 @@ export function SettingsSubPage({
   const footer = onSave ? (
     <View style={styles.footerBar}>
       <View style={styles.footer}>
-        <TouchableOpacity
+        <MotionPressable
           // Spelled out because the spinner replaces the visible text while saving.
           accessibilityLabel={isSaving ? 'Saving' : saveLabel}
           accessibilityRole="button"
@@ -50,7 +51,7 @@ export function SettingsSubPage({
           {isSaving
             ? <ActivityIndicator color={colors.text.onAccent} />
             : <Text style={styles.saveButtonText}>{saveLabel}</Text>}
-        </TouchableOpacity>
+        </MotionPressable>
       </View>
     </View>
   ) : undefined;
@@ -58,7 +59,7 @@ export function SettingsSubPage({
   return (
     <ScreenLayout contentContainerStyle={styles.content} footer={footer}>
       <View style={styles.header}>
-        <TouchableOpacity
+        <MotionPressable
           accessibilityLabel="Back"
           accessibilityRole="button"
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -66,7 +67,7 @@ export function SettingsSubPage({
           style={styles.backButton}
         >
           <Feather color={colors.text.primary} name="chevron-left" size={24} />
-        </TouchableOpacity>
+        </MotionPressable>
         {/* The title is the page's accessible heading, so it must not be a decorative sibling of the back arrow. */}
         <Text accessibilityRole="header" style={styles.title}>{title}</Text>
       </View>

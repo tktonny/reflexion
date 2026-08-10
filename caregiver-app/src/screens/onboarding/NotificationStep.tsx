@@ -1,18 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
+import { ALERT_SENSITIVITY_OPTIONS, PUSH_NOTIFICATION_OPTIONS, SUMMARY_FREQUENCY_OPTIONS, SUMMARY_TIME_OPTIONS } from '../../data/notificationOptions';
 import { Label, OptionGrid } from './fields';
-import type { AlertSensitivity, NotificationForm, SummaryTime } from './types';
-
-const ALERT_OPTIONS: { value: AlertSensitivity; label: string }[] = [
-  { value: 'notify_me_about_everything', label: 'Notify me about everything' },
-  { value: 'only_important_changes', label: 'Only important changes' },
-  { value: 'only_urgent_alerts', label: 'Only urgent alerts' },
-];
-
-const SUMMARY_OPTIONS: { value: SummaryTime; label: string }[] = [
-  { value: '09:00', label: 'Morning push at 9am' },
-  { value: '19:00', label: 'Evening push at 7pm' },
-];
+import type { NotificationForm } from './types';
 
 export function NotificationStep({
   notifications,
@@ -26,10 +16,7 @@ export function NotificationStep({
       <Label>Push notifications</Label>
       <OptionGrid
         groupLabel="Push notifications"
-        options={[
-          { value: true, label: 'Enable (recommended)' },
-          { value: false, label: 'Disable' },
-        ]}
+        options={PUSH_NOTIFICATION_OPTIONS}
         selected={notifications.pushNotificationsEnabled}
         onSelect={(pushNotificationsEnabled) =>
           setNotifications((current) => ({ ...current, pushNotificationsEnabled }))
@@ -39,7 +26,7 @@ export function NotificationStep({
       <Label>Alert sensitivity</Label>
       <OptionGrid
         groupLabel="Alert sensitivity"
-        options={ALERT_OPTIONS}
+        options={ALERT_SENSITIVITY_OPTIONS}
         selected={notifications.alertSensitivity}
         onSelect={(alertSensitivity) =>
           setNotifications((current) => ({ ...current, alertSensitivity }))
@@ -49,10 +36,20 @@ export function NotificationStep({
       <Label>Preferred daily summary time</Label>
       <OptionGrid
         groupLabel="Preferred daily summary time"
-        options={SUMMARY_OPTIONS}
+        options={SUMMARY_TIME_OPTIONS}
         selected={notifications.preferredDailySummaryTime}
         onSelect={(preferredDailySummaryTime) =>
           setNotifications((current) => ({ ...current, preferredDailySummaryTime }))
+        }
+      />
+
+      <Label>Summary frequency</Label>
+      <OptionGrid
+        groupLabel="Summary frequency"
+        options={SUMMARY_FREQUENCY_OPTIONS}
+        selected={notifications.summaryFrequency}
+        onSelect={(summaryFrequency) =>
+          setNotifications((current) => ({ ...current, summaryFrequency }))
         }
       />
     </View>

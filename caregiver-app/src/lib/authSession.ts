@@ -1,5 +1,7 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { getWebStorage, migrateLegacyPlaintextFile, secureDelete, secureGet, secureSet } from './secureStorage';
+import { isDemoMode } from '../demo/demoMode';
+import { clearDemoSessions, getDemoAuthSession, setDemoAuthSession } from '../demo/demoSession';
 
 /**
  * `userId` is the v1 user id. It was called `nurseId` while identity travelled in legacy query strings;
@@ -49,6 +51,9 @@ function parseSession(raw: string | null | undefined): AuthSession | null {
  * directly. Callers must not treat a null here as "signed out" before hydration has run.
  */
 export function getStoredAuthSession(): AuthSession | null {
+  if (isDemoMode()) {
+    return getDemoAuthSession();
+  }
   if (memorySession) {
     return memorySession;
   }
@@ -67,6 +72,9 @@ export function getStoredAuthSession(): AuthSession | null {
 }
 
 export async function loadStoredAuthSession(): Promise<AuthSession | null> {
+  if (isDemoMode()) {
+    return getDemoAuthSession();
+  }
   const existingSession = getStoredAuthSession();
   if (existingSession) {
     return existingSession;
@@ -83,11 +91,19 @@ export async function loadStoredAuthSession(): Promise<AuthSession | null> {
 }
 
 export async function setStoredAuthSession(session: AuthSession) {
+  if (isDemoMode()) {
+    setDemoAuthSession(session);
+    return;
+  }
   memorySession = session;
   await secureSet(AUTH_SESSION_KEY, JSON.stringify(session));
 }
 
 export async function clearStoredAuthSession() {
+  if (isDemoMode()) {
+    clearDemoSessions();
+    return;
+  }
   memorySession = null;
   await secureDelete(AUTH_SESSION_KEY);
 }

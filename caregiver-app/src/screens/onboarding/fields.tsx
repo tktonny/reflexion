@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { colors, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../../theme';
+import { MotionPressable } from '../../components/Motion';
 
 export function Label({ children }: { children: React.ReactNode }) {
   return <Text style={fieldStyles.label}>{children}</Text>;
@@ -25,18 +26,20 @@ export function OptionGrid<T extends string | boolean>({
       {options.map((option) => {
         const isSelected = option.value === selected;
         return (
-          <TouchableOpacity
+          <MotionPressable
             accessibilityLabel={groupLabel ? `${groupLabel}: ${option.label}` : option.label}
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
             key={String(option.value)}
             onPress={() => onSelect(option.value)}
             style={[fieldStyles.pill, isSelected && fieldStyles.pillActive]}
+            feedback="card"
+            haptic="selection"
           >
             <Text style={[fieldStyles.pillText, isSelected && fieldStyles.pillTextActive]}>
               {option.label}
             </Text>
-          </TouchableOpacity>
+          </MotionPressable>
         );
       })}
     </View>
@@ -59,18 +62,20 @@ export function MultiOptionGrid<T extends string>({
       {options.map((option) => {
         const isSelected = selected.includes(option.value);
         return (
-          <TouchableOpacity
+          <MotionPressable
             accessibilityLabel={groupLabel ? `${groupLabel}: ${option.label}` : option.label}
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
             key={option.value}
             onPress={() => onToggle(option.value)}
             style={[fieldStyles.pill, isSelected && fieldStyles.pillActive]}
+            feedback="card"
+            haptic="selection"
           >
             <Text style={[fieldStyles.pillText, isSelected && fieldStyles.pillTextActive]}>
               {option.label}
             </Text>
-          </TouchableOpacity>
+          </MotionPressable>
         );
       })}
     </View>

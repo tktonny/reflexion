@@ -2,8 +2,11 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { CaregiverProvider } from '../src/architecture/CaregiverContext';
+import { DemoModeIndicator } from '../src/components/DemoModeIndicator';
+import { MotionProvider } from '../src/components/Motion';
 import { queryClient } from '../src/lib/queryClient';
 
 /**
@@ -12,17 +15,18 @@ import { queryClient } from '../src/lib/queryClient';
  */
 export default function RootLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <CaregiverProvider>
-        <StatusBar style="dark" />
-        <Stack screenOptions={{ headerShown: false }}>
+    <MotionProvider>
+      <QueryClientProvider client={queryClient}>
+        <CaregiverProvider>
+          <StatusBar style="dark" />
+          <View style={styles.root}>
+            <Stack screenOptions={{ animation: 'slide_from_right', gestureEnabled: true, headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="sign-in" />
           <Stack.Screen name="forgot-password" />
           <Stack.Screen name="reset-verification" />
           <Stack.Screen name="reset-password" />
           <Stack.Screen name="create-account" />
-          <Stack.Screen name="account-verification" />
           <Stack.Screen name="welcome" />
           <Stack.Screen name="setup" />
           <Stack.Screen name="(tabs)" />
@@ -31,8 +35,13 @@ export default function RootLayout() {
           <Stack.Screen name="chat/[id]" />
           <Stack.Screen name="device/[id]" />
           <Stack.Screen name="settings/[section]" />
-        </Stack>
-      </CaregiverProvider>
-    </QueryClientProvider>
+            </Stack>
+            <DemoModeIndicator />
+          </View>
+        </CaregiverProvider>
+      </QueryClientProvider>
+    </MotionProvider>
   );
 }
+
+const styles = StyleSheet.create({ root: { flex: 1, minWidth: 0 } });

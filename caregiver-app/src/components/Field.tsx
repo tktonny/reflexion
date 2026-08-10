@@ -1,3 +1,4 @@
+import { Feather } from '@expo/vector-icons';
 import React from 'react';
 import {
   Modal,
@@ -7,11 +8,11 @@ import {
   Text,
   TextInput,
   type TextInputProps,
-  TouchableOpacity,
   View,
 } from 'react-native';
 
 import { colors, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../theme';
+import { MotionPressable } from './Motion';
 
 export function Field({ label, secure, error, helperText, ...props }: TextInputProps & { label: string; secure?: boolean; error?: string; helperText?: string }) {
   return (
@@ -50,7 +51,7 @@ export function PhoneField({ label, countryCode, phoneNumber, onCountryCodeChang
     <View style={styles.wrap}>
       <Text style={styles.label}>{label}</Text>
       <View style={[styles.phoneRow, error && styles.inputError]}>
-        <TouchableOpacity
+        <MotionPressable
           accessibilityLabel={`Country code, ${countryCode}`}
           accessibilityRole="button"
           disabled={disabled}
@@ -59,7 +60,7 @@ export function PhoneField({ label, countryCode, phoneNumber, onCountryCodeChang
         >
           <Text style={styles.countryText}>{countryCode}</Text>
           <Text style={styles.countryChevron}>⌄</Text>
-        </TouchableOpacity>
+        </MotionPressable>
         <TextInput
           accessibilityLabel={`${label} number`}
           autoCapitalize="none"
@@ -80,20 +81,62 @@ export function PhoneField({ label, countryCode, phoneNumber, onCountryCodeChang
             <Text accessibilityRole="header" style={styles.modalTitle}>Choose country code</Text>
             <ScrollView contentContainerStyle={styles.codeList}>
               {COUNTRY_CODES.map((code) => (
-                <TouchableOpacity
+                <MotionPressable
                   accessibilityRole="button"
                   accessibilityState={{ selected: code === countryCode }}
+                  feedback="card"
+                  haptic="selection"
                   key={code}
                   onPress={() => { onCountryCodeChange(code); setOpen(false); }}
                   style={[styles.codeOption, code === countryCode && styles.codeOptionSelected]}
                 >
                   <Text style={styles.codeOptionText}>{code}</Text>
-                </TouchableOpacity>
+                </MotionPressable>
               ))}
             </ScrollView>
-            <TouchableOpacity accessibilityRole="button" onPress={() => setOpen(false)} style={styles.modalCancel}>
+            <MotionPressable accessibilityRole="button" onPress={() => setOpen(false)} style={styles.modalCancel}>
               <Text style={styles.modalCancelText}>Cancel</Text>
-            </TouchableOpacity>
+            </MotionPressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </View>
+  );
+}
+
+export type SelectFieldOption = { value: string; label: string };
+
+/** A normal form field that opens a selection sheet. The arrow describes the field action, not a page navigation. */
+export function SelectField({ label, value, options, onChange, placeholder = 'Choose an option', disabled = false, helperText }: {
+  label: string;
+  value: string;
+  options: SelectFieldOption[];
+  onChange: (value: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  helperText?: string;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const selected = options.find((option) => option.value === value);
+  return (
+    <View style={styles.wrap}>
+      <Text style={styles.label}>{label}</Text>
+      <MotionPressable accessibilityLabel={label} accessibilityRole="button" accessibilityState={{ disabled }} disabled={disabled} onPress={() => setOpen(true)} style={styles.selectButton}>
+        <Text style={[styles.selectText, !selected && styles.selectPlaceholder]}>{selected?.label || placeholder}</Text>
+        <Feather color={colors.text.secondary} name="chevron-down" size={21} />
+      </MotionPressable>
+      {helperText ? <Text style={styles.helper}>{helperText}</Text> : null}
+      <Modal accessibilityViewIsModal animationType="slide" onRequestClose={() => setOpen(false)} transparent visible={open}>
+        <Pressable accessibilityLabel={`Close ${label} selector`} onPress={() => setOpen(false)} style={styles.modalBackdrop}>
+          <Pressable onPress={(event) => event.stopPropagation()} style={styles.modalCard}>
+            <Text accessibilityRole="header" style={styles.modalTitle}>Choose {label.toLowerCase()}</Text>
+            <ScrollView contentContainerStyle={styles.codeList} keyboardShouldPersistTaps="handled">
+              {options.map((option) => {
+                const isSelected = option.value === value;
+                return <MotionPressable accessibilityLabel={option.label} accessibilityRole="button" accessibilityState={{ selected: isSelected }} feedback="card" haptic="selection" key={option.value} onPress={() => { onChange(option.value); setOpen(false); }} style={[styles.codeOption, isSelected && styles.codeOptionSelected]}><Text style={[styles.codeOptionText, isSelected && styles.codeOptionTextSelected]}>{option.label}</Text>{isSelected ? <Feather color={colors.accent} name="check" size={21} /> : null}</MotionPressable>;
+              })}
+            </ScrollView>
+            <MotionPressable accessibilityRole="button" onPress={() => setOpen(false)} style={styles.modalCancel}><Text style={styles.modalCancelText}>Cancel</Text></MotionPressable>
           </Pressable>
         </Pressable>
       </Modal>
@@ -102,14 +145,17 @@ export function PhoneField({ label, countryCode, phoneNumber, onCountryCodeChang
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: spacing.sm, width: '100%' },
-  label: { color: colors.text.primary, fontSize: fontSize.body, fontWeight: '700', lineHeight: 20 },
-  input: { backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.md, borderWidth: 1, color: colors.text.primary, fontSize: fontSize.bodyLarge, minHeight: 54, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
+  wrap: { gap: spacing.sm, minWidth: 0, width: '100%' },
+  label: { color: colors.text.primary, fontSize: fontSize.body, fontWeight: '700', lineHeight: 20, minWidth: 0 },
+  input: { backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.md, borderWidth: 1, color: colors.text.primary, fontSize: fontSize.bodyLarge, minHeight: 54, minWidth: 0, paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
+  selectButton: { alignItems: 'center', backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.md, borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between', minHeight: 54, minWidth: 0, paddingHorizontal: spacing.lg },
+  selectText: { color: colors.text.primary, flex: 1, flexShrink: 1, fontSize: fontSize.bodyLarge, lineHeight: 22, minWidth: 0 },
+  selectPlaceholder: { color: colors.placeholder },
   multiline: { minHeight: 120, paddingTop: spacing.md, textAlignVertical: 'top' },
   inputError: { borderColor: colors.error.border, borderWidth: 1.5 },
   error: { color: colors.error.text, fontSize: fontSize.body, lineHeight: 21 },
   helper: { color: colors.text.secondary, fontSize: fontSize.caption, lineHeight: 18 },
-  phoneRow: { alignItems: 'stretch', backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.md, borderWidth: 1, flexDirection: 'row', minHeight: 54, overflow: 'hidden' },
+  phoneRow: { alignItems: 'stretch', backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.md, borderWidth: 1, flexDirection: 'row', minHeight: 54, minWidth: 0, overflow: 'hidden' },
   countryButton: { alignItems: 'center', borderRightColor: colors.border.default, borderRightWidth: 1, flexDirection: 'row', gap: spacing.xs, justifyContent: 'center', minHeight: MIN_TOUCH_TARGET, paddingHorizontal: spacing.md },
   countryText: { color: colors.text.primary, fontSize: fontSize.bodyLarge, fontWeight: '600' },
   countryChevron: { color: colors.text.secondary, fontSize: fontSize.bodyLarge },
@@ -118,9 +164,10 @@ const styles = StyleSheet.create({
   modalCard: { backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.xl, borderWidth: 1, maxHeight: '80%', padding: spacing.xl, width: '100%' },
   modalTitle: { color: colors.text.primary, fontSize: fontSize.heading, fontWeight: '700', lineHeight: 26 },
   codeList: { gap: spacing.sm, paddingVertical: spacing.lg },
-  codeOption: { borderColor: colors.border.default, borderRadius: radius.md, borderWidth: 1, justifyContent: 'center', minHeight: MIN_TOUCH_TARGET, paddingHorizontal: spacing.lg },
+  codeOption: { alignItems: 'center', borderColor: colors.border.default, borderRadius: radius.md, borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between', minHeight: MIN_TOUCH_TARGET, minWidth: 0, paddingHorizontal: spacing.lg },
   codeOptionSelected: { backgroundColor: '#E7F3F0', borderColor: colors.accent },
-  codeOptionText: { color: colors.text.primary, fontSize: fontSize.bodyLarge },
+  codeOptionText: { color: colors.text.primary, flex: 1, flexShrink: 1, fontSize: fontSize.bodyLarge, lineHeight: 22, minWidth: 0 },
+  codeOptionTextSelected: { color: colors.accent, fontWeight: '700' },
   modalCancel: { alignItems: 'center', justifyContent: 'center', minHeight: MIN_TOUCH_TARGET },
   modalCancelText: { color: colors.accent, fontSize: fontSize.bodyLarge, fontWeight: '700' },
 });

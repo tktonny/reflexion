@@ -3,7 +3,8 @@ import * as SecureStore from 'expo-secure-store';
 
 import type { SetupCategory, SetupStatus } from './models';
 import { hasV1Session } from '../lib/v1AuthSession';
-import { getSetupProgressV1, updateSetupProgressV1 } from '../lib/v1Caregiver';
+import { getActualSetupEvidenceV1, getSetupProgressV1, updateSetupProgressV1 } from '../lib/v1Caregiver';
+import { isDemoMode } from '../demo/demoMode';
 
 type CaregiverState = {
   setup: Record<SetupCategory, SetupStatus>;
@@ -24,7 +25,6 @@ const INITIAL_SETUP: Record<SetupCategory, SetupStatus> = {
   routines: 'not-started',
   notifications: 'not-started',
   'consent-control': 'not-started',
-  'care-circle': 'not-started',
   'research-participation': 'not-started',
 };
 
@@ -53,7 +53,35 @@ export function CaregiverProvider({ children }: { children: React.ReactNode }) {
     setSetupError(null);
     try {
       const progress = await getSetupProgressV1();
-      setSetup(progress.categories);
+      const nextSetup = { ...progress.categories };
+      if (isDemoMode()) {
+        setSetup(nextSetup);
+        setSetupVersion(progress.version);
+        setupVersionRef.current = progress.version;
+        return;
+      }
+      try {
+        const evidence = await getActualSetupEvidenceV1();
+        const derived: Partial<Record<SetupCategory, SetupStatus>> = {
+          household: evidence.hasHousehold ? 'complete' : undefined,
+          'pair-device': evidence.hasPairedDevice ? 'complete' : undefined,
+          'language-accessibility': evidence.hasLanguagePreferences ? 'complete' : undefined,
+          routines: evidence.hasRoutines ? 'complete' : undefined,
+          notifications: evidence.hasNotificationPreferences ? 'complete' : undefined,
+          'consent-control': evidence.hasConsentChoices ? 'complete' : undefined,
+          // No active study is a satisfied setup state, not an unfinished task. The research screens
+          // still remain available from Settings if the server later returns an invitation.
+          'research-participation': evidence.hasResearchChoice ? 'complete' : 'not-applicable',
+        };
+        (Object.keys(derived) as SetupCategory[]).forEach((category) => {
+          const status = derived[category];
+          if (status) nextSetup[category] = status;
+        });
+      } catch {
+        // The persisted setup record remains a usable fallback when a partial/offline session cannot load
+        // all of the underlying resources.
+      }
+      setSetup(nextSetup);
       setSetupVersion(progress.version);
       setupVersionRef.current = progress.version;
     } catch (cause) {

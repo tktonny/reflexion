@@ -19,10 +19,10 @@ export default function AccountScreen() {
       <Text style={styles.subtitle}>Manage your personal information and sign-in security.</Text>
       <View style={styles.group}>
         <SettingsRow icon="user" label="Edit personal information" value="Name and relationship" onPress={() => router.push('/settings/account/personal')} />
-        <SettingsRow icon="mail" label="Change email" value="Verified by email link" onPress={() => router.push('/settings/account/email')} />
+        <SettingsRow icon="mail" label="Change email" value="Confirmation by email" onPress={() => router.push('/settings/account/email')} />
         <SettingsRow icon="smartphone" label="Change phone number" value="Verification code by SMS" onPress={() => router.push('/settings/account/phone')} />
         <SettingsRow icon="key" label="Change password" value="Use your current password" onPress={() => router.push('/settings/account/password')} />
-        <SettingsRow icon="shield" label="Sign-in methods" value="Email and password" onPress={() => router.push('/settings/account/sign-in-methods')} />
+        <SettingsRow icon="shield" label="Sign-in methods" value="Email, phone and password" onPress={() => router.push('/settings/account/sign-in-methods')} />
       </View>
       <TertiaryButton label="Sign out" onPress={signOut} />
     </ScreenLayout>

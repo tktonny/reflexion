@@ -1,63 +1,37 @@
-# Reflexion caregiver app — replacement architecture
+# Reflexion caregiver app — current architecture implementation map
 
-This file translates the Final Reflexion Caregiver-App Architecture into the implementation boundary for this app. The architecture document is the product source of truth; the visual references define only the visual language.
+The Markdown architecture in `/Users/chloetan/Downloads/Reflexion Caregiver App/Architecture` remains the product source of truth. The PNG references define the visual language only: mostly white surfaces, teal and muted green, rounded cards, editorial headings, botanical details, Mirror and Bear illustrations.
 
-## Replacement route map
+## Canonical navigation
 
-| Area | Routes | Notes |
+After setup the app has exactly four tabs: Home, Activity, Chat and Settings. The complete 73-screen map is maintained in `src/architecture/screenInventory.ts`; dynamic routes reuse the same screen from setup and Settings.
+
+The seven functional setup categories are Household, Pair Device, Language & Accessibility, Routines and Reminders, Notifications, Older-Adult Consent & Control, and Research Participation. Review and Complete are stages, not categories. Generic category detail, filter, confirmation, status and media-upload states are not extra top-level routes.
+
+## Current route map
+
+| Area | Canonical implementation | Integration boundary |
 | --- | --- | --- |
-| Authentication | `/`, `/sign-in`, `/forgot-password`, `/reset-verification`, `/reset-password`, `/create-account`, `/account-verification` | The public flow; no setup shortcut before account creation. |
-| First-time setup | `/welcome`, `/setup`, `/setup/[category]`, `/setup/review`, `/setup/complete` | Eight independent categories: household, device, accessibility, routines, notifications, consent, care-circle, review. |
-| Main navigation | `/(tabs)/home`, `/(tabs)/activity`, `/(tabs)/chat`, `/(tabs)/settings` | Exactly Home, Activity, Chat and Settings. |
-| Loved-one dashboard | `/loved-one/[id]`, `/loved-one/[id]/sessions`, `/loved-one/[id]/session/[sessionId]`, `/loved-one/[id]/weekly-summary`, `/loved-one/[id]/trends`, `/loved-one/[id]/history`, `/loved-one/[id]/export` | Today, sessions, detail, weekly summary, trends, history and export. |
-| Device flow | `/device/[id]`, `/device/[id]/pairing`, `/device/[id]/wifi`, `/device/[id]/test`, `/device/[id]/placement`, `/device/[id]/success`, `/device/[id]/troubleshooting` | Mirror, Bear, App and Other supported device only. |
-| Activity | `/activity/filter`, `/activity/[eventId]` | Filters: person, date range, conversations, routines, chat, technical and caregiver actions. |
-| Chat | `/chat/[lovedOneId]`, `/chat/[lovedOneId]/compose`, `/chat/[lovedOneId]/preview`, `/chat/[lovedOneId]/status/[messageId]` | Text, photo or voice; now or specific date/time; no replies or requests. |
-| Settings | `/settings/account`, `/settings/notifications`, `/settings/household`, `/settings/accessibility`, `/settings/routines`, `/settings/devices`, `/settings/away`, `/settings/consent`, `/settings/care-circle`, `/settings/privacy`, `/settings/help`, `/settings/feedback`, `/settings/subscription`, `/settings/about` | Settings mirrors onboarding options where the feature overlaps. |
+| Authentication | `/splash`, `/sign-in`, `/forgot-password`, `/reset-verification`, `/reset-password`, `/create-account`, `/account-verification` | Existing v1 identity and secure pending-verification flow |
+| Setup | `/welcome`, `/setup`, `/setup/household`, `/setup/household-review`, `/device/select`, `/device/[id]/[stage]`, `/settings/language`, `/settings/voice-preview`, `/settings/routines`, `/settings/notifications`, `/settings/consent`, `/setup/review`, `/setup/complete` | Existing v1 patient, care-plan, device, routine, notification and consent contracts |
+| Loved one | `/loved-one/[id]`, `/sessions`, `/sessions/[sessionId]`, `/sessions/[sessionId]/conversation`, `/weekly-summary`, `/trends`, `/history`, `/export` | Existing v1 status, sessions, transcripts, trends, routines, messages and device state |
+| Activity | `/(tabs)/activity`, `/activity/[eventId]` | Timeline is assembled from existing sessions, routine occurrences, messages and device assignments; filters are an inline sheet |
+| Chat | `/(tabs)/chat`, `/chat/[id]`, `/compose`, `/photo`, `/voice`, `/preview`, `/status/[messageId]` | Text delivery and opened status use the existing Mirror family-message contract; media screens remain truthful until media APIs exist |
+| Settings | Account, App Language, Loved Ones, edit profile, Away Mode, Routines, Devices, device detail, Language & Accessibility, Notifications, Consent, Privacy, Research, Help, Contact Support, Feedback, Subscription, Payment Method, About | Existing v1 contracts where available; unsupported billing/research/media actions are explicit unavailable states |
+| Research | `/research/overview`, `/research/study`, `/research/confirmation`, `/settings/research` | Existing separate research-consent purpose; no study-specific invitation endpoint exists yet |
 
-## Shared data models
+## Shared information model
 
-`src/architecture/models.ts` owns the product vocabulary for interaction, device, setup, routine response, notifications, consent, Care Circle, messages, screen states and baseline rules. Screens must not define parallel enums or new status strings.
+`src/architecture/models.ts` owns the approved objective interaction, device, setup, routine response, notification, consent, message and screen-state vocabulary. `src/lib/v1Status.ts` translates legacy backend status values without exposing wellness claims. Device status is rendered separately from loved-one interaction state.
 
-## Shared component inventory
+The baseline rule is at least 3 valid sessions in a rolling 14-day window. No caregiver-facing screen says “doing well”, “healthy”, “safe” or “happy”.
 
-- `AppHeader`, `BrandLockup`, `BotanicalCorner`
-- `PrimaryButton`, `SecondaryButton`, `TertiaryButton`, `InputField`
-- `ChoiceCard`, `RadioRow`, `StatusPill`, `SetupProgressCard`
-- `LovedOneCard`, `ConfigurationBanner`, `ProvenanceSection`
-- `ActivityRow`, `MessageBubble`, `MessageStatusTimeline`, `SettingsRow`
-- `LoadingState`, `EmptyState`, `ErrorState`, `OfflineState`
+## Preserved backend contracts
 
-## Design tokens
+The v1 adapter keeps the production API base URL, authentication, field names, endpoint paths, device identifiers and message states. Existing account authentication, pairing/claiming, loved-one assignment, Wi-Fi and technical/audio checks, sessions and summaries, routines and reminder responses, text messages, delivery/opened status, product/research consent and technical online/offline state remain connected.
 
-`src/theme.ts` is the single token system. It uses the architecture’s warm ivory, card white, navy, teal, state colours, controlled radii, 4 px grid-derived spacing and mobile type scale. All accessible text and touch-target constraints are checked through the app’s existing token checks.
+The production v1 family-message endpoint currently accepts `type: text`/`body` only. Photo and voice UI routes therefore never upload or fake delivery. The current v1 read model also exposes 7- and 30-day trends, not a 3-month trend, and has no PDF export or study-invitation data contract; the UI states those limitations rather than inventing data.
 
-## Obsolete implementation to replace
+## Obsolete-route policy
 
-- The four-step onboarding route and its account/patient/mirror/notification-only state.
-- Old Mirror-management naming and its server-specific connected-card screen.
-- The generic Settings `care preferences` prototype route.
-- Any legacy session/trend/history naming at top level; these become person-specific dashboard destinations.
-- Alert-era navigation and any state labels not declared in the Final architecture.
-- Notification options that differ from the architecture or introduce quiet hours.
-- Any routine wording that treats a reported response as independently verified.
-- Any reply, request or "Mark followed up" flow.
-
-Existing API clients are intentionally not treated as product architecture. They can be integrated only when they support these models and states without changing copy, flow or available options.
-
-## V4 authentication and responsive-layout rules
-
-- New registrations, password resets and password changes require at least 12 characters. Sign-in never
-  applies that rule to an existing account, so migrated accounts with a shorter legacy password remain usable.
-- Phone, Google and Apple sign-in remain visible and tappable during the pilot. Each opens a truthful
-  pilot-unavailable dialog with one action, **Continue with email**; no partial provider flow is started.
-- Raw backend, schema, provider or database messages never reach a caregiver. Client validation and stable
-  error codes map to field-level, actionable copy; request-wide failures use a clear retry instruction.
-- The pending verification context persists only the email and timestamp in secure storage. It survives
-  navigation and restart, never stores a plaintext password, and is cleared after the server verifies the link.
-- Verification and resend screens do not claim inbox delivery. A delivery-request success is shown only for a
-  provider-acceptance signal, while account verification itself is shown only after the server validates the link;
-  an unavailable or rejected transactional-email provider is a visible retryable error.
-- Every screen uses the shared `ScreenLayout` and `layout` tokens for safe areas, horizontal boundaries,
-  keyboard avoidance and scrolling. Text may wrap at increased system font sizes; fixed heights and truncation
-  are not used for headings, legal copy, fields, cards or primary actions.
+The former generic setup category route, generic Settings section route, Care Circle route, loved-one `[view]` placeholder route and full-screen Activity filter are redirect bridges only. They do not render obsolete controls or become additional canonical screens.

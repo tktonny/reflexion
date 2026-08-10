@@ -1,7 +1,8 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { colors, spacing, radius, fontSize, fontFamily, layout, scaleSize, MIN_TOUCH_TARGET } from '../theme';
+import { MotionPressable } from './Motion';
 
 // Shared loading / empty / failed placeholders.
 //
@@ -63,14 +64,14 @@ export function ErrorState({
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
       {onRetry ? (
-        <TouchableOpacity
+        <MotionPressable
           accessibilityLabel={retryLabel}
           accessibilityRole="button"
           onPress={onRetry}
           style={styles.retry}
         >
           <Text style={styles.retryText}>{retryLabel}</Text>
-        </TouchableOpacity>
+        </MotionPressable>
       ) : null}
     </View>
   );

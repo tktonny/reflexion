@@ -1,6 +1,7 @@
 import React from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../../theme';
+import { MotionPressable } from '../../components/Motion';
 import { fieldStyles, Label } from './fields';
 import { formatPairingInput } from './helpers';
 import type { PatientForm } from './types';
@@ -58,14 +59,16 @@ export function MirrorStep({
               style={fieldStyles.input}
               value={patient.timezone}
             />
-            <TouchableOpacity
+            <MotionPressable
               accessibilityLabel={`How pairing works for ${heading}'s mirror`}
               accessibilityRole="button"
+              haptic="selection"
               onPress={() => Alert.alert('Pairing instructions', 'Enter the code displayed on the mirror, or scan the mirror QR in the caregiver app once scanner support is enabled.')}
               style={styles.testBtn}
+              feedback="button"
             >
               <Text style={styles.testBtnText}>How pairing works</Text>
-            </TouchableOpacity>
+            </MotionPressable>
           </View>
         );
       })}

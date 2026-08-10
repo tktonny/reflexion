@@ -1,7 +1,8 @@
 import React from 'react';
-import { Alert, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Platform, StyleSheet, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { colors, fontSize, MIN_TOUCH_TARGET, radius, spacing } from '../../theme';
+import { MotionPressable } from '../../components/Motion';
 
 export function PhotoInput({
   photoUrl,
@@ -78,23 +79,25 @@ export function PhotoInput({
           <Text style={styles.photoPlaceholderText}>No photo selected</Text>
         </View>
       )}
-      <TouchableOpacity
+      <MotionPressable
         accessibilityRole="button"
-        activeOpacity={0.8}
+        haptic="selection"
         onPress={() => void pickImage()}
         style={styles.photoButton}
+        feedback="button"
       >
         <Text style={styles.photoButtonText}>{photoUrl ? 'Change photo' : 'Choose photo'}</Text>
-      </TouchableOpacity>
+      </MotionPressable>
       {photoUrl ? (
-        <TouchableOpacity
+        <MotionPressable
           accessibilityRole="button"
-          activeOpacity={0.8}
+          haptic="selection"
           onPress={() => onChange('')}
           style={styles.clearPhotoButton}
+          feedback="button"
         >
           <Text style={styles.clearPhotoText}>Remove photo</Text>
-        </TouchableOpacity>
+        </MotionPressable>
       ) : null}
     </View>
   );
