@@ -84,10 +84,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.xl, minWidth: 0, paddingTop: spacing.lg },
   hero: { minHeight: 84, minWidth: 0, position: 'relative' },
-  botanical: { height: 252, right: -spacing.xl, top: -spacing.xxl, width: 188 },
+  botanical: { height: 220, right: -spacing.xl, top: -spacing.xxl, width: 154 },
   settings: { alignItems: 'center', justifyContent: 'center', minHeight: 44, width: 44 },
   greeting: { gap: spacing.xs, marginTop: -spacing.sm, minWidth: 0 },
-  greetingTitle: { ...typography.display, color: colors.text.primary, fontFamily: fontFamily.ui, fontSize: fontSize.display, fontWeight: '500', lineHeight: 43 },
+  greetingTitle: { ...typography.display, color: colors.text.primary, fontFamily: fontFamily.ui, fontSize: fontSize.title, fontWeight: '500', lineHeight: 37 },
   greetingDate: { ...typography.bodyLarge, color: colors.text.secondary },
   cards: { gap: spacing.lg, minWidth: 0 },
   card: { ...cardShadow, backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: 22, borderWidth: 1, minWidth: 0, padding: spacing.lg },
