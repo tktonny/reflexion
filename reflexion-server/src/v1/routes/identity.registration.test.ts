@@ -39,7 +39,7 @@ test('a caregiver can register, verify, sign in and manage their own profile ent
   })
 
   const email = 'newcaregiver@example.com'
-  const password = 'a-long-enough-passphrase'
+  const password = 'A-long-enough-passphrase1!'
   let accessToken = ''
   let userId = ''
 
@@ -93,11 +93,11 @@ test('a caregiver can register, verify, sign in and manage their own profile ent
 
   await t.test('registration is rejected for a duplicate email, a short password or a bad address', async () => {
     await app.post('/api/v1/auth/registrations')
-      .send({ name: 'Someone Else', email, password: 'another-long-passphrase' }).expect(409)
+      .send({ name: 'Someone Else', email, password: 'Another-long-passphrase1!' }).expect(409)
     await app.post('/api/v1/auth/registrations')
       .send({ name: 'Too Short', email: 'short@example.com', password: 'sh0rt' }).expect(400)
     await app.post('/api/v1/auth/registrations')
-      .send({ name: 'Bad Email', email: 'not-an-email', password: 'a-long-enough-passphrase' }).expect(400)
+      .send({ name: 'Bad Email', email: 'not-an-email', password }).expect(400)
     await app.post('/api/v1/auth/registrations')
       .send({ name: 'No Password', email: 'nopass@example.com' }).expect(400)
   })
@@ -146,7 +146,7 @@ test('a caregiver can register, verify, sign in and manage their own profile ent
   await t.test('setup progress is persisted, versioned and idempotent', async () => {
     const authorization = { Authorization: `Bearer ${accessToken}` }
     const initial = await app.get('/api/v1/setup-progress').set(authorization).expect(200)
-    assert.equal(initial.body.data.total, 8)
+    assert.equal(initial.body.data.total, 7)
     assert.equal(initial.body.data.categories['research-participation'], 'not-started')
     assert.equal(initial.body.data.version, 1)
 
@@ -173,9 +173,9 @@ test('a caregiver can register, verify, sign in and manage their own profile ent
     const code = openSecret(String(event.payload.sealedCode))
     const verified = await app.post('/api/v1/auth/password-reset-verifications').send({ email, code }).expect(200)
     assert.ok(verified.body.data.resetToken)
-    await app.post('/api/v1/auth/password-resets').send({ token: verified.body.data.resetToken, newPassword: 'a-new-long-passphrase' }).expect(200)
+    await app.post('/api/v1/auth/password-resets').send({ token: verified.body.data.resetToken, newPassword: 'A-new-long-passphrase1!' }).expect(200)
     await app.get('/api/v1/me').set({ Authorization: `Bearer ${accessToken}` }).expect(401)
-    await app.post('/api/v1/auth/sessions').send({ email, password: 'a-new-long-passphrase' }).expect(201)
+    await app.post('/api/v1/auth/sessions').send({ email, password: 'A-new-long-passphrase1!' }).expect(201)
   })
 
   await t.test('the server policy can disable verification without rewriting pending accounts', async () => {

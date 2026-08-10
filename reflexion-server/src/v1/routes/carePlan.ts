@@ -167,7 +167,9 @@ carePlanRouter.post('/patients/:patientId/routines', requireCarePlanActor, async
       name: requiredString(body, 'name', 160),
       category: enumValue(body.category, 'category', ROUTINE_CATEGORIES),
       schedule: validateSchedule(body.schedule),
-      notificationPolicy: enumValue(body.notificationPolicy, 'notificationPolicy', ROUTINE_NOTIFICATION_POLICIES),
+      notificationPolicy: legacyNotificationPolicy(body.notificationPolicy, body.notificationPolicies),
+      notificationPolicies: validateNotificationPolicies(body.notificationPolicies === undefined ? [body.notificationPolicy] : body.notificationPolicies),
+      spokenReminder: optionalString(body, 'spokenReminder', 500),
       notes: optionalString(body, 'notes', 1000),
       status: 'active', version: 1, createdBy: principal.userId, createdAt: new Date(), updatedAt: new Date(),
     }
@@ -194,7 +196,15 @@ carePlanRouter.patch('/routines/:routineId', requireCarePlanActor, asyncHandler(
   if ('name' in body) update.name = requiredString(body, 'name', 160)
   if ('category' in body) update.category = enumValue(body.category, 'category', ROUTINE_CATEGORIES)
   if ('schedule' in body) update.schedule = validateSchedule(body.schedule)
-  if ('notificationPolicy' in body) update.notificationPolicy = enumValue(body.notificationPolicy, 'notificationPolicy', ROUTINE_NOTIFICATION_POLICIES)
+  if ('notificationPolicies' in body) {
+    update.notificationPolicies = validateNotificationPolicies(body.notificationPolicies)
+    if (!('notificationPolicy' in body)) update.notificationPolicy = legacyNotificationPolicy(undefined, body.notificationPolicies)
+  }
+  if ('notificationPolicy' in body) {
+    update.notificationPolicy = enumValue(body.notificationPolicy, 'notificationPolicy', ROUTINE_NOTIFICATION_POLICIES)
+    if (!('notificationPolicies' in body)) update.notificationPolicies = [update.notificationPolicy]
+  }
+  if ('spokenReminder' in body) update.spokenReminder = optionalString(body, 'spokenReminder', 500)
   if ('notes' in body) update.notes = optionalString(body, 'notes', 1000)
   if ('status' in body) update.status = enumValue(body.status, 'status', ['active', 'paused', 'ended'] as const)
   if (Object.keys(update).length === 1) throw badRequest('VALIDATION_FAILED', 'At least one supported field is required.')
@@ -299,9 +309,29 @@ function serializeMedicationPlan(plan: Record<string, unknown>) {
 }
 
 function serializeRoutine(routine: Record<string, unknown>) {
+  const notificationPolicies = Array.isArray(routine.notificationPolicies) && routine.notificationPolicies.length
+    ? routine.notificationPolicies
+    : [routine.notificationPolicy]
   return { routineId: routine._id, patientId: routine.patientId, name: routine.name, category: routine.category,
-    schedule: routine.schedule, notificationPolicy: routine.notificationPolicy, notes: routine.notes || null,
+    schedule: routine.schedule, notificationPolicy: routine.notificationPolicy || notificationPolicies[0], notificationPolicies, spokenReminder: routine.spokenReminder || null, notes: routine.notes || null,
     status: routine.status, version: routine.version }
+}
+
+function validateNotificationPolicies(value: unknown) {
+  if (!Array.isArray(value) || !value.length) {
+    throw badRequest('VALIDATION_FAILED', 'notificationPolicies must contain at least one policy.', [{ field: 'notificationPolicies' }])
+  }
+  const policies = [...new Set(value.map((item) => enumValue(item, 'notificationPolicies', ROUTINE_NOTIFICATION_POLICIES)))]
+  if (policies.includes('do-not-notify') && policies.length > 1) {
+    throw badRequest('VALIDATION_FAILED', 'do-not-notify cannot be combined with another notification policy.', [{ field: 'notificationPolicies' }])
+  }
+  return policies
+}
+
+function legacyNotificationPolicy(value: unknown, policies: unknown) {
+  if (value !== undefined) return enumValue(value, 'notificationPolicy', ROUTINE_NOTIFICATION_POLICIES)
+  const normalized = validateNotificationPolicies(policies)
+  return normalized.find((policy) => policy !== 'do-not-notify') || normalized[0]
 }
 
 function serializeOccurrence(item: Record<string, unknown>) {
@@ -315,7 +345,28 @@ function validateSchedule(value: unknown) {
   if (!Array.isArray(body.times) || !body.times.length || body.times.some((time) => typeof time !== 'string' || !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time))) {
     throw badRequest('VALIDATION_FAILED', 'schedule.times must contain valid 24-hour HH:mm values.')
   }
-  return { timezone, times: [...new Set(body.times)].sort(), recurrence: optionalString(body, 'recurrence', 200) || 'daily' }
+  const recurrence = optionalString(body, 'recurrence', 200) || 'daily'
+  if (recurrence !== 'daily' && recurrence !== 'weekly') throw badRequest('VALIDATION_FAILED', 'schedule.recurrence must be daily or weekly.')
+  let daysOfWeek: number[] | undefined
+  if (body.daysOfWeek !== undefined) {
+    if (!Array.isArray(body.daysOfWeek) || !body.daysOfWeek.length || body.daysOfWeek.some((day) => !Number.isInteger(day) || Number(day) < 0 || Number(day) > 6)) {
+      throw badRequest('VALIDATION_FAILED', 'schedule.daysOfWeek must contain one or more days from 0 to 6.')
+    }
+    daysOfWeek = [...new Set(body.daysOfWeek as number[])].sort((left, right) => left - right)
+  }
+  if (recurrence === 'weekly' && !daysOfWeek?.length) throw badRequest('VALIDATION_FAILED', 'schedule.daysOfWeek is required for weekly routines.')
+  const startsOn = optionalDateOnly(body.startsOn, 'schedule.startsOn')
+  const endsOn = optionalDateOnly(body.endsOn, 'schedule.endsOn')
+  if (startsOn && endsOn && endsOn < startsOn) throw badRequest('VALIDATION_FAILED', 'schedule.endsOn must be on or after schedule.startsOn.')
+  return { timezone, times: [...new Set(body.times as string[])].sort(), recurrence, ...(daysOfWeek ? { daysOfWeek } : {}), ...(startsOn ? { startsOn } : {}), ...(endsOn ? { endsOn } : {}) }
+}
+
+function optionalDateOnly(value: unknown, field: string) {
+  if (value === undefined || value === null || value === '') return undefined
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) throw badRequest('VALIDATION_FAILED', `${field} must use YYYY-MM-DD format.`)
+  const parsed = new Date(`${value}T00:00:00Z`)
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) throw badRequest('VALIDATION_FAILED', `${field} must be a valid calendar date.`)
+  return value
 }
 
 function validObject(value: unknown, field: string) {

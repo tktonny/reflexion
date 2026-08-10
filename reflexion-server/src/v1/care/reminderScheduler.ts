@@ -13,12 +13,13 @@ export async function materializeMedicationReminders(db: Db, planId: string, now
     }, { $set: { status: 'cancelled', updatedAt: now } })
     return 0
   }
-  const schedule = plan.schedule as { timezone?: string; times?: string[]; recurrence?: string } | undefined
-  if (!schedule?.timezone || !Array.isArray(schedule.times) || schedule.recurrence !== 'daily') return 0
+  const schedule = plan.schedule as { timezone?: string; times?: string[]; recurrence?: string; daysOfWeek?: number[] } | undefined
+  if (!schedule?.timezone || !Array.isArray(schedule.times) || (schedule.recurrence !== 'daily' && schedule.recurrence !== 'weekly')) return 0
   const today = localDateParts(now, schedule.timezone)
   let created = 0
   for (let dayOffset = 0; dayOffset < HORIZON_DAYS; dayOffset++) {
     const date = new Date(Date.UTC(today.year, today.month - 1, today.day + dayOffset))
+    if (schedule.recurrence === 'weekly' && (!Array.isArray(schedule.daysOfWeek) || !schedule.daysOfWeek.includes(date.getUTCDay()))) continue
     for (const time of schedule.times) {
       const [hour, minute] = time.split(':').map(Number)
       const scheduledAt = zonedDateTimeToUtc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), hour, minute, schedule.timezone)
@@ -53,12 +54,16 @@ export async function materializeRoutineReminders(db: Db, routineId: string, now
     }, { $set: { status: 'cancelled', updatedAt: now } })
     return 0
   }
-  const schedule = routine.schedule as { timezone?: string; times?: string[]; recurrence?: string } | undefined
-  if (!schedule?.timezone || !Array.isArray(schedule.times) || schedule.recurrence !== 'daily') return 0
+  const schedule = routine.schedule as { timezone?: string; times?: string[]; recurrence?: string; daysOfWeek?: number[]; startsOn?: string; endsOn?: string } | undefined
+  if (!schedule?.timezone || !Array.isArray(schedule.times) || (schedule.recurrence !== 'daily' && schedule.recurrence !== 'weekly')) return 0
   const today = localDateParts(now, schedule.timezone)
   let created = 0
   for (let dayOffset = 0; dayOffset < HORIZON_DAYS; dayOffset++) {
     const date = new Date(Date.UTC(today.year, today.month - 1, today.day + dayOffset))
+    const localDate = `${date.getUTCFullYear().toString().padStart(4, '0')}-${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}`
+    if (schedule.startsOn && localDate < schedule.startsOn) continue
+    if (schedule.endsOn && localDate > schedule.endsOn) continue
+    if (schedule.recurrence === 'weekly' && (!Array.isArray(schedule.daysOfWeek) || !schedule.daysOfWeek.includes(date.getUTCDay()))) continue
     for (const time of schedule.times) {
       const [hour, minute] = time.split(':').map(Number)
       const scheduledAt = zonedDateTimeToUtc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), hour, minute, schedule.timezone)
@@ -68,7 +73,7 @@ export async function materializeRoutineReminders(db: Db, routineId: string, now
       }, { $setOnInsert: {
         _id: newId('rem'), tenantId: routine.tenantId, patientId: routine.patientId, sourceId: routineId,
         routineId, scheduledAt, timezone: schedule.timezone, type: 'routine', category: routine.category,
-        displayText: routine.name, notificationPolicy: routine.notificationPolicy, status: 'scheduled', createdAt: now,
+        displayText: routine.spokenReminder || routine.name, notificationPolicy: routine.notificationPolicy, status: 'scheduled', createdAt: now,
       } }, { upsert: true })
       created += result.upsertedCount
     }

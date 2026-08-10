@@ -13,7 +13,7 @@ import { ensureV1Indexes } from '../platform/indexes.js'
 import { issueAccessToken } from '../platform/tokens.js'
 
 const TEST_PASSWORD = 'correct-horse-battery-staple'
-const NEXT_PASSWORD = 'new-correct-horse-battery-staple'
+const NEXT_PASSWORD = 'New-correct-horse1!'
 const TENANT_ID = 'ten_phase3_integration'
 const USER_ID = 'usr_phase3_caregiver'
 const PATIENT_ID = 'pat_phase3_primary'

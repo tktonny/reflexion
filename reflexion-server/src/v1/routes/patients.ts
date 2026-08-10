@@ -35,7 +35,7 @@ const SPEECH_SPEEDS = ['slow', 'normal', 'fast'] as const
  * carePlan.communicationPreferences to the mirror. Putting wake time or topics in `patients` would mean
  * inventing a second delivery path for data the mirror is already wired to read.
  */
-export const PATIENT_PROFILE_FIELDS = ['age', 'gender', 'photoUrl', 'phoneNumber'] as const
+export const PATIENT_PROFILE_FIELDS = ['age', 'gender', 'photoUrl', 'phoneCountryCode', 'phoneNumber', 'relationship', 'emergencyContact', 'livingArrangement'] as const
 
 /** Derived from exact age so the coarse band the monitoring model uses can never disagree with it. */
 export function ageBandForAge(age: number | null | undefined): string | null {
@@ -62,7 +62,11 @@ function validateProfile(input: unknown): Record<string, unknown> {
   }
   if ('gender' in body) profile.gender = body.gender === null ? null : enumValue(body.gender, 'gender', GENDERS)
   if ('photoUrl' in body) profile.photoUrl = optionalString(body, 'photoUrl', 2000) || null
+  if ('phoneCountryCode' in body) profile.phoneCountryCode = optionalString(body, 'phoneCountryCode', 8) || null
   if ('phoneNumber' in body) profile.phoneNumber = optionalString(body, 'phoneNumber', 40) || null
+  if ('relationship' in body) profile.relationship = optionalString(body, 'relationship', 80) || null
+  if ('emergencyContact' in body) profile.emergencyContact = optionalString(body, 'emergencyContact', 240) || null
+  if ('livingArrangement' in body) profile.livingArrangement = optionalString(body, 'livingArrangement', 240) || null
   if ('speechSpeed' in body) profile.speechSpeed = body.speechSpeed === null ? null : enumValue(body.speechSpeed, 'speechSpeed', SPEECH_SPEEDS)
   return profile
 }
@@ -231,13 +235,12 @@ patientsRouter.post('/patients/:patientId/consents', requireActor('human', 'devi
         throw new ApiError(403, 'DEVICE_CONSENT_SCOPE', 'The Mirror may only record the older adult consent for home conversations.')
       }
     } else {
-      await authorizePatient(request, patientId, 'patient:write')
-      // Product consent is the older adult's choice. A caregiver can see it and withdraw it, but cannot
-      // manufacture an acceptance on the loved one's behalf. Optional research remains a separate
-      // caregiver preference and is the only consent a human client may grant here.
-      if (purpose === DAILY_CHECKIN_CONSENT_PURPOSE && status !== 'withdrawn') {
-        throw new ApiError(403, 'OLDER_ADULT_CONSENT_REQUIRED', 'The older adult must review this consent on the Mirror or with the care team.')
-      }
+      // Product consent is a facilitated older-adult choice. An authorised caregiver who can view the
+      // loved one may record the explicit choice; editing the loved-one profile is not required.
+      await authorizePatient(request, patientId, 'patient:read')
+      // The caregiver UI may facilitate and record an explicit older-adult choice. The actor is retained
+      // as `human` in the consent record so the audit trail never presents this as a Mirror-device write.
+      // The UI must explain that the loved one owns the choice and must confirm accept/decline before POSTing.
       if (purpose !== DAILY_CHECKIN_CONSENT_PURPOSE && purpose !== RESEARCH_CONSENT_PURPOSE) {
         throw new ApiError(403, 'CONSENT_PURPOSE_NOT_ALLOWED', 'This consent purpose is not available to the caregiver app.')
       }
@@ -285,7 +288,11 @@ export function serializePatient(patient: Record<string, unknown>) {
       age: (patient.profile as Record<string, unknown> | undefined)?.age ?? null,
       gender: (patient.profile as Record<string, unknown> | undefined)?.gender ?? null,
       photoUrl: (patient.profile as Record<string, unknown> | undefined)?.photoUrl ?? null,
+      phoneCountryCode: (patient.profile as Record<string, unknown> | undefined)?.phoneCountryCode ?? null,
       phoneNumber: (patient.profile as Record<string, unknown> | undefined)?.phoneNumber ?? null,
+      relationship: (patient.profile as Record<string, unknown> | undefined)?.relationship ?? null,
+      emergencyContact: (patient.profile as Record<string, unknown> | undefined)?.emergencyContact ?? null,
+      livingArrangement: (patient.profile as Record<string, unknown> | undefined)?.livingArrangement ?? null,
       speechSpeed: (patient.profile as Record<string, unknown> | undefined)?.speechSpeed ?? null,
     },
     status: String(patient.status || 'active'),

@@ -17,14 +17,13 @@ export const SETUP_PROGRESS_CATEGORIES = [
   'routines',
   'notifications',
   'consent-control',
-  'care-circle',
   'research-participation',
 ] as const
 
 export type SetupProgressCategory = typeof SETUP_PROGRESS_CATEGORIES[number]
-export type SetupProgressStatus = 'not-started' | 'in-progress' | 'complete' | 'skipped'
+export type SetupProgressStatus = 'not-started' | 'in-progress' | 'complete' | 'skipped' | 'not-applicable'
 
-const SETUP_PROGRESS_STATUSES = ['not-started', 'in-progress', 'complete', 'skipped'] as const
+const SETUP_PROGRESS_STATUSES = ['not-started', 'in-progress', 'complete', 'skipped', 'not-applicable'] as const
 
 function defaultCategories(): Record<SetupProgressCategory, SetupProgressStatus> {
   return Object.fromEntries(SETUP_PROGRESS_CATEGORIES.map((category) => [category, 'not-started'])) as Record<SetupProgressCategory, SetupProgressStatus>
@@ -57,8 +56,8 @@ function serializeProgress(row: Record<string, any>) {
     const value = row.categories?.[category]
     if (SETUP_PROGRESS_STATUSES.includes(value)) categories[category] = value
   }
-  const completeCount = SETUP_PROGRESS_CATEGORIES.filter((category) => categories[category] === 'complete').length
-  const complete = SETUP_PROGRESS_CATEGORIES.every((category) => categories[category] === 'complete' || categories[category] === 'skipped')
+  const completeCount = SETUP_PROGRESS_CATEGORIES.filter((category) => categories[category] === 'complete' || categories[category] === 'not-applicable').length
+  const complete = SETUP_PROGRESS_CATEGORIES.every((category) => categories[category] === 'complete' || categories[category] === 'skipped' || categories[category] === 'not-applicable')
   return {
     setupProgressId: row._id,
     userId: row.userId,
@@ -117,4 +116,3 @@ setupProgressRouter.patch('/setup-progress', requireActor('human'), asyncHandler
   })
   sendData(response, result.data, result.status)
 }))
-

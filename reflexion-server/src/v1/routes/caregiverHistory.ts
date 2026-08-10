@@ -39,7 +39,7 @@ const requireHuman = requireActor('human')
 
 const MONTH_PATTERN = /^\d{4}-\d{2}$/
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
-const TREND_RANGES = [7, 30] as const
+const TREND_RANGES = [7, 30, 90] as const
 
 const SESSION_LIST_LIMIT_DEFAULT = 20
 const SESSION_LIST_LIMIT_MAX = 50
@@ -181,7 +181,7 @@ caregiverHistoryRouter.get('/patients/:patientId/sessions/:sessionId', requireHu
 }))
 
 /**
- * Daily conversation duration over the last 7 or 30 local days, oldest first.
+ * Daily conversation duration over the last 7, 30 or 90 local days, oldest first.
  *
  * `missed` means no COMPLETED session that day — the same definition the legacy trend used, kept identical so
  * the client's chart does not change meaning as it migrates.

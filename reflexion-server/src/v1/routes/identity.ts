@@ -79,6 +79,13 @@ identityRouter.post('/auth/sessions', asyncHandler(async (request, response) => 
 }))
 
 const MIN_PASSWORD_LENGTH = 12
+function passwordPolicyError(password: string) {
+  if (password.length < MIN_PASSWORD_LENGTH) return badRequest('PASSWORD_TOO_SHORT', `Choose a password of at least ${MIN_PASSWORD_LENGTH} characters.`)
+  if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+    return badRequest('PASSWORD_POLICY', 'Choose a password with uppercase, lowercase, number and special character.')
+  }
+  return null
+}
 const RELATIONSHIP_TYPES = ['parent', 'sibling', 'spouse', 'inlaw', 'grandpa', 'grandma', 'other'] as const
 
 /**
@@ -113,9 +120,8 @@ identityRouter.post('/auth/registrations', asyncHandler(async (request, response
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     throw badRequest('EMAIL_INVALID', 'Enter a valid email address.')
   }
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    throw badRequest('PASSWORD_TOO_SHORT', `Choose a password of at least ${MIN_PASSWORD_LENGTH} characters.`)
-  }
+  const passwordError = passwordPolicyError(password)
+  if (passwordError) throw passwordError
 
   const db = await getDb()
   const verificationRequired = emailVerificationRequired()
@@ -335,7 +341,8 @@ identityRouter.post('/auth/password-resets', asyncHandler(async (request, respon
   const body = objectBody(request.body)
   const token = requiredString(body, 'token', 500)
   const newPassword = requiredString(body, 'newPassword', 500)
-  if (newPassword.length < 12) throw badRequest('PASSWORD_TOO_SHORT', 'newPassword must contain at least 12 characters.')
+  const passwordError = passwordPolicyError(newPassword)
+  if (passwordError) throw passwordError
   const db = await getDb()
   const reset = await db.collection<any>(collections.passwordResetTokens).findOne({
     tokenDigest: sha256(token), state: 'active', expiresAt: { $gt: new Date() },
@@ -526,7 +533,8 @@ identityRouter.post('/me/password-changes', requireActor('human'), asyncHandler(
   const principal = getPrincipal(request)
   if (principal.kind !== 'human') throw unauthorized()
   const body = objectBody(request.body); const currentPassword = requiredString(body, 'currentPassword', 500); const newPassword = requiredString(body, 'newPassword', 500)
-  if (newPassword.length < MIN_PASSWORD_LENGTH) throw badRequest('PASSWORD_TOO_SHORT', `Choose a password of at least ${MIN_PASSWORD_LENGTH} characters.`)
+  const passwordError = passwordPolicyError(newPassword)
+  if (passwordError) throw passwordError
   const db = await getDb(); const user = await db.collection<any>(collections.users).findOne({ _id: principal.userId, tenantId: principal.tenantId, status: 'active' })
   if (!user?.passwordHash || !verifyPassword(currentPassword, String(user.passwordHash))) throw new ApiError(401, 'CURRENT_PASSWORD_INVALID', 'Your current password is incorrect.')
   await db.collection<any>(collections.users).updateOne({ _id: principal.userId, tenantId: principal.tenantId }, { $set: { passwordHash: hashPassword(newPassword), updatedAt: new Date() } })
@@ -603,7 +611,7 @@ const SUMMARY_FREQUENCIES = ['immediately-after-each-session', 'daily-summary', 
 const NOTIFICATION_TRIGGERS = [
   'conversation-session-summary', 'no-interaction-yet-today', 'repeated-missed-interactions',
   'recent-interaction-shorter-than-usual', 'device-may-be-offline', 'reminder-not-completed-or-unclear',
-  'new-chat-reply', 'weekly-summary',
+  'weekly-summary',
 ] as const
 
 function defaultNotificationTriggers() {

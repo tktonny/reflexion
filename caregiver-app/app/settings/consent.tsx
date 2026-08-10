@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 
@@ -26,6 +26,8 @@ function displayDate(value: string | null | undefined) {
 
 export default function ConsentSettings() {
   const router = useRouter();
+  const { lovedOneId: lovedOneIdParam } = useLocalSearchParams<{ lovedOneId?: string }>();
+  const lovedOneId = typeof lovedOneIdParam === 'string' ? lovedOneIdParam : undefined;
   const { setSetupStatus } = useCaregiver();
   const [patient, setPatient] = useState<V1PatientRecord | null>(null);
   const [state, setState] = useState<V1ConsentState | null>(null);
@@ -39,17 +41,31 @@ export default function ConsentSettings() {
   const [busy, setBusy] = useState(false);
 
   const refresh = useCallback(async () => {
+    setError('');
+    if (!lovedOneId) {
+      setPatient(null);
+      setState(null);
+      setCarePlan(null);
+      setError('Open consent from a loved-one profile so the correct person can be selected.');
+      return;
+    }
+
     const people = await listPatientRecordsV1();
-    const first = people[0] || null;
-    setPatient(first);
-    if (!first) { setState(null); return; }
-    const [next, nextPlan] = await Promise.all([getConsentStateV1(first.patientId), getCarePlanV1(first.patientId)]);
+    const selected = people.find((person) => person.patientId === lovedOneId) || null;
+    setPatient(selected);
+    if (!selected) {
+      setState(null);
+      setCarePlan(null);
+      setError('This loved one is unavailable. Refresh and try again.');
+      return;
+    }
+    const [next, nextPlan] = await Promise.all([getConsentStateV1(selected.patientId), getCarePlanV1(selected.patientId)]);
     setState(next);
     setCarePlan(nextPlan);
     const configuredControl = nextPlan?.communicationPreferences?.productControl;
     setProductControl(configuredControl === 'paused' ? 'paused' : 'active');
     setSetupStatus('consent-control', consentStatus(next).key === 'pending' ? 'in-progress' : 'complete');
-  }, [setSetupStatus]);
+  }, [lovedOneId, setSetupStatus]);
 
   useEffect(() => { void refresh().catch((cause) => setError(cause instanceof Error ? cause.message : 'Could not load consent status.')); }, [refresh]);
 
@@ -125,7 +141,7 @@ export default function ConsentSettings() {
     <Text style={styles.copy}>{patient ? `${patient.displayName} is in control. You can help explain the information and record their choice here or on their Reflexion Mirror.` : 'Your loved one is in control. You can help explain the information and record their choice here or on their Reflexion Mirror.'}</Text>
     {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
     {message ? <View style={styles.messageCard}><View style={styles.messageRow}><Text style={styles.messageIcon}>✓</Text><View style={styles.messageCopy}><Text style={styles.messageTitle}>{message.startsWith('No choice') ? 'Consent remains pending' : 'Choice recorded'}</Text><Text style={styles.messageText}>{message}</Text></View></View></View> : null}
-    {!patient || !state ? <ActivityIndicator color={colors.accent} /> : <>
+    {!patient || !state ? (error ? null : <ActivityIndicator color={colors.accent} />) : <>
       <View style={styles.statusCard}><View style={styles.statusCopy}><Text style={styles.cardLabel}>{patient.displayName}</Text><Text style={styles.statusLabel}>Current status</Text><Text style={[styles.status, current.key === 'accepted' && styles.statusAccepted, current.key === 'declined' && styles.statusDeclined, current.key === 'withdrawn' && styles.statusWithdrawn]}>{current.label}</Text>{current.record?.signedAt || current.record?.withdrawnAt ? <Text style={styles.timestamp}>{displayDate(current.record.signedAt || current.record.withdrawnAt)}</Text> : <Text style={styles.timestamp}>No choice recorded yet</Text>}<Text style={styles.cardCopy}>Required purpose: home conversations and routine support.</Text><SecondaryButton label="View consent details" onPress={() => setDetailsOpen((open) => !open)} /></View></View>
       <View style={styles.controlCard}><Text style={styles.cardLabel}>Product control</Text><Text style={styles.cardCopy}>Pausing is temporary and does not withdraw {patient.displayName}’s consent. {patient.displayName} can also stop an active conversation from the Mirror.</Text><SelectionButton label="Active · conversations and routine support can run" onPress={() => void saveProductControl('active')} selected={productControl === 'active'} /><SelectionButton label="Paused · temporarily stop ordinary support" onPress={() => void saveProductControl('paused')} selected={productControl === 'paused'} /></View>
       {detailsOpen ? <View style={styles.detailsCard}><Text style={styles.cardLabel}>What this is for</Text><View style={styles.detailRow}><Text style={styles.detailTitle}>Home conversations</Text><Text style={styles.cardCopy}>Support recorded conversations and session summaries.</Text></View><View style={styles.detailRow}><Text style={styles.detailTitle}>Routine support</Text><Text style={styles.cardCopy}>Support gentle reminders and record responses.</Text></View><View style={styles.detailRow}><Text style={styles.detailTitle}>Separate choices</Text><Text style={styles.cardCopy}>Product consent is separate from optional research participation.</Text></View></View> : null}

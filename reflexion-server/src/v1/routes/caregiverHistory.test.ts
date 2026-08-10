@@ -145,7 +145,8 @@ test('the caregiver history read models work over v1 and enforce the care relati
 
     const week = await app.get(`/api/v1/patients/${PATIENT_ID}/session-trend?days=7`).set(caregiver).expect(200)
     assert.equal(week.body.data.trend.length, 7)
-    await app.get(`/api/v1/patients/${PATIENT_ID}/session-trend?days=90`).set(caregiver).expect(400)
+    const quarter = await app.get(`/api/v1/patients/${PATIENT_ID}/session-trend?days=90`).set(caregiver).expect(200)
+    assert.equal(quarter.body.data.trend.length, 90)
   })
 
   await t.test('the per-day colour is the finaliser\'s, passed through untouched', async () => {

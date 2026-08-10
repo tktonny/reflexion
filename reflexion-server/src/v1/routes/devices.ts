@@ -422,7 +422,7 @@ devicesRouter.get('/devices/:deviceId/configuration', requireActor('human', 'dev
   })
 }))
 
-/** The paired Mirror records the older adult's product-consent choice; caregivers cannot grant it. */
+/** The paired Mirror records the older adult's product-consent choice through the device-scoped route. */
 devicesRouter.post('/devices/:deviceId/consent', requireActor('device'), asyncHandler(async (request, response) => {
   const result = await executeIdempotent(request, 'POST:/api/v1/devices/:deviceId/consent', async () => {
     const { assignment } = await authorizedDevice(request, request.params.deviceId, 'consent:write')

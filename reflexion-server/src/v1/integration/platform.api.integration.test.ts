@@ -121,8 +121,8 @@ test('all unified v1 business routes work through HTTP with real Mongo authoriza
       const consent = await app.post(`/api/v1/patients/${createdPatientId}/consents`)
         .set({ ...bearer(human), 'Idempotency-Key': idempotencyKey('patient-consent') })
         .send({ purpose: 'home_cognitive_monitoring', documentVersion: '2026-07', status: 'granted' })
-        .expect(403)
-      assert.equal(consent.body.error.code, 'OLDER_ADULT_CONSENT_REQUIRED')
+        .expect(201)
+      assert.equal(consent.body.data.status, 'granted')
       await db.collection(collections.consents).insertOne({
         _id: 'con_api_created_patient', tenantId: TENANT_ID, patientId: createdPatientId,
         purpose: 'home_cognitive_monitoring', documentVersion: '2026-07', status: 'granted',

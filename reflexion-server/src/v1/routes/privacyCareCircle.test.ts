@@ -83,9 +83,9 @@ test('privacy, consent and Care Circle controls are durable and scoped', async (
 
   await t.test('consent withdrawal is visible and blocks future capture', async () => {
     const caregiverGrant = await app.post(`/api/v1/patients/${PATIENT_ID}/consents`)
-      .set({ ...bearer, 'Idempotency-Key': 'privacy_consent_grant_denied_0001' })
-      .send({ purpose: 'home_cognitive_monitoring', documentVersion: 'v1', status: 'granted' }).expect(403)
-    assert.equal(caregiverGrant.body.error.code, 'OLDER_ADULT_CONSENT_REQUIRED')
+      .set({ ...bearer, 'Idempotency-Key': 'privacy_consent_grant_0001' })
+      .send({ purpose: 'home_cognitive_monitoring', documentVersion: 'v1', status: 'granted' }).expect(201)
+    assert.equal(caregiverGrant.body.data.status, 'granted')
     await app.post(`/api/v1/patients/${PATIENT_ID}/consents`).set({ ...bearer, 'Idempotency-Key': 'privacy_consent_withdraw_0001' })
       .send({ purpose: 'home_cognitive_monitoring', documentVersion: 'v1', status: 'withdrawn' }).expect(201)
     const privacy = await app.get(`/api/v1/patients/${PATIENT_ID}/privacy`).set(bearer).expect(200)
