@@ -2,11 +2,12 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
+import { recordMirrorConsent } from '../src/api/deviceConsent'
 import { dataOrThrow, type DeviceConfiguration } from '../src/api/devicePairing'
 import { deviceFetch, getDeviceCredential } from '../src/storage/deviceCredentials'
 import { loadJson } from '../src/storage/mirrorStorage'
 import { NURSE_PATIENT_CONFIG_STORAGE_KEY } from '../src/constants/nursePatientConfig'
-import { MirrorCard, MirrorPage, OutlineButton, PageHeading, StatusRow } from '../src/components/mirror/MirrorChrome'
+import { MirrorCard, MirrorPage, OutlineButton, PageHeading, PrimaryButton, StatusRow } from '../src/components/mirror/MirrorChrome'
 import { MirrorIcon } from '../src/components/mirror/MirrorIcon'
 import { mirrorColors as c, mirrorFonts as f } from '../src/theme/mirrorTheme'
 import { isDemoRoute } from '../src/demo/demoConfig'
@@ -23,6 +24,9 @@ export default function ConsentScreen() {
   const [control, setControl] = useState<ControlState>('Active')
   const [research, setResearch] = useState<ResearchState>('not_invited')
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     let mounted = true
@@ -48,6 +52,30 @@ export default function ConsentScreen() {
     return () => { mounted = false }
   }, [demo])
 
+  const recordChoice = async (next: 'granted' | 'declined') => {
+    if (demo || consent === 'Accepted' || saving) return
+    setSaving(true)
+    setError('')
+    setMessage('')
+    try {
+      const result = await recordMirrorConsent(next)
+      setConsent(result.status === 'granted' ? 'Accepted' : 'Declined')
+      setMessage(result.status === 'granted' ? 'Your choice was saved as Accepted.' : 'Your choice was saved as Declined.')
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Your choice could not be saved. Check the Mirror connection and try again.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const requestHelp = () => {
+    if (demo || consent === 'Accepted' || saving) return
+    setError('')
+    setMessage(consent === 'Pending'
+      ? 'No choice was recorded. Consent remains Pending until you are ready.'
+      : `No change was recorded. Consent remains ${consent}.`)
+  }
+
   return (
     <MirrorPage headerStatus="Mirror ready" onHelp={() => router.push(demo ? '/status?demo=1' : '/status')}>
       <PageHeading title="Your choice, always" subtitle="Product consent & control" />
@@ -67,7 +95,16 @@ export default function ConsentScreen() {
         <StatusRow icon="pause-circle-outline" label="Product control" value={loading ? 'Checking' : control} state={loading ? 'waiting' : control === 'Active' ? 'good' : 'waiting'} />
         {research !== 'not_invited' ? <StatusRow icon="flask-outline" label="Research participation" value={researchLabel(research)} state="waiting" onPress={() => router.push(demo ? '/research?demo=1' : '/research')} /> : null}
       </MirrorCard>
-      <Text style={styles.authority}>{demo ? 'Demo only — changes are local and never sync to a caregiver app.' : 'Your caregiver manages these settings. This mirror never changes consent on its own.'}</Text>
+      {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
+      {message ? <Text style={styles.message}>{message}</Text> : null}
+      {!loading && consent !== 'Accepted' && !demo ? <MirrorCard>
+        <Text style={styles.choiceTitle}>Review your choice</Text>
+        <Text style={styles.choiceBody}>Choose what you want for Reflexion conversations and routine support. You can ask for help before deciding.</Text>
+        <PrimaryButton label={saving ? 'Saving…' : 'Accept'} icon="checkmark-circle" onPress={saving ? undefined : () => { void recordChoice('granted') }} />
+        <OutlineButton label={saving ? 'Saving…' : 'Decline'} icon="close-circle" onPress={saving ? undefined : () => { void recordChoice('declined') }} />
+        <OutlineButton label="Request help / decide later" icon="help-circle-outline" onPress={saving ? undefined : requestHelp} />
+      </MirrorCard> : null}
+      <Text style={styles.authority}>{demo ? 'Demo only — changes are local and never sync to a caregiver app.' : 'Your caregiver can help explain these settings. Accepted or Declined is saved to your Reflexion account.'}</Text>
       <OutlineButton label="Back to home" icon="home-outline" onPress={() => router.replace(demo ? '/demo' : '/conversation')} />
     </MirrorPage>
   )
@@ -124,7 +161,7 @@ function consentDescription(value: ConsentState) {
     case 'Accepted': return 'You have given consent for Reflexion features to work for you.'
     case 'Declined': return 'Reflexion product features are not active.'
     case 'Withdrawn': return 'Product consent has been withdrawn.'
-    default: return 'Your caregiver has not yet confirmed product consent.'
+    default: return 'Your choice has not been recorded yet.'
   }
 }
 
@@ -137,4 +174,8 @@ const styles = StyleSheet.create({
   stateTitle: { color: c.text, fontFamily: f.display, fontSize: 38, marginTop: 4 },
   stateBody: { color: c.textSecondary, fontFamily: f.body, fontSize: 17, lineHeight: 24, marginTop: 5 },
   authority: { color: c.textSecondary, fontFamily: f.body, fontSize: 15, lineHeight: 22, marginBottom: 14, maxWidth: 700, textAlign: 'center' },
+  choiceTitle: { color: c.text, fontFamily: f.display, fontSize: 28, marginBottom: 8 },
+  choiceBody: { color: c.textSecondary, fontFamily: f.body, fontSize: 17, lineHeight: 24 },
+  error: { color: c.coral, fontFamily: f.bodyMedium, fontSize: 16, lineHeight: 22, maxWidth: 760, textAlign: 'center' },
+  message: { color: c.sageDeep, fontFamily: f.bodyMedium, fontSize: 16, lineHeight: 22, maxWidth: 760, textAlign: 'center' },
 })

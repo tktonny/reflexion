@@ -44,7 +44,7 @@ export default function TabLayout() {
         options={{
           title: 'Activity',
           tabBarLabel: ({ color }) => <TabLabel color={color}>Activity</TabLabel>,
-          tabBarIcon: ({ color }) => <Feather name="clock" size={iconSize} color={color} />,
+          tabBarIcon: ({ color }) => <Feather name="trending-up" size={iconSize} color={color} />,
         }}
       />
       <Tabs.Screen

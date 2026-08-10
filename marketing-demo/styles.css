@@ -2308,11 +2308,25 @@ h3 {
 
 /* Home visual-match pass: this page follows REF-home.png's centered, compact composition. */
 body:has(.site-shell--home) {
-  background: #6f7b79;
+  background: #818a8d;
+  scrollbar-width: none;
+}
+
+body:has(.site-shell--home)::-webkit-scrollbar {
+  display: none;
+}
+
+html:has(.site-shell--home) {
+  scrollbar-width: none;
+}
+
+html:has(.site-shell--home)::-webkit-scrollbar {
+  display: none;
 }
 
 .site-shell--home {
   border-radius: 30px;
+  background: #fdfcf9;
 }
 
 .site-shell--home > .footer {
@@ -2321,7 +2335,23 @@ body:has(.site-shell--home) {
 
 .home-header {
   min-height: 84px;
-  padding: 17px 6.4vw;
+  position: relative;
+  padding: 17px 5.4vw 17px 6.6vw;
+}
+
+.home-header .site-nav {
+  position: absolute;
+  left: 56.9%;
+  transform: translateX(-50%);
+}
+
+.home-header > .button {
+  width: 130px;
+  min-width: 130px;
+  min-height: 41px;
+  padding: 9px 8px;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .home-brand {
@@ -2339,6 +2369,7 @@ body:has(.site-shell--home) {
   object-fit: cover;
   object-position: center top;
   mix-blend-mode: multiply;
+  filter: brightness(1.03);
 }
 
 .page--home [data-reveal] {
@@ -2398,6 +2429,16 @@ body:has(.site-shell--home) {
   min-height: 577px;
   padding: 21px 22px 25px;
   border-radius: 23px;
+}
+
+.page--home .home-care-panel--mirror {
+  background-color: #f3e9e2;
+  background-image: none;
+}
+
+.page--home .home-care-panel--caregiver {
+  background-color: #eaeee8;
+  background-image: none;
 }
 
 .page--home .home-care-panel > .panel-label,
@@ -2460,6 +2501,11 @@ body:has(.site-shell--home) {
   filter: drop-shadow(0 18px 16px rgba(53, 49, 40, 0.1));
 }
 
+.page--home .home-product-asset--mirror img,
+.page--home .home-product-asset--caregiver img {
+  mix-blend-mode: multiply;
+}
+
 .page--home .home-care-panel--mirror .home-product-asset {
   right: -1%;
   bottom: -3%;
@@ -2472,6 +2518,11 @@ body:has(.site-shell--home) {
   bottom: 12%;
   width: 46%;
   height: 82%;
+}
+
+.page--home .home-care-panel--caregiver .home-product-asset img {
+  transform: scaleX(0.9);
+  transform-origin: right bottom;
 }
 
 .page--home .home-connection-section {
@@ -2501,6 +2552,10 @@ body:has(.site-shell--home) {
   gap: 11px;
 }
 
+.page--home .home-connection-section .feature-strip {
+  background: #fdf8f3;
+}
+
 .page--home .home-connection-section .feature-strip__item strong {
   margin-bottom: 3px;
   font-size: 14px;
@@ -2517,13 +2572,14 @@ body:has(.site-shell--home) {
 }
 
 .page--home > .section:last-child {
-  padding: 0 5.4vw 28px;
+  padding: 0 5.4vw 26px;
 }
 
 .page--home .cta-band {
   min-height: 180px;
   padding: 27px 36px;
   border-radius: 23px;
+  background: #194d40;
 }
 
 .page--home .cta-band .cta-kicker {
@@ -2600,6 +2656,13 @@ body:has(.site-shell--home) {
   .home-header {
     min-height: 72px;
     padding: 15px 22px;
+  }
+
+  .home-header .site-nav {
+    top: calc(100% + 1px);
+    right: 16px;
+    left: 16px;
+    transform: none;
   }
 
   .page--home .home-hero {
