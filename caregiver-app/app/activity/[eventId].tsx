@@ -124,7 +124,7 @@ export default function ActivityDetailScreen() {
       </View>
 
       <MotionPressable accessibilityLabel="Share this event" accessibilityRole="button" feedback="button" haptic="selection" onPress={share} style={styles.shareButton}>
-        <Feather color={colors.text.onAccent} name="share-2" size={24} />
+        <Feather color={colors.text.onAccent} name="upload" size={22} />
         <Text style={styles.shareText}>Share this event</Text>
       </MotionPressable>
     </ScreenLayout>
@@ -135,7 +135,7 @@ function DetailHeader({ onBack }: { onBack: () => void }) {
   return (
     <View style={[styles.header, styles.layer]}>
       <MotionPressable accessibilityLabel="Back to Activity" accessibilityRole="button" feedback="button" onPress={onBack} style={styles.headerBack}>
-        <Feather color={colors.text.primary} name="chevron-left" size={29} />
+      <Feather color={colors.text.primary} name="chevron-left" size={24} />
         <Text style={styles.headerBackText}>Activity</Text>
       </MotionPressable>
       <Text accessibilityRole="header" numberOfLines={1} style={styles.headerTitle}>Activity detail</Text>
@@ -193,7 +193,7 @@ function decodeParam(value: string | string[] | undefined) {
 const styles = StyleSheet.create({
   content: { gap: spacing.sm, minWidth: 0, paddingTop: 0, position: 'relative' },
   layer: { position: 'relative', zIndex: 1 },
-  botanicalLayer: { height: scaleSize(174), position: 'absolute', right: -spacing.lg, top: -spacing.xl, width: scaleSize(136), zIndex: 0 },
+  botanicalLayer: { height: scaleSize(154), position: 'absolute', right: -spacing.sm, top: spacing.sm, width: scaleSize(120), zIndex: 0 },
   botanical: { height: '100%', width: '100%' },
   header: { alignItems: 'center', flexDirection: 'row', minHeight: 44, minWidth: 0 },
   headerBack: { alignItems: 'center', flexDirection: 'row', gap: 1, minHeight: 44, minWidth: 88, paddingRight: spacing.sm },
@@ -214,16 +214,16 @@ const styles = StyleSheet.create({
   metaText: { color: colors.text.primary, flex: 1, flexShrink: 1, fontFamily: fontFamily.ui, fontSize: fontSize.body, lineHeight: 18, minWidth: 0 },
   rule: { borderTopColor: colors.border.subtle, borderTopWidth: 1, marginTop: spacing.xs },
   cardSectionTitle: { color: colors.text.primary, fontFamily: fontFamily.ui, fontSize: fontSize.bodyLarge, fontWeight: '700', lineHeight: 22, minWidth: 0 },
-  summaryCopy: { color: colors.text.primary, flexShrink: 1, fontFamily: fontFamily.ui, fontSize: fontSize.body, lineHeight: 19, minWidth: 0 },
+  summaryCopy: { color: colors.text.primary, flexShrink: 1, fontFamily: fontFamily.ui, fontSize: fontSize.caption, lineHeight: 17, minWidth: 0 },
   sectionCard: { ...cardShadow, backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.xl, borderWidth: 1, gap: spacing.sm, minWidth: 0, padding: spacing.md },
   factGrid: { flexDirection: 'row', gap: spacing.sm, minWidth: 0 },
   factItem: { alignItems: 'flex-start', flex: 1, flexDirection: 'row', gap: spacing.xs, minWidth: 0 },
-  durationFact: { flex: 0.85 },
-  topicsFact: { flex: 1.25 },
+  durationFact: { flex: 0.78 },
+  topicsFact: { flex: 1.32 },
   iconCircle: { alignItems: 'center', backgroundColor: '#E7F1EC', borderRadius: radius.pill, flexShrink: 0, height: scaleSize(40), justifyContent: 'center', width: scaleSize(40) },
   factCopy: { flex: 1, flexShrink: 1, minWidth: 0 },
-  factLabel: { color: colors.text.primary, fontFamily: fontFamily.ui, fontSize: fontSize.body, lineHeight: 18, minWidth: 0 },
-  factValue: { color: colors.text.primary, fontFamily: fontFamily.ui, fontSize: fontSize.body, lineHeight: 18, marginTop: 2, minWidth: 0 },
+  factLabel: { color: colors.text.primary, fontFamily: fontFamily.ui, fontSize: fontSize.caption, lineHeight: 16, minWidth: 0 },
+  factValue: { color: colors.text.primary, fontFamily: fontFamily.ui, fontSize: fontSize.caption, lineHeight: 16, marginTop: 2, minWidth: 0 },
   topicRow: { flexDirection: 'row', flexWrap: 'nowrap', gap: spacing.xs, marginTop: spacing.xs, minWidth: 0 },
   topicPill: { alignItems: 'center', backgroundColor: '#E7F1EC', borderRadius: radius.pill, minHeight: 28, paddingHorizontal: spacing.xs, paddingVertical: 3 },
   topicText: { color: '#225F5D', fontFamily: fontFamily.ui, fontSize: fontSize.caption, lineHeight: 16 },
