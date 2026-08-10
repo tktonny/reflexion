@@ -1,0 +1,126 @@
+// Native PCM streaming audio bridge for v3 (direct realtime WS).
+//
+// The realtime path needs continuous mic PCM16 @16kHz -> base64 frames sent to Qwen, and
+// gapless PCM16 @24kHz playback of the audio deltas. React Native core has no raw-PCM audio
+// API, so this is backed by the local Expo native module `modules/expo-pcm-audio` (Android:
+// AudioRecord/AudioTrack; iOS: AVAudioEngine). It requires a custom dev build — Expo Go and web
+// cannot load it, so requireOptionalNativeModule returns null there and we fall back to a stub
+// that throws a clear message. The WS/orchestration path is verified independently by
+// server/smoke-direct-ws.mjs (direct-WS + ephemeral-token + orchestration, minus device audio).
+
+import ExpoPcmAudio from '../../modules/expo-pcm-audio'
+
+export type PcmAudioBridge = {
+  /** Begin mic capture; onChunk receives base64 PCM16 mono @16kHz frames. */
+  start: (onChunk: (base64Pcm16: string) => void) => Promise<void>
+  /** Enqueue base64 PCM16 mono @24kHz for gapless playback. */
+  play: (base64Pcm16: string) => void
+  /** Immediately discard queued speaker audio when the user interrupts Aria. */
+  clearPlayback: () => void
+  /** Suppress mic capture during assistant playback (half-duplex). */
+  setCaptureMuted: (muted: boolean) => void
+  /** Unplayed playback backlog in ms; used to un-mute the mic only after playback drains. */
+  getPlaybackBacklogMs: () => number
+  /**
+   * True only when the running build can actually measure the playback backlog. When false, a
+   * getPlaybackBacklogMs() of 0 means "unknown", NOT "drained" — callers must fall back to a floor
+   * wait derived from the enqueued audio duration so the full-playback guarantee is never defeated
+   * by a stub returning 0 (implementation baseline §6).
+   */
+  isBacklogMeasurable: () => boolean
+  stop: () => Promise<void>
+}
+
+/** True when the native PCM module is present in the running build (dev build on a device). */
+export function isNativePcmAvailable(): boolean {
+  return ExpoPcmAudio != null
+}
+
+const CAPTURE_SAMPLE_RATE = 16000
+// Route playback through the voice-communication path so the platform AEC cancels Aria's own voice
+// (fixes the "assistant hears itself" echo). Set EXPO_PUBLIC_AUDIO_COMM_MODE=false to fall back to the
+// louder USAGE_MEDIA path (no echo cancellation) if a device routes voice-comm too quietly.
+const USE_COMMUNICATION_MODE = process.env.EXPO_PUBLIC_AUDIO_COMM_MODE !== 'false'
+
+// Every bridge drives ONE native singleton (ExpoPcmAudio). The wake-word listener and the conversation
+// each build a bridge, so their start()/stop() calls race on the same AudioRecord/AudioTrack. Two
+// concrete failures on the wake-word → conversation handoff (the mirror's normal entry path):
+//   1. The conversation start() runs while the wake-word session is still recording, so the native
+//      start() no-ops (`if (capturing) return`) and never applies MODE_IN_COMMUNICATION — the AEC gets
+//      no playback reference and Aria hears her own speaker (echo → false barge-in → cut-off / early end).
+//   2. The wake-word cleanup's async stop() lands AFTER the conversation start() and tears down the mic
+//      + track the conversation just grabbed → opening plays to a dead track / no capture → failClosed.
+// Serialize every native start/stop through one chain, and stamp each start() with an ownership
+// generation so a stale bridge's stop() can never kill a session a newer start() already took over.
+let nativeOpChain: Promise<unknown> = Promise.resolve()
+let nativeGeneration = 0
+function serializeNativeOp<T>(op: () => Promise<T>): Promise<T> {
+  const run = nativeOpChain.then(op, op)
+  nativeOpChain = run.then(() => undefined, () => undefined)
+  return run as Promise<T>
+}
+
+export function createPcmAudioBridge(options: { communicationMode?: boolean } = {}): PcmAudioBridge {
+  // The conversation defaults to communication mode (playback on the voice path so AEC cancels Aria's
+  // echo). The wake-word listener passes false: it never plays audio, and call-tuned AGC/NS on an idle
+  // mic can attenuate a far-field wake utterance.
+  const communicationMode = options.communicationMode ?? USE_COMMUNICATION_MODE
+  const native = ExpoPcmAudio
+  if (!native) {
+    const notWired = () => {
+      throw new Error(
+        'Native PCM audio module not in this build. v3 (direct realtime WS) needs the ' +
+          'modules/expo-pcm-audio native module + a custom dev build (not Expo Go / web). ' +
+          'Run `npx expo run:android` (or an EAS dev build), or use v1 (relay) / v2 (http).',
+      )
+    }
+    return {
+      start: async () => notWired(),
+      play: () => notWired(),
+      clearPlayback: () => {},
+      setCaptureMuted: () => {},
+      getPlaybackBacklogMs: () => 0,
+      isBacklogMeasurable: () => false,
+      stop: async () => {},
+    }
+  }
+
+  let subscription: { remove: () => void } | null = null
+  let myGeneration = 0
+
+  return {
+    start: async (onChunk) => {
+      // Claim ownership synchronously (at call time, before any await) so a later start() always wins.
+      myGeneration = ++nativeGeneration
+      await serializeNativeOp(async () => {
+        subscription?.remove()
+        subscription = null
+        // Always stop first: native start() no-ops when the singleton is already capturing/playing
+        // (e.g. the still-running wake-word session), which would skip communication-mode routing and
+        // leave the AEC without a reference. A clean stop makes the next start actually rebuild the
+        // track + routing for THIS bridge's mode.
+        await native.stop().catch(() => {})
+        if (myGeneration !== nativeGeneration) return // a newer start() already claimed the mic — yield
+        subscription = native.addListener('onAudioChunk', (event: { data: string }) => {
+          if (event?.data) onChunk(event.data)
+        })
+        await native.start(CAPTURE_SAMPLE_RATE, communicationMode)
+      })
+    },
+    play: (base64Pcm16) => native.play(base64Pcm16),
+    clearPlayback: () => native.clearPlayback(),
+    setCaptureMuted: (muted) => native.setCaptureMuted(muted),
+    getPlaybackBacklogMs: () => native.getPlaybackBacklogMs?.() ?? 0,
+    isBacklogMeasurable: () => typeof native.getPlaybackBacklogMs === 'function',
+    stop: async () => {
+      await serializeNativeOp(async () => {
+        subscription?.remove()
+        subscription = null
+        // Only tear the singleton down if THIS bridge still owns it — stops the wake-word listener's
+        // late cleanup stop() from killing a conversation session that a newer start() took over.
+        if (myGeneration !== nativeGeneration) return
+        await native.stop()
+      })
+    },
+  }
+}

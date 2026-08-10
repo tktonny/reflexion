@@ -1,0 +1,7 @@
+<!doctype html>
+<script>
+localStorage.setItem('reflexion.demo.mode', 'true');
+localStorage.setItem('reflexion.demo.v1Session', JSON.stringify({ accessToken: 'demo-access-token', refreshToken: 'demo-refresh-token', actor: { userId: 'demo-caregiver', tenantId: 'demo-tenant', name: 'Chloe', email: 'demo@reflexion.local', roles: ['caregiver'] } }));
+localStorage.setItem('reflexion.demo.authSession', JSON.stringify({ userId: 'demo-caregiver', name: 'Chloe', email: 'demo@reflexion.local' }));
+location.replace('/(tabs)/activity');
+</script>

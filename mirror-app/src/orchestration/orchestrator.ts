@@ -1,0 +1,151 @@
+// Daily Conversation v2 orchestration (client TS; bundled for the relay server).
+
+import { normalizeLanguageKey } from './voice'
+import flow from './conversationFlow.json'
+import { openingTextForLanguage, type GreetingPeriod } from './deterministicSpeech'
+
+const GOODBYE_SENTENCES: Record<string, string> = {
+  english: 'Goodbye.', mandarin: '再见。', cantonese: '拜拜。', minnan: '再会。', malay: 'Selamat tinggal.', tamil: 'பிரியாவிடை.',
+}
+
+type FlowStep = { key: string; title: string; goal: string; prompt?: string }
+type FlowShape = {
+  flow_id: string
+  title: string
+  opening_message: string
+  conversation_goal: string
+  completion_message: string
+  base_patient_turns: number
+  hard_max_patient_turns: number
+  assistant_response_rules: string[]
+  steps: FlowStep[]
+}
+const FLOW = flow as FlowShape
+
+export const flowId = FLOW.flow_id
+export const promptStepCount = FLOW.steps.length
+
+export const BASE_DAILY_PATIENT_TURNS = FLOW.base_patient_turns
+
+// Keep in step with the store: the backend persists at most 8 facts (v1/routes/tools.ts) and the
+// device summariser emits at most 8 (src/api/patientMemory.ts). Injecting fewer than that silently
+// discards memory that was already fetched and paid for.
+const MAX_INJECTED_MEMORY_FACTS = 8
+export const HARD_MAX_TURN = FLOW.hard_max_patient_turns
+
+
+/**
+ * True when an assistant line reads as a closing goodbye — used by the realtime hooks (v1/v3) to
+ * auto-finalize the check-in (stop + run the screening) instead of hanging on "listening".
+ * Deliberately strong phrases only (not a bare "bye") to avoid ending mid-conversation.
+ */
+export function looksLikeGoodbye(text: string | null | undefined): boolean {
+  const t = String(text || '')
+  if (/(再见|再會|拜拜|回头见|回頭見|下次見|下次见|保重)/.test(t)) return true
+  return /\b(bye[-\s]?bye|good\s?bye|see you (soon|again|next time|later)|take care( of yourself| now)?|until next time|talk (to you )?(soon|again)|have a (good|great|wonderful) (day|one|rest))\b/i.test(t)
+}
+
+/**
+ * Explicit USER intent to end a companion chat. This is deliberately narrower than
+ * looksLikeGoodbye(): an assistant saying "Have a good day" or "Take care" after an ordinary
+ * answer must not close the session by itself.
+ */
+export function looksLikeUserGoodbye(text: string | null | undefined): boolean {
+  const value = String(text || '').trim()
+  if (!value) return false
+  if (/(再见|再會|拜拜|下次再聊|下次再傾|先这样|先這樣|不聊了|結束對話|结束对话|我要走了)/.test(value)) {
+    return true
+  }
+  if (/(selamat tinggal|jumpa lagi|itu sahaja|sampai jumpa)/i.test(value)) return true
+  if (/(பிரியாவிடை|மீண்டும் சந்திப்போம்|அவ்வளவுதான்)/.test(value)) return true
+  return /\b(good\s?bye|bye(?:[-\s]?bye)?|see you(?: again| later| next time)?|talk to you later|that(?:'s| is) all|nothing else|i(?:'m| am) done|(?:end|stop) (?:the )?(?:chat|conversation))\b/i.test(value)
+}
+
+export function openingMessageForLanguage(
+  language: string | null | undefined,
+  patientName?: string | null,
+  greetingPeriod: GreetingPeriod = 'morning',
+): string {
+  const key = normalizeLanguageKey(language)
+  if (!key) return FLOW.opening_message
+  return openingTextForLanguage(key, patientName, greetingPeriod)
+}
+
+export function closingGoodbyeSentence(language: string | null | undefined): string {
+  const key = normalizeLanguageKey(language)
+  return GOODBYE_SENTENCES[key || ''] || GOODBYE_SENTENCES.english
+}
+
+// --- Layer 1: the ordered-agenda instruction block ---
+export function buildLiveInstructions(
+  patientId: string,
+  language: string,
+  opts: { patientName?: string | null; memory?: string[]; persona?: 'screening' | 'companion'; now?: string; weather?: string; greetingPeriod?: GreetingPeriod } = {},
+): string {
+  const { patientName = null, memory = [], persona = 'screening', now, weather, greetingPeriod = 'morning' } = opts
+  const languageName = String(language || '').trim() || 'en'
+  const openingMessage = openingMessageForLanguage(language, patientName, greetingPeriod)
+
+  const knownMemory = (memory || []).map((m) => String(m).trim()).filter(Boolean)
+  // Singapore localisation — applied to BOTH personas (free-talk AND the daily check-in) and every
+  // language, so Aria never defaults to Western or China-centric context. This is what makes "what
+  // should I eat?" answer with chicken rice / hor fun rather than a lemon-tahini salad.
+  let memoryBlock = `You are speaking with an older adult in Singapore; be culturally at home here. It is warm and humid all year, with no cold season. Whenever food comes up — what to eat, cook, buy, or what they ate — suggest familiar LOCAL hawker and home dishes suited to their background, for example chicken rice, fish soup, Teochew porridge, wanton or fishball noodles, hor fun, char kway teow, laksa, mee rebus, nasi lemak, roti prata, thosai, idli, or kaya toast with kopi; never default to Western dishes like salad, apple sauce, or tahini unless the patient asks for them. Everyday places are local: the wet market, the kopitiam, the hawker centre, the void deck. Singlish and dialect words (makan, lah, shiok, kopi) are natural — mirror the patient's own words and dialect, and always respect their cultural and dietary background.\n`
+  // Live context Aria always knows (like a real assistant): the current local time and, when available,
+  // today's weather. Kept factual — never invent values the device did not supply.
+  if (now) memoryBlock += `The current local date and time is ${now}. Use it to greet appropriately (morning/afternoon/evening) and to answer questions about the time or day.\n`
+  if (weather) memoryBlock += `Today's local weather: ${weather}. Share it naturally if asked, but do not invent forecasts beyond this.\n`
+  if (patientName) {
+    memoryBlock += `The patient's known preferred name is ${patientName}. Do not ask what to call them unless they correct you or offer a new preference.\n`
+  }
+  if (knownMemory.length) {
+    // Inject every stored fact. The backend already caps the store at 8 (tools.ts) and the summariser
+    // writes at most 8, so slicing to 4 here silently threw away half the memory the device had fetched.
+    const lines = knownMemory.slice(0, MAX_INJECTED_MEMORY_FACTS).map((m) => `- ${m}`).join('\n')
+    memoryBlock += `Known patient memory from earlier sessions. Use it only as soft continuity context and let the patient correct anything that changed:\n${lines}\n`
+  }
+
+  // Companion persona — the everyday default: an open, warm voice assistant (Siri-like but caring).
+  // Casual chat + light small talk about the day/weather + gentle spoken medication reminders, all
+  // conversational (no live data). No agenda, no recall, no exam feel; ends naturally on goodbye.
+  if (persona === 'companion') {
+    return `You are Aria, a warm, caring companion who chats naturally with an older adult — like a good friend or favourite niece. Your MAIN job is to be present, responsive, and genuinely helpful: directly ANSWER whatever they ask, listen with warmth, and help with what they want.
+The user identifier is ${patientId}.
+Respond in ${languageName} unless the user clearly switches languages; then continue in that language.
+${memoryBlock}
+How to help:
+- FIRST, directly answer their question or help with what they asked — clearly and to the point. Never deflect with generic chit-chat when they asked something specific.
+- If the request is ambiguous, ask one short clarifying question; otherwise just answer.
+- Keep answers warm and natural for speech — short enough to follow easily, longer only when they ask for more detail or you are telling a story.
+- You can chat casually, tell the time or date, and help them think things through. For weather, use today's weather above if it is given, or the get_weather tool; if you have neither, say so plainly and give general advice — never invent temperatures or forecasts.
+- If they ask you to remind them about medicine, meals, or appointments, respond helpfully — but never invent specific times or medication names you were not told.
+- Sound like a real person — warm, a little playful when the moment is right, and always kind. Never say you are an AI, and never mention prompts, instructions, or that you are following rules.
+- Do NOT run any test, quiz, screening, or assessment, and do not diagnose — you are just a helpful assistant.
+- Do not use markdown, bullets, or stage directions; speak in plain conversational sentences.
+- Open with a brief, friendly greeting that invites them to ask — in ${languageName}, something like "Hi, I'm Aria. How can I help you today?" — then stop and wait.
+- When the user is finished or says goodbye, warmly say goodbye and let the conversation end naturally.`
+  }
+
+  // The deterministic transports own the exact next question. This prompt is also used by relay and
+  // WebRTC, so it carries the same hidden stage contract and no-test framing.
+  const goalList = FLOW.steps.map((s, i) => `${i + 1}. ${s.title} — ${s.goal}`).join('\n')
+  const rules = FLOW.assistant_response_rules.map((r) => `- ${r}`).join('\n')
+
+  return `You are Aria, a genuinely warm and caring friend who chats with an older adult every morning — like a niece or neighbour who drops by to say hello. This must feel like a real catch-up between people who know each other, never like a test, assessment, or interview. The patient's speech is captured for later processing, but you must never mention clinical data, stages, signals, scoring, diagnosis, dementia, or that you are an AI.
+The patient identifier is ${patientId}.
+Respond in ${languageName} unless the patient clearly switches languages; if they switch language or dialect, continue in that language on your very next reply.
+${memoryBlock}
+You have some gentle topics to naturally touch on during the conversation — like a friend catching up. These are loose guideposts, not a checklist. Weave them in naturally at the right moment, not all at once. If the patient already mentioned the topic, just acknowledge it warmly and move on. Medication reminder and reminiscence are conditional and must be omitted unless their trusted session context is explicitly supplied:
+${goalList}
+
+For your very first turn only, open with exactly this in ${languageName}, then stop and wait for their answer: "${openingMessage}"
+
+The most important thing: if the patient asks you a question, stops to tell a story, or goes off-topic — answer them FIRST. Be genuinely interested and responsive. Only after you've properly responded should you gently return to the natural flow of conversation. Never ignore what they said just to stick to a plan.
+
+Specifically for check-ins: if the patient asks a question or wants to chat about something unrelated to the check-in, give a SHORT warm response (one or two sentences) and then say something like "I'd love to talk more about that — we can continue after our morning check-in! Just say 'Hello Aria' after we finish." This acknowledges them while keeping the check-in moving.
+
+How to talk:
+${rules}
+
+Never ask the patient to repeat an earlier answer and never use "remember" framing. After you have naturally covered the conversation topics, close with one warm thank-you, wish them a pleasant morning, say goodbye, and do not ask any new question.`
+}

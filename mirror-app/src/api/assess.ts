@@ -1,0 +1,137 @@
+import { qwenChat, qwenVisionChat, type QwenContentPart } from './qwenClient'
+import { QWEN, OMNI_JUDGMENT } from '../config/conversationMode'
+import type { ChatMessage } from '../hooks/conversationTypes'
+
+// Two-stage screening (shared shape with app/api/assess+api.ts). The scoring model NEVER sees the
+// pixels — Stage 1 (vision) turns frames into engagement/affect notes, Stage 2 (text) does the
+// classification from the transcript + those notes. This structurally enforces "classification
+// rests on the conversation", not just a prompt request.
+//
+// Stage 2 — classification (text only). Transcript is PRIMARY; visual observations are support only.
+export const SCREENING_SYSTEM = `You are a clinical screening assistant reviewing a short daily voice check-in between "Aria" (assistant) and a "Patient". This is a RESEARCH SCREENING AID, NOT a diagnosis.
+Assess cognitive signals from the transcript: orientation (person/place/time), short-term recall, narrative coherence & sequencing, word-finding/hesitation, and daily-function independence.
+You may also receive "Visual observations" (engagement/affect/alertness notes). Treat them ONLY as supporting context — they MUST NOT drive the classification, which must rest on the conversation. Never infer dementia from appearance or age.
+Be conservative: prefer "needs_observation" over "dementia" when evidence is weak; a normal chat should read "healthy".
+Return STRICT JSON only, no markdown, with this exact shape:
+{"risk_score": <0..1>, "risk_tier": "low|medium|high", "screening_classification": "healthy|needs_observation|dementia", "summary": "<2-3 sentences>", "findings": ["..."], "evidence_for_risk": ["..."], "evidence_against_risk": ["..."]}`
+
+// Stage 1 — vision. Engagement/affect ONLY; no diagnosis, age, or classification.
+export const VISION_OBS_SYSTEM = `You are given sampled video frames of a person during a short check-in. Describe ONLY their engagement, affect, alertness, and attentiveness as brief factual observations. Do NOT infer age, health, cognition, dementia, or any diagnosis from appearance. Return STRICT JSON only, no markdown: {"visual_observations": ["..."]}`
+
+// Bound the payload/cost of the multimodal call (matches the client-side sampler cap).
+export const MAX_ASSESS_FRAMES = 6
+
+export type ScreeningAssessment = {
+  risk_score: number | null
+  risk_tier: 'low' | 'medium' | 'high' | null
+  screening_classification: 'healthy' | 'needs_observation' | 'dementia' | null
+  summary: string
+  findings: string[]
+  evidence_for_risk: string[]
+  evidence_against_risk: string[]
+  visual_observations?: string[]
+}
+
+export type AssessResponse =
+  | { success: true; assessment: ScreeningAssessment }
+  | { success: false; reason: string }
+
+/** Build a "Aria:/Patient:" transcript from the chat messages (drops system lines). */
+export function transcriptFromMessages(messages: ChatMessage[]): string {
+  return messages
+    .filter((m) => m.role === 'assistant' || m.role === 'user')
+    .map((m) => `${m.role === 'assistant' ? 'Aria' : 'Patient'}: ${m.text.trim()}`)
+    .join('\n')
+}
+
+/**
+ * Developer-only screening preview. Production observations are computed by the backend pipeline
+ * from uploaded session evidence; the Mirror must never publish its own LLM label as clinical data.
+ * The preview still uses the active session's short-lived Qwen ticket, never an account API key.
+ */
+export async function assessConversation(
+  transcript: string,
+  language = 'en',
+  frames: string[] = [],
+): Promise<AssessResponse> {
+  void language
+  if (!__DEV__) return { success: false, reason: 'client_assessment_disabled' }
+  return assessDirect(transcript, frames.slice(-MAX_ASSESS_FRAMES))
+}
+
+async function assessDirect(transcript: string, frames: string[]): Promise<AssessResponse> {
+  // Stage 1 (vision): frames -> engagement/affect notes only. Failure degrades to text-only.
+  const visualObservations = frames.length > 0 ? await visualObservationsDirect(frames) : []
+  // Stage 2 (text): classification from transcript (+ notes as support). Transcript is PRIMARY.
+  try {
+    const userText = visualObservations.length
+      ? `Transcript:\n${transcript}\n\nVisual observations (supporting context only; do NOT let these drive the classification):\n${visualObservations.map((o) => `- ${o}`).join('\n')}`
+      : `Transcript:\n${transcript}`
+    const text = await qwenChat(
+      [
+        { role: 'system', content: SCREENING_SYSTEM },
+        { role: 'user', content: userText },
+      ],
+      { maxTokens: 700, temperature: 0.2 },
+    )
+    const match = text.match(/\{[\s\S]*\}/)
+    const assessment = JSON.parse(match ? match[0] : text) as ScreeningAssessment
+    assessment.visual_observations = visualObservations
+    return { success: true, assessment }
+  } catch (error) {
+    return { success: false, reason: error instanceof Error ? error.message : 'assess_failed' }
+  }
+}
+
+// Experimental: single omni model produces the WHOLE judgment (transcript + frames -> classification
+// + visual_observations) in ONE call, instead of the two-stage vl+plus split. Same output shape.
+const SCREENING_SYSTEM_OMNI = `${SCREENING_SYSTEM}
+You may also directly receive sampled video frames of the patient. Base the classification on the CONVERSATION; use anything you observe in the frames only as supporting engagement/affect context, and place those notes in a "visual_observations" array. Never infer dementia from appearance or age.
+Return STRICT JSON with the shape above plus an added "visual_observations": ["..."] field.`
+
+/**
+ * Experimental omni-first judgment: one multimodal call to an omni model (QWEN.omniModel). Falls
+ * back to the reliable two-stage pipeline via assessConversation() on ANY failure (see assessCheckin).
+ * Runs client-direct (frames go to DashScope) — intended for the standalone/kiosk build.
+ */
+export async function assessViaOmni(transcript: string, frames: string[] = []): Promise<AssessResponse> {
+  if (!__DEV__) return { success: false, reason: 'client_assessment_disabled' }
+  try {
+    const parts: QwenContentPart[] = [{ type: 'text', text: `Transcript of the check-in:\n${transcript}` }]
+    for (const url of frames.slice(-MAX_ASSESS_FRAMES)) parts.push({ type: 'image_url', image_url: { url } })
+    const text = await qwenVisionChat(SCREENING_SYSTEM_OMNI, parts, { model: QWEN.omniModel, maxTokens: 800, temperature: 0.2 })
+    const match = text.match(/\{[\s\S]*\}/)
+    const assessment = JSON.parse(match ? match[0] : text) as ScreeningAssessment
+    if (!assessment.visual_observations) assessment.visual_observations = []
+    return { success: true, assessment }
+  } catch (error) {
+    return { success: false, reason: error instanceof Error ? error.message : 'omni_assess_failed' }
+  }
+}
+
+/**
+ * Screening entry point used by the check-in screens. If OMNI_JUDGMENT is on, TRY the single-call
+ * omni judgment first (用户意图: 尝试让 omni 自己产出判断); on any failure fall back to the reliable
+ * two-stage qwen-vl-max + qwen-plus pipeline. If off, go straight to the two-stage pipeline.
+ */
+export async function assessCheckin(transcript: string, language = 'en', frames: string[] = []): Promise<AssessResponse> {
+  if (OMNI_JUDGMENT) {
+    const omni = await assessViaOmni(transcript, frames)
+    if (omni.success) return omni
+    // omni unavailable/invalid -> reliable path
+  }
+  return assessConversation(transcript, language, frames)
+}
+
+async function visualObservationsDirect(frames: string[]): Promise<string[]> {
+  try {
+    const parts: QwenContentPart[] = [{ type: 'text', text: 'Frames of the patient during the check-in follow.' }]
+    for (const url of frames) parts.push({ type: 'image_url', image_url: { url } })
+    const text = await qwenVisionChat(VISION_OBS_SYSTEM, parts, { maxTokens: 300, temperature: 0.2 })
+    const match = text.match(/\{[\s\S]*\}/)
+    const parsed = JSON.parse(match ? match[0] : text)
+    return Array.isArray(parsed?.visual_observations) ? parsed.visual_observations.map(String) : []
+  } catch {
+    return [] // vision unavailable -> transcript-only classification still proceeds
+  }
+}

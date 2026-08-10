@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Reflexion",
+    "slug": "reflexion",
+    "scheme": "reflexion",
+    "version": "1.0.7",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "updates": {
+      "url": "https://u.expo.dev/fadd4a42-857b-4d96-813f-ee13e762db8a"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.reflexion.caregiver",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Reflexion uses the camera so you can take a photo for an elderly profile.",
+        "NSPhotoLibraryUsageDescription": "Reflexion needs photo access so you can choose a photo for an elderly profile.",
+        "NSPhotoLibraryAddUsageDescription": "Reflexion may save a chosen profile photo to your library."
+      },
+      "buildNumber": "4"
+    },
+    "android": {
+      "allowBackup": false,
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.reflexion.caregiver",
+      "versionCode": 10
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-updates",
+      "expo-notifications",
+      "expo-image-picker",
+      "expo-camera"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "fadd4a42-857b-4d96-813f-ee13e762db8a"
+      }
+    }
+  }
+}

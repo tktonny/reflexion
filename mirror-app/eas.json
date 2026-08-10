@@ -1,0 +1,59 @@
+{
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "mirror-staging": {
+      "distribution": "internal",
+      "channel": "mirror-staging",
+      "environment": "preview",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "EXPO_PUBLIC_API_BASE": "https://reflexion.production.tktonny.top",
+        "EXPO_PUBLIC_ENABLE_INSTALLER_SETUP": "true"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "EXPO_PUBLIC_API_BASE": "https://reflexion.production.tktonny.top",
+        "EXPO_PUBLIC_ENABLE_INSTALLER_SETUP": "true",
+        "EXPO_PUBLIC_CONVERSATION_MODE": "http"
+      }
+    },
+    "release-apk": {
+      "channel": "main",
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": {
+        "EXPO_PUBLIC_API_BASE": "https://reflexion.production.tktonny.top",
+        "EXPO_PUBLIC_ENABLE_INSTALLER_SETUP": "true",
+        "EXPO_PUBLIC_CONVERSATION_MODE": "ws",
+        "EXPO_PUBLIC_BARGEIN": "off",
+        "EXPO_PUBLIC_AUDIO_COMM_MODE": "false"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": { "buildType": "app-bundle" },
+      "env": {
+        "EXPO_PUBLIC_API_BASE": "https://reflexion.production.tktonny.top",
+        "EXPO_PUBLIC_ENABLE_INSTALLER_SETUP": "false",
+        "EXPO_PUBLIC_CONVERSATION_MODE": "ws",
+        "EXPO_PUBLIC_BARGEIN": "off"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

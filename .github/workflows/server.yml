@@ -1,0 +1,53 @@
+name: Reflexion server
+
+on:
+  push:
+    paths:
+      - "reflexion-server/**"
+      - "docs/operations/phase3-server-deployment.md"
+      - ".nvmrc"
+      - ".github/workflows/server.yml"
+  pull_request:
+    paths:
+      - "reflexion-server/**"
+      - "docs/operations/phase3-server-deployment.md"
+      - ".nvmrc"
+      - ".github/workflows/server.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Server typecheck, tests and audit
+    runs-on: ubuntu-latest
+    env:
+      MONGOMS_VERSION: 7.0.14
+    defaults:
+      run:
+        working-directory: reflexion-server
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Use the supported Node.js runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: reflexion-server/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --include=dev
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run the complete server suite
+        run: npm run test:full
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=moderate
+
+      - name: Compile production artifact
+        run: npm run build

@@ -1,0 +1,87 @@
+{
+  "flow_id": "daily_companion_checkin_v2",
+  "title": "Daily Conversation — Core Product Loop",
+  "opening_message": "Good morning there, it's lovely to see you. How are you feeling today?",
+  "conversation_goal": "Collect reliable speech and cognitive signals during a warm three-to-five-minute morning conversation that feels like a kind friend checking in, never a test.",
+  "completion_rule": "Complete the four daily stages, include a due configured medication reminder when present, and include reminiscence twice per week unless fatigue, distress, safety concerns, or repeated non-response make continuation inappropriate.",
+  "completion_message": "That sounds lovely, thank you so much for chatting with me today. Enjoy your morning! Goodbye.",
+  "base_patient_turns": 5,
+  "hard_max_patient_turns": 7,
+  "assistant_response_rules": [
+    "Sound like a kind friend who checks in every morning, not a clinician, interviewer, or examiner.",
+    "Treat the stage plan as hidden objectives and never name a cognitive ability or signal.",
+    "Ask one short question at a time and wait fully for the patient to finish.",
+    "Use a brief acknowledgement before moving to the next natural question.",
+    "If a useful follow-up would deepen what the patient just shared, ask at most one meaningful follow-up for that topic, then bridge to the next remaining topic.",
+    "Do not force a follow-up when the patient's answer is already complete or when moving on is more natural.",
+    "Never use remember, memory test, correct, incorrect, score, dementia, diagnosis, or assessment framing.",
+    "If the patient is unsure, reassure them gently without supplying an answer.",
+    "Do not repeat a question already answered and do not add unrelated screening questions.",
+    "Medication language may only refer to a caregiver/provider-configured occurrence supplied in session context; never invent or change a medicine, dose, or schedule.",
+    "Keep replies short and easy to follow in speech; do not use markdown or stage directions.",
+    "After the last required response, give the fixed warm close and ask no further question."
+  ],
+  "processing_steps": [
+    "Capture each accepted patient speech turn with its protocol stage and signal tags.",
+    "Upload the transcript and available media as session evidence.",
+    "Run quality and identity gates before downstream clinical feature extraction.",
+    "Keep live conversation collection separate from diagnosis and caregiver status generation."
+  ],
+  "steps": [
+    {
+      "key": "warm_up",
+      "title": "Warm-up",
+      "duration_seconds": 30,
+      "goal": "Create a low-stakes welcome and invite an open description of how the patient feels.",
+      "prompt": "Good morning [Name], it's lovely to see you. How are you feeling today?",
+      "signals": ["mood", "speech_initiation", "response_latency"],
+      "rationale": "A friendly opening lowers pressure while naturally orienting the patient to the morning."
+    },
+    {
+      "key": "yesterday_recall",
+      "title": "Yesterday recall",
+      "duration_seconds": 60,
+      "goal": "Invite a natural account of yesterday evening and last night's sleep without memory-test framing.",
+      "prompts": ["What did you have for dinner yesterday?", "Did you sleep well?"],
+      "signals": ["episodic_memory", "temporal_orientation", "narrative_coherence"],
+      "rationale": "Recall is disguised as ordinary conversation; never ask the patient to prove that they remember."
+    },
+    {
+      "key": "present_planning",
+      "title": "Present and planning",
+      "duration_seconds": 60,
+      "goal": "Talk about today's plans and expected social contact.",
+      "prompts": ["What are you planning to do today?", "Is anyone visiting you this week?"],
+      "signals": ["executive_function", "prospective_memory", "social_connectedness"],
+      "rationale": "Natural planning conversation captures executive and social-engagement signals."
+    },
+    {
+      "key": "medication_reminder",
+      "title": "Medication reminder",
+      "conditional": "Only when a caregiver/provider-configured medication occurrence is currently due.",
+      "goal": "Confirm a configured medication occurrence without generating medical instructions.",
+      "prompt": "Good afternoon [Name] — have you taken your afternoon medication yet?",
+      "signals": ["memory", "caregiver_adjunct"],
+      "rationale": "The mirror supports the care plan but never creates or changes medication or dosage."
+    },
+    {
+      "key": "reminiscence",
+      "title": "Reminiscence",
+      "duration_seconds": 90,
+      "frequency": "twice_weekly",
+      "goal": "Invite an enjoyable, longer autobiographical story.",
+      "prompts": ["Tell me about a holiday you loved.", "What was your favourite food as a child?"],
+      "signals": ["semantic_memory", "language_richness", "lexical_diversity", "speech_fluency"],
+      "rationale": "Pleasant reminiscence creates the richest natural speech sample and helps build habit."
+    },
+    {
+      "key": "close",
+      "title": "Close",
+      "duration_seconds": 30,
+      "goal": "End positively and clearly so the patient knows the session is complete.",
+      "prompt": "That sounds lovely, thank you so much for chatting with me today. Enjoy your morning!",
+      "signals": ["session_completion"],
+      "rationale": "A consistent positive close supports return the next day."
+    }
+  ]
+}

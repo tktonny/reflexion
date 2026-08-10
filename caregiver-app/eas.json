@@ -1,0 +1,46 @@
+{
+  "cli": {
+    "version": ">= 20.1.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "node": "24.18.0",
+      "env": {
+        "EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL": "https://reflexion.production.tktonny.top"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "node": "24.18.0",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL": "https://reflexion.production.tktonny.top"
+      }
+    },
+    "release-apk": {
+      "distribution": "internal",
+      "node": "24.18.0",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL": "https://reflexion.production.tktonny.top"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "node": "24.18.0",
+      "env": {
+        "EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL": "https://reflexion.production.tktonny.top"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

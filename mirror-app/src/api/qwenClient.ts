@@ -1,0 +1,142 @@
+// Direct DashScope/Qwen HTTP calls for the on-device turn-based version (v2 / Flavor B).
+// Request/response shapes VERIFIED live against dashscope.aliyuncs.com (China region)
+// via server/smoke-turnbased.mjs: chat=qwen-plus, tts=qwen-tts, asr=qwen3-asr-flash.
+
+import { QWEN } from '../config/conversationMode'
+import { secureQwenAssetUrl } from '../orchestration/networkSecurity'
+import { getBearer, getQwenHttpBase, getQwenHttpModel } from './qwenToken'
+
+/** Region host root for HTTP calls: the active ticket's httpBase (set by the backend per the device's
+ *  region) once a ticket exists, else the build-time default. Read only AFTER getBearer() has resolved. */
+function qwenHttpBase(): string {
+  return getQwenHttpBase() || QWEN.base
+}
+
+export type QwenChatMessage = { role: 'system' | 'user' | 'assistant'; content: string }
+export type QwenContentPart =
+  | { type: 'text'; text: string }
+  | { type: 'image_url'; image_url: { url: string } }
+
+async function authHeaders(apiKey?: string) {
+  const key = apiKey || (await getBearer())
+  return { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }
+}
+
+/** fetch that always settles: aborts after `ms` so callers can't hang indefinitely. */
+export async function fetchWithTimeout(url: string, init: RequestInit, ms = 45000): Promise<Response> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), ms)
+  try {
+    return await fetch(url, { ...init, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/**
+ * Multimodal chat (text + images) for the video-batch screening. `parts` is the user message
+ * content array (text + image_url data URLs). Uses the vision model (qwen-vl-max). Verified live
+ * via server/smoke-vision.mjs. Returns the assistant reply text.
+ */
+export async function qwenVisionChat(
+  system: string,
+  parts: QwenContentPart[],
+  opts: { apiKey?: string; model?: string; maxTokens?: number; temperature?: number } = {},
+): Promise<string> {
+  const headers = await authHeaders(opts.apiKey)
+  const res = await fetchWithTimeout(`${qwenHttpBase()}/compatible-mode/v1/chat/completions`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model: opts.model || getQwenHttpModel('vision') || QWEN.visionModel,
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: parts },
+      ],
+      max_tokens: opts.maxTokens ?? 700,
+      temperature: opts.temperature ?? 0.2,
+    }),
+  })
+  const body = await res.json()
+  if (!res.ok) throw new Error(`qwen vision ${res.status}: ${JSON.stringify(body).slice(0, 200)}`)
+  return String(body?.choices?.[0]?.message?.content ?? '').trim()
+}
+
+/** LLM chat turn (OpenAI-compatible endpoint). Returns the assistant reply text. */
+export async function qwenChat(
+  messages: QwenChatMessage[],
+  opts: { apiKey?: string; model?: string; maxTokens?: number; temperature?: number } = {},
+): Promise<string> {
+  const headers = await authHeaders(opts.apiKey)
+  const res = await fetchWithTimeout(`${qwenHttpBase()}/compatible-mode/v1/chat/completions`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model: opts.model || getQwenHttpModel('chat') || QWEN.chatModel,
+      messages,
+      max_tokens: opts.maxTokens ?? 120,
+      temperature: opts.temperature ?? 0.4,
+    }),
+  })
+  const body = await res.json()
+  if (!res.ok) throw new Error(`qwen chat ${res.status}: ${JSON.stringify(body).slice(0, 200)}`)
+  return String(body?.choices?.[0]?.message?.content ?? '').trim()
+}
+
+/** Text-to-speech. Returns base64 audio (preferred for web playback) and/or a URL. */
+export async function qwenTTS(
+  text: string,
+  opts: { apiKey?: string; model?: string; voice?: string; rate?: number } = {},
+): Promise<{ audioBase64: string | null; url: string | null; format: 'wav' }> {
+  // Aria's default speech is deliberately slow (doc: 0.85×) for elderly listeners. `rate` is sent
+  // best-effort: the current Qwen multimodal-TTS endpoint may ignore it, but plumbing it end-to-end
+  // means a rate-capable engine (or a future Qwen param) needs no code change, and the value is
+  // per-patient configurable. Clamp to a safe, intelligible band.
+  const rate = typeof opts.rate === 'number' && Number.isFinite(opts.rate) ? Math.min(Math.max(opts.rate, 0.5), 1.5) : undefined
+  const input: Record<string, unknown> = { text, voice: opts.voice || QWEN.defaultVoice }
+  if (rate !== undefined && rate !== 1) input.rate = rate
+  const headers = await authHeaders(opts.apiKey)
+  const res = await fetchWithTimeout(`${qwenHttpBase()}/api/v1/services/aigc/multimodal-generation/generation`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model: opts.model || getQwenHttpModel('tts') || QWEN.ttsModel,
+      input,
+    }),
+  })
+  const body = await res.json()
+  if (!res.ok) throw new Error(`qwen tts ${res.status}: ${JSON.stringify(body).slice(0, 200)}`)
+  const audio = body?.output?.audio ?? {}
+  return {
+    audioBase64: typeof audio.data === 'string' ? audio.data : null,
+    url: secureQwenAssetUrl(audio.url),
+    format: 'wav',
+  }
+}
+
+/**
+ * Speech-to-text. `audioBase64` = base64 of an audio clip.
+ * `format` (e.g. 'wav' | 'm4a' | 'mp3') is passed through when provided; web sends WAV
+ * (no format, verified working), native sends m4a with format.
+ */
+export async function qwenASR(
+  audioBase64: string,
+  opts: { apiKey?: string; model?: string; format?: string } = {},
+): Promise<string> {
+  const inputAudio: Record<string, string> = { data: `data:;base64,${audioBase64}` }
+  if (opts.format) inputAudio.format = opts.format
+  const headers = await authHeaders(opts.apiKey)
+  const res = await fetchWithTimeout(`${qwenHttpBase()}/compatible-mode/v1/chat/completions`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model: opts.model || getQwenHttpModel('asr') || QWEN.asrModel,
+      messages: [
+        { role: 'user', content: [{ type: 'input_audio', input_audio: inputAudio }] },
+      ],
+    }),
+  })
+  const body = await res.json()
+  if (!res.ok) throw new Error(`qwen asr ${res.status}: ${JSON.stringify(body).slice(0, 200)}`)
+  return String(body?.choices?.[0]?.message?.content ?? '').trim()
+}

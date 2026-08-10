@@ -1,0 +1,92 @@
+# --- global ---
+.DS_Store
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.venv/
+*.keystore
+*.jks
+*.p12
+.env
+.env.local
+.vscode/
+
+# Local dependency/build caches and generated outputs from either native app.
+**/node_modules/
+**/.gradle-cache/
+**/.gradle/
+**/.cxx/
+**/build/
+**/dist/
+**/dist-apks/
+**/dist-linux/
+
+# --- platform/ (April Python clinic platform) ---
+_archived/.secret/
+_archived/output/
+_archived/data/uploads/
+_archived/data/prepared/
+_archived/data/assessments/
+_archived/data/sample_videos/
+_archived/data/**/*.mp4
+_archived/data/**/*.MP4
+_archived/data/**/*.webm
+_archived/data/**/*.mov
+_archived/data/**/*.MOV
+_archived/data/**/*.avi
+_archived/data/**/*.mkv
+_archived/clinic/tests/output/
+_archived/verification/data/*
+!_archived/verification/data/.gitkeep
+_archived/verification/results/*
+!_archived/verification/results/.gitkeep
+_archived/verification/**/*.mp4
+_archived/verification/**/*.MP4
+_archived/verification/**/*.webm
+_archived/verification/**/*.mov
+_archived/verification/**/*.MOV
+_archived/verification/**/*.avi
+_archived/verification/**/*.mkv
+_archived/verification/**/*.mp3
+_archived/verification/**/*.wav
+
+# --- mirror-app/ (Expo/RN mirror device app) ---
+mirror-app/node_modules/
+mirror-app/.expo/
+mirror-app/dist/
+mirror-app/android/
+mirror-app/ios/
+
+# --- caregiver-app/ (Expo/RN) + reflexion-server/ (Express) ---
+# No trailing slash: ignore node_modules whether it is a real directory OR a symlink
+# (a symlink form slipped past the dir-only pattern and got committed once — see git history).
+caregiver-app/node_modules
+caregiver-app/.expo/
+caregiver-app/dist/
+reflexion-server/node_modules
+reflexion-server/dist/
+mirror-app/server/generated/
+
+# Office lock/temp files
+~$*
+
+# Wake-word training data artifacts (downloaded datasets / generated clips / venv / vendored generator)
+mirror-app/wakeword-training/*.zip
+mirror-app/wakeword-training/*.bin
+mirror-app/wakeword-training/mit_raw/
+mirror-app/wakeword-training/mit_rirs/
+mirror-app/wakeword-training/local_clips/
+mirror-app/wakeword-training/pf_test/
+mirror-app/wakeword-training/pf_test2/
+mirror-app/wakeword-training/piper-sample-generator/
+mirror-app/wakeword-training/.venv/
+mirror-app/wakeword-training/output/
+
+# local scratch
+/tmp/
+
+# local .env backups (e.g. from re-formatting) — never commit
+.env.backup
+.env.*.backup
+.env.bak

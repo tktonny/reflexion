@@ -1,0 +1,290 @@
+import { Ionicons } from '@expo/vector-icons'
+import { CameraView, useCameraPermissions } from 'expo-camera'
+import { router } from 'expo-router'
+import { useEffect, useState } from 'react'
+import { Alert, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import {
+  clearDeviceCredential,
+  getBootstrapCredential,
+  getDeviceCredential,
+  persistBootstrapCredential,
+} from '../src/storage/deviceCredentials'
+
+type DeviceStatus = {
+  deviceId: string
+  provisioned: boolean
+  paired: boolean
+  patientId: string
+  accessExpiresAt: string
+}
+
+const EMPTY_STATUS: DeviceStatus = {
+  deviceId: 'None',
+  provisioned: false,
+  paired: false,
+  patientId: 'None',
+  accessExpiresAt: 'None',
+}
+
+const INSTALLER_SETUP_ENABLED = __DEV__ || process.env.EXPO_PUBLIC_ENABLE_INSTALLER_SETUP === 'true'
+
+/** Internal installer diagnostics. Production builds keep credential import disabled. */
+export default function TestDeviceScreen() {
+  const [status, setStatus] = useState<DeviceStatus>(EMPTY_STATUS)
+  const [clearing, setClearing] = useState(false)
+  const [bootstrapToken, setBootstrapToken] = useState('')
+  const [importing, setImporting] = useState(false)
+  const [importError, setImportError] = useState('')
+  const [scanning, setScanning] = useState(false)
+  const [permission, requestPermission] = useCameraPermissions()
+
+  useEffect(() => { void loadStatus() }, [])
+
+  async function loadStatus() {
+    const [bootstrap, credential] = await Promise.all([
+      getBootstrapCredential(),
+      getDeviceCredential(),
+    ])
+    setStatus({
+      deviceId: credential?.deviceId || bootstrap?.deviceId || 'None',
+      provisioned: Boolean(bootstrap),
+      paired: Boolean(credential),
+      patientId: credential?.patientId || 'None',
+      accessExpiresAt: credential?.accessTokenExpiresAt || 'None',
+    })
+  }
+
+  async function restartPairing() {
+    setClearing(true)
+    try {
+      await clearDeviceCredential({ preserveBootstrap: true })
+      router.replace('/')
+    } finally {
+      setClearing(false)
+    }
+  }
+
+  async function importBootstrapCredential(tokenOverride?: string) {
+    if (!INSTALLER_SETUP_ENABLED || importing) return
+    const token = (tokenOverride ?? bootstrapToken).trim()
+    if (!token) return
+    setImporting(true)
+    setImportError('')
+    try {
+      await persistBootstrapCredential(token)
+      setBootstrapToken('')
+      router.replace('/')
+    } catch (error) {
+      const code = error instanceof Error ? error.message : ''
+      setImportError(code === 'bootstrap_token_expired'
+        ? 'This credential has expired. Generate a new one on the server.'
+        : 'This is not a valid Reflexion device bootstrap credential.')
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  // Enrollment QR payload: a raw bootstrap token, or JSON { bootstrapToken } / { token }.
+  function extractBootstrapToken(data: string): string {
+    const raw = data.trim()
+    try {
+      const parsed = JSON.parse(raw)
+      if (parsed && typeof parsed === 'object') {
+        return String((parsed as Record<string, unknown>).bootstrapToken || (parsed as Record<string, unknown>).token || '').trim()
+      }
+    } catch {}
+    return raw
+  }
+
+  async function openScanner() {
+    if (!INSTALLER_SETUP_ENABLED) return
+    if (!permission?.granted) {
+      const res = await requestPermission()
+      if (!res.granted) { setImportError('Camera permission is required to scan the enrollment QR.'); return }
+    }
+    setImportError('')
+    setScanning(true)
+  }
+
+  function onBarcodeScanned(result: { data: string }) {
+    if (!scanning) return
+    setScanning(false)
+    const token = extractBootstrapToken(result.data)
+    if (!token) { setImportError('That QR did not contain a bootstrap credential.'); return }
+    setBootstrapToken(token)
+    void importBootstrapCredential(token)
+  }
+
+  function confirmRestart() {
+    Alert.alert(
+      'Restart pairing?',
+      'This clears this device’s local access and refresh credentials. The server provisioning identity is preserved.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Restart', style: 'destructive', onPress: () => void restartPairing() },
+      ],
+    )
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.stage}>
+        <View style={styles.card}>
+          <View style={styles.iconWrap}>
+            <Ionicons name="hardware-chip-outline" size={38} color={colors.goldDark} />
+          </View>
+          <Text style={styles.title}>Device identity</Text>
+          <Text style={styles.note}>
+            Identity is issued by the backend during provisioning. A credential entered here is encrypted by Android SecureStore and is used only to begin Pairing v2.
+          </Text>
+
+          {INSTALLER_SETUP_ENABLED ? (
+            <View style={styles.importBlock}>
+              <Text style={styles.label}>Installer bootstrap credential</Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                onChangeText={setBootstrapToken}
+                placeholder="Paste the credential generated by provision:device"
+                placeholderTextColor={colors.taupe}
+                secureTextEntry
+                style={styles.tokenInput}
+                value={bootstrapToken}
+              />
+              {importError ? <Text style={styles.errorText}>{importError}</Text> : null}
+              <Pressable
+                disabled={importing || !bootstrapToken.trim()}
+                onPress={() => void importBootstrapCredential()}
+                style={[styles.importButton, (importing || !bootstrapToken.trim()) && styles.disabledButton]}
+              >
+                <Text style={styles.importButtonText}>{importing ? 'Importing…' : 'Import and start pairing'}</Text>
+              </Pressable>
+              <Pressable
+                disabled={importing}
+                onPress={() => void openScanner()}
+                style={[styles.scanButton, importing && styles.disabledButton]}
+              >
+                <Ionicons name="qr-code-outline" size={18} color={colors.goldDark} />
+                <Text style={styles.scanButtonText}>Scan enrollment QR</Text>
+              </Pressable>
+            </View>
+          ) : null}
+
+          <StatusRow label="Device ID" value={status.deviceId} />
+          <StatusRow label="Provisioned" value={status.provisioned ? 'Yes' : 'No'} />
+          <StatusRow label="Paired" value={status.paired ? 'Yes' : 'No'} />
+          <StatusRow label="Patient ID" value={status.patientId} />
+          <StatusRow label="Access expires" value={status.accessExpiresAt} />
+
+          <Pressable
+            disabled={clearing || !status.provisioned}
+            onPress={confirmRestart}
+            style={[styles.primaryButton, (clearing || !status.provisioned) && styles.disabledButton]}
+          >
+            <Text style={styles.primaryButtonText}>{clearing ? 'Clearing…' : 'Clear pairing and restart'}</Text>
+          </Pressable>
+
+          <Pressable onPress={() => router.replace('/')} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={18} color={colors.secondary} />
+            <Text style={styles.backButtonText}>Back</Text>
+          </Pressable>
+        </View>
+      </View>
+      <Modal visible={scanning} animationType="slide" onRequestClose={() => setScanning(false)}>
+        <View style={styles.scannerWrap}>
+          <CameraView
+            style={StyleSheet.absoluteFill}
+            facing="back"
+            barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+            onBarcodeScanned={onBarcodeScanned}
+          />
+          <View style={styles.scannerOverlay}>
+            <Text style={styles.scannerHint}>Point the camera at the device enrollment QR</Text>
+            <Pressable onPress={() => setScanning(false)} style={styles.scannerCancel}>
+              <Text style={styles.scannerCancelText}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  )
+}
+
+function StatusRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.currentBlock}>
+      <Text style={styles.label}>{label}</Text>
+      <Text selectable style={styles.currentValue}>{value}</Text>
+    </View>
+  )
+}
+
+const colors = {
+  background: '#FFF9F1',
+  card: '#FFFBF4',
+  line: '#F1E5D2',
+  goldDark: '#C89755',
+  taupe: '#BBAFA0',
+  text: '#282828',
+  secondary: '#686868',
+}
+
+const styles = StyleSheet.create({
+  safeArea: { backgroundColor: colors.background, flex: 1 },
+  stage: { alignItems: 'center', backgroundColor: colors.background, flex: 1, justifyContent: 'center', padding: 18 },
+  card: {
+    alignItems: 'stretch', backgroundColor: colors.card, borderColor: colors.line, borderRadius: 8,
+    borderWidth: 1, gap: 14, maxWidth: 430, padding: 28, shadowColor: '#D8C6A8',
+    shadowOffset: { height: 10, width: 0 }, shadowOpacity: 0.22, shadowRadius: 22, width: '100%',
+  },
+  iconWrap: {
+    alignItems: 'center', alignSelf: 'center', backgroundColor: '#FFF2DF', borderRadius: 36,
+    height: 72, justifyContent: 'center', width: 72,
+  },
+  title: { color: colors.text, fontSize: 30, fontWeight: '900', textAlign: 'center' },
+  note: { color: colors.secondary, fontSize: 16, fontWeight: '700', lineHeight: 23, textAlign: 'center' },
+  currentBlock: {
+    backgroundColor: '#FFF6EA', borderColor: colors.line, borderRadius: 8, borderWidth: 1, gap: 6, padding: 12,
+  },
+  importBlock: {
+    backgroundColor: '#FFF6EA', borderColor: colors.line, borderRadius: 8, borderWidth: 1, gap: 10, padding: 12,
+  },
+  tokenInput: {
+    backgroundColor: '#FFFFFF', borderColor: colors.line, borderRadius: 8, borderWidth: 1,
+    color: colors.text, fontSize: 14, minHeight: 48, paddingHorizontal: 12,
+  },
+  importButton: {
+    alignItems: 'center', backgroundColor: colors.goldDark, borderRadius: 8, justifyContent: 'center', minHeight: 46,
+  },
+  importButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
+  scanButton: {
+    alignItems: 'center', backgroundColor: '#FFFFFF', borderColor: colors.goldDark, borderRadius: 8,
+    borderWidth: 1, flexDirection: 'row', gap: 8, justifyContent: 'center', minHeight: 44,
+  },
+  scanButtonText: { color: colors.goldDark, fontSize: 14, fontWeight: '900' },
+  scannerWrap: { backgroundColor: '#000000', flex: 1 },
+  scannerOverlay: { alignItems: 'center', bottom: 48, gap: 16, left: 0, position: 'absolute', right: 0 },
+  scannerHint: {
+    backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 8, color: '#FFFFFF', fontSize: 15,
+    fontWeight: '800', overflow: 'hidden', paddingHorizontal: 14, paddingVertical: 8,
+  },
+  scannerCancel: { backgroundColor: '#FFFFFF', borderRadius: 8, paddingHorizontal: 28, paddingVertical: 12 },
+  scannerCancelText: { color: colors.text, fontSize: 15, fontWeight: '900' },
+  errorText: { color: '#CC766E', fontSize: 13, fontWeight: '700', lineHeight: 18 },
+  label: { color: colors.secondary, fontSize: 12, fontWeight: '900', textTransform: 'uppercase' },
+  currentValue: {
+    color: colors.text, fontFamily: Platform.select({ web: 'monospace', default: undefined }),
+    fontSize: 14, fontWeight: '800',
+  },
+  primaryButton: {
+    alignItems: 'center', backgroundColor: colors.goldDark, borderRadius: 8, justifyContent: 'center', minHeight: 48,
+  },
+  primaryButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '900' },
+  disabledButton: { opacity: 0.48 },
+  backButton: {
+    alignItems: 'center', alignSelf: 'center', flexDirection: 'row', gap: 8, justifyContent: 'center', paddingVertical: 6,
+  },
+  backButtonText: { color: colors.secondary, fontSize: 15, fontWeight: '800' },
+})

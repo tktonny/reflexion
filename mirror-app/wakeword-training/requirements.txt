@@ -1,0 +1,14 @@
+# openWakeWord automatic training toolchain (pin around Python 3.10).
+# If a version resolves poorly on your machine, follow the official notebook
+# (openwakeword/notebooks/automatic_model_training.ipynb) which is the authoritative flow.
+openwakeword==0.6.0
+piper-tts==1.2.0
+onnx==1.16.1
+onnxruntime==1.18.1
+torch==2.3.1
+numpy==1.26.4
+scipy==1.13.1
+tqdm==4.66.4
+pyyaml==6.0.1
+datasets==2.20.0
+soundfile==0.12.1
