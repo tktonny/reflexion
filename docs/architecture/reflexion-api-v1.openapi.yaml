@@ -333,9 +333,11 @@ paths:
       tags: [Devices]
       summary: Create Device Pairing
       operationId: createDevicePairing
-      description: Create a short-lived pairing code from an installed device.
+      description: Create a short-lived pairing session. A fresh mirror registers its locally generated identity on first use; the legacy factory bootstrap credential remains supported for existing fleets.
       security:
         - deviceBootstrap: []
+        - deviceLocalId: []
+          deviceInstallSecret: []
       parameters:
         - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
@@ -367,6 +369,8 @@ paths:
       operationId: getDevicePairing
       security:
         - deviceBootstrap: []
+        - deviceLocalId: []
+          deviceInstallSecret: []
       parameters:
         - name: pairingId
           in: path
@@ -404,11 +408,19 @@ paths:
           application/json:
             schema:
               type: object
-              required: [pairingCode, patientId]
+              required: [patientId]
+              anyOf:
+                - required: [pairingCode]
+                - required: [pairingToken]
               properties:
                 pairingCode:
                   type: string
                   pattern: "^[0-9]{6}$"
+                  description: Six-digit manual fallback. It is short-lived and single-use.
+                pairingToken:
+                  type: string
+                  writeOnly: true
+                  description: Short-lived single-use token from the mirror QR code.
                 patientId:
                   type: string
                 mirrorName:
@@ -437,6 +449,10 @@ paths:
       operationId: exchangeDeviceCredential
       security:
         - deviceBootstrap: []
+        - deviceLocalId: []
+          deviceInstallSecret: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -1488,7 +1504,17 @@ components:
       type: apiKey
       in: header
       name: X-Device-Bootstrap
-      description: Installation credential used only before device pairing.
+      description: Legacy factory installation credential used only before device pairing.
+    deviceLocalId:
+      type: apiKey
+      in: header
+      name: X-Device-Id
+      description: Stable locally generated mirror identity, stored in platform secure storage.
+    deviceInstallSecret:
+      type: apiKey
+      in: header
+      name: X-Device-Install-Secret
+      description: Installation secret paired with X-Device-Id and stored in platform secure storage; never displayed or encoded in the QR payload.
 
   parameters:
     PatientId:
@@ -1691,13 +1717,19 @@ components:
           type: string
     PairingSession:
       type: object
-      required: [pairingId, displayCode, state, expiresAt]
+      required: [deviceId, pairingId, displayCode, pairingToken, state, expiresAt]
       properties:
+        deviceId:
+          type: string
         pairingId:
           type: string
         displayCode:
           type: string
           pattern: "^[0-9]{6}$"
+        pairingToken:
+          type: string
+          writeOnly: true
+          description: Short-lived single-use QR token. It is not a permanent device credential.
         state:
           type: string
           enum: [pending]

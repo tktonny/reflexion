@@ -19,6 +19,10 @@ const USER_ID = 'usr_phase3_caregiver'
 const PATIENT_ID = 'pat_phase3_primary'
 const NO_CONSENT_PATIENT_ID = 'pat_phase3_no_consent'
 const DEVICE_ID = 'dev_phase3_mirror'
+const LOCAL_DEVICE_ID = 'dev_phase3_local_new'
+const LOCAL_DEVICE_SECRET = 'local-install-secret-phase3-000000000000000000000000'
+const EXPIRED_DEVICE_ID = 'dev_phase3_expired_new'
+const EXPIRED_DEVICE_SECRET = 'expired-install-secret-phase3-000000000000000000'
 const SERIAL_HASH = sha256('RF-MIRROR-PHASE3-0001')
 const ARTIFACT_HASH = sha256('phase3-image-bytes')
 const ARTIFACT_SIZE = 128
@@ -226,6 +230,115 @@ test('Phase 3 API works end-to-end across auth, pairing, session ingestion and t
         .set(bootstrapHeader)
         .expect(200)
       assert.equal(polledAfterExchange.body.data.exchangeTicket, undefined)
+    })
+
+    await t.test('fresh mirrors self-register, claim by QR token, and recover credential delivery idempotently', async () => {
+      const localHeaders = { 'X-Device-Id': LOCAL_DEVICE_ID, 'X-Device-Install-Secret': LOCAL_DEVICE_SECRET }
+      const pairingBody = { hardwareRevision: 'mirror-v2', softwareVersion: '2.0.0', timezone: 'Asia/Singapore' }
+      const pairingKey = idempotencyKey('local-pairing')
+      const pairing = await app.post('/api/v1/device-pairings')
+        .set({ ...localHeaders, 'Idempotency-Key': pairingKey })
+        .send(pairingBody)
+        .expect(201)
+      const pairingData = pairing.body.data
+      assert.equal(pairingData.deviceId, LOCAL_DEVICE_ID)
+      assert.match(pairingData.displayCode, /^\d{6}$/)
+      assert.ok(pairingData.pairingToken)
+      assert.equal(pairingData.accessToken, undefined, 'the pairing response must not contain a permanent credential')
+      assert.equal(await db.collection(collections.credentials).countDocuments({ deviceId: LOCAL_DEVICE_ID }), 0)
+
+      const replay = await app.post('/api/v1/device-pairings')
+        .set({ ...localHeaders, 'Idempotency-Key': pairingKey })
+        .send(pairingBody)
+        .expect(201)
+      assert.deepEqual(replay.body.data, pairingData)
+
+      const claimBody = { pairingToken: pairingData.pairingToken, patientId: NO_CONSENT_PATIENT_ID }
+      const claimKey = idempotencyKey('local-claim')
+      const claim = await app.post('/api/v1/device-pairing-claims')
+        .set({ ...bearer(humanAccessToken), 'Idempotency-Key': claimKey })
+        .send(claimBody)
+        .expect(200)
+      assert.equal(claim.body.data.deviceId, LOCAL_DEVICE_ID)
+      assert.equal(await db.collection(collections.assignments).countDocuments({ deviceId: LOCAL_DEVICE_ID, status: 'active' }), 1)
+      assert.equal(await db.collection(collections.credentials).countDocuments({ deviceId: LOCAL_DEVICE_ID, status: 'active' }), 1, 'claim and permanent credential issuance must commit together')
+
+      const claimReplay = await app.post('/api/v1/device-pairing-claims')
+        .set({ ...bearer(humanAccessToken), 'Idempotency-Key': claimKey })
+        .send(claimBody)
+        .expect(200)
+      assert.equal(claimReplay.body.data.assignmentId, claim.body.data.assignmentId)
+
+      const paired = await app.get(`/api/v1/device-pairings/${pairingData.pairingId}`)
+        .set(localHeaders)
+        .expect(200)
+      assert.equal(paired.body.data.state, 'paired')
+      assert.ok(paired.body.data.exchangeTicket)
+
+      const exchangeKey = idempotencyKey('local-exchange')
+      const exchangeBody = { pairingId: pairingData.pairingId, exchangeTicket: paired.body.data.exchangeTicket }
+      const exchange = await app.post('/api/v1/device-credentials/exchange')
+        .set({ ...localHeaders, 'Idempotency-Key': exchangeKey })
+        .send(exchangeBody)
+        .expect(200)
+      const exchangeReplay = await app.post('/api/v1/device-credentials/exchange')
+        .set({ ...localHeaders, 'Idempotency-Key': exchangeKey })
+        .send(exchangeBody)
+        .expect(200)
+      assert.equal(exchangeReplay.body.data.credentialId, exchange.body.data.credentialId)
+      assert.equal(exchangeReplay.body.data.refreshCredential, exchange.body.data.refreshCredential)
+      assert.equal(await db.collection(collections.credentials).countDocuments({ deviceId: LOCAL_DEVICE_ID, status: 'active' }), 1)
+
+      const configuration = await app.get(`/api/v1/devices/${LOCAL_DEVICE_ID}/configuration`)
+        .set(bearer(exchange.body.data.accessToken))
+        .expect(200)
+      assert.equal(configuration.body.data.patient.patientId, NO_CONSENT_PATIENT_ID)
+
+      const usedToken = await app.post('/api/v1/device-pairing-claims')
+        .set({ ...bearer(humanAccessToken), 'Idempotency-Key': idempotencyKey('local-used-token') })
+        .send(claimBody)
+        .expect(400)
+      assert.equal(usedToken.body.error.code, 'PAIRING_CODE_USED')
+
+      const secondPairing = await app.post('/api/v1/device-pairings')
+        .set({ ...localHeaders, 'Idempotency-Key': idempotencyKey('local-second-pairing') })
+        .send(pairingBody)
+        .expect(409)
+      assert.equal(secondPairing.body.error.code, 'DEVICE_ALREADY_CLAIMED')
+    })
+
+    await t.test('expired pairing sessions refresh and repeated invalid claims are rate-limited', async () => {
+      const localHeaders = { 'X-Device-Id': EXPIRED_DEVICE_ID, 'X-Device-Install-Secret': EXPIRED_DEVICE_SECRET }
+      const pairing = await app.post('/api/v1/device-pairings')
+        .set({ ...localHeaders, 'Idempotency-Key': idempotencyKey('expired-pairing') })
+        .send({ hardwareRevision: 'mirror-v2', softwareVersion: '2.0.0', timezone: 'Asia/Singapore' })
+        .expect(201)
+      await db.collection(collections.pairings).updateOne({ _id: pairing.body.data.pairingId }, { $set: { expiresAt: new Date(Date.now() - 1_000) } })
+      const expired = await app.post('/api/v1/device-pairing-claims')
+        .set({ ...bearer(humanAccessToken), 'Idempotency-Key': idempotencyKey('expired-claim') })
+        .send({ pairingCode: pairing.body.data.displayCode, patientId: PATIENT_ID })
+        .expect(400)
+      assert.equal(expired.body.error.code, 'PAIRING_CODE_EXPIRED')
+
+      const refreshed = await app.post('/api/v1/device-pairings')
+        .set({ ...localHeaders, 'Idempotency-Key': idempotencyKey('expired-pairing-refresh') })
+        .send({ hardwareRevision: 'mirror-v2', softwareVersion: '2.0.0', timezone: 'Asia/Singapore' })
+        .expect(201)
+      assert.notEqual(refreshed.body.data.pairingId, pairing.body.data.pairingId)
+
+      await db.collection(collections.auditEvents).deleteMany({ tenantId: TENANT_ID, 'actor.id': USER_ID, action: 'pairing.claim_failed' })
+      const invalidResults: Array<{ status: number; body: any }> = []
+      for (const attempt of [1, 2, 3, 4, 5, 6]) {
+        invalidResults.push(await app.post('/api/v1/device-pairing-claims')
+          .set({ ...bearer(humanAccessToken), 'Idempotency-Key': idempotencyKey(`invalid-rate-${attempt}`) })
+          .send({ pairingCode: '000000', patientId: PATIENT_ID }))
+      }
+      assert.deepEqual(invalidResults.slice(0, 5).map((result) => [result.status, result.body.error.code]), [
+        [400, 'PAIRING_CODE_INVALID'], [400, 'PAIRING_CODE_INVALID'], [400, 'PAIRING_CODE_INVALID'],
+        [400, 'PAIRING_CODE_INVALID'], [400, 'PAIRING_CODE_INVALID'],
+      ])
+      assert.equal(invalidResults[5].status, 429)
+      assert.equal(invalidResults[5].body.error.code, 'PAIRING_ATTEMPTS_EXCEEDED')
     })
 
     await t.test('device authentication rotates and revokes the previous access token', async () => {

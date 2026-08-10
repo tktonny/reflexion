@@ -1,85 +1,56 @@
-# Provisioning a mirror (device code / bootstrap credential)
+# Pairing and provisioning a Reflexion mirror
 
-How a mirror gets its identity, how to run a test fleet, and the two traps that cost real debugging time.
+The normal setup is a first-boot flow. A caregiver does not need to handle a device credential or configure a mirror name.
 
-## The credential chain
+## Normal first-boot flow
 
-```
-provision:device  →  bootstrap token (30-day JWT, per device)
-                     ↓ entered on the device
-                   pairing (6-digit code claimed by the caregiver app)
-                     ↓
-                   rotating device credential  →  short-lived Qwen tickets per conversation
-```
+1. Build the Mirror and Caregiver apps with the same `EXPO_PUBLIC_API_BASE` (staging and production must never be mixed).
+2. Connect the mirror to Wi-Fi. On first use it generates a stable `dev_...` local device ID and a random install secret, then stores both in platform secure storage.
+3. The mirror calls `POST /api/v1/device-pairings` with `X-Device-Id`, `X-Device-Install-Secret`, and a persisted `Idempotency-Key`. The server creates the unclaimed device record if needed and returns a ten-minute pairing session containing a six-digit display code and a separate short-lived QR token.
+4. The mirror shows the code and a QR payload containing only the pairing token. It polls `GET /api/v1/device-pairings/{pairingId}`.
+5. In the Caregiver app, scan the QR or enter the six-digit code, then choose the loved one. The app calls `POST /api/v1/device-pairing-claims` with the caregiver bearer token and the selected patient.
+6. The server transaction checks caregiver permission, device ownership and one-active-assignment rules, creates the assignment and permanent device credential together, invalidates the pairing session, and gives the mirror a short-lived exchange ticket.
+7. The mirror exchanges the ticket at `POST /api/v1/device-credentials/exchange`, stores the access and refresh credentials in SecureStore, fetches the loved one’s configuration, and starts the conversation automatically.
 
-The device never holds a provider key. That is the whole point of the chain — see `docs/ARCHITECTURE-AND-API.md`.
+The QR never contains the permanent access token, refresh credential, install secret, or database identifier beyond the opaque pairing token. The caregiver sees only a pairing action, code/scan input, and loved-one selection.
 
-## Trap 1: the bootstrap token is bound to ONE device
+## Identity and storage
 
-Its payload carries a `did` (device id) claim. So if you bake one token into an APK and install that APK on several units, **they all claim the same device record** — the later install silently takes over the earlier one's identity, and both devices' conversations land on the same patient.
+- The local device ID is created once per app installation. The install secret is never displayed, logged, or sent in a QR code.
+- The server stores the install-secret hash, not the secret. Pairing tokens and exchange tickets are stored as hashes/ciphertext as appropriate, and the permanent refresh credential is stored hashed.
+- Access and refresh credentials are stored in Android/iOS SecureStore. Non-secret metadata such as the active patient and expiry timestamps remains in app storage.
+- A normal update install preserves app data, so the mirror keeps its identity and credential. A credential exchange response can be retried with the same idempotency key if the network drops after delivery.
+- Clearing SecureStore while leaving the old local ID behind fails closed into recovery. A full app-data wipe or factory reset can create a new local identity; support must then unlink/reset the old server assignment before pairing that physical mirror again.
 
-**Therefore: do not embed the token in a shared build.** Leave `EXPO_PUBLIC_DEVICE_BOOTSTRAP_TOKEN` unset and enrol each unit on the device. One universal APK then serves every unit.
+## Compatibility path
 
-The startup self-check has an `identity` item that fails loudly if the embedded token's device id ever disagrees with the paired credential's.
+Existing units may still use the legacy per-device `X-Device-Bootstrap` token from `provision:device`. It is accepted by the pairing, status, and exchange endpoints, but it is no longer required for a fresh mirror. Never embed one bootstrap token in a shared APK: it is bound to one device record.
 
-## Trap 2: reinstalling an APK does NOT lose the credential
-
-`adb install -r` (same signing key, update-install) **preserves** app data, so SecureStore/AsyncStorage keep the credential. Frequent test APKs therefore need **no re-pairing**.
-
-Credentials are only lost by: `adb uninstall`, clearing app data, or changing the signing key.
-
-## Test-fleet recipe
-
-**1. Mint one token per unit** — different `--serial` each time:
+For an existing factory-provisioned unit:
 
 ```bash
 cd reflexion-server
-for i in 01 02 03; do
-  npm run provision:device -- --serial=mirror-test-$i --hardware=v1 --software=1.0.0
-done
+npm run provision:device -- --serial=mirror-test-01 --hardware=v1 --software=1.0.0
 ```
 
-Output per unit: `{ "deviceId": …, "bootstrapToken": …, "expiresInDays": 30 }`. The token is a secret — do not commit or paste it into chat.
+Keep the returned token secret. The installer screen remains available only for the explicit installer setup path; it is not part of the ordinary elder-facing flow.
 
-`--serial` is hashed and upserted, so:
+## User-visible recovery states
 
-| | effect |
-|---|---|
-| **different** serial | a new device record → an independent identity |
-| **same** serial | the *same* device, re-issued token → this is how you **renew**, not how you add a unit |
+- Wi-Fi unavailable: “Connect your mirror to Wi-Fi to continue.”
+- Wi-Fi/internet available but backend unreachable: retry the Reflexion service; this is not reported as a generic unprovisioned-device error.
+- Backend reachable but credential rejected: show the controlled recovery message and contact support; do not silently register a replacement device.
+- Pairing code expired or cancelled: the mirror generates a fresh code.
+- Caregiver has no permission or the loved one already has a mirror: the caregiver app explains the conflict and leaves the existing assignment unchanged.
+- Mirror power/network drops during pairing: the pending pairing is retained until expiry; restart resumes the same session when possible.
+- Exchange response is lost: the mirror retains the exchange ticket and idempotency key and retries; the server returns the same credential response instead of issuing a second credential.
 
-Prefer the unit's real hardware serial: it makes "which physical mirror is this?" answerable, and re-running the same serial later renews rather than creating a duplicate.
+## Diagnostics and security controls
 
-**2. Build a universal APK** — the enrolment screen is gated, and a release build has `__DEV__ === false`, so it needs:
+The mirror records structured, non-sensitive stages: `wifi_connected`, `internet_reachable`, `backend_reachable`, `authenticated`, `paired`, `assigned`, `pairing_session_created`, `pairing_code_displayed`, `credential_saved`, `ready`, and `pairing_failed` with a safe reason code. The backend audit records claim initiation/completion and the atomic credential-issued milestone. After authentication, the next heartbeat sends the bounded diagnostic queue to device telemetry; tokens, codes, install secrets, and credentials are excluded and the server allowlists the diagnostic fields.
 
-```
-EXPO_PUBLIC_ENABLE_INSTALLER_SETUP=true
-# EXPO_PUBLIC_DEVICE_BOOTSTRAP_TOKEN=   ← leave unset
-```
+Pairing codes and QR tokens expire after ten minutes, are single-use, and are rate-limited. Claiming requires an authenticated caregiver with `device:assign` access to the selected loved one. An active device or patient assignment cannot be silently replaced. Credential exchange tickets expire after five minutes, and exchange/claim/pairing mutations use idempotency keys.
 
-**3. Install** — `adb install -r <apk>`
+## Environment check
 
-**4. Enrol on the device** — from the pairing screen, open the device-test screen and either paste the token or scan a QR of it. The QR payload may be the raw token or `{"bootstrapToken":"…"}`. Expired/invalid tokens are reported explicitly.
-
-**5. Pair** — the mirror shows a 6-digit code + QR; the caregiver app claims it; the mirror polls, receives the rotating credential, and enters the conversation.
-
-Steps 1–4 are once per unit. After that, flash as many APKs as you like.
-
-## Expiry
-
-The bootstrap token lasts **30 days** (hard-coded in `reflexion-server/src/scripts/provisionDevice.ts`). To renew, re-run `provision:device` with the **same** `--serial`; the existing pairing is unaffected.
-
-The `identity` self-check warns at ≤7 days remaining, so a fleet no longer discovers this by suddenly being unable to pair.
-
-## ⚠️ Open issue: the 30-day TTL does not survive a factory flow
-
-If the token is written at the factory, the clock starts on the production line. Factory → warehouse → shipping → retail → the customer opening the box **routinely exceeds 30 days**, and the elder would then be unable to pair a brand-new mirror, with no on-site recovery.
-
-The self-check's expiry warning cannot help here: a boxed mirror is not powered on to show it.
-
-Options, in preference order:
-1. **Give factory tokens a long TTL** — add a `--ttl-days` flag and use ≥365 on the line (tests keep 30). Small change; the token is pair-only (`scopes: ['device:pair']`) and is exchanged for a rotating credential immediately, so a long-lived pair-only token is an acceptable risk.
-2. **Mint on first boot** from the hardware serial — cleanest, but needs a new backend endpoint plus serial registration on the line.
-3. **Keep the on-site enrolment path as the fallback** — already works today; costs a technician visit.
-
-Also unresolved: **how the line writes the token**. Rebuilding the APK per unit is the wrong answer (a build per device, and it re-introduces Trap 1). Writing it to device-local storage for the app to read and `persistBootstrapCredential()` once on first boot is the better shape — the same approach the Linux build doc proposes.
+The mirror and caregiver clients each read their own `EXPO_PUBLIC_API_BASE`; there is no safe cross-environment pairing. Release builds must inject the same staging or production URL into both clients, and deployment smoke tests should verify `/health` plus a pairing round trip before distributing an APK.

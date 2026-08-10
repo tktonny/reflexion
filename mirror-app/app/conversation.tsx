@@ -160,6 +160,8 @@ export default function ConversationScreen() {
     turnState,
     ended,
     endReason,
+    checkinComplete,
+    replayLastResponse,
     recording,
     beginPushToTalk,
     endPushToTalk,
@@ -531,9 +533,19 @@ export default function ConversationScreen() {
         )
       }
       setClosingStage('saving')
-      // Navigate immediately — save and memory update happen in the background.
+      // Navigate immediately to the stable MIR-09 close scene — save and memory update happen in the
+      // background. The close scene owns the Return home action instead of disappearing on a timer.
       router.replace({
-        pathname: '/conversation',
+        pathname: '/conversation-closing',
+        params: {
+          completed: checkinComplete ? 'true' : 'false',
+          patientName,
+          nurseName,
+          language,
+          time: formatTime(now, language),
+          date: formatDate(now, language),
+          sync: 'queued',
+        },
       })
       // Background save: never blocks the UI.
       void (async () => {
@@ -550,7 +562,7 @@ export default function ConversationScreen() {
             telemetry,
             sessionAudio,
           })
-          if (persona === 'screening' && messagesRef.current.some((m) => m.role === 'user')) {
+          if (persona === 'screening' && checkinComplete && messagesRef.current.some((m) => m.role === 'user')) {
             void markCheckinDoneToday(wakeHourFrom(usualWakeTime))
           }
           if (ids.patientId) {
@@ -566,7 +578,7 @@ export default function ConversationScreen() {
       setProblemDetail(`save: ${saveMessage}`)
       setLocalProblem(classifyError(saveMessage))
     }
-  }, [language, nurseName, persona, usualWakeTime, stopConversation])
+  }, [checkinComplete, language, now, nurseName, patientName, persona, usualWakeTime, stopConversation])
 
   // A realtime failure before the patient ever answered (endReason='error', zero user turns) is a
   // startup/connection error, NOT a completed check-in. Don't run finalize (which would save a bogus
@@ -620,14 +632,20 @@ export default function ConversationScreen() {
   }
 
   function handleRepeat() {
-    // Signal to repeat the current question — handled by the conversation hook
+    if (replayLastResponse) {
+      void replayLastResponse()
+      return
+    }
+    // Legacy transports without an audio replay implementation retain the diagnostic gesture.
     if (beginPushToTalk) { beginPushToTalk(); setTimeout(() => { endPushToTalk?.() }, 100) }
   }
   function handleStop() {
     void finalize()
   }
   function handleContinue() {
-    // Advance to next question — handled via push-to-talk gesture
+    // The production WS path advances to listening automatically after playback drains. This callback
+    // remains for the approved MIR-07 Continue affordance and is intentionally a no-op in that mode.
+    if (beginPushToTalk) beginPushToTalk()
   }
 
   function startWakeListener() {

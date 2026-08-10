@@ -1,9 +1,8 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Image, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
 import { AppHeader, PrimaryButton, ScreenLayout, TertiaryButton } from '../src/components/AppUI';
-import { BrandLockup } from '../src/components/BrandLockup';
 import { Field, PhoneField } from '../src/components/Field';
 import { validateCreateAccount, type FieldErrors, normalizePhone } from '../src/lib/authValidation';
 import { registrationMessage } from '../src/lib/authMessages';
@@ -11,10 +10,11 @@ import { clearPendingVerification } from '../src/lib/pendingVerification';
 import { PasswordRequirements } from '../src/components/PasswordRequirements';
 import { setV1Session } from '../src/lib/v1AuthSession';
 import { registerCaregiverV1 } from '../src/lib/v1Caregiver';
-import { colors, fontFamily, fontSize, spacing } from '../src/theme';
+import { colors, fontFamily, fontSize, scaleSize, spacing } from '../src/theme';
 
 export default function CreateAccountScreen() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [countryCode, setCountryCode] = useState('+65');
@@ -61,28 +61,41 @@ export default function CreateAccountScreen() {
   };
 
   const clear = (key: keyof FieldErrors) => setErrors((current) => ({ ...current, [key]: undefined }));
+  const logoWidth = Math.min(width * 0.47, scaleSize(180));
+  const branchWidth = Math.min(width * 0.23, scaleSize(90));
   return (
     <ScreenLayout contentContainerStyle={styles.content}>
-      <AppHeader onBack={() => router.back()} />
-      <BrandLockup compact />
-      <Text accessibilityRole="header" style={styles.title}>Create your account</Text>
-      <Text style={styles.subtitle}>Join Reflexion to support the people you love with ease.</Text>
-      <Field error={errors.name} label="Preferred name" onChangeText={(value) => { setName(value); clear('name'); }} placeholder="How should we address you?" value={name} />
-      <Field error={errors.email} label="Email" keyboardType="email-address" autoComplete="email" onChangeText={(value) => { setEmail(value); clear('email'); }} placeholder="you@email.com" value={email} />
-      <PhoneField countryCode={countryCode} error={errors.phoneNumber} helperText="Optional. We keep the country code separate from your phone number." label="Phone number (optional)" onCountryCodeChange={setCountryCode} onPhoneNumberChange={(value) => { setPhoneNumber(value); clear('phoneNumber'); }} phoneNumber={phoneNumber} />
-      <Field error={errors.password} label="Create password" onChangeText={(value) => { setPassword(value); clear('password'); }} placeholder="Create a secure password" secure value={password} />
-      <PasswordRequirements password={password} repeatPassword={repeatPassword} />
-      <Field error={errors.repeatPassword} label="Repeat password" onChangeText={(value) => { setRepeatPassword(value); clear('repeatPassword'); }} placeholder="Enter it again" secure value={repeatPassword} />
-      {requestError ? <Text accessibilityRole="alert" style={styles.requestError}>{requestError}</Text> : null}
-      <PrimaryButton disabled={submitting} label={submitting ? 'Creating account…' : 'Create account'} onPress={() => void create()} />
-      <TertiaryButton label="Already have an account? Sign in" onPress={() => router.replace('/sign-in')} />
-      <Text style={styles.legal}>By creating an account, you agree to the Terms of Service and Privacy Policy.</Text>
+      <View pointerEvents="none" style={styles.artLayer}>
+        <Image accessibilityElementsHidden importantForAccessibility="no-hide-descendants" resizeMode="contain" source={require('../assets/auth/botanical-left.png')} style={[styles.leftBranch, { height: branchWidth * (650 / 240), width: branchWidth }]} />
+        <Image accessibilityElementsHidden importantForAccessibility="no-hide-descendants" resizeMode="contain" source={require('../assets/auth/botanical-right.png')} style={[styles.bottomBranch, { height: branchWidth * (470 / 250), width: branchWidth }]} />
+      </View>
+      <View style={styles.foreground}>
+        <AppHeader onBack={() => router.back()} />
+        <Image accessibilityElementsHidden importantForAccessibility="no-hide-descendants" resizeMode="contain" source={require('../assets/auth/reflexion-logo.png')} style={[styles.logo, { height: logoWidth * (260 / 450), width: logoWidth }]} />
+        <Text accessibilityRole="header" style={styles.title}>Create your account</Text>
+        <Text style={styles.subtitle}>Join Reflexion to support the people you love with ease.</Text>
+        <Field error={errors.name} label="Preferred name" onChangeText={(value) => { setName(value); clear('name'); }} placeholder="How should we address you?" value={name} />
+        <Field error={errors.email} label="Email" keyboardType="email-address" autoComplete="email" onChangeText={(value) => { setEmail(value); clear('email'); }} placeholder="you@email.com" value={email} />
+        <PhoneField countryCode={countryCode} error={errors.phoneNumber} helperText="Optional. We keep the country code separate from your phone number." label="Phone number (optional)" onCountryCodeChange={setCountryCode} onPhoneNumberChange={(value) => { setPhoneNumber(value); clear('phoneNumber'); }} phoneNumber={phoneNumber} />
+        <Field error={errors.password} label="Create password" onChangeText={(value) => { setPassword(value); clear('password'); }} placeholder="Create a secure password" secure value={password} />
+        <PasswordRequirements password={password} repeatPassword={repeatPassword} />
+        <Field error={errors.repeatPassword} label="Repeat password" onChangeText={(value) => { setRepeatPassword(value); clear('repeatPassword'); }} placeholder="Enter it again" secure value={repeatPassword} />
+        {requestError ? <Text accessibilityRole="alert" style={styles.requestError}>{requestError}</Text> : null}
+        <PrimaryButton disabled={submitting} label={submitting ? 'Creating account…' : 'Create account'} onPress={() => void create()} />
+        <TertiaryButton label="Already have an account? Sign in" onPress={() => router.replace('/sign-in')} />
+        <Text style={styles.legal}>By creating an account, you agree to the Terms of Service and Privacy Policy.</Text>
+      </View>
     </ScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.lg },
+  content: { gap: 0, overflow: 'hidden', paddingBottom: spacing.xxl, paddingTop: 0, position: 'relative' },
+  artLayer: { ...StyleSheet.absoluteFill, overflow: 'hidden' },
+  foreground: { gap: spacing.lg, minWidth: 0 },
+  logo: { alignSelf: 'center', marginTop: spacing.xs },
+  leftBranch: { left: -spacing.md, position: 'absolute', top: -spacing.xs },
+  bottomBranch: { bottom: -spacing.xxl, position: 'absolute', right: -spacing.md },
   title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, fontWeight: '500', lineHeight: 36, marginTop: spacing.xl },
   subtitle: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: 22 },
   requestError: { color: colors.error.text, fontSize: fontSize.body, lineHeight: 22 },

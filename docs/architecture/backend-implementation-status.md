@@ -1,6 +1,6 @@
 # Backend implementation status
 
-Date: 2026-07-22
+Date: 2026-08-10
 Contract: `reflexion-api-v1.openapi.yaml`
 Runtime: `reflexion-server`
 
@@ -9,7 +9,7 @@ Runtime: `reflexion-server`
 | Domain | Implemented |
 | --- | --- |
 | Identity | Human access/refresh sessions, rotation, logout, password reset, tenant/role/scope authorization |
-| Device | Unique factory provisioning, bootstrap authentication, pairing claim/exchange, SecureStore-compatible credentials, rotation/revocation, configuration, heartbeat |
+| Device | First-boot local identity registration, legacy bootstrap authentication, short-lived QR/code pairing, atomic caregiver claim plus credential issuance, SecureStore-compatible credentials, rotation/revocation, configuration, heartbeat |
 | Patient/care | Patients, care relationships, consent, program enrollment read, care plans, medication plans, reminder occurrence responses, caregiver tasks |
 | Conversation | Session lifecycle, stale-session abandon, Qwen ticket boundary, ordered event batches, SHA-256 artifact upload/verification, completion, explicit processing-status polling and retry |
 | Assistant tools | Server allowlist for weather, web search, medication lookup and upcoming reminders; tool invocation audit records |
@@ -42,7 +42,7 @@ These are deployment inputs, not missing application code:
 5. S3-compatible object storage when consented daily check-ins upload image/media evidence.
 6. Optional version-pinned embedding provider and dimensions.
 7. Optional Brave Search and Postmark accounts.
-8. Android release keystore and a per-device bootstrap injection process.
+8. Android release keystore. Per-device bootstrap injection is optional legacy compatibility; fresh units self-register on first boot.
 9. Production monitoring/alerts for API latency, worker lag, dead letters, provider failures and database capacity.
 
 ## Deliberately deferred product layers

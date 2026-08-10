@@ -11,7 +11,6 @@ import { buildLiveSessionUpdate, realtimeWsUrl, REALTIME_TOOL_BACKEND } from '..
 import { invokeSessionTool, getPatientMemory } from '../api/sessionSync'
 import { createEnergyVad, decodeBase64Pcm16, pcm16Rms } from '../orchestration/energyVad'
 import {
-  acknowledgementForLanguage,
   base64ToBytes,
   closingTextForLanguage,
   companionClosingTextForLanguage,
@@ -170,6 +169,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const [userSpeaking, setUserSpeaking] = useState(false)
   const [bargeInActive, setBargeInActive] = useState(false)
   const [ended, setEnded] = useState(false)
+  const [checkinComplete, setCheckinComplete] = useState(false)
   const [recording, setRecording] = useState(false)
   const [turnState, setTurnState] = useState<TurnTakingPhase>('idle')
 
@@ -285,6 +285,11 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
   const enqueuedPlaybackMsRef = useRef(0)
   // Raw patient-speech PCM16 frames for the session audio artifact (recorded only while mic is open).
   const sessionAudioFramesRef = useRef<string[]>([])
+  // Keep the last complete assistant turn locally so Repeat can replay the actual spoken audio without
+  // creating another provider turn or accidentally advancing the check-in agenda.
+  const currentResponseAudioChunksRef = useRef<string[]>([])
+  const lastAssistantAudioChunksRef = useRef<string[]>([])
+  const lastAssistantTextRef = useRef('')
   const CAPTURE_SAMPLE_RATE = 16000
   const MAX_AUDIO_FRAMES = 12_000 // bound memory (~a long check-in); older frames beyond this are dropped
 
@@ -443,6 +448,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     assistantTextRef.current = ''
     const clean = text.trim()
     if (!clean) return
+    lastAssistantTextRef.current = clean
     recentAriaRef.current = [clean, ...recentAriaRef.current].slice(0, 4)
     if (id) setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, text: clean, streaming: false } : m)))
     else setMessages((prev) => [...prev, { id: randomId('assistant'), role: 'assistant', text: clean }])
@@ -553,6 +559,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       const chunks = qwenWavToPcm24kChunks(wav)
       if (chunks.length === 0) throw new Error('Qwen TTS returned empty audio.')
 
+      lastAssistantAudioChunksRef.current = chunks.slice()
+      lastAssistantTextRef.current = text.trim()
       finalizeAssistant(text)
       responseAudioReceivedRef.current = true
       transition({ type: 'audio_delta' })
@@ -1008,9 +1016,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         // honoured. A too-short answer consumes a gentle reprompt (re-asks the same question) before
         // advancing, and the flow can never wedge on a required question.
         let scriptedQuestion: string | null = null
+        let answered = persona !== 'screening'
         if (persona === 'screening') {
           const flow = checkinFlowRef.current
-          let answered = false
           if (flow) {
             if (flow.recordAnswer(transcript) === 'insufficient') flow.recordRepromptOrTimeout()
             else answered = true
@@ -1019,13 +1027,8 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
               ? screeningQuestionForTurn(voiceRef.current.languageKey, nextQuestion.order, dailyPlan)
               : null
           } else {
+            answered = true
             scriptedQuestion = screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current, dailyPlan)
-          }
-          // Warm the hand-off: prepend a brief neutral acknowledgement to the next scripted question so
-          // the check-in feels like a friend, not a questionnaire. Only after a satisfactory answer (not
-          // a reprompt), and never before the close (the dailyFlowComplete path owns the goodbye).
-          if (answered && scriptedQuestion) {
-            scriptedQuestion = `${acknowledgementForLanguage(voiceRef.current.languageKey, turnCountRef.current)} ${scriptedQuestion}`
           }
         }
         const dailyFlowComplete = persona === 'screening' && !scriptedQuestion
@@ -1038,6 +1041,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         // The response after the final enabled stage is the fixed positive close. A manual close
         // requested while waiting for transcription also produces one goodbye, never two turns.
         if (dailyFlowComplete || companionGoodbyeRequested || manualCloseRequestedRef.current) {
+          if (dailyFlowComplete) setCheckinComplete(true)
           closingRef.current = true
           wrappingUpRef.current = true
           transition({ type: 'close_requested' })
@@ -1048,8 +1052,28 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           return
         }
 
-        if (scriptedQuestion) {
+        if (scriptedQuestion && !answered) {
+          // A short/unclear answer gets a deterministic reprompt and does not advance the agenda.
           void playDeterministicResponse(scriptedQuestion, false)
+        } else if (scriptedQuestion) {
+          // Let Aria answer what the patient actually said first, then return to the next topic. The
+          // controller has already advanced the flow, so this exact question cannot repeat the one just
+          // answered. Keeping the instruction one-turn scoped prevents the next response from inheriting
+          // a stale agenda override.
+          configureNextResponse(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, {
+            voice: voiceRef.current.voice,
+            languageKey: voiceRef.current.languageKey,
+            persona,
+            patientName: dailyPlan.patientName,
+            autoCreateResponse: false,
+            memory: memoryRef.current,
+            weather: weatherRef.current,
+            responseInstruction:
+              `First answer the patient's latest message directly and warmly in one or two short sentences. ` +
+              `If they asked a question, answer it before returning to the check-in. Then ask exactly this ` +
+              `next question, verbatim: "${scriptedQuestion}" Do not ask any other question or skip the ` +
+              'answer.',
+          }), 'normal')
         } else {
           configureNextResponse(buildLiveSessionUpdate(patientId, voiceRef.current.languageLabel, {
             voice: voiceRef.current.voice,
@@ -1088,6 +1112,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         currentResponseSourceRef.current = 'realtime'
         activeProviderResponseIdRef.current = createdResponseId
         currentResponseClosingRef.current = closingRef.current
+        currentResponseAudioChunksRef.current = []
         goodbyeDetectedRef.current = false
         audioRef.current?.setCaptureMuted(true)
         transition({ type: 'response_created' })
@@ -1111,6 +1136,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
         }
         try {
           const delta = String(payload?.delta || '')
+          if (delta) currentResponseAudioChunksRef.current.push(delta)
           enqueuedPlaybackMsRef.current += pcm24kBase64DurationMs(delta)
           audioRef.current?.play(delta)
         } catch (error) {
@@ -1163,6 +1189,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
           return
         }
         responseCompletedRef.current = true
+        if (currentResponseAudioChunksRef.current.length) {
+          lastAssistantAudioChunksRef.current = currentResponseAudioChunksRef.current.slice()
+        }
         dbg.log(`response.done audio=${responseAudioReceivedRef.current} closing=${currentResponseClosingRef.current}`)
         responseRequestedRef.current = false
         responseActiveRef.current = false
@@ -1222,6 +1251,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     cancelledProviderResponseIdRef.current = null
     currentResponseSourceRef.current = null
     currentResponseClosingRef.current = false
+    currentResponseAudioChunksRef.current = []
     streamIdRef.current = null
     assistantTextRef.current = ''
     userTranscriptsRef.current = []
@@ -1287,6 +1317,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     // start wipes them. (userTranscriptsRef was wiped by cleanup() then restored in tryReconnect.)
     if (!resume) {
       setMessages([])
+      setCheckinComplete(false)
       voiceRef.current = voiceProfileForSession(language)
       turnCountRef.current = 0
       telemetryRef.current.reset()
@@ -1295,6 +1326,9 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
       sessionStartedAtMsRef.current = Date.now()
       recentAriaRef.current = []
       userTranscriptsRef.current = []
+      currentResponseAudioChunksRef.current = []
+      lastAssistantAudioChunksRef.current = []
+      lastAssistantTextRef.current = ''
     }
     // Resume skips the opening (openingRequestedRef=true), flags session.updated to pick up where we left
     // off (resumingRef), and marks the session live (hadResponseRef) so a re-drop reconnects/fails rather
@@ -1578,6 +1612,49 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     finishUserTurn()
   }, [finishUserTurn, pushToTalk])
 
+  const replayLastResponse = useCallback(() => {
+    const lease = runtimeLeaseRef.current
+    const bridge = audioRef.current
+    const chunks = lastAssistantAudioChunksRef.current.slice()
+    if (!lease?.isCurrent() || !bridge || !chunks.length || endedRef.current || closingRef.current || manualCloseRequestedRef.current) return
+
+    // If the user taps Repeat while the provider is still finishing the current sentence, cancel that
+    // provider response first. The cached PCM is then the only audio allowed to reach the speaker.
+    const state = turnTakingRef.current
+    if (state.responseInFlight || state.awaitingPlayback) {
+      if (currentResponseSourceRef.current === 'realtime' && responseActiveRef.current) {
+        cancelledProviderResponseIdRef.current = activeProviderResponseIdRef.current
+        send({ type: 'response.cancel' })
+      }
+      transition({ type: 'assistant_interrupted' })
+    }
+
+    clearDrain()
+    responseAfterSessionUpdateRef.current = null
+    responseRequestedRef.current = false
+    responseActiveRef.current = false
+    responseCompletedRef.current = false
+    responseAudioReceivedRef.current = false
+    currentResponseSourceRef.current = 'local'
+    currentResponseClosingRef.current = false
+    goodbyeDetectedRef.current = false
+    bridge.clearPlayback()
+    bridge.setCaptureMuted(true)
+    transition({ type: 'response_requested' })
+    transition({ type: 'response_created' })
+    transition({ type: 'audio_delta' })
+    enqueuedPlaybackMsRef.current = 0
+    for (const chunk of chunks) {
+      enqueuedPlaybackMsRef.current += pcm24kBase64DurationMs(chunk)
+      bridge.play(chunk)
+    }
+    responseAudioReceivedRef.current = true
+    responseCompletedRef.current = true
+    transition({ type: 'response_done' })
+    updateStatus('speaking', 'Replaying...')
+    waitForPlaybackDrain(() => resumeListening())
+  }, [clearDrain, resumeListening, send, transition, updateStatus, waitForPlaybackDrain])
+
   // Retained for automated diagnostics and callers that cannot expose press-in/press-out events.
   const toggleRecording = useCallback(() => {
     if (recordingRef.current) endPushToTalk()
@@ -1601,6 +1678,7 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     turnState,
     ended,
     endReason: endReasonRef.current ?? undefined,
+    checkinComplete,
     recording: pushToTalk ? recording : undefined,
     beginPushToTalk: pushToTalk ? beginPushToTalk : undefined,
     endPushToTalk: pushToTalk ? endPushToTalk : undefined,
@@ -1611,5 +1689,6 @@ export function useDirectRealtimeConversation(options: Options = {}): Conversati
     getSessionAudio: () => (sessionAudioFramesRef.current.length
       ? { base64Frames: sessionAudioFramesRef.current, sampleRate: CAPTURE_SAMPLE_RATE }
       : null),
+    replayLastResponse,
   }
 }

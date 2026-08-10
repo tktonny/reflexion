@@ -91,6 +91,8 @@ export function buildLiveSessionUpdate(
     memory?: string[]
     /** Today's local weather, one short human line (from the device's ambient widget), if available. */
     weather?: string
+    /** One-turn guidance used by the deterministic check-in controller after an answer. */
+    responseInstruction?: string
   },
 ): Record<string, unknown> {
   const languageName = String(language || '').trim() || 'English'
@@ -112,6 +114,9 @@ export function buildLiveSessionUpdate(
       now: currentLocalTimeLine(language, now), weather: opts.weather,
       greetingPeriod: greetingPeriodForDate(now),
     })
+    if (opts.responseInstruction?.trim()) {
+      instructions += `\n\nFor this reply only: ${opts.responseInstruction.trim()}`
+    }
   }
   // qwen3.5-omni-realtime has its own voice list (rejects the qwen-tts voices carried on the profile).
   // Pick the language-appropriate realtime voice: 粤语->Kiki, 闽南->Joseph Chen, else a multilingual voice.

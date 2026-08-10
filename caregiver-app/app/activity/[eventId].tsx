@@ -193,7 +193,7 @@ function decodeParam(value: string | string[] | undefined) {
 const styles = StyleSheet.create({
   content: { gap: spacing.sm, minWidth: 0, paddingTop: 0, position: 'relative' },
   layer: { position: 'relative', zIndex: 1 },
-  botanicalLayer: { height: scaleSize(154), position: 'absolute', right: -spacing.sm, top: spacing.sm, width: scaleSize(120), zIndex: 2 },
+  botanicalLayer: { height: scaleSize(154), position: 'absolute', right: -spacing.sm, top: -spacing.sm, width: scaleSize(120), zIndex: 0 },
   botanical: { height: '100%', width: '100%' },
   header: { alignItems: 'center', flexDirection: 'row', minHeight: 44, minWidth: 0 },
   headerBack: { alignItems: 'center', flexDirection: 'row', gap: 1, minHeight: 44, minWidth: 88, paddingRight: spacing.sm },

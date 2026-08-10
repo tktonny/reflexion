@@ -75,6 +75,7 @@ function icon(name, className) {
     check: '<path d="m5 12 4 4L19 6"/>',
     close: '<path d="m6 6 12 12M18 6 6 18"/>',
     dots: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+    document: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 12h6M9 16h6"/>',
     heart: '<path d="M20.8 8.7c0 5.4-8.8 10.1-8.8 10.1S3.2 14.1 3.2 8.7A4.6 4.6 0 0 1 12 6.3a4.6 4.6 0 0 1 8.8 2.4Z"/>',
     home: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V10Z"/><path d="M9 21v-7h6v7"/>',
     leaf: '<path d="M20 4C10 4 4 8.2 4 15.5 4 18.8 6.2 21 9.5 21 16.8 21 20 13.8 20 4Z"/><path d="M4 20c3.5-4.2 7.4-6.8 12-8.2"/>',
@@ -300,13 +301,15 @@ function featureStrip(items) {
   );
 }
 
-function trustStrip(items) {
+function trustStrip(items, keyPrefix) {
   return (
     '<div class="trust-strip">' +
     items
       .map(
-        (item) =>
-          '<div class="trust-strip__item">' +
+        (item, index) =>
+          '<div class="trust-strip__item"' +
+          (keyPrefix ? ' data-layout-key="' + keyPrefix + "." + (index + 1) + '"' : "") +
+          ">" +
           '<span class="icon-wrap">' +
           icon(item.icon) +
           "</span>" +
@@ -431,6 +434,34 @@ function processStep(number, tone, title, copy, content) {
   );
 }
 
+function processProductAsset(kind, alt) {
+  const source = kind === "mirror" ? homeAssets.mirror : homeAssets.caregiver;
+  return (
+    '<div class="process-product-asset process-product-asset--' +
+    kind +
+    '"><img src="' +
+    ASSET(source) +
+    '" alt="' +
+    alt +
+    '" loading="eager" /></div>'
+  );
+}
+
+function processBotanical() {
+  return (
+    '<svg class="process-botanical" viewBox="0 0 250 330" fill="none" aria-hidden="true">' +
+    '<path class="process-botanical__stem" d="M91 333C110 271 120 208 143 149 163 98 190 49 225 4"/>' +
+    '<path class="process-botanical__branch" d="M128 193C99 168 71 153 38 145M148 148C119 118 96 95 68 73M165 111C181 86 198 62 218 43"/>' +
+    '<path class="process-botanical__leaf" d="M42 145C51 116 76 108 102 123 87 147 65 156 42 145Z"/>' +
+    '<path class="process-botanical__leaf" d="M69 73C80 47 107 40 130 58 113 80 90 85 69 73Z"/>' +
+    '<path class="process-botanical__leaf" d="M101 264C75 250 69 226 81 204 105 217 113 240 101 264Z"/>' +
+    '<path class="process-botanical__leaf" d="M143 149C160 125 186 119 208 133 193 155 168 162 143 149Z"/>' +
+    '<path class="process-botanical__leaf" d="M177 93C190 68 215 58 237 70 223 94 201 103 177 93Z"/>' +
+    '<circle class="process-botanical__berry" cx="219" cy="42" r="7"/><circle class="process-botanical__berry" cx="230" cy="20" r="6"/><circle class="process-botanical__berry" cx="201" cy="29" r="5"/>' +
+    "</svg>"
+  );
+}
+
 function analysisList() {
   const items = [
     { icon: "message", title: "Conversation summaries", copy: "Key moments and topics from each interaction." },
@@ -468,6 +499,7 @@ function processPage() {
     button("Join the waitlist") +
     "</div>" +
     "</div>" +
+    processBotanical() +
     "</section>" +
     '<section class="section section--tight">' +
     '<div class="process-rail">' +
@@ -476,13 +508,13 @@ function processPage() {
       "warm",
       "They talk naturally",
       "Your loved one has a warm daily conversation and routine check-in with Reflexion.",
-      mirrorVisual({ screen: "speaking" }),
+      processProductAsset("mirror", "Reflexion Mirror on a tabletop"),
     ) +
     processStep(
       "2",
       "sage",
       "Reflexion understands patterns",
-      "Moments are organised into useful, respectful context for the people who care.",
+      "Aria analyzes conversations and routines to uncover insights that matter most.",
       analysisList(),
     ) +
     processStep(
@@ -490,21 +522,20 @@ function processPage() {
       "warm",
       "You stay connected",
       "You receive meaningful updates and suggested next steps—anytime, anywhere.",
-      phoneVisual({ screen: "home" }),
+      processProductAsset("caregiver", "Reflexion caregiver app home screen"),
     ) +
     "</div>" +
     "</section>" +
     '<section class="section section--tight" data-reveal>' +
     '<div class="section-heading">' +
     "<h2>What Aria helps with</h2>" +
-    "<p>Small moments of support, made easier to find and share.</p>" +
     "</div>" +
     '<div class="helps-grid">' +
     [
-      { icon: "brain", title: "Recall & reminiscence", copy: "Meaningful conversations that spark memories and bring comfort." },
-      { icon: "calendar", title: "Daily routines", copy: "Gentle support to stay on track with what matters most." },
-      { icon: "message", title: "Family messages", copy: "Share updates, photos, and love—delivered in the moment." },
-      { icon: "bell", title: "Gentle prompts", copy: "Kind reminders that encourage wellness without overwhelming." },
+      { icon: "brain", title: "Recall & reminiscence", lines: ["Meaningful conversations", "that spark memories and", "bring comfort."] },
+      { icon: "calendar", title: "Daily routines", lines: ["Gentle support to stay", "on track with what", "matters most."] },
+      { icon: "message", title: "Family messages", lines: ["Share updates, photos,", "and love—delivered", "in the moment."] },
+      { icon: "bell", title: "Gentle prompts", lines: ["Kind reminders that", "encourage wellness", "without overwhelming."] },
     ]
       .map(
         (item) =>
@@ -513,7 +544,7 @@ function processPage() {
           "</span><strong>" +
           item.title +
           "</strong><span>" +
-          item.copy +
+          item.lines.join(' <br class="process-desktop-break" />') +
           "</span></div>",
       )
       .join("") +
@@ -537,77 +568,121 @@ function familyFeature(iconName, title, copy) {
   );
 }
 
+function familiesCaregiverAsset() {
+  return (
+    '<div class="families-phone-asset"><img src="' +
+    ASSET(homeAssets.caregiver) +
+    '" alt="Reflexion caregiver app home screen" loading="eager" /></div>'
+  );
+}
+
+function familyFeatureCard(iconName, title, copy, variant) {
+  let preview = "";
+
+  if (variant === "trends") {
+    preview =
+      '<svg class="family-trend-graph" viewBox="0 0 240 92" fill="none" aria-hidden="true">' +
+      '<path class="family-trend-graph__line" d="M2 75C17 66 24 65 38 68 53 72 59 57 74 56 89 55 95 42 108 46 122 51 129 69 143 71 158 73 168 54 181 43 194 31 203 44 215 45 225 46 230 32 238 19"/>' +
+      '<circle cx="38" cy="68" r="4"/><circle cx="74" cy="56" r="4"/><circle cx="108" cy="46" r="4"/><circle cx="143" cy="71" r="4"/><circle cx="181" cy="43" r="4"/><circle cx="215" cy="45" r="4"/><circle cx="238" cy="19" r="4"/>' +
+      "</svg>";
+  }
+
+  if (variant === "alerts") {
+    preview =
+      '<div class="family-alert-preview">' +
+      '<span class="family-avatar family-avatar--dad"></span>' +
+      '<span><strong>Dad Robert</strong><small>Needs your attention</small></span>' +
+      '<b>9:20 AM</b><i></i>' +
+      "</div>";
+  }
+
+  if (variant === "messages") {
+    preview =
+      '<div class="family-message-preview">' +
+      '<span class="family-avatar family-avatar--mum"></span>' +
+      '<span><strong>Mum Mary</strong><small>Morning check-in completed</small></span>' +
+      '<b>8:15 AM</b><i></i>' +
+      "</div>";
+  }
+
+  if (variant === "summary") {
+    preview =
+      '<div class="family-summary-preview"><span class="family-summary-preview__icon">' +
+      icon("document") +
+      '</span><p>Mum was feeling good and enjoyed her morning walk.<br />She mentioned lunch with her sister on Sunday.</p></div>';
+  }
+
+  return (
+    '<article class="family-feature family-feature--' +
+    variant +
+    '" data-reveal>' +
+    '<span class="icon-wrap">' +
+    icon(iconName) +
+    "</span><h3>" +
+    title +
+    "</h3><p>" +
+    copy +
+    "</p>" +
+    preview +
+    "</article>"
+  );
+}
+
 function familiesPage() {
   return (
     '<div class="page page--families">' +
-    '<section class="hero hero--centered">' +
+    '<section class="hero hero--centered families-hero">' +
     '<div class="hero__copy" data-reveal>' +
     badge("For families") +
-    "<h1>Designed for families who want to stay close.</h1>" +
-    "<p>Get a clearer picture of daily life without hovering, guessing, or constantly checking in.</p>" +
+    "<h1>Designed for families<br />who want to stay close.</h1>" +
+    "<p>Get a clearer picture of daily life without<br />hovering, guessing, or constantly checking in.</p>" +
     '<div class="hero-actions hero-actions--centered">' +
     button("Join the waitlist") +
     "</div>" +
     "</div>" +
     '<div class="families-hero-grid">' +
-    '<div class="family-feature-column">' +
-    familyFeature("chart", "See wellness trends", "Track patterns over time to understand how your loved one is doing.") +
-    familyFeature("bell", "Get alerts when needed", "Useful notifications keep you informed about what matters most.") +
+    '<div class="family-feature-column family-feature-column--left">' +
+    familyFeatureCard("chart", "See wellness trends", "Track patterns over time to understand how your loved one is doing.", "trends") +
+    familyFeatureCard("bell", "Get alerts when needed", "Smart notifications keep you informed about what matters most.", "alerts") +
     "</div>" +
     '<div class="families-phone" data-reveal>' +
-    phoneVisual({ screen: "home", size: "large" }) +
+    familiesCaregiverAsset() +
     "</div>" +
-    '<div class="family-feature-column">' +
-    familyFeature("message", "Call or message in seconds", "Reach out quickly with one tap—no logins, no waiting.") +
-    familyFeature("shield", "Stay grounded in real conversation summaries", "See what was discussed so you never miss the meaningful moments.") +
+    '<div class="family-feature-column family-feature-column--right">' +
+    familyFeatureCard("message", "Call or message in seconds", "Reach out quickly with one tap—no logins, no waiting.", "messages") +
+    familyFeatureCard("shield", "Stay grounded in real conversation summaries", "See what was discussed so you never miss the meaningful moments.", "summary") +
     "</div>" +
     "</div>" +
+    '<svg class="families-botanical families-botanical--right" viewBox="0 0 170 250" fill="none" aria-hidden="true">' +
+    '<path d="M42 249C54 192 77 131 124 72 137 56 151 39 164 18"/>' +
+    '<path d="M77 154C54 132 36 117 10 108M101 115C78 89 61 68 43 39M124 73C139 58 151 43 160 28"/>' +
+    '<path d="M11 108C18 84 40 76 61 88 48 108 29 115 11 108ZM43 39C54 18 77 12 96 27 82 46 60 51 43 39ZM77 154C53 148 42 130 47 112 67 118 80 135 77 154ZM101 115C113 93 135 88 151 99 140 117 119 123 101 115ZM124 73C139 52 159 51 170 61 159 78 141 82 124 73Z"/>' +
+    "</svg>" +
+    '<svg class="families-botanical families-botanical--left" viewBox="0 0 120 250" fill="none" aria-hidden="true">' +
+    '<path d="M28 250C34 186 51 121 92 65"/>' +
+    '<path d="M48 181C30 163 17 145 3 121M62 132C45 111 32 90 21 62M81 85C91 68 101 52 111 37"/>' +
+    '<path d="M3 121C9 101 27 94 44 103 34 121 18 128 3 121ZM21 62C31 42 51 37 68 49 56 67 38 72 21 62ZM48 181C29 175 20 159 24 144 40 149 51 164 48 181ZM62 132C73 112 92 108 106 119 96 135 78 140 62 132ZM81 85C94 65 111 65 120 74 110 91 95 95 81 85Z"/>' +
+    "</svg>" +
     "</section>" +
-    '<section class="section section--tight" data-reveal>' +
-    '<div class="insight-callout">' +
+    '<section class="section section--tight families-lower" data-reveal>' +
+    '<figure class="testimonial"><blockquote>Reflexion gives me peace of mind<br />without making Mum feel like<br />I’m watching over her.</blockquote><figcaption><span class="testimonial-avatar" aria-hidden="true"></span><span>— Emma, daughter of Mary</span></figcaption></figure>' +
+    '<div class="insight-callout families-insight">' +
     '<span class="icon-wrap">' +
     icon("leaf") +
     "</span>" +
-    "<span><strong>Suggested next step</strong><h3>See how Reflexion keeps you connected with what matters.</h3><p>A quick call or message can make their day.</p></span>" +
-    button("Join the waitlist", "outline", "button--small") +
+    "<span><strong>Suggested next step</strong><h3>See how Reflexion keeps you<br />connected with what matters.</h3><p>A quick call or message can make their day.</p></span>" +
+    '<span class="families-insight-actions">' +
+    button("Join the waitlist", null, "button--small") +
+    routeLink("See how it works " + icon("arrow"), "/how-it-works", "text-link") +
+    "</span>" +
+    '<svg class="families-insight-botanical" viewBox="0 0 170 190" fill="none" aria-hidden="true">' +
+    '<path d="M45 190C56 143 79 94 125 45 139 30 151 18 164 4"/>' +
+    '<path d="M78 126C54 108 37 94 12 87M101 89C78 69 60 48 44 28M126 45C140 31 151 19 160 10"/>' +
+    '<path d="M12 87C19 68 40 61 59 72 47 89 29 94 12 87ZM44 28C55 10 76 5 94 18 81 35 61 39 44 28ZM78 126C56 120 46 105 50 90 68 96 81 111 78 126ZM101 89C113 70 133 66 149 76 139 93 119 98 101 89ZM126 45C139 27 158 27 170 37 159 53 141 56 126 45Z"/>' +
+    "</svg>" +
     "</div>" +
     "</section>" +
-    '<section class="section section--tight" data-reveal>' +
-    '<div class="section-heading">' +
-    "<h2>Useful updates, right when you need them.</h2>" +
-    "<p>Reflexion keeps the focus on observed moments, clear context, and respectful next steps.</p>" +
-    "</div>" +
-    '<div class="families-visual-cards">' +
-    '<article class="visual-card">' +
-    '<div class="visual-card__image"><img src="' +
-    ASSET("caregiver-trends.png") +
-    '" alt="Reflexion trends screen showing conversation patterns" loading="lazy" /></div>' +
-    '<div class="visual-card__body"><span class="icon-wrap">' +
-    icon("chart") +
-    "</span><h3>See the pattern</h3><p>Follow conversation activity over time without turning care into a dashboard.</p></div>" +
-    "</article>" +
-    '<article class="visual-card">' +
-    '<div class="visual-card__image"><img src="' +
-    ASSET("caregiver-chat.png") +
-    '" alt="Reflexion caregiver family messages screen" loading="lazy" /></div>' +
-    '<div class="visual-card__body"><span class="icon-wrap">' +
-    icon("message") +
-    "</span><h3>Keep the thread</h3><p>Send something kind, see what matters, and stay part of the everyday.</p></div>" +
-    "</article>" +
-    '<article class="visual-card">' +
-    '<div class="visual-card__image"><img src="' +
-    ASSET("caregiver-routines.png") +
-    '" alt="Reflexion routine setup screen" loading="lazy" /></div>' +
-    '<div class="visual-card__body"><span class="icon-wrap">' +
-    icon("calendar") +
-    "</span><h3>Support the routine</h3><p>Make gentle prompts easier to set up and easier to follow.</p></div>" +
-    "</article>" +
-    "</div>" +
-    "</section>" +
-    '<section class="section section--tight" data-reveal>' +
-    '<figure class="testimonial"><blockquote>Reflexion gives me peace of mind without making Mum feel like I’m watching over her.</blockquote><figcaption>— Emma, daughter of Mary</figcaption></figure>' +
-    "</section>" +
-    '<section class="section section--tight" data-reveal>' +
+    '<section class="section section--tight families-trust" data-reveal>' +
     '<div class="section-heading">' +
     "<h2>Why families love Reflexion</h2>" +
     "</div>" +
@@ -615,10 +690,8 @@ function familiesPage() {
       { icon: "heart", title: "Useful updates", copy: "Timely insights help you support without guessing." },
       { icon: "shield", title: "Respectful insights", copy: "Private by design, so independence is protected." },
       { icon: "people", title: "Connection made easy", copy: "Simple tools help you stay close, every day." },
-      { icon: "check", title: "Made for real life", copy: "A calm rhythm that fits the way families actually care." },
     ]) +
     "</section>" +
-    ctaBand("Care. Connected.", "See what Reflexion could look like in your home.", "How it works", "/how-it-works") +
     "</div>"
   );
 }
@@ -649,67 +722,89 @@ function mirrorFeatureCard(imageName, imageAlt, title, copy) {
   );
 }
 
+function mirrorHeroCallout(side, iconName, title, copy) {
+  return (
+    '<article class="mirror-hero-callout mirror-hero-callout--' +
+    side +
+    '" data-reveal><span class="mirror-hero-callout__icon">' +
+    icon(iconName) +
+    '</span><div><h3>' +
+    title +
+    '</h3><p>' +
+    copy +
+    '</p></div></article>'
+  );
+}
+
+function mirrorEverydayCard(variant, title, copy) {
+  return (
+    '<article class="mirror-everyday-card mirror-everyday-card--' +
+    variant +
+    '" data-reveal><div class="mirror-everyday-card__image"><img src="' +
+    ASSET(homeAssets.mirror) +
+    '" alt="Reflexion Mirror in a calm home setting" loading="eager" /></div><div class="mirror-everyday-card__body"><span class="icon-wrap">' +
+    icon(variant === "older" ? "heart" : variant === "home" ? "home" : "wave") +
+    '</span><h3>' +
+    title +
+    '</h3><p>' +
+    copy +
+    '</p></div></article>'
+  );
+}
+
 function mirrorPage() {
   return (
     '<div class="page page--mirror">' +
-    '<section class="hero">' +
-    '<div class="hero__grid">' +
-    '<div class="hero__copy" data-reveal>' +
+    '<section class="mirror-hero">' +
+    '<div class="mirror-hero__copy" data-reveal>' +
     badge("Care. Connected.") +
     "<h1>A familiar mirror, reimagined for gentle daily care.</h1>" +
-    "<p>Voice-first, visually calm, and designed to feel natural in the home.</p>" +
+    "<p>Voice-first, visually calm, and<br />designed to feel natural in the home.</p>" +
     '<div class="hero-actions">' +
     button("Join the waitlist") +
     "</div>" +
     "</div>" +
-    '<div class="hero__visual" data-reveal>' +
-    '<div class="mirror-annotated-stage">' +
-    mirrorVisual({ screen: "idle", size: "large", className: "mirror-device--hero" }) +
-    "</div>" +
-    "</div>" +
-    "</div>" +
-    "</section>" +
-    '<section class="section section--tight">' +
-    '<div class="annotated-layout">' +
-    '<div class="callout-stack callout-stack--left">' +
-    callout("wave", "Voice-first", "Just speak naturally. The mirror listens and responds.") +
-    callout("check", "Simple morning check-in", "A gentle way to start the day.") +
-    callout("message", "Family messages", "See kind notes and updates from the people who care.") +
-    "</div>" +
-    '<div class="mirror-annotated-stage" data-reveal>' +
-    mirrorVisual({ screen: "idle", size: "large" }) +
-    "</div>" +
-    '<div class="callout-stack callout-stack--right">' +
-    callout("calendar", "Daily routine support", "Stay on track with reminders that feel helpful, not intrusive.") +
-    callout("sun", "Ambient side lights", "Soft, adjustable lighting that’s easy on the eyes.") +
-    callout("home", "Thoughtful tabletop design", "Sleek, stable, and made to feel at home.") +
-    "</div>" +
+    '<div class="mirror-hero__scene">' +
+    '<svg class="mirror-hero__botanical" viewBox="0 0 220 340" fill="none" aria-hidden="true">' +
+    '<path d="M60 339C65 276 85 196 132 122 151 92 174 58 202 20"/><path d="M84 251C55 231 31 212 10 184M106 193C80 171 63 145 46 113M132 122C151 96 171 67 185 43"/>' +
+    '<path d="M10 184C16 156 40 144 63 157 50 182 29 192 10 184ZM46 113C58 87 83 78 105 94 90 119 66 126 46 113ZM84 251C57 244 43 224 49 203 72 211 88 230 84 251ZM106 193C121 165 147 156 167 171 153 197 128 204 106 193ZM132 122C150 93 179 87 198 102 184 130 155 138 132 122Z"/>' +
+    '</svg>' +
+    '<div class="mirror-hero__asset"><img src="' +
+    ASSET(homeAssets.mirror) +
+    '" alt="Reflexion Mirror showing a morning check-in on a tabletop" loading="eager" /></div>' +
+    '<div class="mirror-hero__callouts mirror-hero__callouts--left">' +
+    mirrorHeroCallout("left", "wave", "Voice-first", "Just speak naturally. The mirror listens and responds.") +
+    mirrorHeroCallout("left", "check", "Simple morning check-in", "A gentle way to start the day.") +
+    mirrorHeroCallout("left", "message", "Family messages", "See kind notes and updates from the people who care.") +
+    '</div>' +
+    '<div class="mirror-hero__callouts mirror-hero__callouts--right">' +
+    mirrorHeroCallout("right", "calendar", "Daily routine support", "Stay on track with reminders that feel helpful, not intrusive.") +
+    mirrorHeroCallout("right", "sun", "Ambient side lights", "Soft, adjustable lighting that’s easy on the eyes.") +
+    mirrorHeroCallout("right", "home", "Thoughtful tabletop design", "Sleek, stable, and made to feel at home.") +
+    '</div>' +
     "</div>" +
     "</section>" +
-    '<section class="section section--tight" data-reveal>' +
+    '<section class="mirror-everyday" data-reveal>' +
     '<div class="section-heading">' +
     "<h2>Thoughtfully designed for everyday life.</h2>" +
     "<p>No screens to figure out. No apps to open. Just a better way to stay connected and supported.</p>" +
     "</div>" +
-    '<div class="mirror-feature-grid">' +
-    mirrorFeatureCard("mirror-speaking.png", "Reflexion Mirror voice interaction screen", "No app to learn", "Everything happens right on the mirror. Just step up and start talking.") +
-    mirrorFeatureCard("mirror-routine.png", "Reflexion Mirror routine reminder screen", "Designed for older adults", "Large text, clear audio, and simple language make it easy and comfortable.") +
-    mirrorFeatureCard("mirror-message.png", "Reflexion Mirror family message screen", "Built for the home", "Beautiful, minimal, and calming—it fits right in.") +
+    '<div class="mirror-everyday-grid">' +
+    mirrorEverydayCard("learn", "No app to learn", "Everything happens right on the mirror. Just step up and start talking.") +
+    mirrorEverydayCard("older", "Designed for older adults", "Large text, clear audio, and simple language make it easy and comfortable.") +
+    mirrorEverydayCard("home", "Built for the home", "Beautiful, minimal, and calming—it fits right in.") +
     "</div>" +
     "</section>" +
-    '<section class="section section--tight" data-reveal>' +
-    '<div class="mirror-note"><div><p class="panel-label">A calmer kind of technology</p><h2>Care that feels like part of the room.</h2><p>Reflexion is designed around ordinary moments: a morning hello, a reminder, a note from family, a little more ease.</p></div>' +
-    button("Join the waitlist") +
-    "</div>" +
-    "</section>" +
-    ctaBand("Care. Connected.", "See what Reflexion could look like in your home.", "For families", "/for-families") +
+    ctaBand("Care. Connected.", "See what Reflexion could look like in your home.", "How it works", "/how-it-works") +
     "</div>"
   );
 }
 
-function principleCard(iconName, title, copy) {
+function principleCard(iconName, title, copy, layoutKey) {
   return (
-    '<article class="principle-card" data-reveal><span class="icon-wrap">' +
+    '<article class="principle-card" data-reveal' +
+    (layoutKey ? ' data-layout-key="' + layoutKey + '"' : "") +
+    '><span class="icon-wrap">' +
     icon(iconName) +
     "</span><h3>" +
     title +
@@ -719,55 +814,72 @@ function principleCard(iconName, title, copy) {
   );
 }
 
+function aboutBotanical(className, layoutKey) {
+  return (
+    '<svg class="about-botanical ' +
+    className +
+    '"' +
+    (layoutKey ? ' data-layout-key="' + layoutKey + '"' : "") +
+    ' viewBox="0 0 220 340" fill="none" aria-hidden="true">' +
+    '<path d="M60 339C65 276 85 196 132 122 151 92 174 58 202 20"/><path d="M84 251C55 231 31 212 10 184M106 193C80 171 63 145 46 113M132 122C151 96 171 67 185 43"/>' +
+    '<path d="M10 184C16 156 40 144 63 157 50 182 29 192 10 184ZM46 113C58 87 83 78 105 94 90 119 66 126 46 113ZM84 251C57 244 43 224 49 203 72 211 88 230 84 251ZM106 193C121 165 147 156 167 171 153 197 128 204 106 193ZM132 122C150 93 179 87 198 102 184 130 155 138 132 122Z"/>' +
+    '</svg>'
+  );
+}
+
 function aboutPage() {
   return (
     '<div class="page page--about">' +
-    '<section class="hero">' +
-    '<div class="hero__grid">' +
-    '<div class="hero__copy" data-reveal>' +
+    '<section class="about-hero">' +
+    '<div class="about-hero__copy" data-reveal data-layout-key="hero.copy">' +
     badge("Our mission") +
-    "<h1>Built on trust. Designed for dignity.</h1>" +
-    "<p>Reflexion is designed to help families stay connected through respectful conversation, useful context, and thoughtful design.</p>" +
+    "<h1>Built on trust.<br />Designed for dignity.</h1>" +
+    "<p>Reflexion is designed to help families stay connected<br />through respectful conversation, useful context,<br />and thoughtful design.</p>" +
     '<div class="hero-actions">' +
     button("Join the waitlist") +
     routeLink("See how it works " + icon("arrow"), "/how-it-works", "text-link") +
     "</div>" +
     "</div>" +
-    '<div class="hero__visual about-hero__visual" data-reveal>' +
-    mirrorVisual({ screen: "idle", size: "large" }) +
-    phoneVisual({ screen: "home" }) +
-    "</div>" +
+    '<div class="about-hero__scene">' +
+    '<div class="about-hero__mirror" data-layout-key="hero.mirror"><img src="' +
+    ASSET(homeAssets.mirror) +
+    '" alt="Reflexion Mirror showing a morning check-in" loading="eager" /></div>' +
+    '<div class="about-hero__phone" data-layout-key="hero.phone"><img src="' +
+    ASSET(homeAssets.caregiver) +
+    '" alt="Reflexion caregiver app home screen" loading="eager" /></div>' +
+    aboutBotanical("about-botanical--hero", "hero.botanical") +
+    '<div class="about-hero__vase" data-layout-key="hero.vase" aria-hidden="true"></div><div class="about-hero__books" data-layout-key="hero.books" aria-hidden="true"></div>' +
     "</div>" +
     "</section>" +
-    '<section class="section section--tight" data-reveal>' +
+    '<section class="about-principles" data-reveal>' +
     '<div class="principles-grid">' +
-    principleCard("people", "Supports connection, not surveillance", "Reflexion is here to spark meaningful conversations, not track or monitor.") +
-    principleCard("bell", "Flags changes, not diagnoses", "We highlight patterns that may matter—so families can check in and respond.") +
-    principleCard("shield", "Built for privacy and consent", "Personal data stays private and is shared only with your permission.") +
-    principleCard("heart", "Designed for real families", "Every detail—from the mirror to the app—was shaped by caregivers like you.") +
+    principleCard("people", "Supports connection, not surveillance", "Reflexion is here to spark meaningful conversations, not track or monitor.", "principle.1") +
+    principleCard("bell", "Flags changes, not diagnoses", "We highlight patterns that may matter—so families can check in and respond.", "principle.2") +
+    principleCard("shield", "Built for privacy and consent", "Personal data stays private and is shared only with your permission.", "principle.3") +
+    principleCard("heart", "Designed for real families", "Every detail—from the mirror to the app—was shaped by caregivers like you.", "principle.4") +
     "</div>" +
     "</section>" +
-    '<section class="section section--tight" data-reveal>' +
-    '<div class="story">' +
-    '<div><p class="panel-label">OUR STORY</p><h2>Born from a simple but powerful belief.</h2><p>Reflexion was created by families who know the quiet worry of living with someone from afar.</p><p>We believe that a daily check-in can be a bridge—bringing reassurance, preserving independence, and strengthening the bonds that matter most.</p><p class="story-signoff">With care,<span>The Reflexion Team</span></p></div>' +
-    '<div class="story-visual">' +
-    mirrorVisual({ screen: "idle", size: "large" }) +
-    phoneVisual({ screen: "home" }) +
+    '<section class="about-story-section" data-reveal>' +
+    '<div class="about-story">' +
+    '<div class="about-story__copy" data-layout-key="story.copy"><p class="panel-label">OUR STORY</p><h2>Born from a simple<br />but powerful belief.</h2><p>Reflexion was created by families who know the quiet<br />worry of living with someone from afar.</p><p>We believe that a daily check-in can be a bridge—bringing<br />reassurance, preserving independence, and strengthening<br />the bonds that matter most.</p><p class="story-signoff">With care,<span>The Reflexion Team</span></p></div>' +
+    '<div class="about-story__scene"><div class="about-story__mirror" data-layout-key="story.mirror"><img src="' +
+    ASSET(homeAssets.mirror) +
+    '" alt="Reflexion Mirror in the home" loading="eager" /></div><div class="about-story__phone" data-layout-key="story.phone"><img src="' +
+    ASSET(homeAssets.caregiver) +
+    '" alt="Reflexion caregiver app home screen" loading="eager" /></div>' +
+    aboutBotanical("about-botanical--story", "story.botanical") +
     "</div>" +
     "</div>" +
     "</section>" +
-    '<section class="section section--tight" data-reveal>' +
-    '<div class="section-heading">' +
-    "<h2>Trust is at the heart of everything we build.</h2>" +
-    "</div>" +
+    '<section class="about-trust-section" data-reveal><div class="about-trust">' +
+    '<div class="about-trust__heading"><h2>Trust is at the heart of everything we build.</h2></div>' +
     trustStrip([
       { icon: "shield", title: "Privacy first", copy: "Your data is private, secure, and never sold." },
       { icon: "heart", title: "Dignity always", copy: "We design with respect for independence." },
       { icon: "people", title: "Family-centered", copy: "Tools that empower caregivers and loved ones." },
       { icon: "check", title: "Real-life ready", copy: "Simple, warm, and built for everyday use." },
-    ]) +
-    "</section>" +
-    ctaBand("Care. Connected.", "A gentler way to stay close.", "See the mirror", "/the-mirror") +
+    ], "trust") +
+    "</div></section>" +
     "</div>"
   );
 }
@@ -804,7 +916,170 @@ function modalMarkup() {
   );
 }
 
+const layoutEditorStorageKey = "reflexion-marketing-layout-about-v1";
+
+function layoutEditorEnabled() {
+  return currentPath() === "/about" && new URLSearchParams(window.location.search).get("edit") === "1";
+}
+
+function layoutNumber(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? Math.round(numeric) : 0;
+}
+
+function readLayoutState() {
+  try {
+    const stored = window.localStorage.getItem(layoutEditorStorageKey);
+    const parsed = stored ? JSON.parse(stored) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeLayoutState(state) {
+  try {
+    window.localStorage.setItem(layoutEditorStorageKey, JSON.stringify(state));
+  } catch {
+    // The editor still works for the current session if storage is unavailable.
+  }
+}
+
+function applyLayoutOffsets(state) {
+  if (currentPath() !== "/about") return;
+  const offsets = state || readLayoutState();
+  document.querySelectorAll("[data-layout-key]").forEach((target) => {
+    const saved = offsets[target.dataset.layoutKey] || {};
+    target.classList.add("layout-editable");
+    target.style.setProperty("--layout-x", layoutNumber(saved.x) + "px");
+    target.style.setProperty("--layout-y", layoutNumber(saved.y) + "px");
+  });
+}
+
+function layoutTargetLabel(target) {
+  const key = target.dataset.layoutKey || "element";
+  const parts = key.split(".");
+  const last = parts[parts.length - 1];
+  const readable = last.replace(/^(\d+)$/, "card $1").replace(/-/g, " ");
+  return parts.length > 1 ? parts[0] + " / " + readable : readable;
+}
+
+function layoutEditorMarkup() {
+  return (
+    '<aside class="layout-editor" data-layout-editor aria-label="About layout editor">' +
+    '<div class="layout-editor__intro"><span class="layout-editor__icon">' +
+    icon("spark") +
+    '</span><span><strong>Edit layout</strong><small>Drag the outlined pieces into place.</small></span></div>' +
+    '<div class="layout-editor__actions"><button type="button" data-layout-action="reset">Reset</button><button type="button" data-layout-action="close">Done</button></div>' +
+    '<p class="layout-editor__status" data-layout-status>Positions save in this browser.</p>' +
+    '<p class="layout-editor__hint">Tip: press E on About any time to reopen this editor.</p>' +
+    "</aside>"
+  );
+}
+
+function openLayoutEditor() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("edit", "1");
+  window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+  render();
+}
+
+function closeLayoutEditor() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("edit");
+  window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+  render();
+}
+
+function resetLayoutOffsets() {
+  writeLayoutState({});
+  applyLayoutOffsets({});
+  const status = document.querySelector("[data-layout-status]");
+  if (status) status.textContent = "Positions reset to the reference layout.";
+}
+
+function initLayoutEditor() {
+  const targets = Array.from(document.querySelectorAll("[data-layout-key]"));
+  const status = document.querySelector("[data-layout-status]");
+  const setStatus = (message) => {
+    if (status) status.textContent = message;
+  };
+
+  targets.forEach((target) => {
+    const label = layoutTargetLabel(target);
+    target.dataset.layoutLabel = label;
+    target.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) return;
+      const eventTarget = event.target;
+      if (eventTarget instanceof Element && eventTarget.closest("a, button, input, textarea, select")) return;
+      event.preventDefault();
+
+      const saved = readLayoutState()[target.dataset.layoutKey] || {};
+      const startOffset = { x: layoutNumber(saved.x), y: layoutNumber(saved.y) };
+      const startPoint = { x: event.clientX, y: event.clientY };
+      let currentOffset = { ...startOffset };
+
+      target.dataset.layoutDragging = "true";
+      target.style.zIndex = "80";
+      try {
+        if (target.setPointerCapture) target.setPointerCapture(event.pointerId);
+      } catch {
+        // Synthetic pointer events used by local QA do not always have a capturable pointer.
+      }
+      setStatus("Moving " + label + "…");
+
+      const onMove = (moveEvent) => {
+        currentOffset = {
+          x: startOffset.x + moveEvent.clientX - startPoint.x,
+          y: startOffset.y + moveEvent.clientY - startPoint.y,
+        };
+        target.style.setProperty("--layout-x", Math.round(currentOffset.x) + "px");
+        target.style.setProperty("--layout-y", Math.round(currentOffset.y) + "px");
+        setStatus(
+          label +
+            " · " +
+            (currentOffset.x >= 0 ? "+" : "") +
+            Math.round(currentOffset.x) +
+            "px, " +
+            (currentOffset.y >= 0 ? "+" : "") +
+            Math.round(currentOffset.y) +
+            "px",
+        );
+      };
+
+      const finish = () => {
+        const nextState = readLayoutState();
+        nextState[target.dataset.layoutKey] = {
+          x: Math.round(currentOffset.x),
+          y: Math.round(currentOffset.y),
+        };
+        writeLayoutState(nextState);
+        target.removeEventListener("pointermove", onMove);
+        target.removeEventListener("pointerup", finish);
+        target.removeEventListener("pointercancel", finish);
+        target.removeAttribute("data-layout-dragging");
+        target.style.zIndex = "";
+        try {
+          if (target.releasePointerCapture) target.releasePointerCapture(event.pointerId);
+        } catch {
+          // See the setPointerCapture note above.
+        }
+        setStatus(label + " saved locally.");
+      };
+
+      target.addEventListener("pointermove", onMove);
+      target.addEventListener("pointerup", finish);
+      target.addEventListener("pointercancel", finish);
+    });
+  });
+
+  setStatus("Drag an outlined element. Positions save automatically.");
+}
+
 function render() {
+  const existingLayoutEditor = document.querySelector("[data-layout-editor]");
+  if (existingLayoutEditor) existingLayoutEditor.remove();
+  document.body.classList.remove("is-layout-editing");
   const app = document.querySelector("#app");
   const homeClass = currentPath() === "/" ? " site-shell--home" : "";
   app.innerHTML =
@@ -820,6 +1095,12 @@ function render() {
     modalMarkup();
   initMotion();
   initHeaderState();
+  applyLayoutOffsets();
+  if (layoutEditorEnabled()) {
+    document.body.classList.add("is-layout-editing");
+    document.body.insertAdjacentHTML("beforeend", layoutEditorMarkup());
+    initLayoutEditor();
+  }
 }
 
 function openWaitlist() {
@@ -881,6 +1162,14 @@ function initHeaderState() {
 }
 
 document.addEventListener("click", (event) => {
+  const layoutAction = event.target.closest("[data-layout-action]");
+  if (layoutAction) {
+    event.preventDefault();
+    if (layoutAction.dataset.layoutAction === "reset") resetLayoutOffsets();
+    if (layoutAction.dataset.layoutAction === "close") closeLayoutEditor();
+    return;
+  }
+
   const route = event.target.closest("[data-route]");
   if (route) {
     const href = route.getAttribute("href");
@@ -927,6 +1216,21 @@ document.addEventListener("submit", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  const tagName = event.target && event.target.tagName;
+  if (
+    event.key.toLowerCase() === "e" &&
+    currentPath() === "/about" &&
+    !layoutEditorEnabled() &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.altKey &&
+    !["INPUT", "TEXTAREA", "SELECT"].includes(tagName)
+  ) {
+    event.preventDefault();
+    openLayoutEditor();
+    return;
+  }
+
   if (event.key === "Escape") closeWaitlist();
 });
 

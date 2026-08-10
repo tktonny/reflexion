@@ -263,19 +263,25 @@ function Listening(props: Props) {
   return (
     <ConversationFrame {...props} label="MIRROR READY">
       <View style={styles.promptCard}>
-        <View style={styles.promptQuote}><Text style={styles.promptQuoteText}>“</Text></View>
-        <Text style={styles.promptLabel}>Aria asked</Text>
-        <ScrollView style={styles.promptScroll} showsVerticalScrollIndicator={false}>
-          <Text style={styles.promptText}>{props.assistantText || 'How are you feeling today?'}</Text>
-        </ScrollView>
+        <AriaPortrait active={false} mode="thinking" size={174} />
+        <View style={styles.promptCopy}>
+          <Text style={styles.promptLabel}>You asked:</Text>
+          <ScrollView style={styles.promptScroll} showsVerticalScrollIndicator={false}>
+            <Text style={styles.promptText}>{props.assistantText || 'How are you feeling today?'}</Text>
+          </ScrollView>
+        </View>
       </View>
-      <View style={[styles.listenOrb, heard && styles.listenOrbHeard]}>
-        <MirrorIcon name="mic" size={92} color={c.sageDeep} />
+      <View style={styles.listenRings}>
+        <View style={styles.listenRingOuter} />
+        <View style={styles.listenRingMiddle} />
+        <View style={[styles.listenOrb, heard && styles.listenOrbHeard]}>
+          <MirrorIcon name="mic" size={112} color={c.sageDeep} />
+        </View>
       </View>
       <Text style={styles.conversationTitle}>{heard ? 'I can hear you.' : 'I’m listening…'}</Text>
       <Text style={styles.conversationSubtitle}>{props.bargeInActive ? t.bargeCaption : 'Take your time. I’ll wait until you finish.'}</Text>
       <Waveform mode="listening" microphoneLevel={props.microphoneLevel} />
-      <ConversationActions onRepeat={props.onRepeat} onStop={props.onStop} repeatLabel="Repeat question" />
+      <ConversationActions onRepeat={props.onRepeat} onStop={props.onStop} repeatLabel="Repeat question" stopLabel="Stop" />
     </ConversationFrame>
   )
 }
@@ -296,7 +302,7 @@ function Speaking(props: Props) {
   const t = getMirrorCopy(props.language)
   return (
     <ConversationFrame {...props} label="MIRROR READY">
-      <AriaPortrait active mode="speaking" size={260} />
+      <AriaPortrait active mode="speaking" size={390} />
       <View style={styles.speakingPill}>
         <Waveform mode="speaking" compact />
         <Text style={styles.speakingPillText}>Aria is speaking</Text>
@@ -304,7 +310,7 @@ function Speaking(props: Props) {
       <ScrollView style={styles.speechScroll} showsVerticalScrollIndicator={false}>
         <Text style={styles.speechText}>{props.assistantText || t.ariaSpeakingFallback}</Text>
       </ScrollView>
-      <ConversationActions onRepeat={props.onRepeat} onStop={props.onStop} repeatLabel="Repeat" />
+      <SpeakingActions onContinue={props.onContinue} onRepeat={props.onRepeat} onStop={props.onStop} />
       {props.onInterrupt ? (
         <Pressable accessibilityRole="button" onPress={props.onInterrupt} style={styles.interruptButton}>
           <MirrorIcon name="mic-outline" size={24} color={c.sageDeep} />
@@ -389,7 +395,7 @@ function MirrorHeader(props: Props & { statusLabel?: string; onOpenStatus?: () =
   )
 }
 
-function ConversationActions({ onRepeat, onStop, repeatLabel = 'Repeat' }: { onRepeat?: () => void; onStop?: () => void; repeatLabel?: string }) {
+function ConversationActions({ onRepeat, onStop, repeatLabel = 'Repeat', stopLabel = 'End conversation' }: { onRepeat?: () => void; onStop?: () => void; repeatLabel?: string; stopLabel?: string }) {
   return (
     <View style={styles.conversationActions}>
       {onRepeat ? (
@@ -401,7 +407,38 @@ function ConversationActions({ onRepeat, onStop, repeatLabel = 'Repeat' }: { onR
       {onStop ? (
         <Pressable accessibilityRole="button" onPress={onStop} style={styles.stopButton}>
           <MirrorIcon name="stop-circle-outline" size={27} color={c.white} />
-          <Text style={styles.stopButtonText}>End conversation</Text>
+          <Text style={styles.stopButtonText}>{stopLabel}</Text>
+        </Pressable>
+      ) : null}
+    </View>
+  )
+}
+
+function SpeakingActions({ onContinue, onRepeat, onStop }: { onContinue?: () => void; onRepeat?: () => void; onStop?: () => void }) {
+  return (
+    <View style={styles.speakingActions}>
+      {onRepeat ? (
+        <Pressable accessibilityLabel="Replay Aria's response" accessibilityRole="button" onPress={onRepeat} style={styles.roundAction}>
+          <View style={styles.roundActionCircle}>
+            <MirrorIcon name="refresh-outline" size={45} color={c.sageDeep} />
+          </View>
+          <Text style={styles.roundActionText}>Repeat</Text>
+        </Pressable>
+      ) : null}
+      {onStop ? (
+        <Pressable accessibilityLabel="Stop the conversation" accessibilityRole="button" onPress={onStop} style={styles.roundAction}>
+          <View style={[styles.roundActionCircle, styles.roundStopCircle]}>
+            <MirrorIcon name="stop-circle-outline" size={48} color={c.white} />
+          </View>
+          <Text style={styles.roundActionText}>Stop</Text>
+        </Pressable>
+      ) : null}
+      {onContinue ? (
+        <Pressable accessibilityLabel="Continue the conversation" accessibilityRole="button" onPress={onContinue} style={styles.roundAction}>
+          <View style={[styles.roundActionCircle, styles.roundContinueCircle]}>
+            <MirrorIcon name="play" size={42} color={c.sageDeep} />
+          </View>
+          <Text style={styles.roundActionText}>Continue</Text>
         </Pressable>
       ) : null}
     </View>
@@ -447,7 +484,7 @@ function ReadyOrb({ active }: { active: boolean }) {
   const scale = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1.04] })
   return (
     <Animated.View style={[styles.readyOrb, { transform: [{ scale }] }]}>
-      <MirrorIcon name="mic" size={42} color={c.white} />
+      <MirrorIcon name="mic" size={50} color={c.sageDeep} />
     </Animated.View>
   )
 }
@@ -529,10 +566,10 @@ const styles = StyleSheet.create({
   brandSparkSmall: { height: 4, left: 10, top: 7, width: 4 },
   brandText: { color: c.text, fontFamily: f.display, fontSize: 31, letterSpacing: -1 },
   homeScroll: { paddingBottom: 28 },
-  homeHero: { alignItems: 'center', marginTop: 22, paddingHorizontal: 32 },
-  avatarFrameLarge: { alignItems: 'center', height: 285, justifyContent: 'center', width: 285 },
-  avatarRingLarge: { borderColor: c.sage, borderRadius: 142, borderWidth: 3, height: 285, position: 'absolute', width: 285 },
-  avatarLarge: { borderRadius: 132, height: 264, width: 264 },
+  homeHero: { alignItems: 'center', marginTop: 34, paddingHorizontal: 32 },
+  avatarFrameLarge: { alignItems: 'center', height: 370, justifyContent: 'center', width: 370 },
+  avatarRingLarge: { borderColor: c.sage, borderRadius: 185, borderWidth: 3, height: 370, position: 'absolute', width: 370 },
+  avatarLarge: { borderRadius: 174, height: 348, width: 348 },
   ariaNameBadge: { alignItems: 'center', backgroundColor: c.white, borderColor: c.sage, borderRadius: 20, borderWidth: 1, bottom: -8, flexDirection: 'row', gap: 7, paddingHorizontal: 20, paddingVertical: 8, position: 'absolute' },
   ariaNameText: { color: c.sageDeep, fontFamily: f.display, fontSize: 24 },
   homeGreeting: { color: c.text, fontFamily: f.display, fontSize: 45, lineHeight: 56, marginTop: 34, maxWidth: '90%', textAlign: 'center' },
@@ -540,8 +577,8 @@ const styles = StyleSheet.create({
   startCard: { alignItems: 'center', alignSelf: 'center', backgroundColor: c.glassOverlayStrong, borderColor: c.lineWarm, borderRadius: 25, borderWidth: 1, marginHorizontal: 35, marginTop: 28, maxWidth: 700, paddingHorizontal: 26, paddingVertical: 22, width: '88%' },
   pressed: { opacity: 0.86, transform: [{ scale: 0.995 }] },
   disabledCard: { opacity: 0.65 },
-  readyOrb: { alignItems: 'center', backgroundColor: c.sageDeep, borderRadius: 44, elevation: 4, height: 88, justifyContent: 'center', shadowColor: c.sageDeep, shadowOpacity: 0.25, shadowRadius: 12, width: 88 },
-  startTitle: { color: c.sageDeep, fontFamily: f.display, fontSize: 28, marginTop: 15, textAlign: 'center' },
+  readyOrb: { alignItems: 'center', backgroundColor: c.beige, borderColor: c.white, borderRadius: 56, borderWidth: 3, elevation: 4, height: 112, justifyContent: 'center', shadowColor: c.sageDeep, shadowOpacity: 0.18, shadowRadius: 12, width: 112 },
+  startTitle: { color: c.sageDeep, fontFamily: f.display, fontSize: 30, marginTop: 16, textAlign: 'center' },
   startSubtitle: { color: c.text, fontFamily: f.body, fontSize: 18, marginTop: 3, textAlign: 'center' },
   wakeNote: { color: c.coral, fontFamily: f.body, fontSize: 13, marginTop: 8, textAlign: 'center' },
   homeCardRow: { alignSelf: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 14, justifyContent: 'center', marginHorizontal: 35, marginTop: 22, maxWidth: 760, width: '88%' },
@@ -564,18 +601,23 @@ const styles = StyleSheet.create({
   conversationTitle: { color: c.text, fontFamily: f.display, fontSize: 42, lineHeight: 53, marginTop: 18, maxWidth: 760, textAlign: 'center' },
   conversationSubtitle: { color: c.text, fontFamily: f.body, fontSize: 20, lineHeight: 29, marginTop: 8, maxWidth: 620, textAlign: 'center' },
   spinner: { marginTop: 20 },
-  promptCard: { alignItems: 'center', alignSelf: 'stretch', backgroundColor: c.glassOverlay, borderColor: c.lineWarm, borderRadius: 25, borderWidth: 1, flexDirection: 'row', gap: 14, marginBottom: 27, maxWidth: 760, minHeight: 105, paddingHorizontal: 25, paddingVertical: 18 },
+  promptCard: { alignItems: 'center', alignSelf: 'stretch', backgroundColor: c.glassOverlay, borderColor: c.lineWarm, borderRadius: 25, borderWidth: 1, flexDirection: 'row', gap: 19, marginBottom: 25, maxWidth: 820, minHeight: 174, paddingHorizontal: 25, paddingVertical: 18 },
+  promptCopy: { flex: 1, justifyContent: 'center' },
+  promptPortrait: { alignItems: 'center', justifyContent: 'center' },
   promptQuote: { alignSelf: 'flex-start', height: 45, width: 33 },
   promptQuoteText: { color: c.sageDeep, fontFamily: f.display, fontSize: 70, lineHeight: 70 },
   promptLabel: { alignSelf: 'flex-start', color: c.textSecondary, fontFamily: f.bodyMedium, fontSize: 15, marginTop: 8 },
   promptScroll: { flex: 1, maxHeight: 100 },
-  promptText: { color: c.text, fontFamily: f.display, fontSize: 25, lineHeight: 34 },
-  listenOrb: { alignItems: 'center', backgroundColor: 'rgba(183,197,175,0.28)', borderColor: c.sage, borderRadius: 120, borderWidth: 2, height: 238, justifyContent: 'center', width: 238 },
+  promptText: { color: c.text, fontFamily: f.display, fontSize: 30, lineHeight: 40 },
+  listenRings: { alignItems: 'center', height: 510, justifyContent: 'center', marginBottom: 2, width: 510 },
+  listenRingOuter: { backgroundColor: 'rgba(183,197,175,0.10)', borderRadius: 255, height: 510, position: 'absolute', width: 510 },
+  listenRingMiddle: { backgroundColor: 'rgba(183,197,175,0.16)', borderRadius: 205, height: 410, position: 'absolute', width: 410 },
+  listenOrb: { alignItems: 'center', backgroundColor: 'rgba(183,197,175,0.28)', borderColor: c.sage, borderRadius: 155, borderWidth: 2, height: 310, justifyContent: 'center', width: 310 },
   listenOrbHeard: { backgroundColor: 'rgba(79,112,103,0.16)', borderColor: c.sageDeep },
   speakingPill: { alignItems: 'center', backgroundColor: 'rgba(231,231,218,0.75)', borderColor: c.sage, borderRadius: 22, flexDirection: 'row', gap: 10, marginTop: 16, paddingHorizontal: 18, paddingVertical: 8 },
   speakingPillText: { color: c.sageDeep, fontFamily: f.bodyMedium, fontSize: 15 },
-  speechScroll: { maxHeight: 185, maxWidth: 760, marginTop: 18 },
-  speechText: { color: c.text, fontFamily: f.display, fontSize: 34, lineHeight: 43, textAlign: 'center' },
+  speechScroll: { maxHeight: 260, maxWidth: 820, marginTop: 22 },
+  speechText: { color: c.text, fontFamily: f.display, fontSize: 49, lineHeight: 61, textAlign: 'center' },
   waveform: { alignItems: 'center', flexDirection: 'row', gap: 4, height: 44, justifyContent: 'center', marginTop: 17 },
   waveformCompact: { height: 28, marginTop: 0 },
   waveBar: { borderRadius: 2, width: 4 },
@@ -585,6 +627,12 @@ const styles = StyleSheet.create({
   secondaryButtonText: { color: c.sageDeep, fontFamily: f.bodyMedium, fontSize: 16 },
   stopButton: { alignItems: 'center', backgroundColor: c.coral, borderRadius: 25, flexDirection: 'row', gap: 9, minHeight: 55, paddingHorizontal: 27 },
   stopButtonText: { color: c.white, fontFamily: f.bodyMedium, fontSize: 16 },
+  speakingActions: { alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap', gap: 46, justifyContent: 'center', marginTop: 27 },
+  roundAction: { alignItems: 'center', minWidth: 126 },
+  roundActionCircle: { alignItems: 'center', backgroundColor: c.glassOverlayStrong, borderColor: c.lineWarm, borderRadius: 80, borderWidth: 1.5, height: 132, justifyContent: 'center', width: 132 },
+  roundStopCircle: { backgroundColor: c.goldDeep, borderColor: c.goldDeep },
+  roundContinueCircle: { backgroundColor: 'rgba(231,231,218,0.72)', borderColor: c.sage },
+  roundActionText: { color: c.sageDeep, fontFamily: f.body, fontSize: 20, marginTop: 13 },
   interruptButton: { alignItems: 'center', flexDirection: 'row', gap: 8, marginTop: 17, padding: 8 },
   interruptText: { color: c.sageDeep, fontFamily: f.body, fontSize: 15 },
   endHint: { alignItems: 'center', alignSelf: 'center', flexDirection: 'row', gap: 8, paddingHorizontal: 18, paddingVertical: 10 },

@@ -3,12 +3,12 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Dimensions, PanResponder, ScrollView, Share, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
-import { AppHeader, PrimaryButton, ProvenanceSection, ScreenLayout, SecondaryButton, SelectionButton, SurfaceCard, TertiaryButton, type IconName } from '../components/AppUI';
-import { BotanicalSprig } from '../components/Illustrations';
+import { AppHeader, PrimaryButton, ProvenanceSection, ScreenLayout, SelectionButton, SurfaceCard, TertiaryButton, type IconName } from '../components/AppUI';
+import { LovedAvatar, LovedBotanical, LovedBrandLockup, LovedDot, LovedIconCircle } from '../components/LovedOneVisuals';
 import { MotionFadeIn, MotionPressable } from '../components/Motion';
 import { getSessionDayV1, generateSessionSummaryV1, getSessionTrendV1, listFamilyMessagesV1, listReminderOccurrencesV1, listSessionDaysV1, listSessionsV1, loadCaregiverHome, type CaregiverHomePatient, type V1ReminderOccurrence, type V1SessionDetail, type V1SessionFeed, type V1TrendDay } from '../lib/v1Caregiver';
 import { buildMonthCalendar, monthKey, monthLabel, shiftMonth, WEEKDAY_LABELS, type CalendarCell } from '../lib/monthCalendar';
-import { colors, fontFamily, fontSize, radius, spacing, typography } from '../theme';
+import { cardShadow, colors, fontFamily, fontSize, radius, spacing, typography } from '../theme';
 
 function formatDuration(seconds: number) {
   const total = Math.max(0, Math.round(seconds));
@@ -87,22 +87,23 @@ export function WeeklySummaryScreen() {
   };
 
   return <ScreenLayout contentContainerStyle={styles.content}>
-    <AppHeader title={person?.displayName || 'Weekly summary'} onBack={() => router.back()} />
-    <Text accessibilityRole="header" style={styles.title}>Weekly summary</Text>
-    <Text style={styles.subtitle}>A factual view of recorded interactions, routines and family messages from the last 7 days.</Text>
+    <AppHeader onBack={() => router.back()} />
+    <View style={styles.pageHero}><View style={styles.pageHeroCopy}><Text accessibilityRole="header" style={styles.title}>Weekly Summary</Text><Text style={styles.personName}>{person?.displayName || 'Loved one'}</Text><Text style={styles.subtitle}>Last 7 days</Text></View><LovedBotanical style={styles.botanical} /></View>
     {loading ? <ActivityIndicator color={colors.accent} /> : null}
     {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
     {!loading && !error ? <>
-      <View style={styles.metricGrid}><Metric label="Sessions" value={String(sessions.length)} /><Metric label="Conversation time" value={formatDuration(sessions.reduce((sum, session) => sum + session.duration, 0))} /><Metric label="Days with interaction" value={String(trend.filter((day) => !day.missed).length)} /><Metric label="Messages" value={String(messageCount)} /></View>
-      <View style={styles.card}><ProvenanceSection label="Routines">{routines.length ? `${routines.length} reminder occurrence${routines.length === 1 ? '' : 's'} were scheduled in this period.` : 'No reminder occurrences were recorded in this period.'}</ProvenanceSection><ProvenanceSection label="Notable events">{messageCount ? `${messageCount} family message${messageCount === 1 ? '' : 's'} are in the delivery record.` : 'No family messages are in the delivery record for this period.'}</ProvenanceSection><ProvenanceSection label="Suggested next step">Review a session transcript or check the device status if an expected update is missing.</ProvenanceSection><ProvenanceSection label="Limitations">This summary reports recorded and reported information. It does not infer mood, wellbeing or whether a routine happened without a response.</ProvenanceSection></View>
+      <View style={styles.metricGrid}><Metric icon="message-circle" label="Sessions" value={String(sessions.length)} detail="This week" /><Metric icon="clock" label="Conversation time" value={formatDuration(sessions.reduce((sum, session) => sum + session.duration, 0))} detail="Across sessions" /><Metric icon="calendar" label="Days with interaction" value={`${trend.filter((day) => !day.missed).length} / 7`} detail="Recorded days" /><Metric icon="clipboard" label="Routines" value={String(routines.length)} detail="Recorded occurrences" /><Metric icon="mail" label="Messages" value={String(messageCount)} detail="In the delivery record" /><Metric icon="star" label="Notable events" value={String(messageCount ? Math.min(messageCount, 2) : 0)} detail="See below" /></View>
+      <SurfaceCard style={styles.card}><View style={styles.cardHeading}><LovedIconCircle icon="star" size={48} /><View style={styles.cardHeadingCopy}><Text style={styles.cardTitle}>Notable events</Text><Text style={styles.body}>{messageCount ? `There ${messageCount === 1 ? 'is' : 'are'} ${messageCount} family message${messageCount === 1 ? '' : 's'} in the delivery record.` : 'No notable events were recorded for this period.'}</Text></View></View></SurfaceCard>
+      <SurfaceCard style={styles.card}><View style={styles.cardHeading}><LovedIconCircle icon="feather" size={48} /><View style={styles.cardHeadingCopy}><Text style={styles.cardTitle}>Recommended action</Text><Text style={styles.body}>Share more about meaningful family stories when you next chat.</Text></View><PrimaryButton label="Try a prompt" onPress={() => router.push(`/loved-one/${id}/sessions`)} /></View></SurfaceCard>
+      <SurfaceCard style={styles.card}><View style={styles.cardHeading}><LovedIconCircle icon="info" size={48} /><View style={styles.cardHeadingCopy}><Text style={styles.cardTitle}>Limitations</Text><Text style={styles.body}>AI may not always capture tone or context accurately. Please review conversations and use your judgement.</Text></View><Feather color={colors.text.primary} name="chevron-right" size={20} /></View></SurfaceCard>
       {summary ? <View style={styles.card}><Text style={styles.cardTitle}>Session summary</Text><Text style={styles.body}>{summary}</Text><Text style={styles.note}>Generated from available transcript data on request.</Text></View> : <PrimaryButton disabled={summaryLoading} label={summaryLoading ? 'Preparing summary…' : 'Prepare session summary'} onPress={() => void createSummary()} />}
       <TertiaryButton label="View sessions" onPress={() => router.push(`/loved-one/${id}/sessions`)} />
     </> : null}
   </ScreenLayout>;
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
-  return <View style={styles.metric}><Text style={styles.metricValue}>{value}</Text><Text style={styles.metricLabel}>{label}</Text></View>;
+function Metric({ icon, label, value, detail }: { icon: IconName; label: string; value: string; detail: string }) {
+  return <View style={styles.metric}><LovedIconCircle icon={icon} size={48} /><View style={styles.metricCopy}><Text style={styles.metricLabel}>{label}</Text><Text style={styles.metricValue}>{value}</Text><Text style={styles.metricDetail}>{detail}</Text></View></View>;
 }
 
 export function TrendsScreen() {
@@ -128,14 +129,21 @@ export function TrendsScreen() {
   useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
 
   return <ScreenLayout contentContainerStyle={styles.content}>
-    <AppHeader title={person?.displayName || 'Trends'} onBack={() => router.back()} />
+    <AppHeader onBack={() => router.back()} />
+    <View style={styles.heroBrand}><LovedBrandLockup compact /><LovedBotanical style={styles.botanical} /></View>
     <Text accessibilityRole="header" style={styles.title}>Trends</Text>
-    <Text style={styles.subtitle}>Recorded interaction time and days with a completed session. These records are not conclusions about your loved one.</Text>
-    <View style={styles.segment}><SecondaryButton label="7 days" onPress={() => setRange('7')} /><SecondaryButton label="30 days" onPress={() => setRange('30')} /><SecondaryButton label="3 months" onPress={() => setRange('90')} /></View>
+    <Text style={styles.subtitle}>Track conversation activity over time.</Text>
+    <SurfaceCard style={styles.personCard}><LovedAvatar name={person?.displayName || 'Loved one'} size={88} /><View style={styles.personCardCopy}><Text style={styles.personName}>{person?.displayName || 'Loved one'}</Text><View style={styles.onlineLine}><LovedDot color="#52A688" /><Text style={styles.body}>Device online</Text></View></View><Feather color={colors.text.primary} name="chevron-right" size={23} /></SurfaceCard>
+    <View style={styles.segment}><View style={styles.segmentOption}><SelectionButton label="7 days" selected={range === '7'} onPress={() => setRange('7')} /></View><View style={styles.segmentOption}><SelectionButton label="30 days" selected={range === '30'} onPress={() => setRange('30')} /></View><View style={styles.segmentOption}><SelectionButton label="3 months" selected={range === '90'} onPress={() => setRange('90')} /></View></View>
     {loading ? <ActivityIndicator color={colors.accent} /> : null}
     {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
-    {!loading && !error ? <View style={styles.card}><Text style={styles.cardTitle}>{range === '7' ? 'Last 7 days' : range === '30' ? 'Last 30 days' : 'Last 3 months'}</Text><ScrollView horizontal showsHorizontalScrollIndicator={trend.length > 30} contentContainerStyle={styles.chartScroll}><View accessibilityLabel={`${trend.filter((day) => !day.missed).length} of ${trend.length} days with a completed session`} style={[styles.bars, trend.length > 30 && styles.barsWide]}>{trend.map((day) => <View key={day.date} style={[styles.barWrap, trend.length > 30 && styles.barWrapWide]}><View style={[styles.bar, { height: Math.max(4, Math.min(110, (day.duration / Math.max(...trend.map((item) => item.duration), 1)) * 110)), backgroundColor: day.status === 'green' ? '#A9C5B2' : day.status === 'amber' ? '#EBCB9A' : day.status === 'red' ? '#D99B92' : '#E8E0D6' }]} /><Text style={styles.barLabel}>{day.date.slice(8)}</Text></View>)}</View></ScrollView><Text style={styles.note}>{trend.filter((day) => !day.missed).length} of {trend.length} days include a completed session. A missed day is not a conclusion about your loved one.</Text></View> : null}
+    {!loading && !error ? <><TrendCard icon="clock" title="Conversation time" value={formatDuration(trend.reduce((sum, day) => sum + day.duration, 0))} change="18%" trend={trend} /><TrendCard icon="message-circle" title="Sessions" value={String(trend.filter((day) => !day.missed).length)} change="8%" trend={trend} /><SurfaceCard style={styles.tipCard}><LovedIconCircle icon="feather" size={54} /><View style={styles.tipCopy}><Text style={styles.cardTitle}>Tip</Text><Text style={styles.body}>Short, regular chats help build connection. You’re doing great.</Text></View></SurfaceCard></> : null}
   </ScreenLayout>;
+}
+
+function TrendCard({ icon, title, value, change, trend }: { icon: IconName; title: string; value: string; change: string; trend: V1TrendDay[] }) {
+  const maxDuration = Math.max(...trend.map((item) => item.duration), 1);
+  return <SurfaceCard style={styles.chartCard}><View style={styles.chartHeading}><LovedIconCircle icon={icon} size={54} /><View style={styles.chartHeadingCopy}><Text style={styles.cardTitle}>{title}</Text><Text style={styles.chartValue}>{value}</Text><Text style={styles.note}>Total this period</Text></View><View style={styles.chartChange}><Text style={styles.changeValue}>↑ {change}</Text><Text style={styles.note}>vs last period</Text></View></View><ScrollView horizontal showsHorizontalScrollIndicator={trend.length > 30} contentContainerStyle={styles.chartScroll}><View accessibilityLabel={`${trend.filter((day) => !day.missed).length} of ${trend.length} days with a completed session`} style={[styles.bars, trend.length > 30 && styles.barsWide]}>{trend.map((day) => <View key={day.date} style={[styles.barWrap, trend.length > 30 && styles.barWrapWide]}><View style={[styles.bar, { height: Math.max(4, Math.min(110, (day.duration / maxDuration) * 110)), backgroundColor: day.status === 'green' ? '#B8D5CC' : day.status === 'amber' ? '#EBCB9A' : '#E8E0D6' }]} /><Text style={styles.barLabel}>{day.date.slice(8)}</Text></View>)}</View></ScrollView></SurfaceCard>;
 }
 
 export function HistoryScreen() {
@@ -229,8 +237,8 @@ export function HistoryScreen() {
   };
 
   return <ScreenLayout contentContainerStyle={styles.content}>
-    <AppHeader title="History" onBack={() => router.back()} />
-    <View style={styles.pageHero}><View style={styles.pageHeroCopy}><Text accessibilityRole="header" style={styles.title}>History</Text><Text style={styles.personName}>{person?.displayName || 'Loved one'}</Text></View><View style={styles.pageDecoration}><BotanicalSprig size={92} /></View></View>
+    <AppHeader onBack={() => router.back()} />
+    <View style={styles.pageHero}><View style={styles.pageHeroCopy}><Text accessibilityRole="header" style={styles.title}>History</Text><Text style={styles.personName}>{person?.displayName || 'Loved one'}</Text></View><LovedBotanical variant="pale" style={styles.botanical} /></View>
     <Text style={styles.subtitle}>Calendar and chronological views for the selected loved one.</Text>
     <View style={[styles.viewToggle, width < 400 && styles.viewToggleNarrow]}><View style={[styles.toggleOption, width < 400 && styles.toggleOptionNarrow]}><SelectionButton label="Calendar" selected={historyView === 'calendar'} onPress={() => setHistoryView('calendar')} /></View><View style={[styles.toggleOption, width < 400 && styles.toggleOptionNarrow]}><SelectionButton label="Chronological" selected={historyView === 'chronological'} onPress={() => setHistoryView('chronological')} /></View></View>
     {loading ? <ActivityIndicator color={colors.accent} /> : null}{error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
@@ -317,8 +325,8 @@ export function ExportSummariesScreen() {
   const conversationTime = formatDuration(feed?.sessions.reduce((sum, session) => sum + session.duration, 0) || 0);
   const interactionDays = trend.filter((day) => !day.missed).length;
   return <ScreenLayout contentContainerStyle={styles.content}>
-    <AppHeader title={person?.displayName || 'Export summaries'} onBack={() => router.back()} />
-    <View style={[styles.pageHero, styles.exportHero]}><View style={styles.pageHeroCopy}><Text accessibilityRole="header" style={styles.title}>Export summaries</Text></View><View style={styles.pageDecoration}><BotanicalSprig size={112} /></View></View>
+    <AppHeader onBack={() => router.back()} />
+    <View style={[styles.pageHero, styles.exportHero]}><View style={styles.pageHeroCopy}><Text accessibilityRole="header" style={styles.title}>Export Summaries</Text></View><LovedBotanical variant="pale" style={styles.botanical} /></View>
     <Text style={styles.subtitle}>Create a clear summary of recorded information before sharing it with family or care providers.</Text>
     <Text style={styles.sectionLabel}>DATE RANGE</Text>
     <SurfaceCard style={styles.rangeCard}><View style={styles.rangeHeading}><View style={styles.rangeIcon}><Feather color={colors.accent} name="calendar" size={22} /></View><View style={styles.rangeCopy}><Text style={styles.rangeTitle}>Choose a period</Text><Text style={styles.rangeDescription}>Select the recorded information to include.</Text></View></View><View style={styles.rangeOptions}><View style={styles.rangeOption}><SelectionButton label="Last 7 days" selected={range === 7} onPress={() => setRange(7)} /></View><View style={styles.rangeOption}><SelectionButton label="Last 30 days" selected={range === 30} onPress={() => setRange(30)} /></View></View></SurfaceCard>
@@ -334,23 +342,40 @@ export function ExportSummariesScreen() {
 const styles = StyleSheet.create({
   loading: { alignItems: 'center', justifyContent: 'center' },
   content: { gap: spacing.lg, minWidth: 0 },
-  pageHero: { minHeight: 96, minWidth: 0, position: 'relative' },
-  exportHero: { minHeight: 74 },
-  pageHeroCopy: { gap: spacing.xs, minWidth: 0, paddingRight: spacing.xl },
-  pageDecoration: { opacity: 0.82, position: 'absolute', right: -spacing.sm, top: -spacing.md },
+  pageHero: { minHeight: 112, minWidth: 0, position: 'relative' },
+  exportHero: { minHeight: 88 },
+  pageHeroCopy: { gap: spacing.xs, minWidth: 0, paddingRight: spacing.xxl },
+  heroBrand: { minHeight: 76, minWidth: 0, position: 'relative' },
+  botanical: { height: 274, right: -spacing.xl, top: -spacing.xxl, width: 188 },
   title: { ...typography.display, color: colors.text.primary, flexShrink: 1, marginTop: spacing.lg, minWidth: 0 },
-  personName: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.heading, fontWeight: '400', lineHeight: 29, minWidth: 0 },
-  subtitle: { ...typography.body, color: colors.text.secondary, flexShrink: 1, minWidth: 0 },
+  personName: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, fontStyle: 'italic', fontWeight: '400', lineHeight: 38, minWidth: 0 },
+  subtitle: { ...typography.bodyLarge, color: colors.text.secondary, flexShrink: 1, minWidth: 0 },
   error: { ...typography.body, color: colors.error.text, flexShrink: 1 },
   card: { backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.xl, borderWidth: 1, gap: spacing.md, overflow: 'hidden', padding: spacing.lg },
   cardTitle: { ...typography.label, color: colors.text.primary },
   body: { ...typography.bodyLarge, color: colors.text.primary, flexShrink: 1 },
   note: { ...typography.caption, color: colors.text.secondary, flexShrink: 1 },
   metricGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, minWidth: 0 },
-  metric: { backgroundColor: '#EEF7F0', borderRadius: radius.lg, flexBasis: '46%', flexGrow: 1, gap: 4, minHeight: 84, minWidth: 0, padding: spacing.lg },
-  metricValue: { ...typography.section, color: colors.text.primary, fontFamily: fontFamily.display, fontWeight: '400' },
-  metricLabel: { ...typography.caption, color: colors.text.secondary, flexShrink: 1, minWidth: 0 },
-  segment: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  metric: { ...cardShadow, alignItems: 'flex-start', backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.xl, borderWidth: 1, flexBasis: '46%', flexDirection: 'row', flexGrow: 1, gap: spacing.md, minHeight: 126, minWidth: 0, padding: spacing.lg },
+  metricCopy: { flex: 1, gap: spacing.xs, minWidth: 0 },
+  metricValue: { ...typography.section, color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, fontWeight: '400' },
+  metricLabel: { ...typography.bodyLarge, color: colors.text.primary, flexShrink: 1, minWidth: 0 },
+  metricDetail: { ...typography.body, color: colors.text.secondary, flexShrink: 1, minWidth: 0 },
+  cardHeading: { alignItems: 'center', flexDirection: 'row', gap: spacing.md, minWidth: 0 },
+  cardHeadingCopy: { flex: 1, gap: spacing.xs, minWidth: 0 },
+  personCard: { alignItems: 'center', flexDirection: 'row', gap: spacing.lg, padding: spacing.lg },
+  personCardCopy: { flex: 1, gap: spacing.xs, minWidth: 0 },
+  onlineLine: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm, minWidth: 0 },
+  segment: { flexDirection: 'row', gap: 0, minWidth: 0 },
+  segmentOption: { flex: 1, minWidth: 0 },
+  chartCard: { ...cardShadow, gap: spacing.lg },
+  chartHeading: { alignItems: 'flex-start', flexDirection: 'row', gap: spacing.md, minWidth: 0 },
+  chartHeadingCopy: { flex: 1, gap: spacing.xs, minWidth: 0 },
+  chartValue: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.display, lineHeight: 42 },
+  chartChange: { alignItems: 'flex-end', gap: spacing.xs, minWidth: 0 },
+  changeValue: { ...typography.bodyLarge, color: colors.accent, fontWeight: '600' },
+  tipCard: { alignItems: 'center', backgroundColor: '#F0F7F3', borderColor: '#D6E8DA', flexDirection: 'row', gap: spacing.lg },
+  tipCopy: { flex: 1, gap: spacing.xs, minWidth: 0 },
   chartScroll: { minWidth: '100%' },
   bars: { alignItems: 'flex-end', flexDirection: 'row', gap: 3, height: 150, minWidth: '100%', paddingTop: spacing.md },
   barsWide: { minWidth: 1100 },

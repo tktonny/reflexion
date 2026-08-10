@@ -89,7 +89,10 @@ export function corsOptions(): cors.CorsOptions {
   return {
     origin: allowed,
     credentials: true,
-    allowedHeaders: ['Authorization', 'Content-Type', 'Idempotency-Key', 'If-Match', 'X-Request-Id', 'X-Device-Bootstrap'],
+    allowedHeaders: [
+      'Authorization', 'Content-Type', 'Idempotency-Key', 'If-Match', 'X-Request-Id',
+      'X-Device-Bootstrap', 'X-Device-Id', 'X-Device-Install-Secret',
+    ],
     exposedHeaders: ['X-Request-Id', 'Deprecation', 'Sunset'],
   }
 }

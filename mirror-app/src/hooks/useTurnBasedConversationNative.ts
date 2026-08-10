@@ -14,7 +14,6 @@ import {
   openingMessageForLanguage,
 } from '../orchestration/orchestrator'
 import {
-  acknowledgementForLanguage,
   closingTextForLanguage,
   companionClosingTextForLanguage,
   createDailyConversationPlan,
@@ -59,6 +58,7 @@ export function useTurnBasedConversationNative(options: ConversationOptions = {}
   const [sessionActive, setSessionActive] = useState(false)
   const [recording, setRecording] = useState(false)
   const [ended, setEnded] = useState(false)
+  const [checkinComplete, setCheckinComplete] = useState(false)
 
   const llmRef = useRef<QwenChatMessage[]>([])
   const recordingRef = useRef(false) // mirrors `recording` so cleanup needn't depend on the state
@@ -86,6 +86,7 @@ export function useTurnBasedConversationNative(options: ConversationOptions = {}
   const pushToTalkGestureRef = useRef(createPushToTalkGesture({ minimumRecordingMs: 250 }))
   const recorderPreparePromiseRef = useRef<Promise<void> | null>(null)
   const recorderPreparedRef = useRef(false)
+  const lastAssistantTextRef = useRef('')
 
   const updateStatus = useCallback((kind: StatusKind, text: string) => {
     setStatusKind(kind)
@@ -93,6 +94,7 @@ export function useTurnBasedConversationNative(options: ConversationOptions = {}
   }, [])
 
   const addMessage = useCallback((role: ChatMessage['role'], text: string) => {
+    if (role === 'assistant') lastAssistantTextRef.current = text
     setMessages((prev) => [...prev, { id: randomId(role), role, text }])
   }, [])
 
@@ -164,6 +166,8 @@ export function useTurnBasedConversationNative(options: ConversationOptions = {}
     setConnecting(true)
     updateStatus('processing', 'Starting...')
     setMessages([])
+    setCheckinComplete(false)
+    lastAssistantTextRef.current = ''
     voiceRef.current = voiceProfileForSession(language)
     const greetingPeriod = greetingPeriodForDate()
     llmRef.current = [{ role: 'system', content: buildLiveInstructions(patientId, language, { persona, patientName: dailyPlan.patientName, greetingPeriod }) }]
@@ -224,6 +228,7 @@ export function useTurnBasedConversationNative(options: ConversationOptions = {}
       }
 
       let scriptedQuestion: string | null = null
+      let answered = persona !== 'screening'
       const userGoodbyeRequested = looksLikeUserGoodbye(transcript)
       let dailyFlowComplete = false
       if (persona === 'screening') {
@@ -231,10 +236,10 @@ export function useTurnBasedConversationNative(options: ConversationOptions = {}
         if (flow) {
           const answerResult = flow.recordAnswer(transcript)
           if (answerResult === 'answered') {
+            answered = true
             const next = flow.current()
             scriptedQuestion = next ? screeningQuestionForTurn(voiceRef.current.languageKey, next.order, dailyPlan) : null
             dailyFlowComplete = !scriptedQuestion
-            if (scriptedQuestion) scriptedQuestion = `${acknowledgementForLanguage(voiceRef.current.languageKey, turnCountRef.current)} ${scriptedQuestion}`
           } else {
             const action = flow.recordRepromptOrTimeout()
             const next = flow.current()
@@ -242,20 +247,44 @@ export function useTurnBasedConversationNative(options: ConversationOptions = {}
             dailyFlowComplete = action === 'complete' || !scriptedQuestion
           }
         } else {
+          answered = true
           scriptedQuestion = screeningQuestionForTurn(voiceRef.current.languageKey, turnCountRef.current, dailyPlan)
           dailyFlowComplete = !scriptedQuestion
         }
       }
+      if (dailyFlowComplete) setCheckinComplete(true)
       if (userGoodbyeRequested || dailyFlowComplete) closingRef.current = true
 
       updateStatus('processing', 'Thinking...')
       // The screening close is deterministic. Relying on a one-turn LLM directive occasionally
       // produced another question or no goodbye at all on the fallback transport.
-      const reply = closingRef.current
-        ? persona === 'companion' && userGoodbyeRequested
+      let reply: string | null
+      if (closingRef.current) {
+        reply = persona === 'companion' && userGoodbyeRequested
           ? companionClosingTextForLanguage(voiceRef.current.languageKey)
           : closingTextForLanguage(voiceRef.current.languageKey)
-        : scriptedQuestion ?? await qwenChat(llmRef.current, { maxTokens: 120, temperature: 0.4 })
+      } else if (scriptedQuestion && !answered) {
+        reply = scriptedQuestion
+      } else if (scriptedQuestion) {
+        let naturalReply = ''
+        try {
+          naturalReply = await qwenChat([
+            ...llmRef.current,
+            {
+              role: 'system',
+              content:
+                `For this reply only, answer the patient's latest message directly and warmly in one or two ` +
+                `short sentences. If they asked a question, answer it before returning to the check-in. ` +
+                `Do not ask a new question; the app will ask this exact next question afterwards: "${scriptedQuestion}"`,
+            },
+          ], { maxTokens: 120, temperature: 0.4 })
+        } catch {
+          // The deterministic next question remains usable if the optional natural-response request fails.
+        }
+        reply = naturalReply ? `${naturalReply.trim()} ${scriptedQuestion}` : scriptedQuestion
+      } else {
+        reply = await qwenChat(llmRef.current, { maxTokens: 120, temperature: 0.4 })
+      }
       if (!isCurrentSession(epoch)) return
       if (reply) {
         llmRef.current.push({ role: 'assistant', content: reply })
@@ -361,6 +390,16 @@ export function useTurnBasedConversationNative(options: ConversationOptions = {}
     else endPushToTalk()
   }, [beginPushToTalk, endPushToTalk])
 
+  const replayLastResponse = useCallback(async () => {
+    const text = lastAssistantTextRef.current.trim()
+    if (!text || !sessionActiveRef.current || manualCloseRequestedRef.current) return
+    const epoch = lifecycleEpochRef.current
+    const spoken = await speak(text, 'Replaying...', epoch)
+    if (spoken && isCurrentSession(epoch) && !manualCloseRequestedRef.current) {
+      updateStatus('listening', 'Ready for your next answer.')
+    }
+  }, [isCurrentSession, speak, updateStatus])
+
   // Stable teardown ([] deps + refs): the unmount effect is `useEffect(() => cleanup, [cleanup])`,
   // so cleanup MUST NOT change identity mid-session — otherwise React fires the previous cleanup on
   // every `recording` toggle and the session self-destructs on the first mic tap.
@@ -452,9 +491,11 @@ export function useTurnBasedConversationNative(options: ConversationOptions = {}
     sessionActive,
     userSpeaking: recording,
     ended,
+    checkinComplete,
     recording,
     beginPushToTalk,
     endPushToTalk,
     toggleRecording,
+    replayLastResponse,
   }
 }
