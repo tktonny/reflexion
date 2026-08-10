@@ -13,7 +13,7 @@ import { appendOutbox } from '../platform/outbox.js'
 import { issueAccessToken, verifyAccessToken } from '../platform/tokens.js'
 import { enumValue, isoDate, objectBody, optionalString, requiredString } from '../platform/validation.js'
 import { getClientIp, resolveDeviceRegion } from '../platform/region.js'
-import { DAILY_CHECKIN_CONSENT_PURPOSE, publicConsentStatus } from '../platform/consent.js'
+import { DAILY_CHECKIN_CONSENT_PURPOSE, VIDEO_COMPANION_CONSENT_PURPOSE, publicConsentStatus } from '../platform/consent.js'
 
 const PAIRING_TTL_MS = 10 * 60 * 1000
 const EXCHANGE_TTL_MS = 5 * 60 * 1000
@@ -404,15 +404,23 @@ devicesRouter.post('/devices/:deviceId/revocations', requireActor('human'), asyn
 devicesRouter.get('/devices/:deviceId/configuration', requireActor('human', 'device'), asyncHandler(async (request, response) => {
   const { device, assignment } = await authorizedDevice(request, request.params.deviceId)
   const db = await getDb()
-  const [configuration, patient, carePlan, consent] = await Promise.all([
+  const [configuration, patient, carePlan, consent, videoConsent] = await Promise.all([
     db.collection<any>(collections.deviceConfigurations).findOne({ deviceId: device._id }, { sort: { configVersion: -1 } }),
     db.collection<any>(collections.patients).findOne({ _id: assignment.patientId, tenantId: assignment.tenantId }, { projection: { displayName: 1, preferredLanguage: 1, timezone: 1, version: 1 } }),
     db.collection<any>(collections.carePlans).findOne({ tenantId: assignment.tenantId, patientId: assignment.patientId, status: 'active' }, { sort: { version: -1 }, projection: { version: 1, communicationPreferences: 1, dailyRoutine: 1 } }),
     db.collection<any>(collections.consents).find({ tenantId: assignment.tenantId, patientId: assignment.patientId, purpose: DAILY_CHECKIN_CONSENT_PURPOSE }).sort({ createdAt: -1, _id: -1 }).limit(1).next(),
+    // Whether the camera may be used at all — a separate promise from the check-in consent above, and one
+    // the mirror cannot make for itself. Withdrawing it turns every paired mirror audio-only on its next
+    // configuration read, which is what makes withdrawal the off switch.
+    db.collection<any>(collections.consents).findOne({
+      tenantId: assignment.tenantId, patientId: assignment.patientId,
+      purpose: VIDEO_COMPANION_CONSENT_PURPOSE, status: 'granted', withdrawnAt: { $in: [null, undefined] },
+    }),
   ])
   const patientConfiguration = patient ? { patientId: patient._id, displayName: patient.displayName,
     preferredLanguage: patient.preferredLanguage, timezone: patient.timezone, version: patient.version,
     consent: { purpose: DAILY_CHECKIN_CONSENT_PURPOSE, status: publicConsentStatus(consent) },
+    videoConsent: Boolean(videoConsent),
     carePlan: carePlan ? { version: carePlan.version, communicationPreferences: carePlan.communicationPreferences, dailyRoutine: carePlan.dailyRoutine } : null } : null
   sendData(response, configuration ? {
     deviceId: device._id, configVersion: configuration.configVersion, desired: configuration.desired,

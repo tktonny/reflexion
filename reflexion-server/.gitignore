@@ -3,3 +3,4 @@ dist/
 .env
 old-api
 DS_Store
+.env.bak*

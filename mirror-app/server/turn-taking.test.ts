@@ -34,6 +34,7 @@ import {
 import { acquireConversationRuntime } from '../src/orchestration/conversationRuntime'
 import { createPushToTalkGesture } from '../src/orchestration/pushToTalkGesture'
 import { secureQwenAssetUrl } from '../src/orchestration/networkSecurity'
+import { canStartDailyConversation, isConversationConsentError } from '../src/lib/conversationConsent'
 
 const ready: TurnTakingEvent[] = [
   { type: 'connect_started' },
@@ -368,4 +369,19 @@ test('push-to-talk discards an accidental tap instead of sending empty audio', (
   assert.equal(gesture.ready(heldToken!), true)
   now += 800
   assert.equal(gesture.release(), 'send')
+})
+
+test('daily conversation consent gate allows only an accepted choice', () => {
+  assert.equal(canStartDailyConversation('accepted'), true)
+  assert.equal(canStartDailyConversation('pending'), false)
+  assert.equal(canStartDailyConversation('declined'), false)
+  assert.equal(canStartDailyConversation('withdrawn'), false)
+  assert.equal(canStartDailyConversation(undefined), false)
+})
+
+test('backend consent rejections route to consent instead of a service outage', () => {
+  assert.equal(isConversationConsentError('CONSENT_REQUIRED'), true)
+  assert.equal(isConversationConsentError('OLDER_ADULT_CONSENT_REQUIRED'), true)
+  assert.equal(isConversationConsentError('QWEN_TICKET_FAILED'), false)
+  assert.equal(isConversationConsentError('api_503'), false)
 })

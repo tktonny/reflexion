@@ -26,6 +26,7 @@ import {
 import { type ChatMessage } from '../src/hooks/conversationTypes'
 import { useConversation } from '../src/hooks/useConversation'
 import { useWakeWord } from '../src/hooks/useWakeWord'
+import { canStartDailyConversation, isConversationConsentError } from '../src/lib/conversationConsent'
 import { looksLikeGoodbye } from '../src/orchestration/orchestrator'
 import { createDailyConversationPlan } from '../src/orchestration/deterministicSpeech'
 import { clearDeviceCredential, deviceFetch, getDeviceCredential } from '../src/storage/deviceCredentials'
@@ -255,6 +256,15 @@ export default function ConversationScreen() {
         router.replace('/')
         return
       }
+      // This route can be restored directly by Android/Expo Router, bypassing the boot screen that
+      // normally performs the consent gate. Re-check the backend configuration here as well: otherwise
+      // pending/declined/withdrawn consent reaches POST /sessions, gets the correct CONSENT_REQUIRED
+      // response, and is falsely rendered as "Reflexion service unavailable".
+      if (pairing.online && !canStartDailyConversation(pairing.configuration?.patient?.consent?.status)) {
+        setCheckingPairing(false)
+        router.replace('/consent')
+        return
+      }
       const profile = await getStoredMirrorProfile()
       if (!mounted) return
       const nextPatientName = profile.patientName ?? pairing.configuration?.patient?.displayName ?? 'there'
@@ -373,6 +383,12 @@ export default function ConversationScreen() {
       await startConversation()
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to reach the Reflexion service.'
+      // Consent can be withdrawn after this screen's initial configuration read. The session endpoint is
+      // authoritative, so handle its stable rejection as a route transition rather than a service fault.
+      if (isConversationConsentError(message)) {
+        router.replace('/consent')
+        return
+      }
       setProblemDetail(`start: ${message}`)
       setLocalProblem(classifyError(message))
     }

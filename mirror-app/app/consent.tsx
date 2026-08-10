@@ -59,7 +59,12 @@ export default function ConsentScreen() {
           <Text style={styles.cardTitle}>You are in control</Text>
           <Text style={styles.copy}>You can change or withdraw this choice later with your care team. Nothing is shared for optional research unless that is chosen separately.</Text>
         </View>
-        {status === 'declined' ? <View style={styles.notice}><Text style={styles.noticeTitle}>Consent is currently declined</Text><Text style={styles.copy}>Daily check-ins will stay paused. Your caregiver can help you review this choice.</Text></View> : null}
+        {status === 'declined' || status === 'withdrawn' ? (
+          <View style={styles.notice}>
+            <Text style={styles.noticeTitle}>Consent is currently {status}</Text>
+            <Text style={styles.copy}>Daily check-ins will stay paused unless you choose to agree below. Your caregiver can help you review this choice.</Text>
+          </View>
+        ) : null}
         {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
         {busy ? <ActivityIndicator color={c.linen} /> : <>
           <Pressable accessibilityRole="button" accessibilityLabel="Agree and continue" onPress={() => void choose('granted')} style={styles.primary}><Text style={styles.primaryText}>Agree and continue</Text></Pressable>

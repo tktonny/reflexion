@@ -27,6 +27,14 @@ export type ConversationOptions = {
   speechRate?: number
   /** Today's local weather as one short human line (from the ambient widget), injected so Aria knows it. */
   weather?: string
+  /**
+   * Live camera frames for the realtime model, as RAW base64 JPEG, consumed one at a time (returns null
+   * when there is nothing new). Supplying this is what turns video on; leave it undefined and the
+   * conversation is audio-only. The CALLER owns the gate — granted video consent AND an OS camera
+   * permission AND a working camera — because neither this hook nor the model can tell a camera that is
+   * missing from one that is deliberately withheld.
+   */
+  takeVideoFrame?: () => string | null
 }
 
 /** Common shape every conversation version returns, so screens are version-agnostic. */
