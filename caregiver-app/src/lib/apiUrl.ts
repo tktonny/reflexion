@@ -12,7 +12,7 @@ function requireBaseUrl(): string {
 
   if (!baseUrl) {
     // Fail loudly. An APK built without this must not quietly succeed at reaching nothing.
-    throw new Error('EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL is not set');
+    throw new Error('Reflexion is not configured for this build. Please install the latest app or contact support. (EXPO_PUBLIC_CAREGIVER_APP_BACKEND_URL is not set.)');
   }
 
   return baseUrl.replace(/\/+$/, '');

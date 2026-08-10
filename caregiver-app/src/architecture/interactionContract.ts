@@ -42,7 +42,7 @@ export const interactionContracts: InteractionContract[] = [
   ['/settings/household','add','Add loved one','navigate','/settings/household/add',[], 'signed-in caregiver','none','profile form shown','route error','POST /patients','none'],
   ['/settings/devices','pair','Pair a Mirror','navigate','/device/[id]/pairing',['id'], 'signed-in caregiver','none','pairing-method form shown','route error','none','none'],
   ['/device/[id]/code','claim','Connect Mirror','mutate',undefined,['id','pairingCode'], 'caregiver can write patient','claiming Mirror','device assignment created','invalid/expired pairing code','POST /device-pairing-claims','Mirror receives the caregiver configuration'],
-  ['/chat/[id]/preview','send','Send message','mutate','/chat/[id]/status/[messageId]',['id','message'], 'paired Mirror','sending message','queued/delivered status shown','send error','POST /family-messages','Mirror polls and displays the message notification'],
+  ['/chat/[id]/preview','send','Send message','mutate','/chat/[id]',['id','message'], 'paired Mirror','sending message','queued/delivered/opened status shown inline in the chat thread','send error','POST /family-messages','Mirror polls and displays the message notification'],
 ].map((entry) => contract(entry[0] as string, entry[1] as string, entry[2] as string, entry[3] as InteractionContract['actionType'], entry[4] as string | undefined, entry[5] as string[], entry[6] as string, entry[7] as string, entry[8] as string, entry[9] as string, entry[10] as string, entry[11] as string));
 
 export function contractFor(sourceRoute: string, controlId: string) {

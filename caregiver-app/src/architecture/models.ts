@@ -17,9 +17,8 @@ export type SetupCategory =
   | 'routines'
   | 'notifications'
   | 'consent-control'
-  | 'care-circle'
   | 'research-participation';
-export type SetupStatus = 'not-started' | 'in-progress' | 'complete' | 'skipped';
+export type SetupStatus = 'not-started' | 'in-progress' | 'complete' | 'skipped' | 'not-applicable';
 
 export type RoutineCategory =
   | 'medication'
@@ -46,17 +45,21 @@ export type NotificationTrigger =
   | 'recent-interaction-shorter-than-usual'
   | 'device-may-be-offline'
   | 'reminder-not-completed-or-unclear'
-  | 'new-chat-reply'
   | 'weekly-summary';
 export type SessionSummaryFrequency = 'immediately-after-each-session' | 'daily-summary' | 'weekly-summary' | 'off';
 
 export type ConsentStatus = 'pending' | 'accepted' | 'declined' | 'withdrawn';
-export type ConsentControl = 'conversations-active' | 'conversations-paused' | 'conversation-stopped' | 'sharing-paused' | 'participation-withdrawn';
+export type ConsentControl = 'active' | 'paused';
+export type ProductControl = ConsentControl;
+export type ResearchParticipationStatus = 'not-invited' | 'invitation-pending' | 'consented' | 'declined' | 'withdrawn' | 'study-closed';
 export type CareCircleRole = 'full-access' | 'standard-access' | 'view-only' | 'custom-access';
 export type CareCirclePermission = 'view-loved-ones' | 'receive-notifications' | 'manage-routines' | 'manage-devices' | 'invite-or-remove-caregivers';
 
 export type MessageType = 'text' | 'photo' | 'voice';
-export type MessageStatus = 'draft' | 'scheduled' | 'queued' | 'delivered-to-device' | 'opened-or-played' | 'dismissed' | 'expired' | 'failed';
+export type MessageDeliveryState = 'draft' | 'scheduled' | 'queued' | 'delivered-to-device' | 'expired' | 'failed';
+export type MessageInteractionState = 'viewed' | 'played' | 'replayed';
+/** @deprecated Use MessageDeliveryState and MessageInteractionState separately. */
+export type MessageStatus = MessageDeliveryState;
 export type MessageSchedule = 'now' | 'specific-date-and-time';
 
 export type ScreenState =
@@ -82,7 +85,6 @@ export const SETUP_CATEGORIES: ReadonlyArray<{ id: SetupCategory; title: string;
   { id: 'routines', title: 'Routines', description: 'Set up gentle prompts that fit the day.' },
   { id: 'notifications', title: 'Notifications', description: 'Decide which updates you would like to receive.' },
   { id: 'consent-control', title: 'Older-Adult Consent & Control', description: 'Review choices together, in plain language.' },
-  { id: 'care-circle', title: 'Care Circle', description: 'Invite the people who help you care.' },
   { id: 'research-participation', title: 'Research participation', description: 'Choose separately whether to support optional research.' },
 ] as const;
 
@@ -103,8 +105,7 @@ export const NOTIFICATION_TRIGGERS: ReadonlyArray<{ id: NotificationTrigger; tit
   { id: 'recent-interaction-shorter-than-usual', title: 'Recent interaction shorter than usual' },
   { id: 'device-may-be-offline', title: 'Device may be offline' },
   { id: 'reminder-not-completed-or-unclear', title: 'Reminder not completed or unclear' },
-  { id: 'new-chat-reply', title: 'New chat reply' },
   { id: 'weekly-summary', title: 'Weekly summary' },
 ] as const;
 
-export const BASELINE_RULE = { minimumValidSessions: 2, rollingDays: 14 } as const;
+export const BASELINE_RULE = { minimumValidSessions: 3, rollingDays: 14 } as const;

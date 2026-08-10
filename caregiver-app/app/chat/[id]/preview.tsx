@@ -11,8 +11,10 @@ export default function MessagePreviewScreen() {
     if (!id || !message.trim()) return;
     setSending(true);
     try {
-      const result = await sendFamilyMessageV1({ patientId: id, body: message.trim(), ...(scheduledFor ? { scheduledFor } : {}) });
-      router.replace({ pathname: `/chat/${id}/status/${result.messageId}`, params: { state: result.state } });
+      await sendFamilyMessageV1({ patientId: id, body: message.trim(), ...(scheduledFor ? { scheduledFor } : {}) });
+      // Delivery status is rendered inline in the chat thread, not as a separate route.
+      // The thread refetches the server record on focus so queued/delivered/opened state stays truthful.
+      router.replace(`/chat/${id}`);
     } catch (cause) { Alert.alert('Message was not sent', cause instanceof Error ? cause.message : 'Please try again.'); }
     finally { setSending(false); }
   };

@@ -3,10 +3,16 @@
     "name": "Reflexion",
     "slug": "reflexion",
     "scheme": "reflexion",
-    "version": "1.0.1",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "updates": {
+      "url": "https://u.expo.dev/fadd4a42-857b-4d96-813f-ee13e762db8a"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.reflexion.caregiver",
@@ -28,7 +34,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.reflexion.caregiver",
-      "versionCode": 4
+      "versionCode": 10
     },
     "web": {
       "output": "static",
@@ -37,6 +43,7 @@
     "plugins": [
       "expo-router",
       "expo-status-bar",
+      "expo-updates",
       "expo-notifications",
       "expo-image-picker",
       "expo-camera"

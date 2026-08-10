@@ -2,6 +2,27 @@ import { MIN_PASSWORD_LENGTH } from './authMessages';
 
 export const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
+export type PasswordRequirement = {
+  key: 'length' | 'uppercase' | 'lowercase' | 'number' | 'special';
+  label: string;
+  test: (value: string) => boolean;
+};
+
+export const PASSWORD_REQUIREMENTS: readonly PasswordRequirement[] = [
+  { key: 'length', label: `At least ${MIN_PASSWORD_LENGTH} characters`, test: (value) => value.length >= MIN_PASSWORD_LENGTH },
+  { key: 'uppercase', label: 'One uppercase letter', test: (value) => /[A-Z]/.test(value) },
+  { key: 'lowercase', label: 'One lowercase letter', test: (value) => /[a-z]/.test(value) },
+  { key: 'number', label: 'One number', test: (value) => /\d/.test(value) },
+  { key: 'special', label: 'One special character', test: (value) => /[^A-Za-z0-9]/.test(value) },
+];
+
+export function passwordRequirementState(password: string): Record<PasswordRequirement['key'], boolean> {
+  return PASSWORD_REQUIREMENTS.reduce((result, requirement) => {
+    result[requirement.key] = requirement.test(password);
+    return result;
+  }, {} as Record<PasswordRequirement['key'], boolean>);
+}
+
 export type CreateAccountValues = {
   name: string;
   email: string;
@@ -31,7 +52,8 @@ export function normalizePhone(countryCode: string, phoneNumber: string): string
 }
 
 export function validateNewPassword(password: string): string | undefined {
-  return password.length < MIN_PASSWORD_LENGTH ? `Your password must be at least ${MIN_PASSWORD_LENGTH} characters.` : undefined;
+  const missing = PASSWORD_REQUIREMENTS.filter((requirement) => !requirement.test(password)).map((requirement) => requirement.label.toLowerCase());
+  return missing.length ? `Your password needs ${missing.join(', ')}.` : undefined;
 }
 
 export function validatePasswordPair(password: string, repeatPassword: string): FieldErrors {

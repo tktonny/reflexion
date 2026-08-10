@@ -1,109 +1,151 @@
 import * as Linking from 'expo-linking';
 import * as Notifications from 'expo-notifications';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
-import { NOTIFICATION_TRIGGERS, type NotificationTrigger, type SessionSummaryFrequency } from '../../src/architecture/models';
 import { useCaregiver } from '../../src/architecture/CaregiverContext';
-import { AppHeader, PrimaryButton, ScreenLayout, SecondaryButton } from '../../src/components/AppUI';
-import { getCaregiverProfileV1, updateCaregiverProfileV1, type V1NotificationTrigger } from '../../src/lib/v1Caregiver';
-import { colors, contentColumn, fontFamily, fontSize, radius, spacing } from '../../src/theme';
+import { AppHeader, PrimaryButton, ScreenLayout, SelectionButton, SecondaryButton } from '../../src/components/AppUI';
+import { ALERT_SENSITIVITY_OPTIONS, PUSH_NOTIFICATION_OPTIONS, SUMMARY_FREQUENCY_OPTIONS, SUMMARY_TIME_OPTIONS } from '../../src/data/notificationOptions';
+import { getCaregiverProfileV1, updateCaregiverProfileV1, type V1AlertSensitivity, type V1NotificationTrigger, type V1SummaryFrequency, type V1SummaryTime } from '../../src/lib/v1Caregiver';
+import { isDemoMode } from '../../src/demo/demoMode';
+import { colors, fontFamily, fontSize, radius, spacing } from '../../src/theme';
 
-const FREQUENCIES: { id: SessionSummaryFrequency; label: string }[] = [
-  { id: 'immediately-after-each-session', label: 'Immediately after each session' },
-  { id: 'daily-summary', label: 'Daily summary' },
-  { id: 'weekly-summary', label: 'Weekly summary' },
-  { id: 'off', label: 'Off' },
-];
-
-const DEFAULT_TRIGGERS: Record<V1NotificationTrigger, boolean> = Object.fromEntries(
-  NOTIFICATION_TRIGGERS.map(({ id }) => [id, true]),
-) as Record<V1NotificationTrigger, boolean>;
+const DEFAULT_TRIGGERS: Record<V1NotificationTrigger, boolean> = {
+  'conversation-session-summary': true,
+  'no-interaction-yet-today': true,
+  'repeated-missed-interactions': true,
+  'recent-interaction-shorter-than-usual': true,
+  'device-may-be-offline': true,
+  'reminder-not-completed-or-unclear': true,
+  'weekly-summary': true,
+};
 
 export default function NotificationSettings() {
   const router = useRouter();
-  const { setNotificationsEnabled } = useCaregiver();
-  const [enabled, setEnabled] = useState(true);
-  const [frequency, setFrequency] = useState<SessionSummaryFrequency>('daily-summary');
-  const [triggers, setTriggers] = useState(DEFAULT_TRIGGERS);
+  const { setNotificationsEnabled, setSetupStatus } = useCaregiver();
+  const [enabled, setEnabled] = useState(false);
+  const [alertSensitivity, setAlertSensitivity] = useState<V1AlertSensitivity>('notify_me_about_everything');
+  const [summaryTime, setSummaryTime] = useState<V1SummaryTime>('19:00');
+  const [summaryFrequency, setSummaryFrequency] = useState<V1SummaryFrequency>('daily-summary');
+  const [triggers, setTriggers] = useState<Record<V1NotificationTrigger, boolean>>(DEFAULT_TRIGGERS);
+  const [permissionStatus, setPermissionStatus] = useState<Notifications.PermissionStatus | null>(null);
+  const [permissionCanAskAgain, setPermissionCanAskAgain] = useState(true);
   const [busy, setBusy] = useState(true);
   const [saving, setSaving] = useState(false);
   const [denied, setDenied] = useState(false);
-  const [settingsError, setSettingsError] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    void getCaregiverProfileV1().then((profile) => {
-      setEnabled(profile.notificationPreferences.pushNotificationsEnabled);
-      setNotificationsEnabled(profile.notificationPreferences.pushNotificationsEnabled);
-      setFrequency(profile.notificationPreferences.summaryFrequency || 'daily-summary');
-      setTriggers({ ...DEFAULT_TRIGGERS, ...(profile.notificationPreferences.triggers || {}) });
-    }).catch((cause) => setError(cause instanceof Error ? cause.message : 'Could not load notification preferences.')).finally(() => setBusy(false));
-  }, []);
-
-  const save = async () => {
-    setSaving(true);
-    setError(null);
-    try {
-      if (enabled) {
-        const permission = await Notifications.requestPermissionsAsync();
-        if (permission.status !== 'granted') {
-          setDenied(true);
-          return;
-        }
+    void (async () => {
+      try {
+        const profile = await getCaregiverProfileV1();
+        const permission = isDemoMode()
+          ? { status: 'granted' as Notifications.PermissionStatus, canAskAgain: true }
+          : await Notifications.getPermissionsAsync();
+        const preferences = profile.notificationPreferences;
+        setPermissionStatus(permission.status);
+        setPermissionCanAskAgain(permission.canAskAgain);
+        const canNotify = permission.status === 'granted';
+        setEnabled(preferences.pushNotificationsEnabled && canNotify);
+        setDenied(preferences.pushNotificationsEnabled && !canNotify);
+        setNotificationsEnabled(preferences.pushNotificationsEnabled && canNotify);
+        setAlertSensitivity(preferences.alertSensitivity);
+        setSummaryTime(preferences.preferredDailySummaryTime);
+        setSummaryFrequency(preferences.summaryFrequency || 'daily-summary');
+        setTriggers(preferences.triggers || DEFAULT_TRIGGERS);
+      } catch {
+        setError('We could not load notification preferences. Check your connection and try again.');
+      } finally {
+        setBusy(false);
       }
-      await updateCaregiverProfileV1({ notificationPreferences: {
-        pushNotificationsEnabled: enabled,
-        summaryFrequency: frequency,
-        triggers,
-      } });
-      setNotificationsEnabled(enabled);
-      Alert.alert('Preferences saved', 'These notification choices are used in onboarding and Settings.', [{ text: 'Done', onPress: () => router.back() }]);
+    })();
+  }, [setNotificationsEnabled]);
+
+  useFocusEffect(React.useCallback(() => {
+    if (isDemoMode()) return undefined;
+    let active = true;
+    void Notifications.getPermissionsAsync().then((permission) => {
+      if (!active) return;
+      setPermissionStatus(permission.status);
+      setPermissionCanAskAgain(permission.canAskAgain);
+      if (permission.status === 'granted') setDenied(false);
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, []));
+
+  const toggleNotifications = async (nextValue: boolean) => {
+    setError('');
+    if (isDemoMode()) {
+      setEnabled(nextValue);
+      setDenied(false);
+      setPermissionStatus('granted' as Notifications.PermissionStatus);
+      setNotificationsEnabled(nextValue);
+      return;
+    }
+    if (!nextValue) {
+      setEnabled(false); setDenied(false); setNotificationsEnabled(false); return;
+    }
+    try {
+      const current = permissionStatus ? { status: permissionStatus, canAskAgain: permissionCanAskAgain } : await Notifications.getPermissionsAsync();
+      setPermissionStatus(current.status); setPermissionCanAskAgain(current.canAskAgain);
+      if (current.status === 'granted') {
+        setEnabled(true); setDenied(false); setNotificationsEnabled(true); return;
+      }
+      if (current.canAskAgain === false) {
+        setEnabled(false); setDenied(true); setNotificationsEnabled(false); return;
+      }
+      const requested = await Notifications.requestPermissionsAsync();
+      setPermissionStatus(requested.status); setPermissionCanAskAgain(requested.canAskAgain);
+      const granted = requested.status === 'granted';
+      setEnabled(granted); setDenied(!granted); setNotificationsEnabled(granted);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Could not save notification preferences.');
-    } finally {
-      setSaving(false);
+      setEnabled(false); setDenied(true); setNotificationsEnabled(false); setError(cause instanceof Error ? cause.message : 'Notifications could not be enabled.');
     }
   };
 
+  const save = async () => {
+    setSaving(true); setError(''); setDenied(false);
+    try {
+      if (enabled && permissionStatus !== 'granted') {
+        setDenied(true);
+        return;
+      }
+      await updateCaregiverProfileV1({ notificationPreferences: {
+        pushNotificationsEnabled: enabled,
+        alertSensitivity,
+        preferredDailySummaryTime: summaryTime,
+        summaryFrequency,
+        triggers: { ...(triggers ?? {}) },
+      } });
+      setNotificationsEnabled(enabled);
+      setSetupStatus('notifications', 'complete');
+      router.back();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'We could not save notification preferences. Check your connection and try again.'); }
+    finally { setSaving(false); }
+  };
+
   return <ScreenLayout contentContainerStyle={styles.content}>
-      <AppHeader title="Notifications" onBack={() => router.back()} />
-      <Text accessibilityRole="header" style={styles.title}>Notification preferences</Text>
-      <Text style={styles.copy}>Choose the updates you would like to receive. The same canonical list is used throughout Reflexion.</Text>
-      {busy ? <ActivityIndicator color={colors.accent} /> : null}
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <View style={styles.card}>
-        <View style={styles.row}><View style={styles.copyColumn}><Text style={styles.label}>App notifications</Text><Text style={styles.help}>Allow alerts from Reflexion on this phone.</Text></View><Switch accessibilityLabel="App notifications" value={enabled} onValueChange={setEnabled} trackColor={{ false: '#D5D9DB', true: colors.accent }} /></View>
-        {NOTIFICATION_TRIGGERS.map(({ id, title }) => <View key={id} style={styles.row}><View style={styles.copyColumn}><Text style={styles.label}>{title}</Text><Text style={styles.help}>{triggerDescription(id)}</Text></View><Switch accessibilityLabel={title} value={triggers[id]} onValueChange={(value) => setTriggers((current) => ({ ...current, [id]: value }))} trackColor={{ false: '#D5D9DB', true: colors.accent }} /></View>)}
-      </View>
-      <View style={styles.card}><Text style={styles.label}>Conversation summary frequency</Text><Text style={styles.help}>Choose how often session summaries are delivered.</Text>{FREQUENCIES.map((item) => <SecondaryButton key={item.id} label={`${frequency === item.id ? '✓ ' : ''}${item.label}`} onPress={() => setFrequency(item.id)} />)}</View>
-      {denied ? <View style={styles.card}><Text style={styles.help}>Notifications are blocked by your phone. Open Settings to allow them, then return here to save.</Text>{settingsError ? <Text accessibilityRole="alert" style={styles.error}>{settingsError}</Text> : null}<SecondaryButton label="Open phone settings" onPress={() => { setSettingsError(''); void Linking.openSettings().catch(() => setSettingsError('Phone settings could not be opened. Open your device Settings app, allow notifications for Reflexion, then return here.')); }} /></View> : null}
-      {saving ? <ActivityIndicator color={colors.accent} /> : <PrimaryButton label="Save preferences" onPress={() => void save()} />}
+    <AppHeader title="Notification Preferences" onBack={() => router.back()} />
+    <Text accessibilityRole="header" style={styles.title}>Notification Preferences</Text>
+    <Text style={styles.copy}>Stay informed with factual updates about your loved one and connected device.</Text>
+    {busy ? <ActivityIndicator color={colors.accent} /> : null}
+    {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
+    <View style={styles.card}><Text style={styles.label}>Push notifications</Text><Text style={styles.help}>Allow Reflexion to tell you when an update may need your attention.</Text>{PUSH_NOTIFICATION_OPTIONS.map((option) => <SelectionButton key={String(option.value)} label={option.label} onPress={() => { void toggleNotifications(option.value); }} selected={enabled === option.value} />)}</View>
+    <View style={styles.card}><Text style={styles.label}>Alert sensitivity</Text><Text style={styles.help}>Use the same alert choices selected during setup.</Text>{ALERT_SENSITIVITY_OPTIONS.map((option) => <SelectionButton key={option.value} label={option.label} onPress={() => setAlertSensitivity(option.value)} selected={alertSensitivity === option.value} />)}</View>
+    <View style={styles.card}><Text style={styles.label}>Preferred daily summary time</Text><Text style={styles.help}>Choose when a daily summary is delivered.</Text>{SUMMARY_TIME_OPTIONS.map((option) => <SelectionButton key={option.value} label={option.label} onPress={() => setSummaryTime(option.value)} selected={summaryTime === option.value} />)}</View>
+    <View style={styles.card}><Text style={styles.label}>Summary frequency</Text><Text style={styles.help}>Choose how often summary updates are sent.</Text>{SUMMARY_FREQUENCY_OPTIONS.map((option) => <SelectionButton key={option.value} label={option.label} onPress={() => setSummaryFrequency(option.value)} selected={summaryFrequency === option.value} />)}</View>
+    {denied ? <View style={styles.card}><Text style={styles.label}>Notifications are off</Text><Text style={styles.help}>{permissionCanAskAgain ? 'Reflexion needs notification permission before it can send updates.' : 'Your phone has blocked notification permission for Reflexion. Open phone settings to allow it, then return here.'}</Text><SecondaryButton label="Open phone settings" onPress={() => { void Linking.openSettings().catch(() => setError('Phone settings could not be opened. Open your device Settings app and allow notifications for Reflexion.')); }} /></View> : null}
+    {saving ? <ActivityIndicator color={colors.accent} /> : <PrimaryButton label="Save preferences" onPress={() => void save()} />}
   </ScreenLayout>;
 }
 
-function triggerDescription(trigger: NotificationTrigger) {
-  switch (trigger) {
-    case 'conversation-session-summary': return 'A summary is ready after a conversation.';
-    case 'no-interaction-yet-today': return 'There has not been an interaction yet today.';
-    case 'repeated-missed-interactions': return 'Several expected interactions were missed.';
-    case 'recent-interaction-shorter-than-usual': return 'A recent interaction was shorter than usual.';
-    case 'device-may-be-offline': return 'The Mirror may need a connection check.';
-    case 'reminder-not-completed-or-unclear': return 'A routine response was missed or unclear.';
-    case 'new-chat-reply': return 'A loved one replied in Chat.';
-    case 'weekly-summary': return 'A weekly summary is ready.';
-  }
-}
-
 const styles = StyleSheet.create({
-  content: { gap: spacing.lg },
-  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, fontWeight: '500', marginTop: spacing.lg },
-  copy: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: 22 },
-  error: { color: colors.status.red, fontSize: fontSize.body },
-  card: { backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.lg, borderWidth: 1, gap: spacing.md, padding: spacing.lg },
-  row: { alignItems: 'center', borderBottomColor: colors.border.subtle, borderBottomWidth: 1, flexDirection: 'row', gap: spacing.md, paddingVertical: spacing.md },
-  copyColumn: { flex: 1 },
-  label: { color: colors.text.primary, flexShrink: 1, fontSize: fontSize.bodyLarge, fontWeight: '700', lineHeight: 22 },
-  help: { color: colors.text.secondary, flexShrink: 1, fontSize: fontSize.body, lineHeight: 20, marginTop: 2 },
+  content: { gap: spacing.lg, minWidth: 0 },
+  title: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: fontSize.title, fontWeight: '500', lineHeight: 36, marginTop: spacing.lg, minWidth: 0 },
+  copy: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 24, minWidth: 0 },
+  error: { color: colors.error.text, fontSize: fontSize.body, lineHeight: 22 },
+  card: { backgroundColor: colors.surface.card, borderColor: colors.border.default, borderRadius: radius.xl, borderWidth: 1, gap: spacing.md, minWidth: 0, padding: spacing.lg },
+  label: { color: colors.text.primary, flexShrink: 1, fontSize: fontSize.bodyLarge, fontWeight: '700', lineHeight: 22, minWidth: 0 },
+  help: { color: colors.text.secondary, flexShrink: 1, fontSize: fontSize.body, lineHeight: 20, marginTop: 2, minWidth: 0 },
 });

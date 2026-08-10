@@ -26,7 +26,9 @@ export type V1PatientStatus = {
 // Option-1 muted status palette (doc §2.9 / task spec). Small dot/pill, never loud blocks.
 export const STATUS_META: Record<V1Status, { color: string; dot: string; emoji: string; label: string }> = {
   establishing: { color: '#8E877C', dot: '#8E877C', emoji: '⚪', label: 'Learning routine' },
-  doing_well: { color: '#596C56', dot: '#596C56', emoji: '🟢', label: 'Doing well' },
+  // The backend keeps `doing_well` for compatibility. The caregiver UI deliberately translates it into
+  // an observed interaction state instead of making a wellness claim.
+  doing_well: { color: '#347A3B', dot: '#347A3B', emoji: '🟢', label: 'Interaction recorded today' },
   worth_checking: { color: '#9A7A45', dot: '#9A7A45', emoji: '🟡', label: 'Worth checking' },
   needs_attention: { color: '#9B5F4E', dot: '#9B5F4E', emoji: '🔴', label: 'Needs attention' },
 };
@@ -44,6 +46,20 @@ export function getStatusLabel(status: V1Status, name?: string): string {
     return first ? `Learning ${first}'s routine` : 'Learning their routine';
   }
   return STATUS_META[status].label;
+}
+
+/** Translate the legacy/read-model status into the current objective caregiver vocabulary. */
+export function getObjectiveInteractionState(
+  status: Pick<V1PatientStatus, 'status' | 'completedToday' | 'technicalState' | 'baselineState'> | null | undefined,
+  hasDevice: boolean,
+): InteractionState {
+  if (!hasDevice || status?.technicalState === 'unreachable' || status?.technicalState === 'possible_issue') {
+    return hasDevice ? 'device-may-be-offline' : 'no-interaction-yet-today';
+  }
+  if (status?.status === 'needs_attention') return 'needs-your-attention';
+  if (status?.status === 'worth_checking') return 'recent-interaction-shorter-than-usual';
+  if (status?.completedToday) return 'interaction-recorded-today';
+  return 'no-interaction-yet-today';
 }
 
 // Plain-English mapping for every reason code in §4. Warm, non-clinical phrasing.
@@ -70,13 +86,13 @@ export function getReasonText(code: string | null | undefined, name?: string): s
     CAREGIVER_FLAG_NEEDS_ATTENTION: `You flagged ${who} as needing attention.`,
   };
 
-  return map[code ?? ''] ?? 'Everything looks steady.';
+  return map[code ?? ''] ?? 'No additional update is available.';
 }
 
 // Device/technical framing — always presented as a connection issue, never as personal decline.
 export function getTechnicalNote(state: V1TechnicalState): string | null {
   if (state === 'unreachable') {
-    return 'The mirror may be offline. This looks like a device connection issue, not a change in how they are doing.';
+    return 'The Mirror may be offline. This is a device connection issue, not information about your loved one.';
   }
   if (state === 'possible_issue') {
     return 'There may be a minor issue with the mirror connection.';
@@ -131,3 +147,4 @@ export function formatLastInteraction(iso: string | null | undefined): string {
   }
   return `${dayDiff} days ago`;
 }
+import type { InteractionState } from '../architecture/models';

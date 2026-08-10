@@ -3,49 +3,46 @@ import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import { BrandLockup } from '../src/components/BrandLockup';
-import { PrimaryButton, ScreenLayout, SecondaryButton, TertiaryButton } from '../src/components/AppUI';
-import { Field } from '../src/components/Field';
-import { validateSignIn } from '../src/lib/authValidation';
+import { PrimaryButton, ScreenLayout, SecondaryButton, SelectionButton, TertiaryButton } from '../src/components/AppUI';
+import { Field, PhoneField } from '../src/components/Field';
+import { normalizePhone, validateSignIn } from '../src/lib/authValidation';
 import { signInMessage } from '../src/lib/authMessages';
 import { v1Login } from '../src/lib/v1Client';
-import { V1ApiError } from '../src/lib/v1Client';
-import { savePendingVerification } from '../src/lib/pendingVerification';
+import { enterDemoMode, isDemoFeatureEnabled } from '../src/demo/demoMode';
 import { colors, fontFamily, fontSize, spacing } from '../src/theme';
 
-type DeferredMethod = 'Phone' | 'Google' | 'Apple';
+type DeferredMethod = 'Google' | 'Apple';
+type IdentifierMethod = 'email' | 'phone';
 
 export default function SignInScreen() {
   const router = useRouter();
+  const [method, setMethod] = useState<IdentifierMethod>('email');
   const [email, setEmail] = useState('');
+  const [countryCode, setCountryCode] = useState('+65');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
   const [requestError, setRequestError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const showDeferredMethod = (method: DeferredMethod) => {
-    const copy = method === 'Phone'
-      ? 'Phone sign-in is not available during the current pilot. Please sign in using your email.'
-      : method === 'Google'
+    const copy = method === 'Google'
         ? 'Google sign-in is not available during the current pilot. Please sign in using your email.'
         : 'Apple sign-in is not available during the current pilot. Please sign in using your email.';
     Alert.alert(`${method} sign-in unavailable`, copy, [{ text: 'Continue with email', onPress: () => { setErrors({}); setRequestError(''); } }]);
   };
 
   const signIn = async () => {
-    const nextErrors = validateSignIn(email, password, 'email');
+    const identifier = method === 'email' ? email.trim() : normalizePhone(countryCode, phoneNumber);
+    const nextErrors = validateSignIn(identifier, password, method);
     setErrors(nextErrors);
     setRequestError('');
     if (Object.keys(nextErrors).length) return;
     setSubmitting(true);
     try {
-      await v1Login(email.trim(), password);
+      await v1Login(identifier, password);
       router.replace('/(tabs)');
     } catch (cause) {
-      if (cause instanceof V1ApiError && cause.code === 'EMAIL_NOT_VERIFIED') {
-        await savePendingVerification(email.trim().toLowerCase());
-        router.replace({ pathname: '/account-verification', params: { email: email.trim().toLowerCase() } });
-        return;
-      }
       setRequestError(signInMessage(cause));
     } finally {
       setSubmitting(false);
@@ -57,14 +54,18 @@ export default function SignInScreen() {
       <BrandLockup />
       <Text accessibilityRole="header" style={styles.title}>Welcome back</Text>
       <Text style={styles.subtitle}>Sign in to continue caring with confidence.</Text>
-      <Field error={errors.identifier} label="Email" keyboardType="email-address" autoComplete="email" onChangeText={(value) => { setEmail(value); setErrors((current) => ({ ...current, identifier: undefined })); }} placeholder="you@email.com" value={email} />
+      <View accessibilityLabel="Sign-in method" style={styles.methodRow}>
+        <View style={styles.methodOption}><SelectionButton label="Email" selected={method === 'email'} onPress={() => { setMethod('email'); setErrors({}); setRequestError(''); }} /></View>
+        <View style={styles.methodOption}><SelectionButton label="Phone" selected={method === 'phone'} onPress={() => { setMethod('phone'); setErrors({}); setRequestError(''); }} /></View>
+      </View>
+      {method === 'email' ? <Field error={errors.identifier} label="Email" keyboardType="email-address" autoComplete="email" onChangeText={(value) => { setEmail(value); setErrors((current) => ({ ...current, identifier: undefined })); }} placeholder="you@email.com" value={email} /> : <PhoneField countryCode={countryCode} error={errors.identifier} helperText="Use the country code and phone number saved to your Reflexion account." label="Phone number" onCountryCodeChange={setCountryCode} onPhoneNumberChange={(value) => { setPhoneNumber(value); setErrors((current) => ({ ...current, identifier: undefined })); }} phoneNumber={phoneNumber} />}
       <Field error={errors.password} label="Password" autoComplete="current-password" onChangeText={(value) => { setPassword(value); setErrors((current) => ({ ...current, password: undefined })); }} placeholder="Enter your password" secure value={password} />
       {requestError ? <Text accessibilityRole="alert" style={styles.requestError}>{requestError}</Text> : null}
       <PrimaryButton disabled={submitting} label={submitting ? 'Signing in…' : 'Sign in'} onPress={() => void signIn()} />
+      {isDemoFeatureEnabled() ? <View style={styles.demo}><TertiaryButton label="Enter Demo App" onPress={() => { void enterDemoMode().then(() => router.replace('/demo')); }} /><Text style={styles.demoCopy}>Development-only local fixtures. Nothing is synced.</Text></View> : null}
       <TertiaryButton label="Forgot password?" onPress={() => router.push('/forgot-password')} />
       <View style={styles.divider}><View style={styles.rule} /><Text style={styles.or}>or continue with</Text><View style={styles.rule} /></View>
       <View style={styles.deferredRow}>
-        <SecondaryButton accessibilityLabel="Phone sign-in, unavailable during the pilot" label="Phone" onPress={() => showDeferredMethod('Phone')} />
         <SecondaryButton accessibilityLabel="Google sign-in, unavailable during the pilot" label="Google" onPress={() => showDeferredMethod('Google')} />
         <SecondaryButton accessibilityLabel="Apple sign-in, unavailable during the pilot" label="Apple" onPress={() => showDeferredMethod('Apple')} />
       </View>
@@ -80,10 +81,14 @@ const styles = StyleSheet.create({
   subtitle: { color: colors.text.secondary, fontSize: fontSize.bodyLarge, lineHeight: 25 },
   requestError: { color: colors.error.text, fontSize: fontSize.body, lineHeight: 22 },
   divider: { alignItems: 'center', flexDirection: 'row', gap: spacing.sm, marginVertical: spacing.xs },
+  methodRow: { flexDirection: 'row', gap: spacing.sm, minWidth: 0 },
+  methodOption: { flex: 1, minWidth: 0 },
   rule: { backgroundColor: colors.border.default, flex: 1, height: 1 },
   or: { color: colors.text.secondary, fontSize: fontSize.caption },
   deferredRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   create: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: spacing.sm },
   createText: { color: colors.text.secondary, fontSize: fontSize.body, lineHeight: 20 },
   legal: { color: colors.text.secondary, fontSize: fontSize.caption, lineHeight: 18, textAlign: 'center' },
+  demo: { alignItems: 'center', gap: spacing.xs, minWidth: 0 },
+  demoCopy: { color: colors.text.secondary, fontSize: fontSize.caption, lineHeight: 18, textAlign: 'center' },
 });

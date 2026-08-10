@@ -5,8 +5,9 @@ import { Alert, StyleSheet, Text } from 'react-native';
 import { AppHeader, PrimaryButton, ScreenLayout, TertiaryButton } from '../src/components/AppUI';
 import { BrandLockup } from '../src/components/BrandLockup';
 import { Field } from '../src/components/Field';
+import { PasswordRequirements } from '../src/components/PasswordRequirements';
 import { validatePasswordPair } from '../src/lib/authValidation';
-import { MIN_PASSWORD_LENGTH, passwordResetMessage } from '../src/lib/authMessages';
+import { passwordResetMessage } from '../src/lib/authMessages';
 import { resetPasswordV1 } from '../src/lib/v1Caregiver';
 import { colors, fontFamily, fontSize, spacing } from '../src/theme';
 
@@ -42,8 +43,9 @@ export default function ResetPasswordScreen() {
       <AppHeader onBack={() => router.back()} />
       <BrandLockup compact />
       <Text accessibilityRole="header" style={styles.title}>Create new password</Text>
-      <Text style={styles.subtitle}>New passwords must be at least {MIN_PASSWORD_LENGTH} characters. Active sessions will be signed out after the change.</Text>
-      <Field error={errors.password} helperText={`At least ${MIN_PASSWORD_LENGTH} characters.`} label="New password" onChangeText={(value) => { setPassword(value); setErrors((current) => ({ ...current, password: undefined })); }} placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`} secure value={password} />
+      <Text style={styles.subtitle}>Choose a new password. Active sessions will be signed out after the change.</Text>
+      <Field error={errors.password} label="New password" onChangeText={(value) => { setPassword(value); setErrors((current) => ({ ...current, password: undefined })); }} placeholder="Create a secure password" secure value={password} />
+      <PasswordRequirements password={password} repeatPassword={repeat} />
       <Field error={errors.repeatPassword} label="Repeat password" onChangeText={(value) => { setRepeat(value); setErrors((current) => ({ ...current, repeatPassword: undefined })); }} placeholder="Enter it again" secure value={repeat} />
       {requestError ? <Text accessibilityRole="alert" style={styles.requestError}>{requestError}</Text> : null}
       <PrimaryButton disabled={working} label={working ? 'Updating…' : 'Reset password'} onPress={() => void reset()} />

@@ -12,11 +12,11 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { colors, fontFamily, fontSize, radius, spacing, scaleSize, MIN_TOUCH_TARGET } from '../../theme';
 import { PhoneField } from '../../components/Field';
+import { MotionPressable } from '../../components/Motion';
 import { isTopicSelected, normalizeKeyTopics } from './helpers';
 import { PILL_HIT_SLOP, pillStyles } from './optionPills';
 import type { Gender, KeyTopic, Language, PatientForm } from './types';
@@ -74,7 +74,7 @@ export function PatientEditModal({
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalSheet}>
           <View style={styles.modalHeader}>
             <Text accessibilityRole="header" style={styles.modalTitle}>Edit loved one</Text>
-            <TouchableOpacity
+            <MotionPressable
               accessibilityLabel="Close without saving"
               accessibilityRole="button"
               // Stays a 36pt circle to match the header; hitSlop carries it past the 44pt floor.
@@ -83,7 +83,7 @@ export function PatientEditModal({
               style={styles.iconButton}
             >
               <Feather name="x" size={scaleSize(20)} color={colors.accent} />
-            </TouchableOpacity>
+            </MotionPressable>
           </View>
           <ScrollView contentContainerStyle={styles.modalContent}>
             <ModalInput label="Name" value={patient.name} onChangeText={(name) => update({ name })} />
@@ -105,11 +105,13 @@ export function PatientEditModal({
               {TOPIC_OPTIONS.map((topic) => {
                 const selected = isTopicSelected(patient.keyTopics, topic.value);
                 return (
-                  <TouchableOpacity
+                  <MotionPressable
                     key={topic.value}
                     accessibilityLabel={`Key topic, ${topic.label}`}
                     accessibilityRole="button"
                     accessibilityState={{ selected }}
+                    feedback="card"
+                    haptic="selection"
                     hitSlop={PILL_HIT_SLOP}
                     onPress={() => toggleTopic(topic.value)}
                     style={[pillStyles.pill, selected && pillStyles.pillActive]}
@@ -117,7 +119,7 @@ export function PatientEditModal({
                     <Text style={[pillStyles.pillText, selected && pillStyles.pillTextActive]}>
                       {topic.label}
                     </Text>
-                  </TouchableOpacity>
+                  </MotionPressable>
                 );
               })}
             </View>
@@ -128,7 +130,7 @@ export function PatientEditModal({
                 onChangeText={(keyTopicsOtherText) => update({ keyTopicsOtherText })}
               />
             ) : null}
-            <TouchableOpacity
+            <MotionPressable
               // Spinner replaces the text while saving, so the label cannot come from its children.
               accessibilityLabel={isSaving ? 'Saving profile' : 'Save profile'}
               accessibilityRole="button"
@@ -138,7 +140,7 @@ export function PatientEditModal({
               style={[styles.saveBtn, styles.modalSaveBtn, isSaving && styles.saveBtnDisabled]}
             >
               {isSaving ? <ActivityIndicator color={colors.text.onAccent} /> : <Text style={styles.saveBtnText}>Save profile</Text>}
-            </TouchableOpacity>
+            </MotionPressable>
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
@@ -199,29 +201,27 @@ function ModalPhotoInput({ photoUrl, onChange }: { photoUrl: string; onChange: (
           </View>
         ) : null}
         {Platform.OS !== 'web' ? (
-          <TouchableOpacity
+          <MotionPressable
             accessibilityLabel={photoUrl ? 'Change photo' : 'Choose photo'}
             accessibilityRole="button"
-            activeOpacity={0.82}
             onPress={() => void pickImage()}
             style={styles.modalPhotoButton}
           >
             <Feather name="upload" size={15} color={colors.text.onAccent} />
             <Text style={styles.modalPhotoButtonText}>{photoUrl ? 'Change photo' : 'Choose photo'}</Text>
-          </TouchableOpacity>
+          </MotionPressable>
         ) : null}
         {photoUrl ? (
-          <TouchableOpacity
+          <MotionPressable
             accessibilityLabel="Remove photo"
             accessibilityRole="button"
-            activeOpacity={0.82}
             // A quiet text link by design; hitSlop reaches 44pt without loosening the photo card spacing.
             hitSlop={{ bottom: 10, left: 12, right: 12, top: 10 }}
             onPress={() => onChange('')}
             style={styles.modalClearPhotoButton}
           >
             <Text style={styles.modalClearPhotoText}>Remove photo</Text>
-          </TouchableOpacity>
+          </MotionPressable>
         ) : null}
       </View>
     </View>
@@ -280,11 +280,13 @@ function ModalPicker<T extends string>({
       <Text style={styles.modalLabel}>{label}</Text>
       <View style={pillStyles.pickerOptions}>
         {options.map((option) => (
-          <TouchableOpacity
+          <MotionPressable
             key={option.value}
             accessibilityLabel={`${label}, ${option.label}`}
             accessibilityRole="button"
             accessibilityState={{ selected: selected === option.value }}
+            feedback="card"
+            haptic="selection"
             hitSlop={PILL_HIT_SLOP}
             onPress={() => onSelect(option.value)}
             style={[pillStyles.pill, selected === option.value && pillStyles.pillActive]}
@@ -292,7 +294,7 @@ function ModalPicker<T extends string>({
             <Text style={[pillStyles.pillText, selected === option.value && pillStyles.pillTextActive]}>
               {option.label}
             </Text>
-          </TouchableOpacity>
+          </MotionPressable>
         ))}
       </View>
     </View>

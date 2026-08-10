@@ -12,7 +12,7 @@ test('new account validation gives field-level guidance for missing and malforme
 });
 
 test('a valid twelve-character password and separate phone parts pass client validation', () => {
-  const errors = validateCreateAccount({ name: 'Chloe', email: 'chloe@example.com', countryCode: '+65', phoneNumber: '9000 1234', password: 'twelve-char!', repeatPassword: 'twelve-char!' });
+  const errors = validateCreateAccount({ name: 'Chloe', email: 'chloe@example.com', countryCode: '+65', phoneNumber: '9000 1234', password: 'Twelve-char1!', repeatPassword: 'Twelve-char1!' });
   assert.deepEqual(errors, {});
   assert.equal(normalizePhone('+65', '9000 1234'), '+6590001234');
 });

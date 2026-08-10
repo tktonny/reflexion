@@ -7,10 +7,10 @@ import { colors, fontFamily, scaleSize } from '../theme';
 /** A small, reusable brand mark for the calm, editorial setup screens. */
 export function BrandLockup({ compact = false }: { compact?: boolean }) {
   return (
-    <View accessible accessibilityLabel="Reflexion, care connected" style={[styles.wrap, compact && styles.compact]}>
+    <View accessible accessibilityLabel="Reflexion, Care. Connected." style={[styles.wrap, compact && styles.compact]}>
       <Feather name="feather" size={compact ? 19 : 24} color={colors.textDecorative} />
       <Text style={[styles.name, compact && styles.nameCompact]}>Reflexion</Text>
-      <Text style={styles.tagline}>care · connected</Text>
+      <Text style={styles.tagline}>Care. Connected.</Text>
     </View>
   );
 }
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   compact: { alignItems: 'flex-start' },
   name: { color: colors.text.primary, fontFamily: fontFamily.display, fontSize: scaleSize(27), fontWeight: '500', lineHeight: scaleSize(32) },
   nameCompact: { fontSize: scaleSize(22), lineHeight: scaleSize(26) },
-  tagline: { color: colors.accent, fontSize: scaleSize(9), fontWeight: '700', letterSpacing: 2.1, textTransform: 'lowercase' },
+  tagline: { color: colors.accent, fontSize: scaleSize(9), fontWeight: '700', letterSpacing: 1.2 },
   botanical: { bottom: -12, height: 128, opacity: 0.14, position: 'absolute', width: 110 },
   right: { right: -18 },
   left: { left: -18, transform: [{ scaleX: -1 }] },

@@ -1,9 +1,10 @@
 import { Feather } from '@expo/vector-icons';
 import React from 'react';
-import { Image, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors, fontFamily, fontSize, radius, scaleSize, spacing } from '../../theme';
 import { getInitials } from './helpers';
 import { PILL_HIT_SLOP, pillStyles } from './optionPills';
+import { MotionPressable, MotionToggle } from '../../components/Motion';
 
 export function SectionHeader({ title }: { title: string }) {
   return <Text accessibilityRole="header" style={styles.sectionHeader}>{title}</Text>;
@@ -77,13 +78,13 @@ export function ActionRow({
   onPress: () => void;
 }) {
   return (
-    <TouchableOpacity
+    <MotionPressable
       // One label for the whole row, so a loved one reads as "Mum, English" rather than three fragments.
       accessibilityLabel={value ? `${label}, ${value}` : label}
       accessibilityRole="button"
       style={styles.row}
       onPress={onPress}
-      activeOpacity={0.7}
+      feedback="card"
     >
       <View style={styles.rowMain}>
         {fallbackName ? (
@@ -93,7 +94,7 @@ export function ActionRow({
               <Image source={{ uri: imageUrl }} style={styles.patientAvatarImage} />
             ) : (
               // Fixed 34pt circle: initials cannot grow without spilling out of it.
-              <Text maxFontSizeMultiplier={1.6} style={styles.patientAvatarText}>{getInitials(fallbackName)}</Text>
+              <Text style={styles.patientAvatarText}>{getInitials(fallbackName)}</Text>
             )}
           </View>
         ) : null}
@@ -113,7 +114,7 @@ export function ActionRow({
           color={colors.textDecorative}
         />
       </View>
-    </TouchableOpacity>
+    </MotionPressable>
   );
 }
 
@@ -131,14 +132,7 @@ export function SwitchRow({
   return (
     <View style={styles.row}>
       <Text style={styles.rowLabel}>{label}</Text>
-      <Switch
-        accessibilityLabel={label}
-        disabled={disabled}
-        value={value}
-        onValueChange={onChange}
-        trackColor={{ false: colors.border.strong, true: colors.accent }}
-        thumbColor={colors.surface.card}
-      />
+      <MotionToggle label={label} disabled={disabled} value={value} onValueChange={onChange} />
     </View>
   );
 }
@@ -154,18 +148,20 @@ export function PickerRow({ label, options, selected, onSelect }: {
       <Text style={styles.rowLabel}>{label}</Text>
       <View style={pillStyles.pickerOptions}>
         {options.map(o => (
-          <TouchableOpacity
+          <MotionPressable
             key={o.value}
             // The group name is in the label so "Evening (7pm)" is not announced without saying of what.
             accessibilityLabel={`${label}, ${o.label}`}
             accessibilityRole="button"
             accessibilityState={{ selected: selected === o.value }}
+            feedback="card"
+            haptic="selection"
             hitSlop={PILL_HIT_SLOP}
             style={[pillStyles.pill, selected === o.value && pillStyles.pillActive]}
             onPress={() => onSelect(o.value)}
           >
             <Text style={[pillStyles.pillText, selected === o.value && pillStyles.pillTextActive]}>{o.label}</Text>
-          </TouchableOpacity>
+          </MotionPressable>
         ))}
       </View>
     </View>

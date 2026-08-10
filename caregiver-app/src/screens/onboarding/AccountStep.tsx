@@ -1,7 +1,8 @@
 import React from 'react';
 import { MIN_PASSWORD_LENGTH } from '../../lib/authMessages';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { PhoneField } from '../../components/Field';
+import { MotionPressable } from '../../components/Motion';
 import { colors, fontSize, MIN_TOUCH_TARGET } from '../../theme';
 import { fieldStyles, Label, OptionGrid } from './fields';
 import type { AccountForm, Relationship } from './types';
@@ -80,9 +81,9 @@ export function AccountStep({
         }
       />
 
-      <TouchableOpacity accessibilityRole="button" onPress={onSignIn} style={styles.signInLink}>
+      <MotionPressable accessibilityRole="button" onPress={onSignIn} style={styles.signInLink} feedback="button">
         <Text style={styles.signInLinkText}>Have an account? Sign in!</Text>
-      </TouchableOpacity>
+      </MotionPressable>
     </View>
   );
 }

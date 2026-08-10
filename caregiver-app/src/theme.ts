@@ -9,7 +9,7 @@ import { Dimensions, PixelRatio, Platform } from 'react-native';
 
 export const colors = {
   surface: {
-    page: '#FBF8F2',
+    page: '#FCFAF7',
     card: '#FFFDFC',
     input: '#FFFDFC',
     muted: '#F6F1E8',
@@ -108,6 +108,7 @@ export const fontSize = {
   caption: fontScale(12),
   body: fontScale(14),
   bodyLarge: fontScale(16),
+  button: fontScale(16),
   subheading: fontScale(17),
   heading: fontScale(20),
   title: fontScale(28),
@@ -118,10 +119,11 @@ export const fontSize = {
 export const fontFamily = {
   /** Editorial display face for warm, human headings; body copy remains the platform font. */
   display: Platform.select({ android: 'serif', ios: 'Georgia', default: 'Georgia' }) || 'serif',
-  regular: 'System',
-  medium: 'System',
-  semibold: 'System',
-  bold: 'System',
+  ui: Platform.select({ android: 'sans-serif', ios: 'System', default: 'System' }) || 'System',
+  regular: Platform.select({ android: 'sans-serif', ios: 'System', default: 'System' }) || 'System',
+  medium: Platform.select({ android: 'sans-serif-medium', ios: 'System', default: 'System' }) || 'System',
+  semibold: Platform.select({ android: 'sans-serif-medium', ios: 'System', default: 'System' }) || 'System',
+  bold: Platform.select({ android: 'sans-serif', ios: 'System', default: 'System' }) || 'System',
 } as const;
 
 export const fontWeight = {
@@ -130,6 +132,62 @@ export const fontWeight = {
   semibold: '600' as const,
   bold: '700' as const,
 };
+
+/**
+ * Shared semantic type styles. Screens can add colour or spacing without choosing a
+ * different font family, weight or line-height for the same kind of content.
+ * Display headings stay editorial; all other text stays on the platform UI face.
+ */
+export const typography = {
+  display: {
+    fontFamily: fontFamily.display,
+    fontSize: fontSize.title,
+    fontWeight: fontWeight.regular,
+    lineHeight: Math.max(36, Math.round(fontSize.title * 1.3)),
+  },
+  displayLarge: {
+    fontFamily: fontFamily.display,
+    fontSize: fontSize.display,
+    fontWeight: fontWeight.regular,
+    lineHeight: Math.max(42, Math.round(fontSize.display * 1.24)),
+  },
+  section: {
+    fontFamily: fontFamily.ui,
+    fontSize: fontSize.heading,
+    fontWeight: fontWeight.semibold,
+    lineHeight: Math.max(27, Math.round(fontSize.heading * 1.35)),
+  },
+  body: {
+    fontFamily: fontFamily.ui,
+    fontSize: fontSize.body,
+    fontWeight: fontWeight.regular,
+    lineHeight: Math.max(22, Math.round(fontSize.body * 1.55)),
+  },
+  bodyLarge: {
+    fontFamily: fontFamily.ui,
+    fontSize: fontSize.bodyLarge,
+    fontWeight: fontWeight.regular,
+    lineHeight: Math.max(24, Math.round(fontSize.bodyLarge * 1.5)),
+  },
+  label: {
+    fontFamily: fontFamily.ui,
+    fontSize: fontSize.bodyLarge,
+    fontWeight: fontWeight.semibold,
+    lineHeight: Math.max(22, Math.round(fontSize.bodyLarge * 1.4)),
+  },
+  button: {
+    fontFamily: fontFamily.ui,
+    fontSize: fontSize.button,
+    fontWeight: fontWeight.semibold,
+    lineHeight: Math.max(22, Math.round(fontSize.button * 1.4)),
+  },
+  caption: {
+    fontFamily: fontFamily.ui,
+    fontSize: fontSize.caption,
+    fontWeight: fontWeight.regular,
+    lineHeight: Math.max(18, Math.round(fontSize.caption * 1.5)),
+  },
+} as const;
 
 export const MIN_TOUCH_TARGET = 44;
 
@@ -160,6 +218,7 @@ export const maxContentWidth = Math.round(fontSize.body * 0.6 * 65 + spacing.xl 
 export const contentColumn = {
   alignSelf: 'center' as const,
   maxWidth: maxContentWidth,
+  minWidth: 0,
   width: '100%' as const,
 };
 

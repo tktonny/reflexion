@@ -27,7 +27,6 @@ export type V1NotificationTrigger =
   | 'recent-interaction-shorter-than-usual'
   | 'device-may-be-offline'
   | 'reminder-not-completed-or-unclear'
-  | 'new-chat-reply'
   | 'weekly-summary';
 export type V1SummaryFrequency = 'immediately-after-each-session' | 'daily-summary' | 'weekly-summary' | 'off';
 
@@ -95,7 +94,11 @@ export type V1PatientProfile = {
   age: number | null;
   gender: 'male' | 'female' | 'other' | null;
   photoUrl: string | null;
+  phoneCountryCode: string | null;
   phoneNumber: string | null;
+  relationship: string | null;
+  emergencyContact: string | null;
+  livingArrangement: string | null;
   speechSpeed: 'slow' | 'normal' | 'fast' | null;
 };
 
@@ -182,12 +185,17 @@ export type V1Routine = {
   patientId: string;
   name: string;
   category: 'medication' | 'meals' | 'hydration' | 'medical-appointments' | 'exercise' | 'family-events' | 'custom-other';
-  schedule: { timezone: string; times: string[]; recurrence: string };
-  notificationPolicy: 'do-not-notify' | 'after-one-missed-or-unclear-response' | 'daily-summary';
+  schedule: { timezone: string; times: string[]; recurrence: string; daysOfWeek?: number[]; startsOn?: string | null; endsOn?: string | null };
+  spokenReminder: string | null;
+  notificationPolicy: V1RoutineNotificationPolicy;
+  /** New additive form; the singular field remains for existing Mirror/server readers. */
+  notificationPolicies?: V1RoutineNotificationPolicy[];
   notes: string | null;
   status: 'active' | 'paused' | 'ended';
   version: number;
 };
+
+export type V1RoutineNotificationPolicy = 'do-not-notify' | 'after-one-missed-or-unclear-response' | 'daily-summary';
 
 export function listRoutinesV1(patientId: string): Promise<V1Routine[]> {
   return v1Get(`/patients/${encodeURIComponent(patientId)}/routines`);
@@ -198,17 +206,48 @@ export function createRoutineV1(patientId: string, input: {
   category: V1Routine['category'];
   schedule: V1Routine['schedule'];
   notificationPolicy: V1Routine['notificationPolicy'];
+  notificationPolicies?: V1Routine['notificationPolicies'];
+  spokenReminder?: string;
   notes?: string;
 }): Promise<V1Routine> {
   return v1Post(`/patients/${encodeURIComponent(patientId)}/routines`, input, { idempotencyKey: generateIdempotencyKey() });
 }
 
-export function updateRoutineV1(routine: V1Routine, input: Partial<Pick<V1Routine, 'name' | 'category' | 'schedule' | 'notificationPolicy' | 'notes' | 'status'>>): Promise<V1Routine> {
+export function updateRoutineV1(routine: V1Routine, input: Partial<Pick<V1Routine, 'name' | 'category' | 'schedule' | 'notificationPolicy' | 'notificationPolicies' | 'spokenReminder' | 'notes' | 'status'>>): Promise<V1Routine> {
   return v1Patch(`/routines/${encodeURIComponent(routine.routineId)}`, input, { ifMatch: String(routine.version) });
 }
 
 export function endRoutineV1(routineId: string): Promise<{ routineId: string; state: 'ended' }> {
   return v1Delete(`/routines/${encodeURIComponent(routineId)}`, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export type V1ReminderOccurrence = {
+  occurrenceId: string;
+  patientId: string;
+  scheduledAt: string;
+  type: 'routine' | 'medication' | string;
+  category: string | null;
+  displayText: string;
+  status: string;
+  respondedAt: string | null;
+};
+
+export async function listReminderOccurrencesV1(patientId: string, from: string, to: string): Promise<V1ReminderOccurrence[]> {
+  const params = new URLSearchParams({ from, to });
+  const body = await v1Get<V1ReminderOccurrence[]>(`/patients/${encodeURIComponent(patientId)}/reminder-occurrences?${params.toString()}`);
+  return Array.isArray(body) ? body : [];
+}
+
+export function recordReminderResponseV1(
+  occurrenceId: string,
+  status: 'reported-complete' | 'deferred' | 'declined' | 'no-response' | 'unknown',
+  note?: string,
+): Promise<V1ReminderOccurrence> {
+  return v1Post<V1ReminderOccurrence>(`/reminder-occurrences/${encodeURIComponent(occurrenceId)}/responses`, {
+    status,
+    respondedAt: new Date().toISOString(),
+    ...(note ? { note } : {}),
+  }, { idempotencyKey: generateIdempotencyKey() });
 }
 
 // ── Consent (a HARD gate: without it POST /sessions refuses a daily check-in, so no check-in can run)
@@ -231,12 +270,18 @@ export const CHECKIN_CONSENT_PURPOSE = 'home_cognitive_monitoring';
 /** The document version the onboarding consent screen presents. Bump when that wording changes. */
 export const CHECKIN_CONSENT_DOCUMENT_VERSION = 'checkin-consent-2026-07';
 
-export function withdrawCheckInConsentV1(patientId: string, purpose = CHECKIN_CONSENT_PURPOSE): Promise<unknown> {
+export type V1ConsentRecordStatus = 'granted' | 'declined' | 'withdrawn';
+
+export function recordCheckInConsentV1(patientId: string, status: V1ConsentRecordStatus, purpose = CHECKIN_CONSENT_PURPOSE): Promise<unknown> {
   return v1Post(`/patients/${encodeURIComponent(patientId)}/consents`, {
     purpose,
     documentVersion: CHECKIN_CONSENT_DOCUMENT_VERSION,
-    status: 'withdrawn',
+    status,
   }, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export function withdrawCheckInConsentV1(patientId: string, purpose = CHECKIN_CONSENT_PURPOSE): Promise<unknown> {
+  return recordCheckInConsentV1(patientId, 'withdrawn', purpose);
 }
 
 export const RESEARCH_CONSENT_PURPOSE = 'optional_research_participation';
@@ -244,6 +289,10 @@ export const RESEARCH_CONSENT_DOCUMENT_VERSION = 'research-consent-2026-07';
 
 export function grantResearchParticipationV1(patientId: string): Promise<unknown> {
   return v1Post(`/patients/${encodeURIComponent(patientId)}/consents`, { purpose: RESEARCH_CONSENT_PURPOSE, documentVersion: RESEARCH_CONSENT_DOCUMENT_VERSION, status: 'granted' }, { idempotencyKey: generateIdempotencyKey() });
+}
+
+export function declineResearchParticipationV1(patientId: string): Promise<unknown> {
+  return v1Post(`/patients/${encodeURIComponent(patientId)}/consents`, { purpose: RESEARCH_CONSENT_PURPOSE, documentVersion: RESEARCH_CONSENT_DOCUMENT_VERSION, status: 'declined' }, { idempotencyKey: generateIdempotencyKey() });
 }
 
 export function withdrawResearchParticipationV1(patientId: string): Promise<unknown> {
@@ -408,9 +457,13 @@ export function getSessionProcessingStatusV1(sessionId: string): Promise<V1Sessi
   return v1Get(`/sessions/${encodeURIComponent(sessionId)}/processing-status`);
 }
 
+export function createAwayPeriodV1(patientId: string, input: { startsOn: string; endsOn: string; timezone: string; reason?: string }): Promise<{ awayPeriodId: string; patientId: string; startsOn: string; endsOn: string; timezone: string; state: 'active' }> {
+  return v1Post(`/patients/${encodeURIComponent(patientId)}/away-periods`, input, { idempotencyKey: generateIdempotencyKey() });
+}
+
 export type V1TrendDay = { date: string; duration: number; sessionCount: number; status: 'green' | 'amber' | 'red' | null; missed: boolean };
 
-export async function getSessionTrendV1(patientId: string, days: 7 | 30): Promise<V1TrendDay[]> {
+export async function getSessionTrendV1(patientId: string, days: 7 | 30 | 90): Promise<V1TrendDay[]> {
   const body = await v1Get<{ trend: V1TrendDay[] }>(
     `/patients/${encodeURIComponent(patientId)}/session-trend?days=${days}`,
   );
@@ -528,6 +581,43 @@ export function updateSetupProgressV1(category: SetupCategory, status: SetupStat
   });
 }
 
+/**
+ * Setup progress is a convenience record, not a second source of truth. These flags are derived from the
+ * resources the caregiver already owns so an existing account can resume setup after reinstalling or
+ * signing in on another phone.
+ */
+export type ActualSetupEvidence = {
+  hasHousehold: boolean;
+  hasPairedDevice: boolean;
+  hasLanguagePreferences: boolean;
+  hasRoutines: boolean;
+  hasNotificationPreferences: boolean;
+  hasConsentChoices: boolean;
+  hasResearchChoice: boolean;
+};
+
+export async function getActualSetupEvidenceV1(): Promise<ActualSetupEvidence> {
+  const home = await loadCaregiverHome();
+  const [routineLists, consentStates] = await Promise.all([
+    Promise.all(home.patients.map((patient) => listRoutinesV1(patient.patientId).catch(() => [] as V1Routine[]))),
+    Promise.all(home.patients.map((patient) => getConsentStateV1(patient.patientId).catch(() => null))),
+  ]);
+  const consentChoices = consentStates.flatMap((state) => state?.consents || []);
+  const hasConsentChoices = home.patients.length > 0 && home.patients.every((patient, index) => {
+    const state = consentStates[index];
+    return Boolean(state?.consents.some((consent) => consent.purpose === CHECKIN_CONSENT_PURPOSE && ['granted', 'declined', 'withdrawn'].includes(consent.status)));
+  });
+  return {
+    hasHousehold: home.patients.length > 0,
+    hasPairedDevice: home.patients.some((patient) => Boolean(patient.deviceId)),
+    hasLanguagePreferences: home.patients.length > 0 && home.patients.every((patient) => Boolean(patient.preferredLanguage.trim())),
+    hasRoutines: routineLists.some((routines) => routines.length > 0),
+    hasNotificationPreferences: Boolean(home.caregiver.notificationPreferences),
+    hasConsentChoices,
+    hasResearchChoice: consentChoices.some((consent) => consent.purpose === RESEARCH_CONSENT_PURPOSE),
+  };
+}
+
 export type NewLovedOne = {
   displayName: string;
   preferredLanguage: string;
@@ -538,6 +628,7 @@ export type NewLovedOne = {
   topics?: string[];
   otherTopic?: string;
   speechOrHearingNotes?: string;
+  safetyNotes?: string;
 };
 
 /**
@@ -545,8 +636,8 @@ export type NewLovedOne = {
  *
  * A daily check-in is refused with 403 CONSENT_REQUIRED unless a granted home_cognitive_monitoring consent
  * exists, and the monitoring pipeline drops any session without a consentRef. Adding a loved one creates the
- * patient and care plan only; the older adult must make the product-consent choice on the Mirror (or with the
- * care team). The caregiver can view the state and withdraw an existing grant, but cannot accept it for them.
+ * patient and care plan only; the consent screen records an explicitly facilitated choice while preserving
+ * the older adult as the decision-maker.
  *
  * The care plan carries everything that changes how Aria talks, which is what the mirror reads from its
  * device configuration; those fields previously sat unread in the legacy patient document.
@@ -568,6 +659,7 @@ export async function createLovedOneV1(input: NewLovedOne): Promise<V1PatientRec
       speechOrHearingNotes: input.speechOrHearingNotes || '',
       speechSpeed: input.profile?.speechSpeed || 'normal',
     },
+    safetyNotes: input.safetyNotes || null,
   });
 
   return patient;
@@ -590,6 +682,8 @@ export type CaregiverHomePatient = {
   profile: V1PatientProfile;
   mirrorName: string | null;
   deviceId: string | null;
+  deviceTechnicalState: 'ok' | 'possible_issue' | 'unknown';
+  lastHeartbeatAt: string | null;
   /** True when this loved one cannot have check-ins yet because consent is missing. */
   needsConsent: boolean;
 };
@@ -629,6 +723,8 @@ export async function loadCaregiverHome(): Promise<CaregiverHome> {
         profile: patient.profile,
         mirrorName: assignment?.mirrorName ?? null,
         deviceId: assignment?.deviceId ?? null,
+        deviceTechnicalState: assignment?.device?.technicalState ?? 'unknown',
+        lastHeartbeatAt: assignment?.device?.lastHeartbeatAt ?? null,
         needsConsent: (consentStates[index]?.missingPurposes.length ?? 0) > 0,
       };
     }),

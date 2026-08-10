@@ -1,12 +1,12 @@
 import { getApiUrl } from './apiUrl';
 
 export async function apiGet<T>(path: string): Promise<T> {
-  const response = await fetch(getApiUrl(path));
+  const response = await fetchLegacy(path, getApiUrl(path));
   return readJsonResponse<T>(response, path);
 }
 
 export async function apiSend<T>(path: string, init: RequestInit): Promise<T> {
-  const response = await fetch(getApiUrl(path), {
+  const response = await fetchLegacy(path, getApiUrl(path), {
     ...init,
     headers: {
       'content-type': 'application/json',
@@ -22,11 +22,34 @@ export async function apiSend<T>(path: string, init: RequestInit): Promise<T> {
  */
 export class LegacyApiError extends Error {
   status: number;
+  readonly wireMessage: string;
 
   constructor(message: string, status: number) {
-    super(message);
+    super(legacyFacingApiMessage(status));
     this.name = 'LegacyApiError';
     this.status = status;
+    this.wireMessage = message;
+  }
+}
+
+function legacyFacingApiMessage(status: number): string {
+  if (status === 401) return 'Your session has expired. Sign in again.';
+  if (status === 403) return 'You do not have permission to make this change.';
+  if (status === 404) return 'We could not find that item. Refresh and try again.';
+  if (status === 409) return 'This changed elsewhere. Refresh and try again.';
+  if (status === 429) return 'Too many requests just now. Wait a moment and try again.';
+  if (status >= 500) return 'We could not connect to Reflexion right now. Check your connection and try again.';
+  if (status === 400) return 'Check the details and try again.';
+  return 'We could not connect to Reflexion right now. Check your connection and try again.';
+}
+
+async function fetchLegacy(path: string, url: string, init?: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, init);
+  } catch (cause) {
+    const wireMessage = cause instanceof Error ? cause.message : String(cause);
+    console.warn(`[legacy] ${path} request failed`, wireMessage);
+    throw new LegacyApiError(wireMessage, 0);
   }
 }
 
