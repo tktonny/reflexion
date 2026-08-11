@@ -2,7 +2,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Ionicons } from '@expo/vector-icons'
 import Constants from 'expo-constants'
 
-import { applyDownloadedUpdate, checkAndDownload, currentUpdateLabel } from '../src/lib/otaUpdates'
+import {
+  applyDownloadedUpdate, applyShellUpdate, checkAndDownload, checkShellUpdate, currentUpdateLabel,
+  shellUpdatesAvailable,
+} from '../src/lib/otaUpdates'
 import { router } from 'expo-router'
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -153,6 +156,34 @@ export default function SettingsScreen() {
     }
   }
 
+  // The Ubuntu appliance only. Separate from the bundle check above because this is a ~97 MB download that
+  // replaces Chromium and the main process and needs a full relaunch, not a window reload — so it is an
+  // explicit, rare operator action rather than part of a routine update check.
+  async function checkForShellUpdate() {
+    if (checkingUpdate) return
+    setCheckingUpdate(true)
+    try {
+      const outcome = await checkShellUpdate()
+      if (outcome.kind === 'downloaded') {
+        Alert.alert('System update ready', `${outcome.detail}\n\nOnly restart when nobody is mid-conversation.`, [
+          { text: 'Later', style: 'cancel' },
+          {
+            text: 'Restart now',
+            onPress: () => {
+              void applyShellUpdate().then((result) => {
+                if (!result.ok) Alert.alert('System update failed', result.error ?? 'Could not install the update.')
+              })
+            },
+          },
+        ])
+      } else {
+        Alert.alert(outcome.kind === 'failed' ? 'System update failed' : 'No system update', outcome.detail)
+      }
+    } finally {
+      setCheckingUpdate(false)
+    }
+  }
+
   async function uploadLogs() {
     const result = await flushPendingConversations()
     setState((current) => ({ ...current, pendingUploads: result.remaining }))
@@ -213,6 +244,11 @@ export default function SettingsScreen() {
             <AdminAction icon="wifi-outline" label="Set up the internet connection" onPress={() => router.push('/network-setup')} />
           ) : null}
           <AdminAction icon="cloud-download-outline" label={checkingUpdate ? 'Checking for update…' : 'Check for app update'} onPress={() => void checkForAppUpdate()} />
+          {/* Ubuntu appliance only: the shell (Chromium, main process, network stack) is a separate, much
+              larger channel that the bundle update above cannot reach. */}
+          {shellUpdatesAvailable() ? (
+            <AdminAction icon="hardware-chip-outline" label="Check for system update" onPress={() => void checkForShellUpdate()} />
+          ) : null}
           <AdminAction icon="reload-outline" label="Restart mirror app" onPress={() => router.replace('/')} />
           <AdminAction danger icon="unlink-outline" label="Reset pairing" onPress={confirmResetPairing} />
         </View>

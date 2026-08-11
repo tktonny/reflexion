@@ -25,10 +25,16 @@ const crypto = require('crypto')
 const { spawn } = require('child_process')
 
 const network = require('./network')
-const { DEFAULT_API_BASE, createBackendProxy, isBackendPath, normalizeBase } = require('./apiProxy')
+const { DEFAULT_API_BASE, createBackendProxy, isBackendPath } = require('./apiProxy')
+const { configPath, configPaths, readDeviceConfig, resolveApiBase, resolveBootstrapToken, systemConfigPath } = require('./deviceConfig')
+const bundleUpdates = require('./bundleUpdates')
+const shellUpdates = require('./shellUpdates')
 const { DEFAULT_PORTAL_PORT, generatePin, startSetupPortal } = require('./setupPortal')
 
-const WEB_DIR = path.join(__dirname, '..', 'dist')
+// The bundle shipped inside the AppImage. An OTA update installs alongside it and WEB_DIR is re-resolved to
+// the active one at startup, so the packaged copy always remains as the ultimate fallback.
+const PACKAGED_WEB_DIR = path.join(__dirname, '..', 'dist')
+let WEB_DIR = PACKAGED_WEB_DIR
 const WEB_PORT = Number(process.env.REFLEXION_MIRROR_WEB_PORT) || 8899
 const RELAY_PORT = Number(process.env.REFLEXION_RELAY_PORT) || 8787
 const PORTAL_PORT = Number(process.env.REFLEXION_SETUP_PORTAL_PORT) || DEFAULT_PORTAL_PORT
@@ -38,28 +44,8 @@ const PORTAL_PORT = Number(process.env.REFLEXION_SETUP_PORTAL_PORT) || DEFAULT_P
 const SETUP_GRACE_MS = Number(process.env.REFLEXION_SETUP_GRACE_MS) || 45_000
 const SETUP_POLL_MS = 8_000
 
-/**
- * Backend origin, resolved at RUNTIME (not baked into the SPA bundle).
- *
- * Precedence: launch env -> device config file -> production default. Runtime resolution is what lets a
- * unit be re-pointed at a different backend without re-exporting the web bundle, and it is what makes the
- * /api proxy possible at all: the main process must know the target before the renderer runs.
- */
-function resolveApiBase() {
-  const fromEnv = process.env.REFLEXION_API_BASE || process.env.EXPO_PUBLIC_API_BASE
-  if (fromEnv && fromEnv.trim()) return normalizeBase(fromEnv)
-  try {
-    const configPath = path.join(app.getPath('userData'), 'device-config.json')
-    if (fs.existsSync(configPath)) {
-      const parsed = JSON.parse(fs.readFileSync(configPath, 'utf8'))
-      if (typeof parsed?.apiBase === 'string' && parsed.apiBase.trim()) return normalizeBase(parsed.apiBase)
-    }
-  } catch (error) {
-    console.warn('[electron] could not read device-config.json', error)
-  }
-  return DEFAULT_API_BASE
-}
-
+// Backend origin AND per-device bootstrap token are both resolved at RUNTIME — see electron/deviceConfig.js
+// for why nothing device-bound may be compiled into the bundle.
 let API_BASE = DEFAULT_API_BASE
 const proxyToBackend = createBackendProxy(() => API_BASE)
 
@@ -266,6 +252,41 @@ function createWindow() {
 }
 
 /**
+ * Where update manifests live. Defaults to `<backend origin>/mirror-updates`, so a unit that already knows
+ * its backend needs no extra configuration to be updatable — which matters because units are imaged in the
+ * field and every extra required setting is another way to ship one that can never be fixed remotely.
+ */
+function resolveUpdateBase() {
+  const fromEnv = process.env.REFLEXION_UPDATE_BASE
+  if (fromEnv && fromEnv.trim()) return fromEnv.trim().replace(/\/+$/, '')
+  const configured = readDeviceConfig(app.getPath('userData')).updateBase
+  if (typeof configured === 'string' && configured.trim()) return configured.trim().replace(/\/+$/, '')
+  return `${API_BASE.replace(/\/+$/, '')}/mirror-updates`
+}
+
+/**
+ * The bundle version packaged inside this AppImage, stamped into dist/ by scripts/publish-linux-update.mjs.
+ * Absent in a plain `expo export`, which simply means "unknown" — the first OTA check then installs whatever
+ * is published, which is the safe direction.
+ */
+function packagedBundleVersion() {
+  try {
+    return fs.readFileSync(path.join(PACKAGED_WEB_DIR, 'bundle-version.txt'), 'utf8').trim() || null
+  } catch {
+    return null
+  }
+}
+
+/** Everything the settings screen needs to describe this unit's update situation in one call. */
+function updatesState() {
+  return {
+    updateBase: resolveUpdateBase(),
+    bundle: { ...bundleUpdates.currentBundle(app.getPath('userData')), packagedVersion: packagedBundleVersion() },
+    shell: { version: app.getVersion(), supported: shellUpdates.shellUpdateSupported(), arch: process.arch },
+  }
+}
+
+/**
  * Expose the privileged network operations to the renderer over IPC.
  *
  * The renderer is sandboxed and context-isolated, so this is the only path by which the setup screen can
@@ -295,6 +316,38 @@ function registerNetworkIpc() {
     'reflexion:setup:state': () => setupStateForRenderer(),
     'reflexion:setup:start': () => startSetupMode('requested').then(setupStateForRenderer),
     'reflexion:setup:stop': () => stopSetupMode().then(() => setupStateForRenderer()),
+    // Provisioning: hand the renderer the bootstrap token an operator dropped in device-config.json, so
+    // the AppImage itself can stay identity-free and serve the whole fleet. Read on every call rather than
+    // cached, so dropping the file in and restarting nothing but the window is enough.
+    'reflexion:provisioning:bootstrap-token': () => ({
+      token: resolveBootstrapToken(app.getPath('userData')),
+      configPath: configPath(app.getPath('userData')),
+    }),
+    // OTA. Two channels, both manual: the renderer bundle (small, frequent) and the Electron shell (large,
+    // rare). Check and apply are separate calls on purpose — applying reloads or relaunches, so it must
+    // never happen while an elder is mid-conversation.
+    'reflexion:updates:state': () => updatesState(),
+    'reflexion:updates:bundle-check': () => bundleUpdates.checkAndDownload({
+      userDataDir: app.getPath('userData'), updateBase: resolveUpdateBase(), packagedVersion: packagedBundleVersion(),
+    }),
+    'reflexion:updates:bundle-apply': () => bundleUpdates.applyPending(app.getPath('userData')),
+    'reflexion:updates:bundle-rollback': () => bundleUpdates.rollback(app.getPath('userData')),
+    // Sent by the renderer once it has actually rendered. Without this positive signal the shell cannot tell
+    // "the new bundle started" from "the new bundle is a white screen", so rollback would be impossible.
+    'reflexion:updates:booted': () => bundleUpdates.markBooted(app.getPath('userData')),
+    'reflexion:updates:shell-check': () => shellUpdates.checkAndDownload({
+      updateBase: resolveUpdateBase(), currentVersion: app.getVersion(),
+    }),
+    'reflexion:updates:shell-apply': () => shellUpdates.applyDownloaded(),
+    'reflexion:updates:shell-discard': () => shellUpdates.discardDownloaded(),
+    // Separate from apply so the operator confirms the restart itself.
+    'reflexion:updates:relaunch': () => { app.relaunch(); app.exit(0); return { ok: true } },
+    'reflexion:updates:reload': () => {
+      // Reloading the window is how a promoted bundle takes effect: the web server re-resolves WEB_DIR.
+      WEB_DIR = bundleUpdates.activeWebDir(app.getPath('userData'), PACKAGED_WEB_DIR)
+      for (const win of BrowserWindow.getAllWindows()) win.reload()
+      return { ok: true }
+    },
   }
   for (const [channel, handler] of Object.entries(handlers)) {
     ipcMain.handle(channel, async (_event, options) => {
@@ -310,9 +363,25 @@ function registerNetworkIpc() {
   }
 }
 
-app.whenReady().then(() => {
-  API_BASE = resolveApiBase()
+app.whenReady().then(async () => {
+  const userDataDir = app.getPath('userData')
+  // BEFORE anything is served: if the last launch applied a bundle that never reported a successful boot,
+  // that bundle is broken. Undo it now, or the unit crash-loops in someone's home until an engineer visits.
+  await bundleUpdates.rollbackIfLastBootFailed(userDataDir)
+  WEB_DIR = bundleUpdates.activeWebDir(userDataDir, PACKAGED_WEB_DIR)
+  const runningBundle = bundleUpdates.currentBundle(userDataDir)
+  console.log(`[electron] serving ${runningBundle.embedded ? 'packaged bundle' : `OTA bundle ${runningBundle.version}`} from ${WEB_DIR}`)
+  await bundleUpdates.pruneBundles(userDataDir)
+  API_BASE = resolveApiBase(app.getPath('userData'))
   console.log(`[electron] backend proxied at http://127.0.0.1:${WEB_PORT}/api -> ${API_BASE}`)
+  // Printed so an installer can find where to drop the token on a unit with no file manager. Absence is a
+  // normal state, not an error: network setup and the self-check still run, only pairing needs the token.
+  for (const candidate of configPaths(app.getPath('userData'))) {
+    console.log(`[electron] device config: ${candidate}${fs.existsSync(candidate) ? ' (present)' : ''}`)
+  }
+  if (!resolveBootstrapToken(app.getPath('userData'))) {
+    console.log(`[electron] no bootstrap token yet — unit is unprovisioned; put "bootstrapToken" in ${systemConfigPath()}`)
+  }
   registerNetworkIpc()
   // The mirror is a controlled appliance and the daily check-in needs the microphone, so auto-grant
   // media capture rather than prompting an elder for permission.
