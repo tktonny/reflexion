@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 REFLEXION is a daily reassurance companion for Singaporean elderly: a smart-mirror device runs a short spoken daily check-in (Qwen omni realtime voice), a backend computes a deterministic reassurance status, and a caregiver app answers "is Mum okay today?". It is explicitly **not diagnostic** only advise — never surface a cognitive score or clinical wording only store in backend. Data flows one direction: Mirror raw signals → backend status engine → caregiver display. The mirror never computes status; the caregiver app never recomputes it.
 
+`README.md` at the repo root is the orientation for a human arriving cold (product, one-way data flow, packages, quickstarts). This file is the working notes — conventions plus the specific things that have bitten us.
+
 **Canonical reference: `docs/ARCHITECTURE-AND-API.md`** (three apps, all end-to-end flows, every v1 endpoint, full collection map, deployment topology). The legacy Python clinic platform now archived in `_archived/` (dead code, reference only).
 
 ## Repo layout
@@ -13,9 +15,10 @@ REFLEXION is a daily reassurance companion for Singaporean elderly: a smart-mirr
 Plain multi-package repo — **no root package.json, no workspaces, no Makefile**. Run every command from inside the specific package directory. The supported server Node.js runtime is Node 24.x; `.nvmrc` pins local/CI development to `24.18.0` because the server's exact `geoip-lite@2.0.3` dependency requires Node 24 or newer. Deployments must select the same Node line; no provider-specific deployment configuration is checked into this repository.
 
 - `reflexion-server/` — Express + TypeScript ESM + raw MongoDB driver (no ODM). The single backend for all clients. One `tsc` build serves multiple processes: HTTP API, outbox worker, scheduled jobs.
-- `mirror-app/` — Expo SDK 56 / RN Android smart-mirror app (`com.reflexion.mirror`), plus a Node relay under `server/` (web-dev diagnostic only) and a local Python wake-word training pipeline under `wakeword-training/`.
+- `mirror-app/` — Expo SDK 56 / RN smart-mirror app (`com.reflexion.mirror`) shipping to **Android APK and Ubuntu AppImage**; plus the Electron shell under `electron/`, a Node relay under `server/` (web dev + the Linux appliance) and a local Python wake-word training pipeline under `wakeword-training/`.
 - `caregiver-app/` — Expo/RN caregiver app (iOS + Android).
 - `admin-web/` — Vite + React operator SPA (patients onboarding, users, support threads), v1 API only.
+- `caregiver-web/` — a single 19 KB static `index.html` prototype of the caregiver UI. No build, no backend calls — a design reference, not a client. Don't mistake it for a fourth app.
 - `docs/` — canonical doc plus `operations/phase3-server-deployment.md` (deploy runbook), `reflexion-implementation-baseline.md` (frozen decisions + mirror→backend upload contract), `releases/` (production facts), `architecture/`, `mirror-app/`.
 - `hardware/SoundRecorder/` — the **system sound-recorder on the real Mirroh mirror hardware**, vendored here as AOSP platform sources (Soong `Android.bp`, `CleanSpec.mk`, `OWNERS`, `NOTICE`; 8 Java files under `src/com/android/soundrecorder/`). It is **stock, unmodified AOSP** `com.android.soundrecorder` (Google OWNER, zero Reflexion/Mirroh code) — a privileged system app that records to on-device files and registers the `MediaStore.RECORD_SOUND` intent. It is compiled into the **device system image** by the platform/AOSP build, not by any npm/Gradle flow in this repo, and there are no run/test commands for it here. **Not the check-in capture path**: the daily check-in streams realtime PCM through `mirror-app/modules/expo-pcm-audio` (16 kHz mono → Qwen), not this OS-level recorder — keep the two separate when reasoning about mic/audio behavior.
 
@@ -38,7 +41,9 @@ npm run db:indexes         # ensure Mongo indexes (part of release order)
 
 Release-order gate (from the runbook): `npm ci → typecheck → test → coverage → build → db:indexes`.
 
-Operational CLIs: `npm run bootstrap:admin -- --email=... --password=... --tenant=...` (first tenant admin), `npm run provision:device -- --serial=... --hardware=v1 --software=1.0.0` (mint per-device bootstrap token), `npm run migrate:legacy-v1`, `npm run smoke:deployment -- --base=<origin>`.
+Operational CLIs: `npm run bootstrap:admin -- --email=... --password=... --tenant=...` (first tenant admin), `npm run provision:device -- --serial=... --hardware=v1 --software=1.0.0` (mint per-device bootstrap token; also takes `--serial-hash=` when only the hash is known, `--device-id=` to re-issue an existing identity, `--display-name=` so a non-mirror unit isn't labelled "Reflexion Mirror", `--ttl-days=` because the 30-day default is too short for a test fleet), `npm run migrate:legacy-v1`, `npm run smoke:deployment -- --base=<origin>`.
+
+**A bootstrap token can only be minted where it will be used.** `bootstrapClaims()` verifies the signature *and* re-reads `devices` by `(did, serialHash)` on every call, so a token created against a local database with a local `JWT_SECRET` always 401s in production. Production tokens are minted by running `provision:device` **on the production server**. The script uses `tsx` on source and never touches `dist/`, so running it needs no rebuild and no `pm2 restart`.
 
 ### mirror-app
 
@@ -50,10 +55,20 @@ npm run test:turn-taking   # esbuild-bundle + node --test (only server/turn-taki
 npm run relay              # build src/orchestration bundle + start Node relay on :8787 (reads .env.server.local)
 node --env-file=.env.server.local server/smoke.mjs   # headless relay→Qwen check, no mic (more smoke-*.mjs alongside)
 cd android && ./gradlew assembleRelease              # signed release APK (fails by design without REFLEXION_MIRROR_* signing env/Keychain)
-npm run electron:build     # Linux (Ubuntu) app: web build wrapped in Electron → dist-linux/*.AppImage + *.deb (see docs/mirror-app/linux-electron.md)
+npm run test:network       # 82 node:test cases for electron/ (network, api proxy, setup portal, device config, OTA)
+npm run electron:build     # Linux (Ubuntu) app → dist-linux/*.AppImage (see docs/mirror-app/linux-electron.md)
+npm run electron:publish-update -- --version=YYYY.MM.DD-N   # build the OTA payload + manifest into dist-updates/
 ```
 
-The mirror ships on two platforms from one codebase: **Android** (native APK) and **Linux/Ubuntu** (Electron wrapping the `react-native-web` build — `electron/`, `web.output: single`). The Linux build is functionally lighter: `relay` transport + Web-Audio (no native PCM/wake-word/direct-WS), and the relay holds a Qwen key as appliance config. Full detail in `docs/mirror-app/linux-electron.md`.
+The mirror ships on two platforms from one codebase: **Android** (native APK) and **Linux/Ubuntu** (Electron wrapping the `react-native-web` build — `electron/`, `web.output: single`). The Linux build is functionally lighter: `relay` transport + Web-Audio (no native PCM/wake-word/direct-WS). It is **keyless** like Android — no Qwen key on the unit; the renderer mints a per-session ticket and hands it to the local relay. Full detail in `docs/mirror-app/linux-electron.md`.
+
+Three Linux-only rules that are easy to get wrong:
+
+- **The AppImage carries NO device identity.** `npm run electron:export` runs `scripts/export-linux.mjs`, which strips `EXPO_PUBLIC_DEVICE_BOOTSTRAP_TOKEN`, forces `--clear`, and **fails the build if a JWT is found in the output**. Both the strip and the `--clear` are load-bearing: passing an empty value on the command line does not beat `.env`, and inlined env is part of the Metro transform, so a cached export reproduces the token at the same bundle hash. The token is runtime config in `/etc/reflexion/device-config.json` (or `<userData>/…`, which is `~/.config/reflexion-mobile-mirror-interface-app/` — `productName` never reaches the packaged `package.json`).
+- **`expo-updates` does not work here** — it has no web implementation, so `Updates.isEnabled` is always `false` in Electron. Linux OTA is the shell's job: `electron/bundleUpdates.js` (renderer bundle, ~5 MB, routine) and `electron/shellUpdates.js` (whole AppImage, ~97 MB, rare). `src/lib/otaUpdates.ts` picks the right one, so one settings screen drives both. Manual trigger only, download and apply always separate, and a bundle that never reports a successful boot is rolled back on the next launch.
+- **Never spawn a system binary with the inherited env from an AppImage.** The AppImage runtime injects `LD_LIBRARY_PATH`/`XDG_DATA_DIRS` pointing inside the bundle, so `nmcli`/`bluetoothctl`/`unzip` load the bundle's libraries and fail — on real units only, never in dev or tests. Use `systemEnv()` from `electron/systemEnv.js`.
+
+`.deb` must be built **on Linux**: fpm on macOS silently emits a 96-byte broken `ar` archive that looks like a package.
 
 Wake-word retraining lives in `wakeword-training/` (own Python venv, fully local Apple-Silicon pipeline) — see its README; the custom "Hello Aria" model is already swapped into `assets/wakeword/wakeword.onnx`.
 
@@ -116,7 +131,7 @@ Aliyun ECS + BT-Panel + nginx. Two pm2 processes from one build: `reflexion-api`
 ## Critical constraints
 
 - **Secrets/env**: every package's `.env` is gitignored (`.env.example` is the template); the backend `.env` exists only on the prod server — it has been lost once, treat it carefully. `JWT_SECRET`, `PAIRING_PEPPER`, `CREDENTIAL_ENCRYPTION_KEY` must each be ≥32 chars or `requireServerSecret()` throws at runtime.
-- **`EXPO_PUBLIC_*` values are compiled into the APK.** Never put `QWEN_API_KEY`/`DASHSCOPE_API_KEY`/`MONGODB_URI` in a mobile `.env`; server-only keys go in `mirror-app/.env.server.local` (read only by the relay/smoke scripts via `node --env-file`). Each release APK embeds the API origin and a **per-device** bootstrap token — never share one bootstrap token across devices. A mirror build without `EXPO_PUBLIC_API_BASE` fails closed to unreachable `http://127.0.0.1:9`.
+- **`EXPO_PUBLIC_*` values are compiled into the APK.** Never put `QWEN_API_KEY`/`DASHSCOPE_API_KEY`/`MONGODB_URI` in a mobile `.env`; server-only keys go in `mirror-app/.env.server.local` (read only by the relay/smoke scripts via `node --env-file`). **Never share one bootstrap token across devices** — it is device-bound (`did` + `serialHash`), so two units holding the same token claim the same identity and knock each other's pairing over. On Android the token is embedded per APK or entered on screen (`app/test-device.tsx`); on Linux it is never embedded at all (see the mirror-app section). A mirror build without `EXPO_PUBLIC_API_BASE` fails closed to unreachable `http://127.0.0.1:9` — except on Linux, where the origin is resolved at runtime and the shell proxies `/api` same-origin.
 - **MongoDB must be a replica set** (single-node is fine for dev): pairing claim, credential exchange, and session completion use multi-document transactions.
 - **Debugging the backend usually means querying Mongo directly**: 4xx business errors (e.g. `EXCHANGE_TICKET_INVALID`) are returned but never logged — inspect `audit_events`, `outbox_events`, `idempotency_records`.
 - **caregiver-app invariants** (documented in-file, learned from crashes): the `AuthGate` in `app/_layout.tsx` must never re-gate whether `<Stack>` renders after first hydration (caused "Reflexion keeps stopping"). Legacy sign-in is primary and v1 login is best-effort by design — don't make v1 required. React Query is configured to never auto-refetch (`staleTime: Infinity`) — screens refetch explicitly via `useFocusEffect`/`invalidateQueries`. The two URL builders are incompatible: legacy `getApiUrl()` strips a leading `/api`, `getV1Url()` appends `/api/v1`.
