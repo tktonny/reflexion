@@ -12,3 +12,5 @@ pnpm-debug.log*
 # Release APKs (large, built locally)
 dist-apks/
 dist-linux/
+# Staged OTA payloads (bundle zips + AppImages) — rsynced to the update host, never committed
+dist-updates/

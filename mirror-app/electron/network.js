@@ -16,6 +16,8 @@
 
 const { execFile } = require('child_process')
 
+const { systemEnv } = require('./systemEnv')
+
 const NMCLI = 'nmcli'
 const BLUETOOTHCTL = 'bluetoothctl'
 const DEFAULT_TIMEOUT_MS = 20_000
@@ -36,7 +38,10 @@ const CONNECT_TIMEOUT_MS = 75_000
  */
 function run(command, args, { timeout = DEFAULT_TIMEOUT_MS, label = '' } = {}) {
   return new Promise((resolve) => {
-    execFile(command, args, { timeout, maxBuffer: 4 * 1024 * 1024 }, (error, stdout, stderr) => {
+    // `systemEnv()` strips the library/data paths the AppImage runtime injects. Without it nmcli and
+    // bluetoothctl resolve their libraries against the bundle instead of the OS and fail on a real Ubuntu
+    // unit — while working fine in dev and in tests. See electron/systemEnv.js.
+    execFile(command, args, { env: systemEnv(), timeout, maxBuffer: 4 * 1024 * 1024 }, (error, stdout, stderr) => {
       const failed = Boolean(error)
       // `label` falls back to the sub-command verb only (e.g. "device"), never a full argument list.
       if (failed) console.warn(`[network] ${command} ${label || args[0] || ''} -> ${String(stderr || error.message).trim()}`)

@@ -23,6 +23,30 @@ contextBridge.exposeInMainWorld('reflexionMirror', {
   apiProxy: true,
 })
 
+// The unit's identity, read at runtime from <userData>/device-config.json rather than compiled in — one
+// AppImage has to serve a whole fleet, and a bootstrap token is device-bound (see electron/deviceConfig.js).
+contextBridge.exposeInMainWorld('reflexionProvisioning', {
+  bootstrapToken: invoke('reflexion:provisioning:bootstrap-token'),
+})
+
+// OTA. expo-updates has no web implementation, so the Linux build cannot use the Android update path at all;
+// the shell does the work and the renderer drives it from the same settings screen. Two channels: the
+// renderer bundle (small, frequent) and the Electron shell itself (large, rare).
+contextBridge.exposeInMainWorld('reflexionUpdates', {
+  state: invoke('reflexion:updates:state'),
+  bundleCheck: invoke('reflexion:updates:bundle-check'),
+  bundleApply: invoke('reflexion:updates:bundle-apply'),
+  bundleRollback: invoke('reflexion:updates:bundle-rollback'),
+  shellCheck: invoke('reflexion:updates:shell-check'),
+  shellApply: invoke('reflexion:updates:shell-apply'),
+  shellDiscard: invoke('reflexion:updates:shell-discard'),
+  reload: invoke('reflexion:updates:reload'),
+  relaunch: invoke('reflexion:updates:relaunch'),
+  // Reports that this bundle actually rendered. The shell rolls back on the next launch without it, so it
+  // must be called unconditionally on boot — see src/lib/otaUpdates.ts.
+  markBooted: invoke('reflexion:updates:booted'),
+})
+
 contextBridge.exposeInMainWorld('reflexionNetwork', {
   capabilities: invoke('reflexion:network:capabilities'),
   status: invoke('reflexion:network:status'),

@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar'
 import { startDeviceHeartbeat, subscribeDeviceHeartbeat } from '../src/api/deviceHeartbeat'
 import { flushPendingConversations } from '../src/storage/conversationQueue'
 import { runHardwareChecks, runSpeakerProbe, speakerProbeIsStale } from '../src/lib/hardwareCheck'
+import { initOtaUpdates } from '../src/lib/otaUpdates'
 import { mirrorColors } from '../src/theme/mirrorTheme'
 
 export default function RootLayout() {
@@ -12,6 +13,11 @@ export default function RootLayout() {
   // real mirror reports its own hardware status at startup (no physical device needed to wire it).
   useEffect(() => {
     let stopHeartbeat: (() => void) | undefined
+    // FIRST, and deliberately not awaited by anything below: on the Ubuntu build this reports to the
+    // Electron shell that this bundle rendered. Without that signal the shell assumes a freshly applied OTA
+    // bundle is broken and rolls it back on the next launch — so it must not sit behind the hardware probe,
+    // which is slow, audible, and allowed to fail.
+    void initOtaUpdates()
     // Verify the speaker for REAL before reporting anything about it. This is the one moment we know the
     // audio device is idle (the wake-word listener and the conversation both come later), and it has to
     // run BEFORE runHardwareChecks so the report — which the heartbeat then captures for the whole

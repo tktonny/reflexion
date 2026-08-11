@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store'
 import { Platform } from 'react-native'
 
 import { getApiUrl } from '../config/apiUrl'
+import { readShellBootstrapToken } from '../native/shellProvisioning'
 import { validateBootstrapCredential } from '../orchestration/deviceBootstrap'
 import {
   ACTIVE_MIRROR_ID_STORAGE_KEY,
@@ -31,8 +32,12 @@ export type StoredDeviceCredential = {
 
 export async function getBootstrapCredential() {
   const stored = await secureGet(SECURE_BOOTSTRAP)
+  // The Linux appliance has no keyboard, so its token arrives as a file the operator drops in rather than
+  // as a compiled-in constant — see src/native/shellProvisioning.ts. Ordered AFTER `stored` so a unit that
+  // has already adopted a token keeps it, and BEFORE the build-time value so a file can correct a bad bake.
+  const fromShell = await readShellBootstrapToken()
   const configured = process.env.EXPO_PUBLIC_DEVICE_BOOTSTRAP_TOKEN?.trim()
-  for (const candidate of [stored, configured]) {
+  for (const candidate of [stored, fromShell, configured]) {
     if (!candidate) continue
     try {
       const { deviceId } = validateBootstrapCredential(candidate)
