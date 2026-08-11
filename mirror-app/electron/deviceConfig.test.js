@@ -4,7 +4,9 @@ const os = require('node:os')
 const path = require('node:path')
 const { test } = require('node:test')
 
-const { claimedDeviceId, readDeviceConfig, resolveApiBase, resolveBootstrapToken } = require('./deviceConfig')
+const {
+  claimedDeviceId, configPaths, readDeviceConfig, resolveApiBase, resolveBootstrapToken, systemConfigPath,
+} = require('./deviceConfig')
 const { DEFAULT_API_BASE } = require('./apiProxy')
 
 function scratch(contents) {
@@ -20,6 +22,9 @@ function fakeToken(did = 'dev_abc123') {
   return `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ did, kind: 'bootstrap' })}.c2lnbmF0dXJl`
 }
 
+// These assert on the userData location only. /etc/reflexion/device-config.json is also read (it is the
+// name-independent path an imaged unit uses) but is not writable from a test, so it is exercised through
+// configPaths/systemConfigPath rather than by planting a file.
 test('a missing config file is "no configuration", not a crash', () => {
   assert.deepEqual(readDeviceConfig(scratch()), {})
 })
@@ -31,6 +36,17 @@ test('a corrupt config file degrades instead of taking the appliance down', () =
 
 test('a config file that is valid JSON but not an object is ignored', () => {
   assert.deepEqual(readDeviceConfig(scratch('"just a string"')), {})
+})
+
+test('both config locations are searched, userData first', () => {
+  const dir = scratch()
+  assert.deepEqual(configPaths(dir), [path.join(dir, 'device-config.json'), '/etc/reflexion/device-config.json'])
+  assert.equal(systemConfigPath(), '/etc/reflexion/device-config.json')
+})
+
+test('the file a value came from is reported, so the startup log can name it', () => {
+  const dir = scratch(JSON.stringify({ bootstrapToken: fakeToken() }))
+  assert.equal(readDeviceConfig(dir).__source, path.join(dir, 'device-config.json'))
 })
 
 test('apiBase precedence: env beats file beats the production default', () => {

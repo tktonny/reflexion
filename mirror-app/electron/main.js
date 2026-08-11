@@ -26,7 +26,7 @@ const { spawn } = require('child_process')
 
 const network = require('./network')
 const { DEFAULT_API_BASE, createBackendProxy, isBackendPath } = require('./apiProxy')
-const { CONFIG_FILENAME, configPath, readDeviceConfig, resolveApiBase, resolveBootstrapToken } = require('./deviceConfig')
+const { configPath, configPaths, readDeviceConfig, resolveApiBase, resolveBootstrapToken, systemConfigPath } = require('./deviceConfig')
 const bundleUpdates = require('./bundleUpdates')
 const shellUpdates = require('./shellUpdates')
 const { DEFAULT_PORTAL_PORT, generatePin, startSetupPortal } = require('./setupPortal')
@@ -376,9 +376,11 @@ app.whenReady().then(async () => {
   console.log(`[electron] backend proxied at http://127.0.0.1:${WEB_PORT}/api -> ${API_BASE}`)
   // Printed so an installer can find where to drop the token on a unit with no file manager. Absence is a
   // normal state, not an error: network setup and the self-check still run, only pairing needs the token.
-  console.log(`[electron] device config: ${configPath(app.getPath('userData'))} (${CONFIG_FILENAME})`)
+  for (const candidate of configPaths(app.getPath('userData'))) {
+    console.log(`[electron] device config: ${candidate}${fs.existsSync(candidate) ? ' (present)' : ''}`)
+  }
   if (!resolveBootstrapToken(app.getPath('userData'))) {
-    console.log('[electron] no bootstrap token yet — unit is unprovisioned; set bootstrapToken in the file above')
+    console.log(`[electron] no bootstrap token yet — unit is unprovisioned; put "bootstrapToken" in ${systemConfigPath()}`)
   }
   registerNetworkIpc()
   // The mirror is a controlled appliance and the daily check-in needs the microphone, so auto-grant

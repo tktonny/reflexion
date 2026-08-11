@@ -126,17 +126,33 @@ cd /www/wwwroot/reflexion/reflexion-server
 npm run provision:device -- --serial=<the unit's hardware serial> --hardware=ubuntu-v1
 ```
 
-Then drop the token on the unit — `<userData>` is `~/.config/Reflexion Mirror/`, printed at startup:
+Then drop the token on the unit. **Use `/etc/reflexion/device-config.json`:**
 
-```json
-// ~/.config/Reflexion Mirror/device-config.json
+```bash
+sudo install -d -m 755 /etc/reflexion
+sudo tee /etc/reflexion/device-config.json >/dev/null <<'JSON'
 {
   "apiBase": "https://reflexion.production.tktonny.top",
-  "bootstrapToken": "eyJhbGciOiJIUzI1NiI..."
+  "bootstrapToken": "PASTE_THE_TOKEN_HERE"
 }
+JSON
+sudo chmod 600 /etc/reflexion/device-config.json   # it is a credential
 ```
 
-Restarting the app is enough; nothing is rebuilt. `REFLEXION_BOOTSTRAP_TOKEN` in the launch environment overrides the file, which is the convenient path for a bench test.
+Restart the app — nothing is rebuilt. Both config locations are printed at startup, with `(present)` next to any that exists.
+
+Two locations are read, in this order:
+
+| Location | Use |
+|---|---|
+| `<userData>/device-config.json` | per-user override. `<userData>` is `~/.config/reflexion-mobile-mirror-interface-app/` — derived from the npm package name, so awkward to type and it moves if the package is ever renamed |
+| `/etc/reflexion/device-config.json` | **the normal one.** Short, root-owned, what you bake into a disk image, and independent of the app's name |
+
+`REFLEXION_BOOTSTRAP_TOKEN` in the launch environment overrides both — the convenient path for a bench test:
+
+```bash
+REFLEXION_BOOTSTRAP_TOKEN=eyJ... ./"Reflexion Mirror-1.0.0.AppImage"
+```
 
 A malformed token is rejected **at startup** with a log line naming its source, rather than surfacing later as an opaque 401 during pairing — the check is a JWT shape check only (the shell cannot verify a signature). An unprovisioned unit is a **normal state**: network setup, the hardware self-check and the update channels all work without a token; only pairing needs one.
 

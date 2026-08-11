@@ -24,8 +24,23 @@ const { DEFAULT_API_BASE, normalizeBase } = require('./apiProxy')
 
 const CONFIG_FILENAME = 'device-config.json'
 
+// The second, name-independent location. Electron's <userData> is derived from the app's name, so the real
+// path is `~/.config/reflexion-mobile-mirror-interface-app/` — awkward to type on every unit, tied to the
+// npm package name, and per-user. `/etc/reflexion/` is where appliance configuration belongs on Linux: it is
+// short, it is what you bake into a disk image, and it survives the app being renamed. Both are read.
+const SYSTEM_CONFIG_DIR = '/etc/reflexion'
+
 function configPath(userDataDir) {
   return path.join(userDataDir, CONFIG_FILENAME)
+}
+
+function systemConfigPath() {
+  return path.join(SYSTEM_CONFIG_DIR, CONFIG_FILENAME)
+}
+
+/** Both places a unit may be configured from, in precedence order. */
+function configPaths(userDataDir) {
+  return [configPath(userDataDir), systemConfigPath()]
 }
 
 /**
@@ -34,15 +49,19 @@ function configPath(userDataDir) {
  * leave a mirror in a home with a black screen.
  */
 function readDeviceConfig(userDataDir) {
-  const file = configPath(userDataDir)
-  try {
-    if (!fs.existsSync(file)) return {}
-    const parsed = JSON.parse(fs.readFileSync(file, 'utf8'))
-    return parsed && typeof parsed === 'object' ? parsed : {}
-  } catch (error) {
-    console.warn(`[electron] ignoring unreadable ${CONFIG_FILENAME}: ${error.message}`)
-    return {}
+  for (const file of configPaths(userDataDir)) {
+    try {
+      if (!fs.existsSync(file)) continue
+      const parsed = JSON.parse(fs.readFileSync(file, 'utf8'))
+      if (parsed && typeof parsed === 'object') return { ...parsed, __source: file }
+      console.warn(`[electron] ignoring ${file}: not a JSON object`)
+    } catch (error) {
+      // A stray comma must not take the appliance down — a mirror in a home would just show a black screen.
+      // Keep looking: the other location may still hold a usable file.
+      console.warn(`[electron] ignoring unreadable ${file}: ${error.message}`)
+    }
   }
+  return {}
 }
 
 /**
@@ -81,9 +100,10 @@ function claimedDeviceId(token) {
  * Precedence: launch env -> config file. Never a build-time constant: nothing device-bound is compiled in.
  */
 function resolveBootstrapToken(userDataDir, env = process.env) {
+  const config = readDeviceConfig(userDataDir)
   const candidates = [
     ['REFLEXION_BOOTSTRAP_TOKEN', env.REFLEXION_BOOTSTRAP_TOKEN],
-    [CONFIG_FILENAME, readDeviceConfig(userDataDir).bootstrapToken],
+    [config.__source || CONFIG_FILENAME, config.bootstrapToken],
   ]
   for (const [source, value] of candidates) {
     if (typeof value !== 'string' || !value.trim()) continue
@@ -101,9 +121,12 @@ function resolveBootstrapToken(userDataDir, env = process.env) {
 
 module.exports = {
   CONFIG_FILENAME,
+  SYSTEM_CONFIG_DIR,
   claimedDeviceId,
   configPath,
+  configPaths,
   readDeviceConfig,
   resolveApiBase,
   resolveBootstrapToken,
+  systemConfigPath,
 }
